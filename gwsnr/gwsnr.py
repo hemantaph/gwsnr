@@ -306,8 +306,8 @@ class GWSNR():
         halfSNR_interpolator = self.halfSNR
         
         A1 = Mc**(5./6.)
-        ci_2 = np.cos(iota)**2
-        ci_param = ((1+np.cos(iota)**2)/2)**2
+        ci_2 = np.cos(theta_jn)**2
+        ci_param = ((1+np.cos(theta_jn)**2)/2)**2
         detectors = self.list_of_detectors
         
         opt_snr = {'opt_snr_net': 0}
@@ -318,13 +318,16 @@ class GWSNR():
         #self.idx_ratio = idx_ratio 
         # loop wrt detectors
         for i in range(len(detectors)):
+            det = detectors[i]
             # calculation of snr_half_scaled for particular detector at the required mtot
             for j in idx_tracker:
                 snr_half_scaled[j] = halfSNR_interpolator[idx_ratio[j],i](mtot[j]) # i is iterator wrt detectors
-
-            Fp = self.ifos[i].antenna_response(ra, dec, geocent_time, psi, 'plus')
-            Fc = self.ifos[i].antenna_response(ra, dec, geocent_time, psi, 'cross')
-            Deff1 = luminosity_distance/np.sqrt( Fp**2*ci_param + Fc**2*ci_2 )
+            
+            Deff1 = np.zeros(size)
+            for k in range(len(ra)):
+                Fp = self.ifos[i].antenna_response(ra[k], dec[k], geocent_time[k], psi[k], 'plus')
+                Fc = self.ifos[i].antenna_response(ra[k], dec[k], geocent_time[k], psi[k], 'cross')
+                Deff1[k] = luminosity_distance[k]/np.sqrt( Fp**2*ci_param[k] + Fc**2*ci_2[k] )
 
             opt_snr[det] = (A1/Deff1)*snr_half_scaled
             opt_snr['opt_snr_net'] += opt_snr[det]**2
@@ -419,14 +422,14 @@ class GWSNR():
 
             A2 = mchirp**(5./6.)
             ######## filling in interpolation table for different detectors ########
-            j = 0
-            for det in detectors:
-                Fp, Fc = Detector(det).antenna_pattern(ra_, dec_, psi_, geocent_time_)
+            for j in range(len(detectors)):
+                Fp = self.ifos[j].antenna_response(ra_, dec_, geocent_time_, psi_, 'plus')
+                Fc = self.ifos[j].antenna_response(ra_, dec_, geocent_time_, psi_, 'cross')
                 Deff2 = luminosity_distance_/np.sqrt(Fp**2*((1+np.cos(iota_)**2)/2)**2+Fc**2*np.cos(iota_)**2 )
 
-                snrHalf_[i,j] = interp1d( mtot_table, (Deff2/A2)*opt_snr_unscaled[det], kind = 'cubic')
-                j+=1
-            i+=1
+                snrHalf_[i,j] = interp1d( mtot_table, (Deff2/A2)*opt_snr_unscaled[detectors[j]], kind = 'cubic')
+                
+            i+=1 # iterator over mass_ratio
             
         # 2D array size: n_detectors X nsamples np.concatenate((a, b), axis=0)
         # snrHalf_det['mtot'] = mtot_table
@@ -756,11 +759,12 @@ class GWSNR():
             
         SNRs_list = []
         NetSNR      = 0.
+        # detectors = self.list_of_detectors
         list_of_detectors = params[15:].tolist()
         psds_arrays = params[14]
-        for ifo in list_of_detectors:
+        for i in range(len(list_of_detectors)):
             # need to compute the inner product for
-            p_array = psds_arrays[ifo].get_power_spectral_density_array(f_array)[idx]
+            p_array = psds_arrays[list_of_detectors[i]].get_power_spectral_density_array(f_array)[idx]
             idx2 = (p_array!=0.) & (p_array!=np.inf)
             hp_inner_hp = bilby.gw.utils.noise_weighted_inner_product(h_plus[idx2],
                                                                            h_plus[idx2],
@@ -771,7 +775,8 @@ class GWSNR():
                                                                            p_array[idx2],
                                                                            waveform_generator.duration)
             # make an ifo object to get the antenna pattern
-            Fp, Fc = Detector(ifo).antenna_pattern(parameters['ra'],parameters['dec'],parameters['psi'],parameters['geocent_time'])
+            Fp = self.ifos[i].antenna_response(parameters['ra'],parameters['dec'], parameters['geocent_time'], parameters['psi'], 'plus')
+            Fc = self.ifos[i].antenna_response(parameters['ra'],parameters['dec'], parameters['geocent_time'], parameters['psi'], 'cross')
 
             snrs_sq = abs((Fp**2)*hp_inner_hp + (Fc**2)*hc_inner_hc)
 
@@ -828,9 +833,9 @@ class GWSNR():
         NetSNR      = 0.
         list_of_detectors = params[15:].tolist()
         psds_arrays = params[14]
-        for ifo in list_of_detectors:
+        for i in range(len(list_of_detectors)):
             # need to compute the inner product for
-            p_array = psds_arrays[ifo].get_power_spectral_density_array(waveform_generator.frequency_array)
+            p_array = psds_arrays[list_of_detectors[i]].get_power_spectral_density_array(waveform_generator.frequency_array)
             idx2 = (p_array!=0.) & (p_array!=np.inf)
             hp_inner_hp = bilby.gw.utils.noise_weighted_inner_product(polas['plus'][idx2],
                                                                            polas['plus'][idx2],
@@ -841,7 +846,8 @@ class GWSNR():
                                                                            p_array[idx2],
                                                                            waveform_generator.duration)
             # make an ifo object to get the antenna pattern
-            Fp, Fc = Detector(ifo).antenna_pattern(parameters['ra'],parameters['dec'],parameters['psi'],parameters['geocent_time'])
+            Fp = self.ifos[i].antenna_response(parameters['ra'],parameters['dec'], parameters['geocent_time'], parameters['psi'], 'plus')
+            Fc = self.ifos[i].antenna_response(parameters['ra'],parameters['dec'], parameters['geocent_time'], parameters['psi'], 'cross')
 
             snrs_sq = abs((Fp**2)*hp_inner_hp + (Fc**2)*hc_inner_hc)
 
