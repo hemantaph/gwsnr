@@ -43,10 +43,10 @@ class GWSNR():
     #             Class initialization                 #
     #                                                  #
     ####################################################
-    def __init__(self, npool=int(4), mtot_min=2., mtot_max=439.6, nsamples_mtot=100, nsamples_mass_ratio=50, \
-                 sampling_frequency=4096.,\
-                 waveform_approximant = 'IMRPhenomD', minimum_frequency = 20., \
-                 snr_type = 'interpolation', waveform_inspiral_must_be_above_fmin=False, psds=False, psd_file=False):
+    def __init__(self, npool=int(4), mtot_min=2., mtot_max=439.6, nsamples_mtot=100, nsamples_mass_ratio=50, 
+                 sampling_frequency=4096., waveform_approximant = 'IMRPhenomD', minimum_frequency = 20., 
+                 snr_type = 'interpolation', waveform_inspiral_must_be_above_fmin=False, psds=False, psd_file=False,
+                ifos=False):
         
         '''
         Initialized parameters and functions
@@ -99,22 +99,35 @@ class GWSNR():
         
         if psds==False:
             print("psds not given. Choosing bilby's default psds")
-            self.psds_default = True
             psds = dict()
             psds['L1'] = 'aLIGO_O4_high_asd.txt'
             psds['H1'] = 'aLIGO_O4_high_asd.txt'
             psds['V1'] = 'AdV_asd.txt'
             self.psds = psds
+            self.psd_file = False # or [False,False,False]
             self.list_of_detectors    = list(psds.keys())
-        else:
-            self.psds_default = False
-            self.list_of_detectors    = list(psds.keys())
+            # for Fp, Fc calculation
+            self.ifos = bilby.gw.detector.InterferometerList(self.list_of_detectors)
             print("given psds: ",psds)
+        else:
             self.psds = psds
+            self.list_of_detectors    = list(psds.keys())
+            # for Fp, Fc calculation
+            ifos_ = [] 
+            len_ = len(self.list_of_detectors)
+            for i in range(len_):
+                try:
+                    if ifos[i]:
+                        ifos_.append(ifos[i])
+                    else:
+                        ifos_.append(bilby.gw.detector.InterferometerList([self.list_of_detectors[i]])[0])
+                except:
+                    ifos_.append(bilby.gw.detector.InterferometerList([self.list_of_detectors[i]])[0])
+                    
+            self.ifos = ifos_
+            print("given psds: ",psds)
         
-        # for Fp, Fc calculation
-        self.ifos = ifos = bilby.gw.detector.InterferometerList(self.list_of_detectors)
-            
+        # dealing with interpolator
         if snr_type == 'interpolation':
             
             # creating interpolator_pickle directory to store scipy inter
@@ -127,13 +140,13 @@ class GWSNR():
                         
             # check existing interpolators
             param_dict_stored = pickle.load(open("./interpolator_pickle/param_dict_list.pickle", "rb"))
-            param_dict_given = {'mtot_min':mtot_min, 'mtot_max':mtot_max, 'nsamples_mtot':nsamples_mtot,\
-                                 'nsamples_mass_ratio':nsamples_mass_ratio, \
-                                 'sampling_frequency':sampling_frequency, \
-                                 'waveform_approximant':waveform_approximant,\
-                                 'minimum_frequency':minimum_frequency, \
-                                 'waveform_inspiral_must_be_above_fmin':waveform_inspiral_must_be_above_fmin,\
-                                 'psds':psds ,'detector_list': self.list_of_detectors}
+            param_dict_given = {'mtot_min': mtot_min, 'mtot_max': mtot_max, 'nsamples_mtot': nsamples_mtot,\
+                                 'nsamples_mass_ratio': nsamples_mass_ratio, \
+                                 'sampling_frequency': sampling_frequency, \
+                                 'waveform_approximant': waveform_approximant,\
+                                 'minimum_frequency': minimum_frequency, \
+                                 'waveform_inspiral_must_be_above_fmin': waveform_inspiral_must_be_above_fmin,\
+                                 'psds': psds , 'psd_file':psd_file, 'detector_list': self.list_of_detectors}
             
             # checking for existing gwsnr interpolator or generate it
             len_ = len(param_dict_stored)
@@ -170,7 +183,6 @@ class GWSNR():
                     pickle.dump(param_dict_stored, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 print("interpolator stored as {}.".format(path_interpolator))
                 print("In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {}".format(path_interpolator))
-        
         
 
     ####################################################
@@ -473,6 +485,7 @@ class GWSNR():
                                psds={'L1':'aLIGO_O4_high_asd.txt','H1':'aLIGO_O4_high_asd.txt'}
                                custom created txt file has two columns. 1st column: frequency array, 2nd column: strain 
         psd_file             : if set True, the given value of psds param should be of psds instead of asd. If asd, set psd_file=False.
+                               e.g. if psd is {'L1':'aLIGO_O4_high_asd.txt','H1':'aLIGO_early_high_psd.txt'}, then psd_file = [False,True].
         psd_with_time        : gps end time end strain data for which psd will be found. (this param will be given highest priority)
                                example=> psd_with_time=1246527224.169434
         
@@ -489,27 +502,30 @@ class GWSNR():
         geocent_time_ = 1246527224.169434 # random time from O3
         sampling_frequency = self.sampling_frequency
         if psds==False:
+            # if psds are not given at the method level get what whatever that was initialized at the class level
             detectors = self.list_of_detectors
+            psd_file = self.psd_file
+            psds = self.psds.copy()
         else:
-            # if psds are given
+            # if psds are given at the method level
             detectors = list(psds.keys())
         approximant = self.waveform_approximant
         f_min = self.f_min
+        psd_file = (np.array([psd_file]).reshape(-1)*np.ones(len(detectors))).astype('bool')
         
         ################
         # psd handling #
         ################
         # if psds information is not manually given, we will use the one provided in bilby for O3 sensitivity
         psds_arrays = dict()
-        psds_ = dict()
         #######################################
-        # more realistic psds
+        # more realistic psds from averaging a segment of gwosc data
         # psd calculation from gps time point 
         # add exception handling for unrecognised time
         if psd_with_time!=False:
             print('wait for sometime while psd data is being fetch...')
             # Use gwpy to fetch the open data
-            duration = 4.
+            duration = 16.
             roll_off = 0.2
             psd_duration = duration * 32. # uint (seconds)
             psd_start_time = psd_with_time - psd_duration
@@ -522,84 +538,27 @@ class GWSNR():
             
                 psds_arrays[ifo] = bilby.gw.detector.PowerSpectralDensity(frequency_array=det_psd.frequencies.value, \
                                                                           psd_array=det_psd.value)
-                
-        elif psds==False and self.psds_default==True:
-            psds = self.psds
+        # get psd with psd name or with txt file
+        else:
+            i = 0 # iterator
             for det in detectors:
-                try:
-                    psds_[det] = psds[det]
-                except KeyError:
-                    print('psd for {} detector not provided. The parameter psds dict should be contain, chosen detector names as keys \
-                    and corresponding psds txt file name as their values'.format(det))
-
-            # psd or asd txt file has two columns. 1st column: frequency array, 2nd column: strain            
-            for key in psds_:
-                psds_arrays[key] = bilby.gw.detector.PowerSpectralDensity(asd_file = psds_[key])
-                
-
-        else: 
-            if psds==False:
-                psds = self.psds
-            check_dtype = list(psds.values())[0]
-            ######################
-            # if psds dict is provided with txt file name corresponding to name of detectors as keys, 
-            # psd or asd txt file has two columns. 1st column: frequency array, 2nd column: strain 
-            if type(check_dtype)==str and check_dtype[-3:]=='txt':
-                for det in detectors:
-                    try:
-                        psds_[det] = psds[det]
-                    except KeyError:
-                        print('psd for {} detector not provided. The parameter psds dict should be contain, chosen detector names as keys \
-                        and corresponding psds txt file name as their values'.format(det))
+                # either provided psd or what's available in bilby
+                if type(psds[det])==str and psds[det][-3:]=='txt':
+                    if psd_file[i]:
+                        psds_arrays[det] = self.power_spectral_density(psds[det])
+                    else:
+                        psds_arrays[det] = self.amplitude_spectral_density(psds[det])
                     
-                # pushing the chosen psds to bilby's PowerSpectralDensity object
-                psd_file = self.psd_file
-                if psd_file:
-                    if verbose==True:
-                        print('the noise curve provided is psd type and not asd. If not, please set the psd_file=False')
-                    for key in psds_:
-                        psds_arrays[key] = bilby.gw.detector.PowerSpectralDensity(psd_file = psds[key])
+                # name string should be avaible in the list of psds in pycbc
+                elif type(psds[det])==str:
+                    psds_arrays[det] = self.power_spectral_density_pycbc(psds[det])
+            
                 else:
-                    if verbose==True:
-                        print('the noise curve provided is asd type and not psd. If not, please set the psd_file=True')
-                    for key in psds_:
-                        psds_arrays[key] = bilby.gw.detector.PowerSpectralDensity(asd_file = psds[key])
-            ######################      
-            # if psds dict is provided with txt file name corresponding to name of detectors as keys, 
-            # we will use the one provided in bilby for O3 sensitivity
-            # this txt file should contain frequency and psd information
-            elif type(check_dtype)==str:
-                delta_f = 1.0 / 16.
-                flen = int(self.sampling_frequency / delta_f)
-                low_frequency_cutoff = self.f_min
-
-                for det in detectors:
-                    try:
-                        psds_[det] = pycbc.psd.from_string(psds[det], flen, delta_f, low_frequency_cutoff)
-                    except KeyError:
-                        print('psd for {} detector not provided or psd name provided is not recognised by pycbc'.format(det))
-                    
-                # pushing the chosen psds to bilby's PowerSpectralDensity object
-                if psd_file:
-                    if verbose==True:
-                        print('the noise curve provided is psd type and not asd. If not, please set the psd_file=False')
-                    for key in psds_:
-                        psds_arrays[key] = bilby.gw.detector.PowerSpectralDensity(frequency_array=psds_[det].sample_frequencies, \
-                                                                                  psd_array=psds_[det].data)
-                else:
-                    if verbose==True:
-                        print('the noise curve provided is asd type and not psd. If not, please set the psd_file=True')
-                    for key in psds_:
-                        psds_arrays[key] = bilby.gw.detector.PowerSpectralDensity(frequency_array=psds_[det].sample_frequencies, \
-                                                                                  asd_array=psds_[det].data)
-                
-            ######################
-            else:
-                raise Exception("the psds format is not recognised. The parameter psds dict should contain chosen detector names as keys \
-                        and corresponding psds txt file name (or name from pycbc psd)as their values'")
+                    raise Exception("the psds format is not recognised. The parameter psds dict should contain chosen detector names as keys \
+                            and corresponding psds txt file name (or name from pycbc psd)as their values'")
+                i+=1 # iterator wrt detectors
 
         #######################################        
-
         # check whether there is input for geocent_time
         if not np.array(geocent_time).tolist():
             geocent_time = geocent_time_
@@ -703,9 +662,44 @@ class GWSNR():
         # how to load data form .json file
         # f = open ('data.json', "r")
         # data = json.loads(f.read())
-        
-        
         return(SNRs_dict)
+    
+    ####################################################
+    #                                                  #
+    #            psd array finder from bilby           #
+    #                                                  #
+    ####################################################
+    def power_spectral_density(self, psd):
+        """
+        psd array finder from bilby
+        """
+        return(bilby.gw.detector.PowerSpectralDensity(psd_file = psd))
+
+    ####################################################
+    #                                                  #
+    #            asd array finder from bilby           #
+    #                                                  #
+    ####################################################
+    def amplitude_spectral_density(self, asd):
+        """
+        asd array finder from bilby
+        """
+        return(bilby.gw.detector.PowerSpectralDensity(asd_file = asd))
+    
+    ####################################################
+    #                                                  #
+    #            psd array finder from pycbc           #
+    #                                                  #
+    ####################################################
+    def power_spectral_density_pycbc(self, psd):
+        """
+        psd array finder from pycbc
+        """
+        delta_f = 1.0 / 16.
+        flen = int(self.sampling_frequency / delta_f)
+        low_frequency_cutoff = self.f_min
+        psd_ = pycbc.psd.from_string(psd, flen, delta_f, low_frequency_cutoff)
+        return(bilby.gw.detector.PowerSpectralDensity(frequency_array=psd_.sample_frequencies, psd_array=psd_.data))
     
     ####################################################
     #                                                  #
