@@ -367,6 +367,45 @@ class GWSNR():
     #   half_snr vs mtot table for interpolation       #
     #                                                  #
     ####################################################
+    def bns_horizon(self, snr_threshold=8.):
+
+        detectors = self.list_of_detectors
+
+        C = 299792458.
+        G = 6.67408*1e-11
+        Mo = 1.989*1e30
+        f_min = self.f_min
+
+        # geocent_time cannot be array here
+        # this geocent_time is only to get halfScaledSNR
+        geocent_time_ = 1246527224.169434 # random time from O3
+    
+        iota_, ra_, dec_, psi_, phase_ = 0.,0.,0.,0.,0.
+        luminosity_distance_ = 100.
+        q = 1.
+        mass_1_ = 1.4
+        mass_2_ = mass_1_*q
+        
+        ######## calling bilby_snr ########
+        opt_snr_unscaled = self.compute_bilby_snr_(mass_1=mass_1_, mass_2=mass_2_, luminosity_distance=luminosity_distance_, \
+                                                theta_jn=iota_, psi=psi_, ra=ra_, dec=dec_,verbose=False, jsonFile=False)  
+
+        ######## filling in interpolation table for different detectors ########
+        horizon = np.zeros(len(detectors))
+        for j in range(len(detectors)):
+            Fp = self.ifos[j].antenna_response(ra_, dec_, geocent_time_, psi_, 'plus')
+            Fc = self.ifos[j].antenna_response(ra_, dec_, geocent_time_, psi_, 'cross')
+            Deff2 = luminosity_distance_/np.sqrt(Fp**2*((1+np.cos(iota_)**2)/2)**2+Fc**2*np.cos(iota_)**2 )
+
+            horizon[j] = (Deff2/snr_threshold)*opt_snr_unscaled[detectors[j]]
+
+        return(horizon)
+        
+    ####################################################
+    #                                                  #
+    #   half_snr vs mtot table for interpolation       #
+    #                                                  #
+    ####################################################
     def __init_halfScaled(self):
         '''
         Function for finding (f/PSD) integration in the limit [f_min,f_max]
@@ -622,7 +661,7 @@ class GWSNR():
             with Pool(processes=npool) as pool:
                 # call the same function with different data in parallel
                 # imap->retain order in the list, while map->doesn't
-                for result in tqdm(pool.imap(self.snr_with_fmax_cutoff,input_arguments),total=len(input_arguments), \
+                for result in tqdm(pool.imap_unordered(self.snr_with_fmax_cutoff,input_arguments),total=len(input_arguments), \
                                    ncols= 100, disable=not verbose):
                     iter_.append(result[1])
                     SNRs_list.append(result[0])
@@ -630,7 +669,7 @@ class GWSNR():
             with Pool(processes=npool) as pool:
                 # call the same function with different data in parallel
                 # imap->retain order in the list, while map->doesn't
-                for result in tqdm(pool.imap(self.noise_weighted_inner_prod,input_arguments),total=len(input_arguments), \
+                for result in tqdm(pool.imap_unordered(self.noise_weighted_inner_prod,input_arguments),total=len(input_arguments), \
                                    ncols= 100, disable=not verbose):  
                     iter_.append(result[1])
                     SNRs_list.append(result[0])
