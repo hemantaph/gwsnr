@@ -46,7 +46,7 @@ class GWSNR():
     def __init__(self, npool=int(4), mtot_min=2., mtot_max=439.6, nsamples_mtot=100, nsamples_mass_ratio=50, 
                  sampling_frequency=4096., waveform_approximant = 'IMRPhenomD', minimum_frequency = 20., 
                  snr_type = 'interpolation', waveform_inspiral_must_be_above_fmin=False, psds=False, psd_file=False,
-                ifos=False):
+                ifos=False, interpolator_dir='./interpolator_pickle'):
         
         '''
         Initialized parameters and functions
@@ -131,7 +131,7 @@ class GWSNR():
         if snr_type == 'interpolation':
             
             # creating interpolator_pickle directory to store scipy inter
-            path = './interpolator_pickle'
+            path = interpolator_dir
             if not os.path.exists(path):
                 os.makedirs(path)
                 dict_list = []
@@ -139,7 +139,7 @@ class GWSNR():
                     pickle.dump(dict_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
                         
             # check existing interpolators
-            param_dict_stored = pickle.load(open("./interpolator_pickle/param_dict_list.pickle", "rb"))
+            param_dict_stored = pickle.load(open(path+'/param_dict_list.pickle', "rb"))
             param_dict_given = {'mtot_min': mtot_min, 'mtot_max': mtot_max, 'nsamples_mtot': nsamples_mtot,\
                                  'nsamples_mass_ratio': nsamples_mass_ratio, \
                                  'sampling_frequency': sampling_frequency, \
@@ -179,7 +179,7 @@ class GWSNR():
                     pickle.dump(self.halfSNR, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
                 param_dict_stored.append(param_dict_given)
-                with open("./interpolator_pickle/param_dict_list.pickle", 'wb') as handle:
+                with open(path+'/param_dict_list.pickle', 'wb') as handle:
                     pickle.dump(param_dict_stored, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 print("interpolator stored as {}.".format(path_interpolator))
                 print("In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {}".format(path_interpolator))
