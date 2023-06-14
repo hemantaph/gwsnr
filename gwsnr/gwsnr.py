@@ -16,7 +16,6 @@ from scipy.optimize import fsolve
 from multiprocessing import Pool
 import pycbc.psd
 from tqdm import tqdm
-import warnings
 import json
 import os
 import pickle
@@ -44,9 +43,9 @@ class GWSNR():
     #                                                  #
     ####################################################
     def __init__(self, npool=int(4), mtot_min=2., mtot_max=439.6, nsamples_mtot=100, nsamples_mass_ratio=50, 
-                 sampling_frequency=4096., waveform_approximant = 'IMRPhenomD', minimum_frequency = 20., 
-                 snr_type = 'interpolation', waveform_inspiral_must_be_above_fmin=False, psds=False, psd_file=False,
-                ifos=False, interpolator_dir='./interpolator_pickle'):
+                 sampling_frequency=2048., waveform_approximant = 'IMRPhenomD', minimum_frequency = 20., 
+                 snr_type = 'interpolation', waveform_inspiral_must_be_above_fmin=False, psds=None, psd_file=False,
+                ifos=None, interpolator_dir='./interpolator_pickle'):
         
         '''
         Initialized parameters and functions
@@ -90,100 +89,148 @@ class GWSNR():
         self.waveform_type        = self.waveform_classifier(waveform_approximant)
         self.snr_type             = snr_type
         self.waveform_inspiral_must_be_above_fmin = waveform_inspiral_must_be_above_fmin
-        self.psd_file             = psd_file
         
-        # pre-initialized half scaled snr with search sort
-        # self.halfSNR values are initialized
-        #print('waveform_type=',self.waveform_type)
-        
-        
-        if psds==False:
+        if not psds:
             print("psds not given. Choosing bilby's default psds")
             psds = dict()
             psds['L1'] = 'aLIGO_O4_high_asd.txt'
             psds['H1'] = 'aLIGO_O4_high_asd.txt'
             psds['V1'] = 'AdV_asd.txt'
             self.psds = psds
-            self.psd_file = False # or [False,False,False]
-            self.list_of_detectors    = list(psds.keys())
+            list_of_detectors    = list(psds.keys())
             # for Fp, Fc calculation
-            self.ifos = bilby.gw.detector.InterferometerList(self.list_of_detectors)
-            print("given psds: ",psds)
+            self.ifos = bilby.gw.detector.InterferometerList(list_of_detectors)
         else:
             self.psds = psds
-            self.list_of_detectors    = list(psds.keys())
+            list_of_detectors    = list(psds.keys())
             # for Fp, Fc calculation
             ifos_ = [] 
-            len_ = len(self.list_of_detectors)
+            len_ = len(list_of_detectors)
             for i in range(len_):
                 try:
                     if ifos[i]:
                         ifos_.append(ifos[i])
                     else:
-                        ifos_.append(bilby.gw.detector.InterferometerList([self.list_of_detectors[i]])[0])
+                        ifos_.append(bilby.gw.detector.InterferometerList([list_of_detectors[i]])[0])
                 except:
-                    ifos_.append(bilby.gw.detector.InterferometerList([self.list_of_detectors[i]])[0])
+                    ifos_.append(bilby.gw.detector.InterferometerList([list_of_detectors[i]])[0])
                     
             self.ifos = ifos_
-            print("given psds: ",psds)
-        
+        print("given psds: ",psds)
+        self.psd_file = (np.array([psd_file]).reshape(-1)*np.ones(len(list_of_detectors))).astype('bool')
+
         # dealing with interpolator
         if snr_type == 'interpolation':
-            
-            # creating interpolator_pickle directory to store scipy inter
-            path = interpolator_dir
-            if not os.path.exists(path):
-                os.makedirs(path)
-                dict_list = []
-                with open(path+'/param_dict_list.pickle', 'wb') as handle:
-                    pickle.dump(dict_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
-                        
-            # check existing interpolators
-            param_dict_stored = pickle.load(open(path+'/param_dict_list.pickle', "rb"))
-            param_dict_given = {'mtot_min': mtot_min, 'mtot_max': mtot_max, 'nsamples_mtot': nsamples_mtot,\
-                                 'nsamples_mass_ratio': nsamples_mass_ratio, \
-                                 'sampling_frequency': sampling_frequency, \
-                                 'waveform_approximant': waveform_approximant,\
-                                 'minimum_frequency': minimum_frequency, \
-                                 'waveform_inspiral_must_be_above_fmin': waveform_inspiral_must_be_above_fmin,\
-                                 'psds': psds , 'psd_file':psd_file, 'detector_list': self.list_of_detectors}
-            
-            # checking for existing gwsnr interpolator or generate it
-            len_ = len(param_dict_stored)
-            if param_dict_given in param_dict_stored:
-                # try and except is added so that user can regenerate a new interpolator pickle file just by 
-                # deleting the right file and reruing gwsnr with that params again
-                # also, if the user delete the file by mistake, it will generate in the next run
-                try:
-                    print("getting stored interpolator...")
-                    idx = param_dict_stored.index(param_dict_given)
-                    path_interpolator_old = path+'/halfSNR_dict_'+str(idx)+'.pickle'
-                    self.halfSNR = pickle.load(open(path_interpolator_old, "rb"))
-                    
-                    print("In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {}".format(path_interpolator_old))
-                except:
-                    print("interpolator not found, generating new interpolator")
-                    self.__init_halfScaled() # you can also reinitialized this
-                    with open(path_interpolator_old, 'wb') as handle:
-                        pickle.dump(self.halfSNR, handle, protocol=pickle.HIGHEST_PROTOCOL)
-                    print("interpolator stored as {}.".format(path_interpolator_old))
-                    print("In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {}".format(path_interpolator_old))
-                    
-            # if interpolators are not found
-            else:
-                path_interpolator = path+'/halfSNR_dict_'+str(len_)+'.pickle'
-                print("generating new interpolator for the given new gwsnr params")
-                self.__init_halfScaled() # you can also reinitialized this
-                # self.snr_correction_func() # extra correction needed for the snr
-                with open(path_interpolator, 'wb') as handle:
-                    pickle.dump(self.halfSNR, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            self.interpolator_dict = {}
+            self.list_of_detectors = []
 
-                param_dict_stored.append(param_dict_given)
-                with open(path+'/param_dict_list.pickle', 'wb') as handle:
-                    pickle.dump(param_dict_stored, handle, protocol=pickle.HIGHEST_PROTOCOL)
-                print("interpolator stored as {}.".format(path_interpolator))
-                print("In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {}".format(path_interpolator))
+            # getting interpolator if exists
+            for det in list_of_detectors:
+                path_interpolator, it_exist = self.interpolator_pickle_path(det, list_of_detectors, interpolator_dir)
+                if it_exist:
+                    print(f"Interpolator will be loaded for {det} detector from {path_interpolator}")
+                else:
+                    print(f"Interpolator will be generated for {det} detector at {path_interpolator}")
+                    self.list_of_detectors.append(det)
+
+                self.interpolator_dict[det] = path_interpolator
+
+            # generating new interpolator
+            if len(self.list_of_detectors)>0:
+                self.init_halfScaled()
+                print("interpolator generated")
+
+            # now the entire list_of_detectors 
+            self.list_of_detectors = list_of_detectors
+
+            return None
+
+    ####################################################
+    #                                                  #
+    #      store or get interpolator pickle path       #
+    #                                                  #
+    ####################################################
+    def interpolator_pickle_path(self, detector, detector_list, path='./interpolator_pickle'):
+        """
+        Function for storing or getting interpolator pickle path
         
+        Parameters
+        ----------
+        detector : str
+            detector name
+            e.g. 'L1'
+        detector_list : list
+            list of detectors
+            e.g. ['L1','H1','V1']
+        path : str
+            path to store the pickle file
+            default: './interpolator_pickle'
+
+        Returns
+        -------
+        path_interpolator : str
+            path to the interpolator pickle file
+            e.g. './interpolator_pickle/L1/halfSNR_dict_0.pickle'
+        it_exist: bool
+            True if the interpolator exists
+            False if the interpolator does not exists
+        """
+
+        # arg no. for the detector from the detector list
+        det_arg = detector_list.index(detector)
+        det_path = path+'/'+detector
+
+        # check if path exists
+        if not os.path.exists(path):
+            os.makedirs(path)
+        
+        # check if detector path exists
+        if not os.path.exists(det_path):
+            os.makedirs(det_path)
+
+        # check if param_dict_list.pickle exists
+        if not os.path.exists(det_path+'/param_dict_list.pickle'):
+            dict_list = []
+            with open(det_path+'/param_dict_list.pickle', 'wb') as handle:
+                pickle.dump(dict_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        # for checking existing interpolator pickle in the det_path/param_dict_list.pickle file
+        param_dict_stored = pickle.load(open(det_path+'/param_dict_list.pickle', "rb"))
+        param_dict_given = {'mtot_min': self.mtot_min, 'mtot_max': self.mtot_max, 'nsamples_mtot': self.nsamples, \
+                            'sampling_frequency': self.sampling_frequency, 'waveform_approximant': self.waveform_approximant, \
+                            'minimum_frequency': self.f_min, 'waveform_inspiral_must_be_above_fmin': self.waveform_inspiral_must_be_above_fmin, \
+                            'psds': self.psds[detector] , 'psd_file':self.psd_file[det_arg], 'ifos': str(self.ifos[det_arg])}
+        
+        len_ = len(param_dict_stored)
+        if param_dict_given in param_dict_stored:
+            # try and except is added so that user can regenerate a new interpolator pickle file just by 
+            # deleting the right file and reruing gwsnr with that params again
+            # also, if the user delete the file by mistake, it will generate in the next run
+            idx = param_dict_stored.index(param_dict_given)
+            # check if interpolator pickle exists
+            # get halfSNR interpolator if exists
+            path_interpolator = det_path+'/halfSNR_dict_'+str(idx)+'.pickle'
+            # there will be exception if the file is deleted by mistake
+            if os.path.exists(path_interpolator):
+                it_exist = True
+            else:
+                it_exist = False
+
+        # if related dict not found in the param_dict_list.pickle
+        else:
+            it_exist = False
+            path_interpolator = det_path+'/halfSNR_dict_'+str(len_)+'.pickle'
+            # print("related dict not found in the param_dict_list.pickle, new interpolator will be generated")
+
+            # store the pickle dict
+            param_dict_stored.append(param_dict_given)
+            with open(det_path+'/param_dict_list.pickle', 'wb') as handle:
+                pickle.dump(param_dict_stored, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        #print(f"In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {path_interpolator} \n")
+
+        return(path_interpolator, it_exist)
+
 
     ####################################################
     #                                                  #
@@ -314,13 +361,10 @@ class GWSNR():
             
         idx2 = idx2&(mtot>=self.mtot_min)&(mtot<=self.mtot_max)
         
-        # getting simple snr_half_scaled values for interpolation
-        halfSNR_interpolator = self.halfSNR
-        
         A1 = Mc**(5./6.)
         ci_2 = np.cos(theta_jn)**2
         ci_param = ((1+np.cos(theta_jn)**2)/2)**2
-        detectors = self.list_of_detectors
+        detectors = self.list_of_detectors.copy()
         
         opt_snr = {'opt_snr_net': 0}
 
@@ -331,9 +375,13 @@ class GWSNR():
         # loop wrt detectors
         for i in range(len(detectors)):
             det = detectors[i]
+            # get interpolated half_snr for the required detector
+            with open(self.interpolator_dict[det], 'rb') as handle:
+                halfSNR_interpolator = pickle.load(handle) 
+
             # calculation of snr_half_scaled for particular detector at the required mtot
             for j in idx_tracker:
-                snr_half_scaled[j] = halfSNR_interpolator[idx_ratio[j],i](mtot[j]) # i is iterator wrt detectors
+                snr_half_scaled[j] = halfSNR_interpolator[idx_ratio[j]](mtot[j]) # i is iterator wrt detectors
             
             Deff1 = np.zeros(size)
             for k in range(len(ra)):
@@ -368,13 +416,21 @@ class GWSNR():
     #                                                  #
     ####################################################
     def bns_horizon(self, snr_threshold=8.):
+        """
+        Function for finding detector horizon distance for BNS
 
-        detectors = self.list_of_detectors
+        Parameters
+        ----------
+        snr_threshold : float
+            SNR threshold for the horizon distance
+            default: 8.
 
-        C = 299792458.
-        G = 6.67408*1e-11
-        Mo = 1.989*1e30
-        f_min = self.f_min
+        Returns
+        -------
+        horizon : array
+        """
+
+        detectors = self.list_of_detectors.copy()
 
         # geocent_time cannot be array here
         # this geocent_time is only to get halfScaledSNR
@@ -406,26 +462,22 @@ class GWSNR():
     #   half_snr vs mtot table for interpolation       #
     #                                                  #
     ####################################################
-    def __init_halfScaled(self):
+    def init_halfScaled(self):
         '''
-        Function for finding (f/PSD) integration in the limit [f_min,f_max]
-        f_min is already initialized
-        f_max is taken as 'last stable orbit frequency' is a function of mtot
-        __init_halfScaled(self) will initialize the interpolator (scipy cubic spline) as self.halfSNR
-        -----------------
-        Input parameters
-        -----------------
+
+        Parameters
+        ----------
         None
-        -----------------
-        Return values
-        -----------------
-        snrHalf_det  : cubic spline interpolator for halfScaledSNR --> (f/PSD) integration in the limit [f_min,f_max]
-                       If there is 3 detectors, it will return 3 types of scipy cubic spline objects
+
+        Returns
+        -------
+        None
         '''
         mtot_min = self.mtot_min
         mtot_max = self.mtot_max
         nsamples = self.nsamples
-        detectors = self.list_of_detectors
+        detectors = self.list_of_detectors.copy()
+        print(f"Generating interpolator for {detectors} detectors")
         
         try:
             if  mtot_min<1.:
@@ -433,9 +485,6 @@ class GWSNR():
         except ValueError:
             print('Error: mass too low')
         
-        C = 299792458.
-        G = 6.67408*1e-11
-        Mo = 1.989*1e30
         f_min = self.f_min
 
         # geocent_time cannot be array here
@@ -463,13 +512,7 @@ class GWSNR():
             mchirp = ( (mass_1_*mass_2_)**(3/5) )/( (mtot_table)**(1/5) )
             ######## calling bilby_snr ########
             opt_snr_unscaled = self.compute_bilby_snr_(mass_1=mass_1_, mass_2=mass_2_, luminosity_distance=luminosity_distance_, \
-                                                    theta_jn=iota_, psi=psi_, ra=ra_, dec=dec_,verbose=False, jsonFile=False)  
-            '''
-            example of opt_snr_unscaled return values
-            {'opt_snr_net': array([156.53268655, 243.00092419, 292.10396943]),
-             'L1': array([132.08275995, 205.04492349, 246.47822334]),
-             'H1': array([ 84.00372897, 130.40716432, 156.75845871])}
-            '''
+                                                    theta_jn=iota_, psi=psi_, ra=ra_, dec=dec_,verbose=False, jsonFile=False)
 
             A2 = mchirp**(5./6.)
             ######## filling in interpolation table for different detectors ########
@@ -481,16 +524,13 @@ class GWSNR():
                 snrHalf_[i,j] = interp1d( mtot_table, (Deff2/A2)*opt_snr_unscaled[detectors[j]], kind = 'cubic')
                 
             i+=1 # iterator over mass_ratio
-            
-        # 2D array size: n_detectors X nsamples np.concatenate((a, b), axis=0)
-        # snrHalf_det['mtot'] = mtot_table
-        #print(snrHalf_det)
-        self.halfSNR = snrHalf_
+
+        # save the interpolators for each detectors
+        for j in range(len(detectors)):
+            with open(self.interpolator_dict[detectors[j]], 'wb') as handle:
+                pickle.dump(snrHalf_[:,j], handle, protocol=pickle.HIGHEST_PROTOCOL)
         
-        # save halfSNR interpolation values
-        
-        
-        return(snrHalf_)
+        return None
     
     ####################################################
     #                                                  #
@@ -550,7 +590,6 @@ class GWSNR():
             detectors = list(psds.keys())
         approximant = self.waveform_approximant
         f_min = self.f_min
-        psd_file = (np.array([psd_file]).reshape(-1)*np.ones(len(detectors))).astype('bool')
         
         ################
         # psd handling #
