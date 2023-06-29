@@ -116,11 +116,15 @@ class GWSNR:
             psds["V1"] = "AdV_asd.txt"
             self.psds = psds
             list_of_detectors = list(psds.keys())
+            psd_file = [False,False,False]
             # for Fp, Fc calculation
             self.ifos = bilby.gw.detector.InterferometerList(list_of_detectors)
         else:
             self.psds = psds
             list_of_detectors = list(psds.keys())
+            psd_file = (
+            np.array([psd_file]).reshape(-1) * np.ones(len(list_of_detectors))
+        ).astype("bool")
             # for Fp, Fc calculation
             ifos_ = []
             len_ = len(list_of_detectors)
@@ -141,16 +145,16 @@ class GWSNR:
 
             self.ifos = ifos_
         print("given psds: ", psds)
-        self.psd_file = (
-            np.array([psd_file]).reshape(-1) * np.ones(len(list_of_detectors))
-        ).astype("bool")
-
+        self.psd_file = psd_file
+        
         # dealing with interpolator
         if snr_type == "interpolation":
             self.interpolator_dict = {}
             self.list_of_detectors = []
+            psd_file_buffer = []
 
             # getting interpolator if exists
+            k = 0  # keep track of psd_file_buffer param
             for det in list_of_detectors:
                 path_interpolator, it_exist = self.interpolator_pickle_path(
                     det, list_of_detectors, interpolator_dir
@@ -164,12 +168,17 @@ class GWSNR:
                         f"Interpolator will be generated for {det} detector at {path_interpolator}"
                     )
                     self.list_of_detectors.append(det)
+                    psd_file_buffer.append(psd_file[k])
 
                 self.interpolator_dict[det] = path_interpolator
-
+                
+                k+=1  # keep track of psd_file_buffer param
+                
             # generating new interpolator
             if len(self.list_of_detectors) > 0:
+                self.psd_file = psd_file_buffer
                 self.init_halfScaled()
+                self.psd_file = psd_file
                 print("interpolator generated")
 
         # now the entire list_of_detectors
@@ -287,10 +296,10 @@ class GWSNR:
             "Ringdown": [],
         }
         if waveform_approximant in waveform_dict["Inspiral"]:
-            print("Given: Inspiral waveform")
-            return "inspiral"
+            print(f"Given: Inspiral waveform, {self.waveform_approximant}.")
+            return "Inspiral"
         elif waveform_approximant in waveform_dict["IMR"]:
-            print("Given: IMR waveform")
+            print("Given: IMR waveform, {self.waveform_approximant}.")
             return "IMR"
         else:
             print(
@@ -548,7 +557,7 @@ class GWSNR:
     ####################################################
     def bns_horizon(self, snr_threshold=8.0):
         """
-        Function for finding detector horizon distance for BNS
+        Function for finding detector horizon distance for BNS (m1=m2=1.4)
 
         Parameters
         ----------
@@ -1014,7 +1023,7 @@ class GWSNR:
         )
 
         #######################################
-        # if inspiral only waveform
+        # if inspiral only waveform, apply fmax cutoff
         if self.waveform_type == "Inspiral":
             with Pool(processes=npool) as pool:
                 # call the same function with different data in parallel
