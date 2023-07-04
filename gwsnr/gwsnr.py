@@ -116,15 +116,15 @@ class GWSNR:
             psds["V1"] = "AdV_asd.txt"
             self.psds = psds
             list_of_detectors = list(psds.keys())
-            psd_file = [False,False,False]
+            psd_file = [False, False, False]
             # for Fp, Fc calculation
             self.ifos = bilby.gw.detector.InterferometerList(list_of_detectors)
         else:
             self.psds = psds
             list_of_detectors = list(psds.keys())
             psd_file = (
-            np.array([psd_file]).reshape(-1) * np.ones(len(list_of_detectors))
-        ).astype("bool")
+                np.array([psd_file]).reshape(-1) * np.ones(len(list_of_detectors))
+            ).astype("bool")
             # for Fp, Fc calculation
             ifos_ = []
             len_ = len(list_of_detectors)
@@ -146,7 +146,7 @@ class GWSNR:
             self.ifos = ifos_
         print("given psds: ", psds)
         self.psd_file = psd_file
-        
+
         # dealing with interpolator
         if snr_type == "interpolation":
             self.interpolator_dict = {}
@@ -171,9 +171,9 @@ class GWSNR:
                     psd_file_buffer.append(psd_file[k])
 
                 self.interpolator_dict[det] = path_interpolator
-                
-                k+=1  # keep track of psd_file_buffer param
-                
+
+                k += 1  # keep track of psd_file_buffer param
+
             # generating new interpolator
             if len(self.list_of_detectors) > 0:
                 self.psd_file = psd_file_buffer
@@ -1104,6 +1104,16 @@ class GWSNR:
     def power_spectral_density(self, psd):
         """
         psd array finder from bilby
+
+        Parameters
+        ----------
+        psd : str
+            name of the psd
+            e.g. 'aLIGO_O4_high_psd.txt'
+
+        Returns
+        -------
+        psd_array : bilby.gw.detector.psd.PowerSpectralDensity object
         """
         return bilby.gw.detector.PowerSpectralDensity(psd_file=psd)
 
@@ -1115,6 +1125,16 @@ class GWSNR:
     def amplitude_spectral_density(self, asd):
         """
         asd array finder from bilby
+
+        Parameters
+        ----------
+        asd : str
+            name of the asd
+            e.g. 'aLIGO_O4_high_asd.txt'
+
+        Returns
+        -------
+        psd_array : bilby.gw.detector.psd.PowerSpectralDensity object
         """
         return bilby.gw.detector.PowerSpectralDensity(asd_file=asd)
 
@@ -1126,6 +1146,16 @@ class GWSNR:
     def power_spectral_density_pycbc(self, psd):
         """
         psd array finder from pycbc
+
+        Parameters
+        ----------
+        psd : str
+            name of the psd
+            e.g. 'aLIGOaLIGODesignSensitivityT1800044'
+
+        Returns
+        -------
+        psd_array : bilby.gw.detector.psd.PowerSpectralDensity object
         """
         delta_f = 1.0 / 16.0
         flen = int(self.sampling_frequency / delta_f)
@@ -1412,6 +1442,14 @@ class GWSNR:
                 p_array[idx2],
                 waveform_generator.duration,
             )
+            """
+            hp_inner_hc = bilby.gw.utils.noise_weighted_inner_product(
+                polas["plus"][idx2],
+                polas["cross"][idx2],
+                p_array[idx2],
+                waveform_generator.duration,
+            )
+            """
             # make an ifo object to get the antenna pattern
             Fp = self.ifos[i].antenna_response(
                 parameters["ra"],
@@ -1427,7 +1465,13 @@ class GWSNR:
                 parameters["psi"],
                 "cross",
             )
-
+            """
+            snrs_sq = abs(
+                (Fp**2) * hp_inner_hp
+                + (Fc**2) * hc_inner_hc
+                + 2 * Fp * Fc * hp_inner_hc
+            )
+            """
             snrs_sq = abs((Fp**2) * hp_inner_hp + (Fc**2) * hc_inner_hc)
 
             SNRs_list.append(np.sqrt(snrs_sq))
