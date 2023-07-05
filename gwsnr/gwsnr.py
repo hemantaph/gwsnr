@@ -938,7 +938,7 @@ class GWSNR:
         # time duration calculation for each of the mass combination
         safety = 1.2
         approx_duration = safety * self.findchirp_chirptime(mass_1, mass_2, f_min)
-        duration = np.ceil(approx_duration + 4.0)
+        duration = np.ceil(approx_duration + 2.0)
 
         if self.waveform_inspiral_must_be_above_fmin == True:
             # select only those that have inspiral part above f_min
@@ -1259,7 +1259,7 @@ class GWSNR:
         )  # last stable orbit frequency
         waveform_arguments = dict(
             waveform_approximant=params[15],
-            reference_frequency=30.0,
+            reference_frequency=20.0,
             minimum_frequency=params[16],
         )
 
@@ -1408,7 +1408,7 @@ class GWSNR:
 
         waveform_arguments = dict(
             waveform_approximant=params[15],
-            reference_frequency=30.0,
+            reference_frequency=20.0,
             minimum_frequency=params[16],
         )
 
