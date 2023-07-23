@@ -8,14 +8,14 @@
 # at f_min==10Hz: mtot_max=439.6
 import numpy as np
 import bilby
-
+import pycbc
+import pycbc.psd
 # from pycbc.detector import Detector
 from scipy.stats import norm
 from scipy.interpolate import interp1d
 from gwpy.timeseries import TimeSeries
 from scipy.optimize import fsolve
 from multiprocessing import Pool
-import pycbc.psd
 from tqdm import tqdm
 import json
 import os
@@ -1419,6 +1419,10 @@ class GWSNR:
             waveform_arguments=waveform_arguments,
         )
         polas = waveform_generator.frequency_domain_strain(parameters=parameters)
+
+        # h = F+.h+ + Fx.hx
+        # <h|h>
+        # 
 
         SNRs_list = []
         NetSNR = 0.0
