@@ -108,6 +108,9 @@ class GWSNR:
         self.snr_type = snr_type
         self.waveform_inspiral_must_be_above_fmin = waveform_inspiral_must_be_above_fmin
 
+        # dealing with psds
+        # if not given, bilby's default psds will be used
+        # interferometer object will be created for Fp, Fc calculation
         if not psds:
             print("psds not given. Choosing bilby's default psds")
             psds = dict()
@@ -142,49 +145,77 @@ class GWSNR:
                     ifos_.append(
                         bilby.gw.detector.InterferometerList([list_of_detectors[i]])[0]
                     )
-
             self.ifos = ifos_
         print("given psds: ", psds)
         self.psd_file = psd_file
 
         # dealing with interpolator
+        # list_of_detectors, interpolator_dir
         if snr_type == "interpolation":
-            self.interpolator_dict = {}
-            self.list_of_detectors = []
-            psd_file_buffer = []
+            self.interpolator_check(list_of_detectors, interpolator_dir, psd_file)
 
-            # getting interpolator if exists
-            k = 0  # keep track of psd_file_buffer param
-            for det in list_of_detectors:
-                path_interpolator, it_exist = self.interpolator_pickle_path(
-                    det, list_of_detectors, interpolator_dir
-                )
-                if it_exist:
-                    print(
-                        f"Interpolator will be loaded for {det} detector from {path_interpolator}"
-                    )
-                else:
-                    print(
-                        f"Interpolator will be generated for {det} detector at {path_interpolator}"
-                    )
-                    self.list_of_detectors.append(det)
-                    psd_file_buffer.append(psd_file[k])
+        elif snr_type == "pdet":
+            print("Initializing Pdet calculation")
+            print("Step 1: half snr interpolator check and generation if not exists")
+            self.interpolator_check(list_of_detectors, interpolator_dir, psd_file)
+            print("Step 2: Simulation of unlensed CBCs")
 
-                self.interpolator_dict[det] = path_interpolator
-
-                k += 1  # keep track of psd_file_buffer param
-
-            # generating new interpolator
-            if len(self.list_of_detectors) > 0:
-                self.psd_file = psd_file_buffer
-                self.init_halfScaled()
-                self.psd_file = psd_file
-                print("interpolator generated")
+        else:
+            pass
 
         # now the entire list_of_detectors
         self.list_of_detectors = list_of_detectors
 
         return None
+
+    # interpolator check and generation
+    def interpolator_check(self, list_of_detectors, interpolator_dir, psd_file):
+        """ Function for interpolator check and generation if not exists
+        Parameters
+        ----------
+        list_of_detectors : list
+            list of detectors
+            e.g. ['L1','H1','V1']
+        interpolator_dir : str
+            path to store the interpolator pickle file
+            default: './interpolator_pickle'
+        psd_file : if set True, the given value of psds param should be of psds instead of asd. If asd, set psd_file=False.
+        """
+
+        self.interpolator_dict = {}
+        self.list_of_detectors = []
+        psd_file_buffer = []
+
+        # getting interpolator if exists
+        k = 0  # keep track of psd_file_buffer param
+        for det in list_of_detectors:
+            path_interpolator, it_exist = self.interpolator_pickle_path(
+                det, list_of_detectors, interpolator_dir
+            )
+            if it_exist:
+                print(
+                    f"Interpolator will be loaded for {det} detector from {path_interpolator}"
+                )
+            else:
+                print(
+                    f"Interpolator will be generated for {det} detector at {path_interpolator}"
+                )
+                self.list_of_detectors.append(det)
+                psd_file_buffer.append(psd_file[k])
+
+            self.interpolator_dict[det] = path_interpolator
+
+            k += 1  # keep track of psd_file_buffer param
+
+        # generating new interpolator
+        if len(self.list_of_detectors) > 0:
+            self.psd_file = psd_file_buffer
+            self.init_halfScaled()
+            self.psd_file = psd_file
+            print("interpolator generated")
+
+        return None
+
 
     ####################################################
     #                                                  #
