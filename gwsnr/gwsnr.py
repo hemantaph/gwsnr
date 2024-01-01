@@ -8,15 +8,13 @@
 # at f_min==10Hz: mtot_max=439.6
 import numpy as np
 import bilby
-import pycbc
-import pycbc.psd
+from multiprocessing import Pool
+from tqdm import tqdm
 # from pycbc.detector import Detector
 from scipy.stats import norm
 from scipy.interpolate import interp1d
 from gwpy.timeseries import TimeSeries
 from scipy.optimize import fsolve
-from multiprocessing import Pool
-from tqdm import tqdm
 import json
 import os
 import pickle
@@ -327,10 +325,10 @@ class GWSNR:
             "Ringdown": [],
         }
         if waveform_approximant in waveform_dict["Inspiral"]:
-            print(f"Given: Inspiral waveform, {self.waveform_approximant}.")
+            print(f"Given: Inspiral waveform, {waveform_approximant}.")
             return "Inspiral"
         elif waveform_approximant in waveform_dict["IMR"]:
-            print("Given: IMR waveform, {self.waveform_approximant}.")
+            print(f"Given: IMR waveform, {waveform_approximant}.")
             return "IMR"
         else:
             print(
@@ -347,7 +345,7 @@ class GWSNR:
         mass_1=10.0,
         mass_2=10.0,
         luminosity_distance=100.0,
-        iota=0.0,
+        theta_jn=0.0,
         psi=0.0,
         phase=0.0,
         geocent_time=1246527224.169434,
@@ -359,7 +357,7 @@ class GWSNR:
         tilt_2=0.0,
         phi_12=0.0,
         phi_jl=0.0,
-        GWparam_dict=False,
+        gw_param_dict=False,
         verbose=True,
         jsonFile=False,
     ):
@@ -372,7 +370,7 @@ class GWSNR:
         mass_2               : Lighter compact object of the binary, unit: Mo (solar mass)
                                (flaot array or just float)
         luminosity_distance  : Distance between detector and binary, unit: Mpc
-        iota                 : Inclination angle of binary orbital plane wrt to the line of sight. unit: rad
+        theta_jn                 : Inclination angle of binary orbital plane wrt to the line of sight. unit: rad
         psi                  : Polarization angle. unit: rad
         phase                : Phase of GW at the the time of coalesence, unit: rad
         geocent_time         : GPS time of colescence of that GW, unit: sec
@@ -388,29 +386,48 @@ class GWSNR:
                                  'H1': array([ 84.00372897, 130.40716432, 156.75845871])}
 
         """
-        if GWparam_dict != False:
-            mass_1 = GWparam_dict["mass_1"]
-            mass_2 = GWparam_dict["mass_2"]
-            luminosity_distance = GWparam_dict["luminosity_distance"]
-            iota = GWparam_dict["iota"]
-            psi = GWparam_dict["psi"]
-            phase = GWparam_dict["phase"]
-            geocent_time = GWparam_dict["geocent_time"]
-            ra = GWparam_dict["ra"]
-            dec = GWparam_dict["dec"]
-            a_1 = GWparam_dict["a_1"]
-            a_2 = GWparam_dict["a_2"]
-            tilt_1 = GWparam_dict["tilt_1"]
-            tilt_2 = GWparam_dict["tilt_2"]
-            phi_12 = GWparam_dict["phi_12"]
-            phi_jl = GWparam_dict["phi_jl"]
+        if gw_param_dict != False:
+            mass_1 = gw_param_dict["mass_1"]
+            mass_2 = gw_param_dict["mass_2"]
+            luminosity_distance = gw_param_dict["luminosity_distance"]
+            theta_jn = gw_param_dict["theta_jn"]
+            psi = gw_param_dict["psi"]
+            phase = gw_param_dict["phase"]
+            geocent_time = gw_param_dict["geocent_time"]
+            ra = gw_param_dict["ra"]
+            dec = gw_param_dict["dec"]
+            size = len(mass_1)
+            try:
+                a_1 = gw_param_dict["a_1"]
+                a_2 = gw_param_dict["a_2"]
+                try:
+                    tilt_1 = gw_param_dict["tilt_1"]
+                    tilt_2 = gw_param_dict["tilt_2"]
+                    phi_12 = gw_param_dict["phi_12"]
+                    phi_jl = gw_param_dict["phi_jl"]
+                except:
+                    tilt_1 = np.zeros(size)
+                    tilt_2 = np.zeros(size)
+                    phi_12 = np.zeros(size)
+                    phi_jl = np.zeros(size)
+            except:
+                a_1 = np.zeros(size)
+                a_2 = np.zeros(size)
+                tilt_1 = np.zeros(size)
+                tilt_2 = np.zeros(size)
+                phi_12 = np.zeros(size)
+                phi_jl = np.zeros(size)
+
+        # save geocent_time in json file
+        # with open("./geocent_time.json", "w") as write_file:
+        #     json.dump(list(geocent_time), write_file, indent=4)
 
         if self.snr_type == "interpolation":
             snr_dict = self.snr_with_interpolation(
                 mass_1,
                 mass_2,
                 luminosity_distance=luminosity_distance,
-                iota=iota,
+                theta_jn=theta_jn,
                 psi=psi,
                 phase=phase,
                 geocent_time=geocent_time,
@@ -429,7 +446,7 @@ class GWSNR:
                 mass_1,
                 mass_2,
                 luminosity_distance=luminosity_distance,
-                theta_jn=iota,
+                theta_jn=theta_jn,
                 psi=psi,
                 phase=phase,
                 geocent_time=geocent_time,
@@ -455,7 +472,7 @@ class GWSNR:
         mass_1,
         mass_2,
         luminosity_distance=100.0,
-        iota=0.0,
+        theta_jn=0.0,
         psi=0.0,
         phase=0.0,
         geocent_time=1246527224.169434,
@@ -472,7 +489,7 @@ class GWSNR:
         mass_2               : Lighter compact object of the binary, unit: Mo (solar mass)
                                (flaot array or just float)
         luminosity_distance  : Distance between detector and binary, unit: Mpc
-        iota                 : Inclination angle of binary orbital plane wrt to the line of sight. unit: rad
+        theta_jn                 : Inclination angle of binary orbital plane wrt to the line of sight. unit: rad
         psi                  : Polarization angle. unit: rad
         phase                : Phase of GW at the the time of coalesence, unit: rad
         geocent_time         : GPS time of colescence of that GW, unit: sec
@@ -492,7 +509,7 @@ class GWSNR:
         size = len(mass_1)
         luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec = (
             np.array([luminosity_distance]).reshape(-1) * np.ones(size),
-            np.array([iota]).reshape(-1) * np.ones(size),
+            np.array([theta_jn]).reshape(-1) * np.ones(size),
             np.array([psi]).reshape(-1) * np.ones(size),
             np.array([phase]).reshape(-1) * np.ones(size),
             np.array([geocent_time]).reshape(-1) * np.ones(size),
@@ -607,7 +624,7 @@ class GWSNR:
         # this geocent_time is only to get halfScaledSNR
         geocent_time_ = 1246527224.169434  # random time from O3
 
-        iota_, ra_, dec_, psi_, phase_ = 0.0, 0.0, 0.0, 0.0, 0.0
+        theta_jn_, ra_, dec_, psi_, phase_ = 0.0, 0.0, 0.0, 0.0, 0.0
         luminosity_distance_ = 100.0
         q = 1.0
         mass_1_ = 1.4
@@ -618,7 +635,7 @@ class GWSNR:
             mass_1=mass_1_,
             mass_2=mass_2_,
             luminosity_distance=luminosity_distance_,
-            theta_jn=iota_,
+            theta_jn=theta_jn_,
             psi=psi_,
             ra=ra_,
             dec=dec_,
@@ -632,8 +649,8 @@ class GWSNR:
             Fp = self.ifos[j].antenna_response(ra_, dec_, geocent_time_, psi_, "plus")
             Fc = self.ifos[j].antenna_response(ra_, dec_, geocent_time_, psi_, "cross")
             Deff2 = luminosity_distance_ / np.sqrt(
-                Fp**2 * ((1 + np.cos(iota_) ** 2) / 2) ** 2
-                + Fc**2 * np.cos(iota_) ** 2
+                Fp**2 * ((1 + np.cos(theta_jn_) ** 2) / 2) ** 2
+                + Fc**2 * np.cos(theta_jn_) ** 2
             )
 
             horizon[j] = (Deff2 / snr_threshold) * opt_snr_unscaled[detectors[j]]
@@ -674,7 +691,7 @@ class GWSNR:
         # this geocent_time is only to get halfScaledSNR
         geocent_time_ = 1246527224.169434  # random time from O3
 
-        iota_, ra_, dec_, psi_, phase_ = 0.0, 0.0, 0.0, 0.0, 0.0
+        theta_jn_, ra_, dec_, psi_, phase_ = 0.0, 0.0, 0.0, 0.0, 0.0
         luminosity_distance_ = 100.0
 
         ratio = self.ratio
@@ -708,7 +725,7 @@ class GWSNR:
                 mass_1=mass_1_,
                 mass_2=mass_2_,
                 luminosity_distance=luminosity_distance_,
-                theta_jn=iota_,
+                theta_jn=theta_jn_,
                 psi=psi_,
                 ra=ra_,
                 dec=dec_,
@@ -726,14 +743,14 @@ class GWSNR:
                     ra_, dec_, geocent_time_, psi_, "cross"
                 )
                 Deff2 = luminosity_distance_ / np.sqrt(
-                    Fp**2 * ((1 + np.cos(iota_) ** 2) / 2) ** 2
-                    + Fc**2 * np.cos(iota_) ** 2
+                    Fp**2 * ((1 + np.cos(theta_jn_) ** 2) / 2) ** 2
+                    + Fc**2 * np.cos(theta_jn_) ** 2
                 )
 
                 snrHalf_[i, j] = interp1d(
                     mtot_table,
                     (Deff2 / A2) * opt_snr_unscaled[detectors[j]],
-                    kind="cubic",
+                    kind="cubic", fill_value="extrapolate",
                 )
 
             i += 1  # iterator over mass_ratio
@@ -1188,6 +1205,9 @@ class GWSNR:
         -------
         psd_array : bilby.gw.detector.psd.PowerSpectralDensity object
         """
+        import pycbc
+        import pycbc.psd
+
         delta_f = 1.0 / 16.0
         flen = int(self.sampling_frequency / delta_f)
         low_frequency_cutoff = self.f_min
