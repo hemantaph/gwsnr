@@ -519,7 +519,6 @@ class GWSNR:
 
         Mc = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
         mtot = mass_1 + mass_2
-        luminosity_distance = luminosity_distance
 
         snr_half_scaled = np.zeros(size)
         # select only those that have inspiral part above f_min
