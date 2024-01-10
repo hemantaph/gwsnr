@@ -1,25 +1,34 @@
+# -*- coding: utf-8 -*-
+"""
+Helper functions for gwsnr. All functions are njit compiled.
+"""
+
 import numpy as np
 from numba import njit
+
+Gamma = 0.5772156649015329
+Pi = np.pi
+MTSUN_SI = 4.925491025543576e-06
 
 @njit
 def findchirp_chirptime(m1, m2, fmin):
     """
     Time taken from f_min to f_lso (last stable orbit). 3.5PN in fourier phase considered.
-    -----------------
-    Input parameters
-    -----------------
-    m1         : component mass of BBH, m1>m2, unit(Mo)
-    m2         : component mass of BBH, m1>m2, unit(Mo)
-    fmin       : minimum frequency cut-off for the analysis, unit(s)
-    -----------------
-    Return values
-    -----------------
-    chirp_time : Time taken from f_min to f_lso (frequency at last stable orbit), unit(s)
-    """
 
-    Gamma = 0.5772156649015329
-    Pi = np.pi
-    MTSUN_SI = 4.925491025543576e-06
+    Parameters
+    ----------
+    m1 : `float`
+        Mass of the first body in solar masses.
+    m2 : `float`
+        Mass of the second body in solar masses.
+    fmin : `float`
+        Lower frequency cutoff.
+
+    Returns
+    -------
+    chirp_time : float
+        Time taken from f_min to f_lso (last stable orbit frequency).
+    """
 
     # variables used to compute chirp time
     m = m1 + m2
@@ -78,6 +87,9 @@ def findchirp_chirptime(m1, m2, fmin):
 
 @njit
 def einsum1(m,n):
+    """
+    Function to calculate einsum of two 3x1 vectors
+    """
     ans = np.zeros((3,3))
     ans[0,0] = m[0]*n[0]
     ans[0,1] = m[0]*n[1]
@@ -91,11 +103,17 @@ def einsum1(m,n):
     return ans
 @njit
 def einsum2(m,n):
+    """
+    Function to calculate einsum of two 3x3 matrices
+    """
     ans = m[0,0]*n[0,0] + m[0,1]*n[0,1] + m[0,2]*n[0,2] + m[1,0]*n[1,0] + m[1,1]*n[1,1] + m[1,2]*n[1,2] + m[2,0]*n[2,0] + m[2,1]*n[2,1] + m[2,2]*n[2,2]
     return ans
 
 @njit
 def gps_to_gmst(gps_time):
+    """
+    Function to convert gps time to greenwich mean sidereal time
+    """
     slope = 7.292115855382993e-05
     time0 = 1126259642.413
     time = gps_time - time0
@@ -103,12 +121,19 @@ def gps_to_gmst(gps_time):
 
 @njit
 def ra_dec_to_theta_phi(ra, dec, gmst):
+    """
+    Function to convert ra and dec to theta and phi
+    """
+
     phi = ra - gmst
     theta = np.pi / 2.0 - dec
     return theta, phi
 
 @njit
 def get_polarization_tensor(ra, dec, time, psi, mode='plus'):
+    """
+    Function to calculate the polarization tensor
+    """
     gmst = np.fmod(gps_to_gmst(time), 2 * np.pi)
     theta, phi = ra_dec_to_theta_phi(ra, dec, gmst)
     u = np.array([np.cos(phi) * np.cos(theta), np.cos(theta) * np.sin(phi), -np.sin(theta)])
@@ -123,12 +148,56 @@ def get_polarization_tensor(ra, dec, time, psi, mode='plus'):
 
 @njit
 def antenna_response(ra, dec, time, psi, detector_tensor, mode='plus'):
+    """
+    Function to calculate the antenna response
+
+    Parameters
+    ----------
+    ra : `float`
+        Right ascension of the source in radians.
+    dec : float
+        Declination of the source in radians.
+    time : `float`
+        GPS time of the source.
+    psi : `float`
+        Polarization angle of the source.
+    detector_tensor : array-like
+        Detector tensor for the detector (3x3 matrix)
+    mode : `str`
+        Mode of the polarization. Default is 'plus'.
+
+    Returns
+    -------
+    antenna_response: `float`
+        Antenna response of the detector.
+    """
 
     polarization_tensor = get_polarization_tensor(ra, dec, time, psi, mode=mode)
     return einsum2(detector_tensor, polarization_tensor)
 
 @njit
 def antenna_response_array(ra, dec, time, psi, detector_tensor):
+    """
+    Function to calculate the antenna response in array form.
+
+    Parameters
+    ----------
+    ra : `numpy.ndarray`
+        Right ascension of the source in radians.
+    dec : `numpy.ndarray`
+        Declination of the source in radians.
+    time : `numpy.ndarray`
+        GPS time of the source.
+    psi : `numpy.ndarray`
+        Polarization angle of the source.
+    detector_tensor : array-like
+        Detector tensor for the multiple detectors (nx3x3 matrix), where n is the number of detectors.
+
+    Returns
+    -------
+    antenna_response: `numpy.ndarray`
+        Antenna response of the detector. Shape is (n, len(ra)).
+    """
 
     len_det = len(detector_tensor)
     len_param = len(ra) 
@@ -137,11 +206,6 @@ def antenna_response_array(ra, dec, time, psi, detector_tensor):
 
     for j in range(len_det):
         for i in range(len_param):
-            # print("ra", ra[j])
-            # print("dec", dec[j])
-            # print("time", time[j])
-            # print("psi", psi[j])
-            # print("detector_tensor", detector_tensor[i])
             Fp[j,i] = antenna_response(ra[i], dec[i], time[i], psi[i], detector_tensor[j], mode="plus")
             Fc[j,i] = antenna_response(ra[i], dec[i], time[i], psi[i], detector_tensor[j], mode="cross")
 
@@ -171,12 +235,47 @@ def noise_weighted_inner_product(
 
 @njit
 def get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, detector_tensor, snr_halfscaled, ratio_arr, mtot_arr):
+    """
+    Function to calculate the interpolated snr for a given set of parameters
+
+    Parameters
+    ----------
+    mass_1 : `numpy.ndarray`
+        Mass of the first body in solar masses.
+    mass_2 : `numpy.ndarray`
+        Mass of the second body in solar masses.
+    luminosity_distance : `float`
+        Luminosity distance to the source in Mpc.
+    theta_jn : `numpy.ndarray`
+        Angle between the total angular momentum and the line of sight to the source in radians.
+    psi : `numpy.ndarray`
+        Polarization angle of the source.
+    geocent_time : `numpy.ndarray`
+        GPS time of the source.
+    ra : ``numpy.ndarray`
+        Right ascension of the source in radians.
+    dec : `numpy.ndarray`
+        Declination of the source in radians.
+    detector_tensor : array-like
+        Detector tensor for the detector (3x3 matrix)
+    snr_halfscaled : `numpy.ndarray`
+        Array of snr_halfscaled coefficients for the detector.
+    ratio_arr : `numpy.ndarray`
+        Array of mass ratio values for the snr_halfscaled coefficients.
+    mtot_arr : `numpy.ndarray`
+        Array of total mass values for the snr_halfscaled coefficients.
     
+    Returns
+    -------
+    snr : `float`
+        snr of the detector.
+    """
+
     size = len(mass_1)
     len_ = len(detector_tensor)
     mtot = mass_1 + mass_2
     ratio = mass_2 / mass_1
-
+    # get array of antenna response
     Fp, Fc = antenna_response_array(ra, dec, geocent_time, psi, detector_tensor)
 
     Mc = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
@@ -188,7 +287,9 @@ def get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geo
     snr_half_ = np.zeros((len_,size))
     d_eff = np.zeros((len_,size))
     snr = np.zeros((len_,size))
+    # loop over the detectors
     for j in range(len_):
+        # loop over the parameter points
         for i in range(size):
             snr_half_coeff = snr_halfscaled[j]
             snr_half_[j,i] = cubic_spline_interpolator2d(mtot[i], ratio[i], snr_half_coeff, mtot_arr, ratio_arr)
@@ -203,6 +304,27 @@ def get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geo
 
 @njit
 def cubic_spline_interpolator2d(xnew, ynew, coefficients, x, y):
+    """
+    Function to calculate the interpolated value of snr_halfscaled given the mass ratio (ynew) and total mass (xnew). This is based off 2D bicubic spline interpolation.
+
+    Parameters
+    ----------
+    xnew : `float`
+        Total mass of the binary.
+    ynew : `float`
+        Mass ratio of the binary.
+    coefficients : `numpy.ndarray`
+        Array of coefficients for the cubic spline interpolation.
+    x : `numpy.ndarray`
+        Array of total mass values for the coefficients.
+    y : `numpy.ndarray`
+        Array of mass ratio values for the coefficients.
+
+    Returns
+    -------
+    result : `float`
+        Interpolated value of snr_halfscaled.
+    """
 
     len_y = len(y)
     # y_idx = np.searchsorted(y, ynew)
@@ -238,6 +360,23 @@ def cubic_spline_interpolator2d(xnew, ynew, coefficients, x, y):
 
 @njit
 def cubic_spline_interpolator(xnew, coefficients, x):
+    """
+    Function to calculate the interpolated value of snr_halfscaled given the total mass (xnew). This is based off 1D cubic spline interpolation.
+
+    Parameters
+    ----------
+    xnew : `float`
+        Total mass of the binary.
+    coefficients : `numpy.ndarray`
+        Array of coefficients for the cubic spline interpolation.
+    x : `numpy.ndarray`
+        Array of total mass values for the coefficients.
+
+    Returns
+    -------
+    result : `float`
+        Interpolated value of snr_halfscaled.
+    """
     # Handling extrapolation
     i = np.searchsorted(x, xnew) - 1 if xnew > x[0] else 0
 
@@ -252,7 +391,9 @@ def cubic_spline_interpolator(xnew, coefficients, x):
 
 @njit
 def coefficients_generator(y1, y2, y3, y4, z1, z2, z3, z4):
-        
+    """
+    Function to generate the coefficients for the cubic spline interpolation of fn(y)=z.
+    """
     matrixA = np.array([
         [y1**3, y1**2, y1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
         [y2**3, y2**2, y2, 1, 0, 0, 0, 0, 0, 0, 0, 0],
