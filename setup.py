@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 setup(name='gwsnr',
-      version='0.1.4',
+      version='0.2.0',
       description='Fast SNR interpolator',
       author='Hemantakumar Phurailatpam',
       license="MIT",
