@@ -67,7 +67,7 @@ def dealing_with_psds(psds=None, isit_psd_file=False, ifos=None, f_min=20., samp
         except ValueError as e:
             raise ValueError("psds must be a dictionary with keys as detector names (e.g.'L1' for Livingston etc) and values as str") from e
         
-        if isinstance(isit_psd_file) == bool:  # this means all psds are 
+        if type(isit_psd_file) == bool:  # this means all psds are 
             isit_psd_file_dict = dict()
             for det in detector_list:
                 isit_psd_file_dict[det] = isit_psd_file
@@ -79,11 +79,11 @@ def dealing_with_psds(psds=None, isit_psd_file=False, ifos=None, f_min=20., samp
         ifos = []
         len_ = len(detector_list)
         for i in range(len_):
-            if ifos[i]:
+            try:
                 # if ifos is not None, then use the given ifos
                 # ifos is a list of bilby.gw.detector.Interferometer 
                 ifos.append(ifos[i])
-            else:
+            except:
                 # if ifos is None, then generate bilby's default ifos with the given list of detectors
                 ifos.append(
                     bilby.gw.detector.InterferometerList(

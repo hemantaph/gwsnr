@@ -266,8 +266,8 @@ class GWSNR:
         mtot_max=439.6,
         ratio_min=0.1,
         ratio_max=1.0,
-        mtot_resolution=100,
-        ratio_resolution=100,
+        mtot_resolution=500,
+        ratio_resolution=50,
         sampling_frequency=2048.0,
         waveform_approximant="IMRPhenomD",
         minimum_frequency=20.0,
@@ -363,15 +363,15 @@ class GWSNR:
                 self.detector_list = detector_list
                 print("Please be patient while the interpolator is generated")
                 self.init_halfscaled()
+            
+            # get all halfscaledSNR from the stored interpolator
+            self.snr_halfsacaled_list = [load_json(path) for path in self.path_interpolator]
 
         # change back to original
         self.psds_list = psds_list
         self.detector_tensor_list = detector_tensor_list
         self.detector_list = detector_list
         self.multiprocessing_verbose = multiprocessing_verbose
-
-        # get all halfscaledSNR from the stored interpolator
-        self.snr_halfsacaled_list = [load_json(path) for path in self.path_interpolator]
 
     def calculate_mtot_max(self, mtot_max, minimum_frequency):
         """
