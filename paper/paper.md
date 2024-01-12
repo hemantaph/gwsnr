@@ -9,10 +9,8 @@ tags:
 authors:
   - name: Phurailatpam Hemantakumar
     orcid: 0000-0000-0000-0000
-    equal-contrib: true
     affiliation: "1"
   - name: Otto Akseli HANNUKSELA 
-    equal-contrib: false 
     affiliation: "1"
 affiliations:
   - name: Department of Physics, The Chinese University of Hong Kong, Shatin, New Territories, Hong Kong
@@ -27,26 +25,26 @@ Gravitational waves, ripples in spacetime predicted by Einstein's theory of Gene
 
 # Statement of Need
 
-The `gwsnr` Python package addresses the need for efficient SNR computation in gravitational wave research. It innovatively streamlines SNR calculations, enhancing accuracy and efficiency with several advanced techniques. Firstly, it utilizes an innovative interpolation method, employing a half-scaling approach for accurately interpolating the SNR of gravitational waves from spin-less binary systems, focusing on the mass parameters. Secondly, the package features a noise-weighted inner product method, similar to that in the `bilby` package, but enhanced with multiprocessing capabilities. This integration allows for the parallel processing of complex calculations, thereby expediting the SNR computation. Lastly, `gwsnr` leverages the `numba` Just-In-Time (njit) compiler, which optimizes performance by compiling Python code into machine code at runtime, drastically reducing execution times. Beyond these technical merits, `gwsnr` stands out for its user-friendly features and seamless integration with other related software packages, making it not just a powerful tool but also an accessible one for researchers. These attributes position `gwsnr` as an invaluable asset in gravitational wave data analysis, particularly in simulations of detectable binary mergers, calculation of merger rates, determining gravitational wave lensing rates, and in the analysis of selection effects within hierarchical Bayesian frameworks. The package thus represents a significant step forward in gravitational wave research, enabling more precise and efficient exploration of the universe through gravitational wave observations. Additionally, `gwsnr` is instrumental in the `LeR` package for calculating detectable rates of both lensed and unlensed gravitational wave events, showcasing its utility in advanced gravitational wave studies.
+The `gwsnr` Python package addresses the need for efficient SNR computation in gravitational wave research. It innovatively streamlines SNR calculations, enhancing accuracy and efficiency with several advanced techniques. Firstly, it utilizes an innovative interpolation method, employing a half-scaling approach for accurately interpolating the SNR of gravitational waves from spin-less binary systems, focusing on the mass parameters. Secondly, the package features a noise-weighted inner product method, similar to that in the `bilby` package, but enhanced with multiprocessing capabilities. This integration allows for the parallel processing of complex calculations, thereby expediting the SNR computation. Lastly, `gwsnr` leverages the `numba` Just-In-Time (njit) compiler, which optimizes performance by compiling Python code into machine code at runtime, drastically reducing execution times. Beyond these technical merits, `gwsnr` stands out for its user-friendly features and seamless integration with other related software packages, making it not just a powerful tool but also an accessible one for researchers. These attributes position `gwsnr` as an invaluable asset in gravitational wave data analysis, particularly in simulations of detectable binary mergers, calculation of merger rates, determining gravitational wave lensing rates, and in the analysis of selection effects within hierarchical Bayesian frameworks. The package thus represents a significant step forward in gravitational wave research, enabling more precise and efficient exploration of the universe through gravitational wave observations and simulations. Additionally, `gwsnr` is instrumental in the `LeR` package for calculating detectable rates of both lensed and unlensed gravitational wave events, showcasing its utility in advanced gravitational wave studies.
 
 # Mathematical Formulation
 
 #### Modified FINDCHIRP Method: Half Scaling Approach
 
-The `gwsnr` package introduces the Half Scaling method for SNR calculations in spin-less binary systems. This method, rooted in the FINDCHIRP algorithm, focuses on non-spinning IMR waveforms and particularly interpolates the Half scaled SNR ($\rho_{1/2}$) based on mass parameters ($M_{tot},q$).
+The `gwsnr` package introduces the Half Scaling method for SNR calculations in spin-less binary systems. This method, rooted in the (FINDCHIRP)[https://arxiv.org/abs/gr-qc/0509116] algorithm, focuses on non-spinning IMR waveforms and particularly interpolates the Half scaled SNR ($\rho_{1/2}$) based on mass parameters ($M_{tot},q$).
 
 - **Interpolation Method**: Utilizes a 2D cubic spline technique (njit-ted) for the 'halfsnr' segment.
 
 - **Equations**:
 
-  - For a simple inspiral waveform, the optimal SNR:
+  - For a simple inspiral waveform, the optimal SNR is given by,
     $$\rho = F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi) \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }$$
 
   - $F$ is defined as a function of luminosity distance ($D_l$), chirp mass ($\mathcal{M}$), inclination angle ($\iota$), polarization angles ($\psi$), right ascension ($\alpha$), and declination ($\delta$). $f$ is the frequency, $f_{ISCO}$ is the last stable orbit frequency and $S_n(f)$ is the detector's noise curve or power spectral density (psd).
 
-  - Half scaled SNR: $\rho_{1/2} = \sqrt{ 4\int_0^\infty \frac{f^{-7/3}}{S_n(f)}df } \approx \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }$
+  - Then, half scaled SNR: $\rho_{1/2} = \sqrt{ 4\int_0^\infty \frac{f^{-7/3}}{S_n(f)}df } \approx \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }$
 
-  - For spinless IMR (Inspiral-Merger-Ringdown) waveforms with optimal SNR equal to $\rho$: $$\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi)$$
+  - For an spinless frequency-domain IMR (Inspiral-Merger-Ringdown) waveform with optimal SNR equal to $\rho$: $$\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi)$$
 
   - $\rho_{1/2}$ is considered a function of $M_{tot}$ and $q$.
 
