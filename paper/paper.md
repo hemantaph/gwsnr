@@ -51,3 +51,7 @@ Designed for SNR calculations in systems characterized by frequency domain wavef
   - $h_{+\times}$ are frequency domain waveform polarizations, and $F_{+\times}$ are antenna patterns. 
 
 These formulations highlight `gwsnr`'s capability to efficiently process diverse gravitational wave signals, enhancing data analysis accuracy and efficiency.
+
+# Acknowledgements
+
+The author express his sincere appreciation for the significant contributions that have been instrumental in completing this research. Special thanks are extended to my academic advisors for his invaluable guidance and steadfast support. The collaborative efforts and enriching discussions with research colleagues significantly enhanced the study's quality. Acknowledgement is given to the Department of Physics, The Chinese University of Hong Kong, for the Postgraduate Studentship that facilitated this research. Appreciation is conveyed for the computational resources provided by the LIGO Laboratory, supported by National Science Foundation Grants No. PHY-0757058 and No. PHY-0823459.
