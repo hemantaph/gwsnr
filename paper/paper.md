@@ -9,10 +9,10 @@ tags:
 authors:
   - name: Phurailatpam Hemantakumar
     orcid: 0000-0000-0000-0000
-    # equal-contrib: true
+    equal-contrib: true
     affiliation: "1"
   - name: Otto Akseli HANNUKSELA 
-    # equal-contrib: False 
+    equal-contrib: false 
     affiliation: "1"
 affiliations:
   - name: Department of Physics, The Chinese University of Hong Kong, Shatin, New Territories, Hong Kong
