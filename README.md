@@ -1,4 +1,5 @@
 # gwsnr: Gravitational Wave Signal-to-Noise Ratio Computation Package
+[![DOI](https://zenodo.org/badge/626733473.svg)]() [![PyPI version](https://badge.fury.io/py/ler.svg)](https://badge.fury.io/py/gwsnr) [![DOCS](https://readthedocs.org/projects/gwsnr/badge/?version=latest)](https://ler.readthedocs.io/en/latest/)
 
 ## Summary
 
