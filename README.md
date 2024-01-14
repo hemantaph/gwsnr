@@ -15,4 +15,3 @@ is a fast package for computing signal-to-noise ratios for any spinless, non-HOM
 * from quintet import Quintet as quin
 * quin_ = quin()
 
-## for further details on how to use, refer to quintet/test.ipynb file
