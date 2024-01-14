@@ -5,4 +5,3 @@ gwsnr
    :maxdepth: 4
 
    gwsnr
-   setup
