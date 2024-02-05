@@ -4,7 +4,7 @@ import sys
 # read the contents of your README file
 from pathlib import Path
 this_directory = Path(__file__).parent
-long_description = (this_directory / "README.md").read_text()
+long_description = (. / "README.md").read_text()
 
 # check that python version is 3.7 or above
 python_version = sys.version_info
@@ -14,7 +14,7 @@ if python_version < (3, 10):
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 setup(name='gwsnr',
-      version='0.2.1',
+      version='0.2.2',
       description='Fast SNR interpolator',
       author='Hemantakumar Phurailatpam',
       license="MIT",
