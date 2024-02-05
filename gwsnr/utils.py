@@ -24,7 +24,7 @@ class NumpyEncoder(json.JSONEncoder):
         # Fallback to default behavior for other types
         return super(NumpyEncoder, self).default(obj)
 
-def dealing_with_psds(psds=None, isit_psd_file=False, ifos=None, f_min=20., sampling_frequency=2048.):
+def dealing_with_psds(psds=None, ifos=None, f_min=20., sampling_frequency=2048.):
     """
     Function to deal with psds inputs and for creating bilby.gw.detector.PowerSpectralDensity objects.
 
@@ -46,8 +46,8 @@ def dealing_with_psds(psds=None, isit_psd_file=False, ifos=None, f_min=20., samp
     psds_list : `list`
         list of bilby.gw.detector.PowerSpectralDensity objects
     """
-    
-    if not psds:
+
+    if not psds and not ifos:
         # if psds is not given, choose bilby's default psds
         print("psds not given. Choosing bilby's default psds")
         psds = dict()
@@ -55,69 +55,116 @@ def dealing_with_psds(psds=None, isit_psd_file=False, ifos=None, f_min=20., samp
         psds["H1"] = "aLIGO_O4_high_asd.txt"
         psds["V1"] = "AdV_asd.txt"
         detector_list = list(psds.keys())
-        isit_psd_file_dict = dict(L1=False, H1=False, V1=False)
         # for Fp, Fc calculation
         ifos = bilby.gw.detector.InterferometerList(detector_list)
-    else:
-        # given psds is a dictionary
-        # dict keys are the detectors names
-        # dict values are the psds file names
-        try:
-            detector_list = list(psds.keys())
-        except ValueError as e:
-            raise ValueError("psds must be a dictionary with keys as detector names (e.g.'L1' for Livingston etc) and values as str") from e
-        
-        if type(isit_psd_file) == bool:  # this means all psds are 
-            isit_psd_file_dict = dict()
-            for det in detector_list:
-                isit_psd_file_dict[det] = isit_psd_file
-        elif list(isit_psd_file.keys())==detector_list:
-            pass
-        else:
-            raise ValueError(f"isit_psd_file must be a dictionary with keys: {detector_list} and values as bool")
 
-        ifos = []
-        len_ = len(detector_list)
-        for i in range(len_):
-            try:
-                # if ifos is not None, then use the given ifos
-                # ifos is a list of bilby.gw.detector.Interferometer 
-                ifos.append(ifos[i])
-            except:
-                # if ifos is None, then generate bilby's default ifos with the given list of detectors
-                ifos.append(
-                    bilby.gw.detector.InterferometerList(
-                        [detector_list[i]]
-                    )[0]
-                )
+    elif not psds and ifos:
+        ifos_ = []
+        detector_list = []
+        psds = dict()
+        for ifo in ifos:
+            if isinstance(ifo, str):
+                if ifo == "ET":
+                    ifos_ += (bilby.gw.detector.InterferometerList([ifo]))
+                    detector_list.append("ET1")
+                    detector_list.append("ET2")
+                    detector_list.append("ET3")
+                    psds["ET1"] = ifos_[-3].power_spectral_density.psd_file
+                    psds["ET2"] = ifos_[-2].power_spectral_density.psd_file
+                    psds["ET3"] = ifos_[-1].power_spectral_density.psd_file
+                else:
+                    ifos_.append(bilby.gw.detector.InterferometerList([ifo])[0])
+                    detector_list.append(ifo)
+                    psds[ifo] = ifos_[-1].power_spectral_density.psd_file
+
+            else:
+                ifos_.append(ifo)
+                detector_list.append(ifo.name)
+                psds[ifo.name] = ifo.power_spectral_density.psd_file
+        ifos = ifos_
+
+    elif psds and not ifos:
+        detector_list = list(psds.keys())
+        ifos = bilby.gw.detector.InterferometerList(detector_list)
+
+        if "ET" in detector_list:
+            # insert ET1, ET2, ET3 inplace of ET in the detector_list
+            idx = detector_list.index("ET")
+            detector_list.pop(idx)
+            detector_list.insert(idx, "ET1")
+            detector_list.insert(idx+1, "ET2")
+            detector_list.insert(idx+2, "ET3")
+
+        for i, ifo in enumerate(ifos):
+            psds[ifo.name] = ifo.power_spectral_density.psd_file
+
+    elif psds and ifos:
+        detector_list = []
+        ifos_ = []
+        psds_ = dict()
+        for ifo in ifos:
+            if isinstance(ifo, str):
+                if ifo == "ET":
+                    ifos_ += (bilby.gw.detector.InterferometerList([ifo]))
+                    detector_list.append("ET1")
+                    detector_list.append("ET2")
+                    detector_list.append("ET3")
+                    psds_["ET1"] = psds["ET"]
+                    psds_["ET2"] = psds["ET"]
+                    psds_["ET3"] = psds["ET"]
+                else:
+                    ifos_.append(bilby.gw.detector.InterferometerList([ifo])[0])
+                    detector_list.append(ifo)
+                    psds_[ifo] = psds[ifo]
+
+            else:
+                ifos_.append(ifo)
+                detector_list.append(ifo.name)
+                psds_[ifo.name] = psds[ifo.name]
+
+        ifos = ifos_
+        psds = psds_
+    else:
+        raise ValueError("psds and ifos are not in the correct format")
 
     # generate bilby's psd objects
     psds_list = []
     detector_tensor_list = []
-    i = 0
-    for det in detector_list:
+    error_msg = "the psds format is not recognised. The parameter psds dict should contain chosen detector names as keys and corresponding psds txt file name (or name from pycbc psd)as their values"
+    # print(psds)
+    # print(detector_list)
+    for i, det in enumerate(detector_list):
         # either provided psd or what's available in bilby
+        
         if type(psds[det]) == str and psds[det][-3:] == "txt":
-            if isit_psd_file_dict[det]:
-                psds_list.append(
-                    bilby.gw.detector.PowerSpectralDensity(
-                        psd_file=psds[det]
-                    )
-                )
-            else:
-                psds_list.append(
-                    bilby.gw.detector.PowerSpectralDensity(
-                        asd_file=psds[det]
-                    )
-                )
+            try:
+                psds_list.append(bilby.gw.detector.PowerSpectralDensity(
+                    psd_file=psds[det]))
+            except:
+                psds_list.append(bilby.gw.detector.PowerSpectralDensity(
+                    asd_file=psds[det]))
+                
+            # if isit_psd_file_dict[det]:
+            #     psds_list.append(
+            #         bilby.gw.detector.PowerSpectralDensity(
+            #             psd_file=psds[det]
+            #         )
+            #     )
+            # else:
+            #     psds_list.append(
+            #         bilby.gw.detector.PowerSpectralDensity(
+            #             asd_file=psds[det]
+            #         )
+            #     )
             detector_tensor_list.append(ifos[i].detector_tensor)
-            i += 1
-        elif type(psds[det]) == str:
-            psds_list.append(power_spectral_density_pycbc(psds[det]), f_min, sampling_frequency)
+
+        elif isinstance(psds[det], str):
+            try:
+                psds_list.append(power_spectral_density_pycbc(psds[det]), f_min, sampling_frequency)
+            except:
+                raise ValueError(error_msg)
         else:
-            raise ValueError(
-                        "the psds format is not recognised. The parameter psds dict should contain chosen detector names as keys and corresponding psds txt file name (or name from pycbc psd)as their values"
-                    )
+            raise ValueError(error_msg)
 
     return psds_list, detector_tensor_list, detector_list
 
@@ -186,6 +233,7 @@ def interpolator_check(
     detector_tensor_list_ = []
     psds_list_ = []
     path_interpolator_ = []
+    path_interpolator_all = []
 
     # getting interpolator if exists
     k = 0
@@ -210,11 +258,13 @@ def interpolator_check(
             detector_list_.append(det)
             psds_list_.append(psds_list[k])
             detector_tensor_list_.append(detector_tensor_list[k])
+            path_interpolator_.append(path_interpolator)
 
-        path_interpolator_.append(path_interpolator)
+        path_interpolator_all.append(path_interpolator)
         k += 1
-
-    return psds_list_, detector_tensor_list_, detector_list_, path_interpolator_
+    
+    
+    return psds_list_, detector_tensor_list_, detector_list_, path_interpolator_, path_interpolator_all
 
 def interpolator_pickle_path(
     param_dict_given, path="./interpolator_pickle"

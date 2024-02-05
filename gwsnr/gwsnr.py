@@ -71,8 +71,6 @@ class GWSNR:
         psds={'L1':'aLIGO_O4_high_asd.txt','H1':'aLIGO_O4_high_asd.txt', 'V1':'AdV_asd.txt', 'K1':'KAGRA_design_asd.txt'}.
         For other psd files, check https://github.com/lscsoft/bilby/tree/master/bilby/gw/detector/noise_curves \n
         Example 3: when values are custom psd txt file. psds={'L1':'custom_psd.txt','H1':'custom_psd.txt'}. Custom created txt file has two columns. 1st column: frequency array, 2nd column: strain.
-    isit_psd_file : `bool` or `dict`
-        If set True, the given value of psds param should be of psds instead of asd. If asd, set isit_psd_file=False. Default is False. If dict, it should be of the form {'L1':True, 'H1':True, 'V1':True} and should have keys for all the detectors.
     psd_with_time : `bool` or `float`
         gps end time of strain data for which psd will be found. (this param will be given highest priority), example: psd_with_time=1246527224.169434. If False, psds given in psds param will be used. Default is False. If True (without gps time), psds will be calculated from strain data by setting gps end time as geocent_time-duration. Default is False.
     ifos : `list` or `None`
@@ -92,7 +90,7 @@ class GWSNR:
                 yarm_azimuth = 117.6157 + 90.,
                 xarm_tilt = 0.,
                 yarm_tilt = 0.)
-        >>> snr = GWSNR(psds=dict(LIO='your_asd_file.txt'), ifos=[ifosLIO], isit_psd_file=[False])
+        >>> snr = GWSNR(psds=dict(LIO='your_asd_file.txt'), ifos=[ifosLIO])
     interpolator_dir : `str`
         Path to store the interpolator pickle file. Default is './interpolator_pickle'.
     create_new_interpolator : `bool`
@@ -243,10 +241,6 @@ class GWSNR:
     """``dict`` \n
     Dictionary of psds for different detectors."""
 
-    isit_psd_file = None
-    """``dict`` \n
-    dict keys with detector names and values as bool."""
-
     interpolator_dir = None
     """``str`` \n
     Path to store the interpolator pickle file."""
@@ -273,7 +267,6 @@ class GWSNR:
         minimum_frequency=20.0,
         snr_type="interpolation",
         psds=None,
-        isit_psd_file=False,
         ifos=None,
         interpolator_dir="./interpolator_pickle",
         create_new_interpolator=False,
@@ -313,9 +306,9 @@ class GWSNR:
         # if not given, bilby's default psds will be used
         # interferometer object will be created for Fp, Fc calculation
         # self.psds and self.ifos are list of dictionaries
-        # self.isit_psd_file and self.detector_list are list of bool and list of strings respectively and will be set at the last.
+        # self.detector_list are list of strings and will be set at the last.
         psds_list, detector_tensor_list, detector_list = dealing_with_psds(
-            psds, isit_psd_file, ifos, minimum_frequency, sampling_frequency
+            psds, ifos, minimum_frequency, sampling_frequency
         )
         # print some info
         self.print_all_params(gwsnr_verbose)
@@ -345,11 +338,15 @@ class GWSNR:
                 self.detector_tensor_list,
                 self.detector_list,
                 self.path_interpolator,
+                path_interpolator_all
             ) = interpolator_check(
                 param_dict_given=self.param_dict_given.copy(),
                 interpolator_dir=interpolator_dir,
                 create_new=create_new_interpolator,
             )
+
+            # print(self.path_interpolator)
+            # print(self.detector_list)
 
             self.multiprocessing_verbose = False  # This lets multiprocessing to use map instead of imap_unordered function.
             # len(detector_list) == 0, means all the detectors have interpolator stored
@@ -365,13 +362,14 @@ class GWSNR:
                 self.init_halfscaled()
             
             # get all halfscaledSNR from the stored interpolator
-            self.snr_halfsacaled_list = [load_json(path) for path in self.path_interpolator]
+            self.snr_halfsacaled_list = [load_json(path) for path in path_interpolator_all]
 
         # change back to original
         self.psds_list = psds_list
         self.detector_tensor_list = detector_tensor_list
         self.detector_list = detector_list
         self.multiprocessing_verbose = multiprocessing_verbose
+        self.path_interpolator = path_interpolator_all
 
     def calculate_mtot_max(self, mtot_max, minimum_frequency):
         """
