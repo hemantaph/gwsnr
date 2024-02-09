@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gwsnr.utils &mdash; gwsnr 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/tabs.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+        <script src="../../_static/tabs.js?v=3030b3cb"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            gwsnr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Summary.html">Summary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/gwsnr/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.gwsnr</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/njit_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.njit_functions</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/multiprocessing_routine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.multiprocessing_routine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/pdet/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.pdet</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.utils</span></code></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Short%20Example.html">Short Example</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">gwsnr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gwsnr.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gwsnr.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Helper functions for gwsnr</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">bilby</span>
+
+
+<div class="viewcode-block" id="NumpyEncoder">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.NumpyEncoder">[docs]</a>
+<span class="k">class</span> <span class="nc">NumpyEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Custom JSON encoder for numpy data types. It converts numpy.ndarray objects (and any nested-list composition </span>
+<span class="sd">    that includes ndarray objects) into regular lists for JSON serialization. This is particularly useful when </span>
+<span class="sd">    serializing data structures that include numpy arrays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="NumpyEncoder.default">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.NumpyEncoder.default">[docs]</a>
+    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="c1"># Check if the object is an instance of numpy.ndarray</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>  <span class="c1"># Convert ndarray to list</span>
+        <span class="c1"># Fallback to default behavior for other types</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">NumpyEncoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="dealing_with_psds">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.dealing_with_psds">[docs]</a>
+<span class="k">def</span> <span class="nf">dealing_with_psds</span><span class="p">(</span><span class="n">psds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ifos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">f_min</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">sampling_frequency</span><span class="o">=</span><span class="mf">2048.</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to deal with psds inputs and for creating bilby.gw.detector.PowerSpectralDensity objects.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    psds : dict</span>
+<span class="sd">        dictionary of psds. psds.keys()=detector names, psds.values()=psds file names or pycbc psd names</span>
+<span class="sd">    isit_psd_file : `bool` or `dict`</span>
+<span class="sd">        If set True, the given value of psds param should be of psds instead of asd. If asd, set isit_psd_file=False. Default is False. If dict, it should be of the form {&#39;L1&#39;:True, &#39;H1&#39;:True, &#39;V1&#39;:True} and should have keys for all the detectors.</span>
+<span class="sd">    ifos : `list` or `None`</span>
+<span class="sd">        List of interferometer objects. Default is None. If None, bilby&#39;s default interferometer objects will be used.</span>
+<span class="sd">    f_min : `float`</span>
+<span class="sd">        Minimum frequency of the psds. Default is 20.</span>
+<span class="sd">    sampling_frequency : `float`</span>
+<span class="sd">        Sampling frequency of the psds. Default is 2048.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    psds_list : `list`</span>
+<span class="sd">        list of bilby.gw.detector.PowerSpectralDensity objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">psds</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ifos</span><span class="p">:</span>
+        <span class="c1"># if psds is not given, choose bilby&#39;s default psds</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;psds not given. Choosing bilby&#39;s default psds&quot;</span><span class="p">)</span>
+        <span class="n">psds</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">psds</span><span class="p">[</span><span class="s2">&quot;L1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;aLIGO_O4_high_asd.txt&quot;</span>
+        <span class="n">psds</span><span class="p">[</span><span class="s2">&quot;H1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;aLIGO_O4_high_asd.txt&quot;</span>
+        <span class="n">psds</span><span class="p">[</span><span class="s2">&quot;V1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;AdV_asd.txt&quot;</span>
+        <span class="n">detector_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">psds</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="c1"># for Fp, Fc calculation</span>
+        <span class="n">ifos</span> <span class="o">=</span> <span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">InterferometerList</span><span class="p">(</span><span class="n">detector_list</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">psds</span> <span class="ow">and</span> <span class="n">ifos</span><span class="p">:</span>
+        <span class="n">ifos_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">detector_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">psds</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ifo</span> <span class="ow">in</span> <span class="n">ifos</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ifo</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ifo</span> <span class="o">==</span> <span class="s2">&quot;ET&quot;</span><span class="p">:</span>
+                    <span class="n">ifos_</span> <span class="o">+=</span> <span class="p">(</span><span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">InterferometerList</span><span class="p">([</span><span class="n">ifo</span><span class="p">]))</span>
+                    <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ET1&quot;</span><span class="p">)</span>
+                    <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ET2&quot;</span><span class="p">)</span>
+                    <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ET3&quot;</span><span class="p">)</span>
+                    <span class="n">psds</span><span class="p">[</span><span class="s2">&quot;ET1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ifos_</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">power_spectral_density</span><span class="o">.</span><span class="n">psd_file</span>
+                    <span class="n">psds</span><span class="p">[</span><span class="s2">&quot;ET2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ifos_</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">power_spectral_density</span><span class="o">.</span><span class="n">psd_file</span>
+                    <span class="n">psds</span><span class="p">[</span><span class="s2">&quot;ET3&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ifos_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">power_spectral_density</span><span class="o">.</span><span class="n">psd_file</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ifos_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">InterferometerList</span><span class="p">([</span><span class="n">ifo</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ifo</span><span class="p">)</span>
+                    <span class="n">psds</span><span class="p">[</span><span class="n">ifo</span><span class="p">]</span> <span class="o">=</span> <span class="n">ifos_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">power_spectral_density</span><span class="o">.</span><span class="n">psd_file</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ifos_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ifo</span><span class="p">)</span>
+                <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ifo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">psds</span><span class="p">[</span><span class="n">ifo</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ifo</span><span class="o">.</span><span class="n">power_spectral_density</span><span class="o">.</span><span class="n">psd_file</span>
+        <span class="n">ifos</span> <span class="o">=</span> <span class="n">ifos_</span>
+
+    <span class="k">elif</span> <span class="n">psds</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ifos</span><span class="p">:</span>
+        <span class="n">detector_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">psds</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">ifos</span> <span class="o">=</span> <span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">InterferometerList</span><span class="p">(</span><span class="n">detector_list</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;ET&quot;</span> <span class="ow">in</span> <span class="n">detector_list</span><span class="p">:</span>
+            <span class="c1"># insert ET1, ET2, ET3 inplace of ET in the detector_list</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">detector_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;ET&quot;</span><span class="p">)</span>
+            <span class="n">detector_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="n">detector_list</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="s2">&quot;ET1&quot;</span><span class="p">)</span>
+            <span class="n">detector_list</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;ET2&quot;</span><span class="p">)</span>
+            <span class="n">detector_list</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;ET3&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ifo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ifos</span><span class="p">):</span>
+            <span class="n">psds</span><span class="p">[</span><span class="n">ifo</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ifo</span><span class="o">.</span><span class="n">power_spectral_density</span><span class="o">.</span><span class="n">psd_file</span>
+
+    <span class="k">elif</span> <span class="n">psds</span> <span class="ow">and</span> <span class="n">ifos</span><span class="p">:</span>
+        <span class="n">detector_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ifos_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">psds_</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ifo</span> <span class="ow">in</span> <span class="n">ifos</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ifo</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ifo</span> <span class="o">==</span> <span class="s2">&quot;ET&quot;</span><span class="p">:</span>
+                    <span class="n">ifos_</span> <span class="o">+=</span> <span class="p">(</span><span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">InterferometerList</span><span class="p">([</span><span class="n">ifo</span><span class="p">]))</span>
+                    <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ET1&quot;</span><span class="p">)</span>
+                    <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ET2&quot;</span><span class="p">)</span>
+                    <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ET3&quot;</span><span class="p">)</span>
+                    <span class="n">psds_</span><span class="p">[</span><span class="s2">&quot;ET1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psds</span><span class="p">[</span><span class="s2">&quot;ET&quot;</span><span class="p">]</span>
+                    <span class="n">psds_</span><span class="p">[</span><span class="s2">&quot;ET2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psds</span><span class="p">[</span><span class="s2">&quot;ET&quot;</span><span class="p">]</span>
+                    <span class="n">psds_</span><span class="p">[</span><span class="s2">&quot;ET3&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psds</span><span class="p">[</span><span class="s2">&quot;ET&quot;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ifos_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">InterferometerList</span><span class="p">([</span><span class="n">ifo</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ifo</span><span class="p">)</span>
+                    <span class="n">psds_</span><span class="p">[</span><span class="n">ifo</span><span class="p">]</span> <span class="o">=</span> <span class="n">psds</span><span class="p">[</span><span class="n">ifo</span><span class="p">]</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ifos_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ifo</span><span class="p">)</span>
+                <span class="n">detector_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ifo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">psds_</span><span class="p">[</span><span class="n">ifo</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">psds</span><span class="p">[</span><span class="n">ifo</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="n">ifos</span> <span class="o">=</span> <span class="n">ifos_</span>
+        <span class="n">psds</span> <span class="o">=</span> <span class="n">psds_</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;psds and ifos are not in the correct format&quot;</span><span class="p">)</span>
+
+    <span class="c1"># generate bilby&#39;s psd objects</span>
+    <span class="n">psds_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">detector_tensor_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;the psds format is not recognised. The parameter psds dict should contain chosen detector names as keys and corresponding psds txt file name (or name from pycbc psd)as their values&quot;</span>
+    <span class="c1"># print(psds)</span>
+    <span class="c1"># print(detector_list)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">det</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">detector_list</span><span class="p">):</span>
+        <span class="c1"># either provided psd or what&#39;s available in bilby</span>
+        
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">psds</span><span class="p">[</span><span class="n">det</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">psds</span><span class="p">[</span><span class="n">det</span><span class="p">][</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">&quot;txt&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">psds_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">PowerSpectralDensity</span><span class="p">(</span>
+                    <span class="n">psd_file</span><span class="o">=</span><span class="n">psds</span><span class="p">[</span><span class="n">det</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">psds_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">PowerSpectralDensity</span><span class="p">(</span>
+                    <span class="n">asd_file</span><span class="o">=</span><span class="n">psds</span><span class="p">[</span><span class="n">det</span><span class="p">]))</span>
+                
+            <span class="c1"># if isit_psd_file_dict[det]:</span>
+            <span class="c1">#     psds_list.append(</span>
+            <span class="c1">#         bilby.gw.detector.PowerSpectralDensity(</span>
+            <span class="c1">#             psd_file=psds[det]</span>
+            <span class="c1">#         )</span>
+            <span class="c1">#     )</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#     psds_list.append(</span>
+            <span class="c1">#         bilby.gw.detector.PowerSpectralDensity(</span>
+            <span class="c1">#             asd_file=psds[det]</span>
+            <span class="c1">#         )</span>
+            <span class="c1">#     )</span>
+            <span class="n">detector_tensor_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ifos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">detector_tensor</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">psds</span><span class="p">[</span><span class="n">det</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">psds_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">power_spectral_density_pycbc</span><span class="p">(</span><span class="n">psds</span><span class="p">[</span><span class="n">det</span><span class="p">]),</span> <span class="n">f_min</span><span class="p">,</span> <span class="n">sampling_frequency</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">psds_list</span><span class="p">,</span> <span class="n">detector_tensor_list</span><span class="p">,</span> <span class="n">detector_list</span></div>
+
+
+<div class="viewcode-block" id="power_spectral_density_pycbc">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.power_spectral_density_pycbc">[docs]</a>
+<span class="k">def</span> <span class="nf">power_spectral_density_pycbc</span><span class="p">(</span><span class="n">psd</span><span class="p">,</span> <span class="n">f_min</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">sampling_frequency</span><span class="o">=</span><span class="mf">2048.</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    psd array finder from pycbc</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    psd : str</span>
+<span class="sd">        name of the psd</span>
+<span class="sd">        e.g. &#39;aLIGOaLIGODesignSensitivityT1800044&#39;</span>
+<span class="sd">    f_min : float</span>
+<span class="sd">        minimum frequency of the psd</span>
+<span class="sd">        default: 20.</span>
+<span class="sd">    sampling_frequency : float</span>
+<span class="sd">        sampling frequency of the psd</span>
+<span class="sd">        default: 2048.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    psd_array : bilby.gw.detector.psd.PowerSpectralDensity object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pycbc</span>
+    <span class="kn">import</span> <span class="nn">pycbc.psd</span>
+
+    <span class="n">delta_f</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">16.0</span>
+    <span class="n">flen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sampling_frequency</span> <span class="o">/</span> <span class="n">delta_f</span><span class="p">)</span>
+    <span class="n">low_frequency_cutoff</span> <span class="o">=</span> <span class="n">f_min</span>
+    <span class="n">psd_</span> <span class="o">=</span> <span class="n">pycbc</span><span class="o">.</span><span class="n">psd</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">psd</span><span class="p">,</span> <span class="n">flen</span><span class="p">,</span> <span class="n">delta_f</span><span class="p">,</span> <span class="n">low_frequency_cutoff</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">PowerSpectralDensity</span><span class="p">(</span>
+        <span class="n">frequency_array</span><span class="o">=</span><span class="n">psd_</span><span class="o">.</span><span class="n">sample_frequencies</span><span class="p">,</span> <span class="n">psd_array</span><span class="o">=</span><span class="n">psd_</span><span class="o">.</span><span class="n">data</span>
+    <span class="p">)</span></div>
+
+
+<span class="c1"># interpolator check and generation</span>
+<div class="viewcode-block" id="interpolator_check">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.interpolator_check">[docs]</a>
+<span class="k">def</span> <span class="nf">interpolator_check</span><span class="p">(</span>
+        <span class="n">param_dict_given</span><span class="p">,</span> <span class="n">interpolator_dir</span><span class="p">,</span> <span class="n">create_new</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function for interpolator (snr_halfsacaled) check and generation if not exists.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_dict_given : dict</span>
+<span class="sd">        dictionary of parameters based on which the existence of interpolator will be checked</span>
+<span class="sd">    interpolator_dir : str</span>
+<span class="sd">        path to the interpolator pickle file</span>
+<span class="sd">    create_new : bool</span>
+<span class="sd">        if True, new interpolator will be generated even if the interpolator exists</span>
+<span class="sd">        if False, existing interpolator will be used if exists, otherwise new interpolator will be generated</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    psds_list_ : list</span>
+<span class="sd">        list of psd objects</span>
+<span class="sd">    detector_tensor_list_ : list</span>
+<span class="sd">        list of detector tensors</span>
+<span class="sd">    detector_list_ : list</span>
+<span class="sd">        list of detector names</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">detector_list</span> <span class="o">=</span> <span class="n">param_dict_given</span><span class="p">[</span><span class="s2">&quot;detector&quot;</span><span class="p">]</span>
+    <span class="n">psds_list</span> <span class="o">=</span> <span class="n">param_dict_given</span><span class="p">[</span><span class="s2">&quot;psds&quot;</span><span class="p">]</span>
+    <span class="n">detector_tensor_list</span> <span class="o">=</span> <span class="n">param_dict_given</span><span class="p">[</span><span class="s2">&quot;detector_tensor&quot;</span><span class="p">]</span>
+    <span class="n">detector_list_</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">detector_tensor_list_</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">psds_list_</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">path_interpolator_</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">path_interpolator_all</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># getting interpolator if exists</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">det</span> <span class="ow">in</span> <span class="n">detector_list</span><span class="p">:</span>
+        <span class="n">param_dict_given</span><span class="p">[</span><span class="s2">&quot;detector&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">det</span>
+        <span class="n">param_dict_given</span><span class="p">[</span><span class="s2">&quot;psds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psds_list</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">param_dict_given</span><span class="p">[</span><span class="s2">&quot;detector_tensor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">detector_tensor_list</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">path_interpolator</span><span class="p">,</span> <span class="n">it_exist</span> <span class="o">=</span> <span class="n">interpolator_pickle_path</span><span class="p">(</span>
+            <span class="n">param_dict_given</span><span class="p">,</span> <span class="n">interpolator_dir</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">create_new</span><span class="p">:</span>
+            <span class="n">it_exist</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">it_exist</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Interpolator will be loaded for </span><span class="si">{</span><span class="n">det</span><span class="si">}</span><span class="s2"> detector from </span><span class="si">{</span><span class="n">path_interpolator</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Interpolator will be generated for </span><span class="si">{</span><span class="n">det</span><span class="si">}</span><span class="s2"> detector at </span><span class="si">{</span><span class="n">path_interpolator</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="n">detector_list_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">det</span><span class="p">)</span>
+            <span class="n">psds_list_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">psds_list</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">detector_tensor_list_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">detector_tensor_list</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">path_interpolator_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path_interpolator</span><span class="p">)</span>
+
+        <span class="n">path_interpolator_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path_interpolator</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+    
+    
+    <span class="k">return</span> <span class="n">psds_list_</span><span class="p">,</span> <span class="n">detector_tensor_list_</span><span class="p">,</span> <span class="n">detector_list_</span><span class="p">,</span> <span class="n">path_interpolator_</span><span class="p">,</span> <span class="n">path_interpolator_all</span></div>
+
+
+<div class="viewcode-block" id="interpolator_pickle_path">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.interpolator_pickle_path">[docs]</a>
+<span class="k">def</span> <span class="nf">interpolator_pickle_path</span><span class="p">(</span>
+    <span class="n">param_dict_given</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./interpolator_pickle&quot;</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function for storing or getting interpolator (snr_halfsacaled) pickle path</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_dict_given : dict</span>
+<span class="sd">        dictionary of parameters based on which the existence of interpolator will be checked</span>
+<span class="sd">    path : str</span>
+<span class="sd">        path to the directory where the interpolator pickle file will be stored</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    path_interpolator : str</span>
+<span class="sd">        path to the interpolator pickle file</span>
+<span class="sd">        e.g. &#39;./interpolator_pickle/L1/halfSNR_dict_0.pickle&#39;</span>
+<span class="sd">    it_exist: bool</span>
+<span class="sd">        True if the interpolator exists</span>
+<span class="sd">        False if the interpolator does not exists</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">detector</span> <span class="o">=</span> <span class="n">param_dict_given</span><span class="p">[</span><span class="s2">&quot;detector&quot;</span><span class="p">]</span>
+    <span class="c1"># arg no. for the detector from the detector list</span>
+    <span class="n">det_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">detector</span>
+
+    <span class="c1"># check if path exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="c1"># check if detector path exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">det_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">det_path</span><span class="p">)</span>
+
+    <span class="c1"># check if param_dict_list.pickle exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">det_path</span> <span class="o">+</span> <span class="s2">&quot;/param_dict_list.pickle&quot;</span><span class="p">):</span>
+        <span class="n">dict_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">det_path</span> <span class="o">+</span> <span class="s2">&quot;/param_dict_list.pickle&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dict_list</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+
+    <span class="c1"># for checking existing interpolator pickle in the det_path/param_dict_list.pickle file</span>
+    <span class="n">param_dict_stored</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+        <span class="nb">open</span><span class="p">(</span><span class="n">det_path</span> <span class="o">+</span> <span class="s2">&quot;/param_dict_list.pickle&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">len_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">param_dict_stored</span><span class="p">)</span>
+    <span class="c1">#del param_dict_given[&quot;psds&quot;]</span>
+    <span class="n">param_dict_given</span><span class="p">[</span><span class="s2">&quot;detector_tensor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">param_dict_given</span><span class="p">[</span><span class="s2">&quot;detector_tensor&quot;</span><span class="p">])</span>
+    <span class="c1"># print(&quot;\n\n&quot;, param_dict_given)</span>
+    <span class="c1"># print(&quot;\n\n&quot;,param_dict_stored)</span>
+    <span class="k">if</span> <span class="n">param_dict_given</span> <span class="ow">in</span> <span class="n">param_dict_stored</span><span class="p">:</span>
+        <span class="c1"># try and except is added so that user can regenerate a new interpolator pickle file just by</span>
+        <span class="c1"># deleting the right file and reruing gwsnr with that params again</span>
+        <span class="c1"># also, if the user delete the file by mistake, it will generate in the next run</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">param_dict_stored</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">param_dict_given</span><span class="p">)</span>
+        <span class="c1"># check if interpolator pickle exists</span>
+        <span class="c1"># get halfSNR interpolator if exists</span>
+        <span class="n">path_interpolator</span> <span class="o">=</span> <span class="n">det_path</span> <span class="o">+</span> <span class="s2">&quot;/halfSNR_dict_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.pickle&quot;</span>
+        <span class="c1"># there will be exception if the file is deleted by mistake</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path_interpolator</span><span class="p">):</span>
+            <span class="n">it_exist</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">it_exist</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># if related dict not found in the param_dict_list.pickle</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">it_exist</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">path_interpolator</span> <span class="o">=</span> <span class="n">det_path</span> <span class="o">+</span> <span class="s2">&quot;/halfSNR_dict_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">len_</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.pickle&quot;</span>
+        <span class="c1"># print(&quot;related dict not found in the param_dict_list.pickle, new interpolator will be generated&quot;)</span>
+
+        <span class="c1"># store the pickle dict</span>
+        <span class="n">param_dict_stored</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_dict_given</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">det_path</span> <span class="o">+</span> <span class="s2">&quot;/param_dict_list.pickle&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">param_dict_stored</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+
+    <span class="c1"># print(f&quot;In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {path_interpolator} \n&quot;)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">path_interpolator</span><span class="p">,</span> <span class="n">it_exist</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_json">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.load_json">[docs]</a>
+<span class="k">def</span> <span class="nf">load_json</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a json file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_name : `str`</span>
+<span class="sd">        json file name for storing the parameters.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param : `dict`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">param</span></div>
+
+
+<div class="viewcode-block" id="save_json">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.save_json">[docs]</a>
+<span class="k">def</span> <span class="nf">save_json</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save a json file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param : `dict`</span>
+<span class="sd">        dictionary of parameters.</span>
+<span class="sd">    file_name : `str`</span>
+<span class="sd">        json file name for storing the parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_json_dict">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.save_json_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">save_json_dict</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save a json file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param : `dict`</span>
+<span class="sd">        dictionary of parameters.</span>
+<span class="sd">    file_name : `str`</span>
+<span class="sd">        json file name for storing the parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">json_dump</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">NumpyEncoder</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">write_file</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_dump</span><span class="p">),</span> <span class="n">write_file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="load_json_dict">
+<a class="viewcode-back" href="../../autoapi/gwsnr/utils/index.html#gwsnr.utils.load_json_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">load_json_dict</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a json file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_name : `str`</span>
+<span class="sd">        json file name for storing the parameters.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param : `dict`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">param</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Phurailatpam Hemantakumar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

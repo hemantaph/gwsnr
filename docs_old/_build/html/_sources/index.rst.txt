@@ -27,10 +27,7 @@ The code is available at `github <https://github.com/hemantaph/gwsnr>`_
    :maxdepth: 1
    :caption: API:
 
-   autoapi/gwsnr/gwsnr/index.rst
-   autoapi/gwsnr/njit_functions/index.rst
-   autoapi/gwsnr/multiprocessing_routine/index.rst
-   autoapi/gwsnr/utils/index.rst
+
    
 .. toctree::
    :maxdepth: 2

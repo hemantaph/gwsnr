@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gwsnr.gwsnr &mdash; gwsnr 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/tabs.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+        <script src="../../_static/tabs.js?v=3030b3cb"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            gwsnr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Summary.html">Summary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/gwsnr/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.gwsnr</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/njit_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.njit_functions</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/multiprocessing_routine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.multiprocessing_routine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/pdet/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.pdet</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.utils</span></code></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Short%20Example.html">Short Example</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">gwsnr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gwsnr.gwsnr</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gwsnr.gwsnr</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains functions for calculating the SNR of a CBC signal. It has two methods: interpolation (bicubic) and inner product. Interpolation method is much faster than inner product method. Interpolation method is tested for IMRPhenomD and TaylorF2 waveform approximants for the spinless scenario.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">CubicSpline</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fsolve</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">save_json</span><span class="p">,</span>
+    <span class="n">dealing_with_psds</span><span class="p">,</span>
+    <span class="n">interpolator_check</span><span class="p">,</span>
+    <span class="n">load_json</span><span class="p">,</span>
+    <span class="n">save_json_dict</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.njit_functions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_interpolated_snr</span><span class="p">,</span>
+    <span class="n">findchirp_chirptime</span><span class="p">,</span>
+    <span class="n">antenna_response</span><span class="p">,</span>
+    <span class="n">antenna_response_array</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.multiprocessing_routine</span> <span class="kn">import</span> <span class="n">noise_weighted_inner_prod</span>
+
+<span class="c1"># defining constants</span>
+<span class="n">C</span> <span class="o">=</span> <span class="mf">299792458.0</span>
+<span class="n">G</span> <span class="o">=</span> <span class="mf">6.67408e-11</span>
+<span class="n">Pi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+<span class="n">MTSUN_SI</span> <span class="o">=</span> <span class="mf">4.925491025543576e-06</span>
+
+
+<div class="viewcode-block" id="GWSNR">
+<a class="viewcode-back" href="../../autoapi/gwsnr/index.html#gwsnr.gwsnr.GWSNR">[docs]</a>
+<span class="k">class</span> <span class="nc">GWSNR</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to calculate SNR of a CBC signal with either interpolation or inner product method. Interpolation method is much faster than inner product method. Interpolation method is tested for IMRPhenomD and TaylorF2 waveform approximants for the spinless scenario.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    npool : `int`</span>
+<span class="sd">        Number of processors to use for parallel processing.</span>
+<span class="sd">        Default is 4.</span>
+<span class="sd">    mtot_min : `float`</span>
+<span class="sd">        Minimum total mass of the binary in solar mass (use interpolation purpose). Default is 2.0.</span>
+<span class="sd">    mtot_max : `float`</span>
+<span class="sd">        Maximum total mass of the binary in solar mass (use interpolation purpose). Default is 184. This is set so that the waveform is within the frequency range of the detector (with fmin=20.).</span>
+<span class="sd">    ratio_min : `float`</span>
+<span class="sd">        Minimum mass ratio of the binary (use interpolation purpose). Default is 0.1.</span>
+<span class="sd">    ratio_max : `float`</span>
+<span class="sd">        Maximum mass ratio of the binary (use interpolation purpose). Default is 1.0.</span>
+<span class="sd">    mtot_resolution : `int`</span>
+<span class="sd">        Number of points in the total mass array (use interpolation purpose). Default is 100.</span>
+<span class="sd">    ratio_resolution : `int`</span>
+<span class="sd">        Number of points in the mass ratio array (use interpolation purpose). Default is 100.</span>
+<span class="sd">    sampling_frequency : `float`</span>
+<span class="sd">        Sampling frequency of the detector. Default is 2048.0.</span>
+<span class="sd">    waveform_approximant : `str`</span>
+<span class="sd">        Waveform approximant to use. Default is &#39;IMRPhenomD&#39;.</span>
+<span class="sd">    minimum_frequency : `float`</span>
+<span class="sd">        Minimum frequency of the waveform. Default is 20.0.</span>
+<span class="sd">    snr_type : `str`</span>
+<span class="sd">        Type of SNR calculation. Default is &#39;interpolation&#39;.</span>
+<span class="sd">        options: &#39;interpolation&#39;, &#39;inner_product&#39;, &#39;pdet&#39;</span>
+<span class="sd">    psds : `dict`</span>
+<span class="sd">        Dictionary of psds for different detectors. Default is None. If None, bilby&#39;s default psds will be used. Other options:\n</span>
+<span class="sd">        Example 1: when values are psd name from pycbc analytical psds, psds={&#39;L1&#39;:&#39;aLIGOaLIGODesignSensitivityT1800044&#39;,&#39;H1&#39;:&#39;aLIGOaLIGODesignSensitivityT1800044&#39;,&#39;V1&#39;:&#39;AdvVirgo&#39;}. To check available psd name run \n</span>
+<span class="sd">        &gt;&gt;&gt; import pycbc.psd</span>
+<span class="sd">        &gt;&gt;&gt; pycbc.psd.get_lalsim_psd_list()</span>
+<span class="sd">        Example 2: when values are psd txt file available in bilby,</span>
+<span class="sd">        psds={&#39;L1&#39;:&#39;aLIGO_O4_high_asd.txt&#39;,&#39;H1&#39;:&#39;aLIGO_O4_high_asd.txt&#39;, &#39;V1&#39;:&#39;AdV_asd.txt&#39;, &#39;K1&#39;:&#39;KAGRA_design_asd.txt&#39;}.</span>
+<span class="sd">        For other psd files, check https://github.com/lscsoft/bilby/tree/master/bilby/gw/detector/noise_curves \n</span>
+<span class="sd">        Example 3: when values are custom psd txt file. psds={&#39;L1&#39;:&#39;custom_psd.txt&#39;,&#39;H1&#39;:&#39;custom_psd.txt&#39;}. Custom created txt file has two columns. 1st column: frequency array, 2nd column: strain.</span>
+<span class="sd">    psd_with_time : `bool` or `float`</span>
+<span class="sd">        gps end time of strain data for which psd will be found. (this param will be given highest priority), example: psd_with_time=1246527224.169434. If False, psds given in psds param will be used. Default is False. If True (without gps time), psds will be calculated from strain data by setting gps end time as geocent_time-duration. Default is False.</span>
+<span class="sd">    ifos : `list` or `None`</span>
+<span class="sd">        List of interferometer objects. Default is None. If None, bilby&#39;s default interferometer objects will be used. For example for LIGO India detector, it can be defined as follows, \n</span>
+<span class="sd">        &gt;&gt;&gt; import bilby</span>
+<span class="sd">        &gt;&gt;&gt; from gwsnr import GWSNR</span>
+<span class="sd">        &gt;&gt;&gt; ifosLIO = bilby.gw.detector.interferometer.Interferometer(</span>
+<span class="sd">                name = &#39;LIO&#39;,</span>
+<span class="sd">                power_spectral_density = bilby.gw.detector.PowerSpectralDensity(asd_file=&#39;your_asd_file.txt&#39;),</span>
+<span class="sd">                minimum_frequency = 10.,</span>
+<span class="sd">                maximum_frequency = 2048.,</span>
+<span class="sd">                length = 4,</span>
+<span class="sd">                latitude = 19 + 36. / 60 + 47.9017 / 3600,</span>
+<span class="sd">                longitude = 77 + 01. / 60 + 51.0997 / 3600,</span>
+<span class="sd">                elevation = 450.,</span>
+<span class="sd">                xarm_azimuth = 117.6157,</span>
+<span class="sd">                yarm_azimuth = 117.6157 + 90.,</span>
+<span class="sd">                xarm_tilt = 0.,</span>
+<span class="sd">                yarm_tilt = 0.)</span>
+<span class="sd">        &gt;&gt;&gt; snr = GWSNR(psds=dict(LIO=&#39;your_asd_file.txt&#39;), ifos=[ifosLIO])</span>
+<span class="sd">    interpolator_dir : `str`</span>
+<span class="sd">        Path to store the interpolator pickle file. Default is &#39;./interpolator_pickle&#39;.</span>
+<span class="sd">    create_new_interpolator : `bool`</span>
+<span class="sd">        If set True, new interpolator will be generated or replace the existing one. Default is False.</span>
+<span class="sd">    gwsnr_verbose : `bool`</span>
+<span class="sd">        If True, print all the parameters of the class instance. Default is True.</span>
+<span class="sd">    multiprocessing_verbose : `bool`</span>
+<span class="sd">        If True, it will show progress bar while computing SNR (inner product) with :meth:`~snr_with_interpolation`. Default is True. If False, it will not show progress bar but will be faster.</span>
+<span class="sd">    mtot_cut : `bool`</span>
+<span class="sd">        If True, it will set the maximum total mass of the binary according to the minimum frequency of the waveform. Default is True.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &gt;&gt;&gt; from gwsnr import GWSNR</span>
+<span class="sd">    &gt;&gt;&gt; snr = GWSNR()</span>
+<span class="sd">    &gt;&gt;&gt; snr.snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)</span>
+
+<span class="sd">    Instance Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    GWSNR class has the following attributes, \n</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    | Atrributes                          | Type                             |</span>
+<span class="sd">    +=====================================+==================================+</span>
+<span class="sd">    |:attr:`~npool`                       | `int`                            |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~mtot_min`                    | `float`                          |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~mtot_max`                    | `float`                          |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~ratio_min`                   | `float`                          |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~ratio_max`                   | `float`                          |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~mtot_resolution`             | `int`                            |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~ratio_resolution`            | `int`                            |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~ratio_arr`                   | `numpy.ndarray`                  |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~mtot_arr`                    | `numpy.ndarray`                  |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~sampling_frequency`          | `float`                          |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~waveform_approximant`        | `str`                            |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~f_min`                       | `float`                          |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~snr_type`                    | `str`                            |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~interpolator_dir`            | `str`                            |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~psds_list`                   | `list` of bilby&#39;s                |</span>
+<span class="sd">    |                                     |  PowerSpectralDensity `object`   |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~detector_tensor_list`        | `list` of detector tensor        |</span>
+<span class="sd">    |                                     |  `numpy.ndarray`                 |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~detector_list`               | `list` of `str`                  |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~path_interpolator`           | `list` of `str`                  |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:attr:`~multiprocessing_verbose`     | `bool`                           |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+
+<span class="sd">    Instance Methods</span>
+<span class="sd">    ----------</span>
+<span class="sd">    GWSNR class has the following methods, \n</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    | Methods                             | Description                      |</span>
+<span class="sd">    +=====================================+==================================+</span>
+<span class="sd">    |:meth:`~snr`                         | Calls                            |</span>
+<span class="sd">    |                                     | :meth:`~snr_with_interpolation`  |</span>
+<span class="sd">    |                                     | or :meth:`~compute_bilby_snr`    |</span>
+<span class="sd">    |                                     | depending on the value of        |</span>
+<span class="sd">    |                                     | :attr:`~snr_type` attribute.     |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:meth:`~snr_with_interpolation`      | Calculates SNR using             |</span>
+<span class="sd">    |                                     | interpolation method.            |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:meth:`~compute_bilby_snr`           | Calculates SNR using             |</span>
+<span class="sd">    |                                     | inner product method.            |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:meth:`~bns_horizon`                 | Calculates BNS horizon           |</span>
+<span class="sd">    |                                     | distance.                        |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:meth:`~print_all_params`            | Prints all the parameters of     |</span>
+<span class="sd">    |                                     | the class instance.              |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    |:meth:`~init_halfscaled`             | Generates halfscaled SNR         |</span>
+<span class="sd">    |                                     | interpolation coefficients.      |</span>
+<span class="sd">    +-------------------------------------+----------------------------------+</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Attributes</span>
+<div class="viewcode-block" id="GWSNR.npool">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.npool">[docs]</a>
+    <span class="n">npool</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``int`` \n</span>
+<span class="sd">    Number of processors to use for parallel processing.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.mtot_min">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.mtot_min">[docs]</a>
+    <span class="n">mtot_min</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``float`` \n</span>
+<span class="sd">    Minimum total mass of the binary in solar mass (use interpolation purpose).&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.mtot_max">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.mtot_max">[docs]</a>
+    <span class="n">mtot_max</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``float`` \n</span>
+<span class="sd">    Maximum total mass of the binary in solar mass (use interpolation purpose).&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.ratio_min">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.ratio_min">[docs]</a>
+    <span class="n">ratio_min</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``float`` \n</span>
+<span class="sd">    Minimum mass ratio of the binary (use interpolation purpose).&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.ratio_max">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.ratio_max">[docs]</a>
+    <span class="n">ratio_max</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``float`` \n</span>
+<span class="sd">    Maximum mass ratio of the binary (use interpolation purpose).&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.mtot_resolution">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.mtot_resolution">[docs]</a>
+    <span class="n">mtot_resolution</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``int`` \n</span>
+<span class="sd">    Number of points in the total mass array (use interpolation purpose).&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.ratio_resolution">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.ratio_resolution">[docs]</a>
+    <span class="n">ratio_resolution</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``int`` \n</span>
+<span class="sd">    Number of points in the mass ratio array (use interpolation purpose).&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.ratio_arr">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.ratio_arr">[docs]</a>
+    <span class="n">ratio_arr</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``numpy.ndarray`` \n</span>
+<span class="sd">    Array of mass ratio.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.snr_halfsacaled">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.snr_halfsacaled">[docs]</a>
+    <span class="n">snr_halfsacaled</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``numpy.ndarray`` \n</span>
+<span class="sd">    Array of half scaled SNR interpolation coefficients.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.sampling_frequency">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.sampling_frequency">[docs]</a>
+    <span class="n">sampling_frequency</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``float`` \n</span>
+<span class="sd">    Sampling frequency of the detector.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.waveform_approximant">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.waveform_approximant">[docs]</a>
+    <span class="n">waveform_approximant</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``str`` \n</span>
+<span class="sd">    Waveform approximant to use.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.f_min">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.f_min">[docs]</a>
+    <span class="n">f_min</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``float`` \n</span>
+<span class="sd">    Minimum frequency of the waveform.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.snr_type">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.snr_type">[docs]</a>
+    <span class="n">snr_type</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``str`` \n</span>
+<span class="sd">    Type of SNR calculation.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.psds">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.psds">[docs]</a>
+    <span class="n">psds</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``dict`` \n</span>
+<span class="sd">    Dictionary of psds for different detectors.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.interpolator_dir">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.interpolator_dir">[docs]</a>
+    <span class="n">interpolator_dir</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``str`` \n</span>
+<span class="sd">    Path to store the interpolator pickle file.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.detector_list">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.detector_list">[docs]</a>
+    <span class="n">detector_list</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``list`` \n</span>
+<span class="sd">    List of detectors.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GWSNR.stored_snrs">
+<a class="viewcode-back" href="../../autoapi/gwsnr/gwsnr/index.html#gwsnr.gwsnr.GWSNR.stored_snrs">[docs]</a>
+    <span class="n">stored_snrs</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``dict`` \n</span>
+<span class="sd">    Dictionary of stored SNRs.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">npool</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+        <span class="n">mtot_min</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">mtot_max</span><span class="o">=</span><span class="mf">439.6</span><span class="p">,</span>
+        <span class="n">ratio_min</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">ratio_max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">mtot_resolution</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">ratio_resolution</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">sampling_frequency</span><span class="o">=</span><span class="mf">2048.0</span><span class="p">,</span>
+        <span class="n">waveform_approximant</span><span class="o">=</span><span class="s2">&quot;IMRPhenomD&quot;</span><span class="p">,</span>
+        <span class="n">minimum_frequency</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">snr_type</span><span class="o">=</span><span class="s2">&quot;interpolation&quot;</span><span class="p">,</span>
+        <span class="n">psds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ifos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">interpolator_dir</span><span class="o">=</span><span class="s2">&quot;./interpolator_pickle&quot;</span><span class="p">,</span>
+        <span class="n">create_new_interpolator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">gwsnr_verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">multiprocessing_verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">mtot_cut</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># setting instance attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npool</span> <span class="o">=</span> <span class="n">npool</span>
+
+        <span class="c1"># dealing with mtot_max</span>
+        <span class="c1"># set max cut off according to minimum_frequency</span>
+        <span class="n">mtot_max</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">mtot_max</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mtot_cut</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_mtot_max</span><span class="p">(</span><span class="n">mtot_max</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mtot_max</span> <span class="o">=</span> <span class="n">mtot_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mtot_min</span> <span class="o">=</span> <span class="n">mtot_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratio_min</span> <span class="o">=</span> <span class="n">ratio_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratio_max</span> <span class="o">=</span> <span class="n">ratio_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mtot_resolution</span> <span class="o">=</span> <span class="n">mtot_resolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratio_resolution</span> <span class="o">=</span> <span class="n">ratio_resolution</span>
+        <span class="c1"># buffer of 0.01 is added to the ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ratio_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="n">ratio_min</span><span class="p">,</span> <span class="n">ratio_max</span><span class="p">,</span> <span class="n">ratio_resolution</span><span class="p">)</span>
+        <span class="c1"># buffer of 0.1 is added to the mtot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mtot_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+            <span class="n">mtot_min</span> <span class="o">+</span> <span class="n">mtot_max</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="n">mtot_min</span><span class="p">,</span> <span class="n">mtot_max</span><span class="p">,</span> <span class="n">mtot_resolution</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_frequency</span> <span class="o">=</span> <span class="n">sampling_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">waveform_approximant</span> <span class="o">=</span> <span class="n">waveform_approximant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span> <span class="o">=</span> <span class="n">minimum_frequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snr_type</span> <span class="o">=</span> <span class="n">snr_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interpolator_dir</span> <span class="o">=</span> <span class="n">interpolator_dir</span>
+
+        <span class="c1"># dealing with psds</span>
+        <span class="c1"># if not given, bilby&#39;s default psds will be used</span>
+        <span class="c1"># interferometer object will be created for Fp, Fc calculation</span>
+        <span class="c1"># self.psds and self.ifos are list of dictionaries</span>
+        <span class="c1"># self.detector_list are list of strings and will be set at the last.</span>
+        <span class="n">psds_list</span><span class="p">,</span> <span class="n">detector_tensor_list</span><span class="p">,</span> <span class="n">detector_list</span> <span class="o">=</span> <span class="n">dealing_with_psds</span><span class="p">(</span>
+            <span class="n">psds</span><span class="p">,</span> <span class="n">ifos</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="p">,</span> <span class="n">sampling_frequency</span>
+        <span class="p">)</span>
+        <span class="c1"># print some info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_all_params</span><span class="p">(</span><span class="n">gwsnr_verbose</span><span class="p">)</span>
+
+        <span class="c1"># now generate interpolator, if not exists</span>
+        <span class="k">if</span> <span class="n">snr_type</span> <span class="o">!=</span> <span class="s2">&quot;inner_product&quot;</span><span class="p">:</span>
+            <span class="c1"># dealing with interpolator</span>
+            <span class="c1"># interpolator check and generation will be skipped if snr_type=&quot;inner_product&quot;</span>
+            <span class="c1"># param_dict_given is an identifier for the interpolator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_dict_given</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;mtot_min&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_min</span><span class="p">,</span>
+                <span class="s2">&quot;mtot_max&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_max</span><span class="p">,</span>
+                <span class="s2">&quot;mtot_resolution&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_resolution</span><span class="p">,</span>
+                <span class="s2">&quot;ratio_min&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_min</span><span class="p">,</span>
+                <span class="s2">&quot;ratio_max&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_max</span><span class="p">,</span>
+                <span class="s2">&quot;ratio_resolution&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_resolution</span><span class="p">,</span>
+                <span class="s2">&quot;sampling_frequency&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_frequency</span><span class="p">,</span>
+                <span class="s2">&quot;waveform_approximant&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">waveform_approximant</span><span class="p">,</span>
+                <span class="s2">&quot;minimum_frequency&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span>
+                <span class="s2">&quot;detector&quot;</span><span class="p">:</span> <span class="n">detector_list</span><span class="p">,</span>
+                <span class="s2">&quot;psds&quot;</span><span class="p">:</span> <span class="n">psds_list</span><span class="p">,</span>
+                <span class="s2">&quot;detector_tensor&quot;</span><span class="p">:</span> <span class="n">detector_tensor_list</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="c1"># Note: it will only select detectors that does not have interpolator stored yet</span>
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psds_list</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">detector_tensor_list</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">detector_list</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">path_interpolator</span><span class="p">,</span>
+                <span class="n">path_interpolator_all</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">interpolator_check</span><span class="p">(</span>
+                <span class="n">param_dict_given</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">param_dict_given</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                <span class="n">interpolator_dir</span><span class="o">=</span><span class="n">interpolator_dir</span><span class="p">,</span>
+                <span class="n">create_new</span><span class="o">=</span><span class="n">create_new_interpolator</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># print(self.path_interpolator)</span>
+            <span class="c1"># print(self.detector_list)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_verbose</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># This lets multiprocessing to use map instead of imap_unordered function.</span>
+            <span class="c1"># len(detector_list) == 0, means all the detectors have interpolator stored</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please be patient while the interpolator is generated&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_halfscaled</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">create_new_interpolator</span><span class="p">:</span>
+                <span class="c1"># change back to original</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">psds_list</span> <span class="o">=</span> <span class="n">psds_list</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">detector_tensor_list</span> <span class="o">=</span> <span class="n">detector_tensor_list</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">detector_list</span> <span class="o">=</span> <span class="n">detector_list</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please be patient while the interpolator is generated&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_halfscaled</span><span class="p">()</span>
+            
+            <span class="c1"># get all halfscaledSNR from the stored interpolator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">snr_halfsacaled_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">load_json</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">path_interpolator_all</span><span class="p">]</span>
+
+        <span class="c1"># change back to original</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psds_list</span> <span class="o">=</span> <span class="n">psds_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector_tensor_list</span> <span class="o">=</span> <span class="n">detector_tensor_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector_list</span> <span class="o">=</span> <span class="n">detector_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_verbose</span> <span class="o">=</span> <span class="n">multiprocessing_verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_interpolator</span> <span class="o">=</span> <span class="n">path_interpolator_all</span>
+
+<div class="viewcode-block" id="GWSNR.calculate_mtot_max">
+<a class="viewcode-back" href="../../autoapi/gwsnr/index.html#gwsnr.gwsnr.GWSNR.calculate_mtot_max">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate_mtot_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mtot_max</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function to calculate maximum total mass of the binary in solar mass (use in interpolation purpose) according to the minimum frequency of the waveform.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mtot_max : `float`</span>
+<span class="sd">            Maximum total mass of the binary in solar mass (use interpolation purpose).</span>
+<span class="sd">        minimum_frequency : `float`</span>
+<span class="sd">            Minimum frequency of the waveform.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mtot_max : `float`</span>
+<span class="sd">            Maximum total mass of the binary in solar mass (use interpolation purpose).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mass_ratio</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+            <span class="n">mass_1</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">mass_ratio</span><span class="p">)</span>
+            <span class="n">mass_2</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">mass_ratio</span><span class="p">)</span> <span class="o">*</span> <span class="n">mass_ratio</span>
+
+            <span class="k">return</span> <span class="n">findchirp_chirptime</span><span class="p">(</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="p">,</span> <span class="n">minimum_frequency</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.2</span>
+        
+        <span class="c1"># find where func is zero</span>
+        <span class="n">mtot_max_generated</span> <span class="o">=</span> <span class="n">fsolve</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="mi">150</span><span class="p">)[</span>
+            <span class="mi">0</span>
+        <span class="p">]</span>  <span class="c1"># to make sure that chirptime is not negative, TaylorF2 might need this</span>
+        <span class="k">if</span> <span class="n">mtot_max</span> <span class="o">&gt;</span> <span class="n">mtot_max_generated</span><span class="p">:</span>
+            <span class="n">mtot_max</span> <span class="o">=</span> <span class="n">mtot_max_generated</span>
+
+        <span class="k">return</span> <span class="n">mtot_max</span></div>
+
+
+<div class="viewcode-block" id="GWSNR.print_all_params">
+<a class="viewcode-back" href="../../autoapi/gwsnr/index.html#gwsnr.gwsnr.GWSNR.print_all_params">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_all_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function to print all the parameters of the class instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        verbose : `bool`</span>
+<span class="sd">            If True, print all the parameters of the class instance. Default is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;npool: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">npool</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;snr type: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_type</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;waveform approximant: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">waveform_approximant</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sampling frequency: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_frequency</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;minimum frequency (fmin): &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mtot=mass1+mass2&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;min(mtot): &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_min</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;max(mtot) (with the given fmin=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mtot_max</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_type</span> <span class="o">==</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;min(ratio): &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_min</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;max(ratio): &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_max</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mtot resolution: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_resolution</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ratio resolution: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_resolution</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;interpolator directory: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolator_dir</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GWSNR.snr">
+<a class="viewcode-back" href="../../autoapi/gwsnr/index.html#gwsnr.gwsnr.GWSNR.snr">[docs]</a>
+    <span class="k">def</span> <span class="nf">snr</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mass_1</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">mass_2</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">luminosity_distance</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+        <span class="n">theta_jn</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">psi</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">phase</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">geocent_time</span><span class="o">=</span><span class="mf">1246527224.169434</span><span class="p">,</span>
+        <span class="n">ra</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">dec</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">a_1</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">a_2</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">tilt_1</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">tilt_2</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">phi_12</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">phi_jl</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">gw_param_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">output_jsonfile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function for calling SNR calculation function depending on the value of snr_type attribute. If snr_type is &#39;interpolation&#39;, it calls snr_with_interpolation function. If snr_type is &#39;inner_product&#39;, it calls compute_bilby_snr function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mass_1 : `numpy.ndarray` or `float`</span>
+<span class="sd">            Primary mass of the binary in solar mass. Default is 10.0.</span>
+<span class="sd">        mass_2 : `numpy.ndarray` or `float`</span>
+<span class="sd">            Secondary mass of the binary in solar mass. Default is 10.0.</span>
+<span class="sd">        luminosity_distance : `numpy.ndarray` or `float`</span>
+<span class="sd">            Luminosity distance of the binary in Mpc. Default is 100.0.</span>
+<span class="sd">        theta_jn : `numpy.ndarray` or `float`</span>
+<span class="sd">            Inclination angle of the binary in radian. Default is 0.0.</span>
+<span class="sd">        psi : `numpy.ndarray` or `float`</span>
+<span class="sd">            Polarization angle of the binary in radian. Default is 0.0.</span>
+<span class="sd">        phase : `numpy.ndarray` or `float`</span>
+<span class="sd">            Phase of the binary in radian. Default is 0.0.</span>
+<span class="sd">        geocent_time : `numpy.ndarray` or `float`</span>
+<span class="sd">            Geocentric time of the binary in gps. Default is 1246527224.169434.</span>
+<span class="sd">        ra : `numpy.ndarray` or `float`</span>
+<span class="sd">            Right ascension of the binary in radian. Default is 0.0.</span>
+<span class="sd">        dec : `numpy.ndarray` or `float`</span>
+<span class="sd">            Declination of the binary in radian. Default is 0.0.</span>
+<span class="sd">        a_1 : `numpy.ndarray` or `float`</span>
+<span class="sd">            Primary spin of the binary. Default is 0.0.</span>
+<span class="sd">        a_2 : `numpy.ndarray` or `float`</span>
+<span class="sd">            Secondary spin of the binary. Default is 0.0.</span>
+<span class="sd">        tilt_1 : `numpy.ndarray` or `float`</span>
+<span class="sd">            Tilt of the primary spin of the binary. Default is 0.0.</span>
+<span class="sd">        tilt_2 : `numpy.ndarray` or `float`</span>
+<span class="sd">            Tilt of the secondary spin of the binary. Default is 0.0.</span>
+<span class="sd">        phi_12 : `numpy.ndarray` or `float`</span>
+<span class="sd">            Relative angle between the primary and secondary spin of the binary. Default is 0.0.</span>
+<span class="sd">        phi_jl : `numpy.ndarray` or `float`</span>
+<span class="sd">            Angle between the total angular momentum and the orbital angular momentum of the binary. Default is 0.0.</span>
+<span class="sd">        gw_param_dict : `dict`</span>
+<span class="sd">            This allows to pass all the parameters as a dictionary (dict.keys()=param_names, dict.values()=param values). Default is False.</span>
+<span class="sd">        output_jsonfile : `str` or `bool`</span>
+<span class="sd">            If str, the SNR dictionary will be saved as a json file with the given name. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        snr_dict : `dict`</span>
+<span class="sd">            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        ----------</span>
+<span class="sd">        &gt;&gt;&gt; from gwsnr import GWSNR</span>
+<span class="sd">        &gt;&gt;&gt; snr = GWSNR(snrs_type=&#39;interpolation&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; snr.snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># if gw_param_dict is given, then use that</span>
+        <span class="k">if</span> <span class="n">gw_param_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">mass_1</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="p">[</span><span class="s2">&quot;mass_1&quot;</span><span class="p">]</span>
+            <span class="n">mass_2</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="p">[</span><span class="s2">&quot;mass_2&quot;</span><span class="p">]</span>
+            <span class="n">luminosity_distance</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="p">[</span><span class="s2">&quot;luminosity_distance&quot;</span><span class="p">]</span>
+            <span class="n">theta_jn</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="p">[</span><span class="s2">&quot;theta_jn&quot;</span><span class="p">]</span>
+            <span class="n">psi</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="p">[</span><span class="s2">&quot;psi&quot;</span><span class="p">]</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="p">[</span><span class="s2">&quot;phase&quot;</span><span class="p">]</span>
+            <span class="n">geocent_time</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="p">[</span><span class="s2">&quot;geocent_time&quot;</span><span class="p">]</span>
+            <span class="n">ra</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="p">[</span><span class="s2">&quot;ra&quot;</span><span class="p">]</span>
+            <span class="n">dec</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="p">[</span><span class="s2">&quot;dec&quot;</span><span class="p">]</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mass_1</span><span class="p">)</span>
+
+            <span class="c1"># Extract spin parameters or initialize to zeros</span>
+            <span class="n">a_1</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a_1&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+            <span class="n">a_2</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a_2&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+
+            <span class="c1"># Extract precessing waveform parameters or initialize to zeros</span>
+            <span class="n">tilt_1</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tilt_1&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+            <span class="n">tilt_2</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tilt_2&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+            <span class="n">phi_12</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;phi_12&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+            <span class="n">phi_jl</span> <span class="o">=</span> <span class="n">gw_param_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;phi_jl&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_type</span> <span class="o">==</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span>
+            <span class="n">snr_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_with_interpolation</span><span class="p">(</span>
+                <span class="n">mass_1</span><span class="p">,</span>
+                <span class="n">mass_2</span><span class="p">,</span>
+                <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance</span><span class="p">,</span>
+                <span class="n">theta_jn</span><span class="o">=</span><span class="n">theta_jn</span><span class="p">,</span>
+                <span class="n">psi</span><span class="o">=</span><span class="n">psi</span><span class="p">,</span>
+                <span class="n">phase</span><span class="o">=</span><span class="n">phase</span><span class="p">,</span>
+                <span class="n">geocent_time</span><span class="o">=</span><span class="n">geocent_time</span><span class="p">,</span>
+                <span class="n">ra</span><span class="o">=</span><span class="n">ra</span><span class="p">,</span>
+                <span class="n">dec</span><span class="o">=</span><span class="n">dec</span><span class="p">,</span>
+                <span class="n">output_jsonfile</span><span class="o">=</span><span class="n">output_jsonfile</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">snr_type</span> <span class="o">==</span> <span class="s2">&quot;inner_product&quot;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;solving SNR with inner product&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;SNR function type not recognised, using inner_product method instead&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">snr_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_bilby_snr</span><span class="p">(</span>
+                <span class="n">mass_1</span><span class="p">,</span>
+                <span class="n">mass_2</span><span class="p">,</span>
+                <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance</span><span class="p">,</span>
+                <span class="n">theta_jn</span><span class="o">=</span><span class="n">theta_jn</span><span class="p">,</span>
+                <span class="n">psi</span><span class="o">=</span><span class="n">psi</span><span class="p">,</span>
+                <span class="n">phase</span><span class="o">=</span><span class="n">phase</span><span class="p">,</span>
+                <span class="n">geocent_time</span><span class="o">=</span><span class="n">geocent_time</span><span class="p">,</span>
+                <span class="n">ra</span><span class="o">=</span><span class="n">ra</span><span class="p">,</span>
+                <span class="n">dec</span><span class="o">=</span><span class="n">dec</span><span class="p">,</span>
+                <span class="n">a_1</span><span class="o">=</span><span class="n">a_1</span><span class="p">,</span>
+                <span class="n">a_2</span><span class="o">=</span><span class="n">a_2</span><span class="p">,</span>
+                <span class="n">tilt_1</span><span class="o">=</span><span class="n">tilt_1</span><span class="p">,</span>
+                <span class="n">tilt_2</span><span class="o">=</span><span class="n">tilt_2</span><span class="p">,</span>
+                <span class="n">phi_12</span><span class="o">=</span><span class="n">phi_12</span><span class="p">,</span>
+                <span class="n">phi_jl</span><span class="o">=</span><span class="n">phi_jl</span><span class="p">,</span>
+                <span class="n">output_jsonfile</span><span class="o">=</span><span class="n">output_jsonfile</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">snr_dict</span></div>
+
+
+<div class="viewcode-block" id="GWSNR.snr_with_interpolation">
+<a class="viewcode-back" href="../../autoapi/gwsnr/index.html#gwsnr.gwsnr.GWSNR.snr_with_interpolation">[docs]</a>
+    <span class="k">def</span> <span class="nf">snr_with_interpolation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mass_1</span><span class="p">,</span>
+        <span class="n">mass_2</span><span class="p">,</span>
+        <span class="n">luminosity_distance</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+        <span class="n">theta_jn</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">psi</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">phase</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">geocent_time</span><span class="o">=</span><span class="mf">1246527224.169434</span><span class="p">,</span>
+        <span class="n">ra</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">dec</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">output_jsonfile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function to calculate SNR using bicubic interpolation method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mass_1 : `numpy.ndarray` or `float`</span>
+<span class="sd">            Primary mass of the binary in solar mass. Default is 10.0.</span>
+<span class="sd">        mass_2 : `numpy.ndarray` or `float`</span>
+<span class="sd">            Secondary mass of the binary in solar mass. Default is 10.0.</span>
+<span class="sd">        luminosity_distance : `numpy.ndarray` or `float`</span>
+<span class="sd">            Luminosity distance of the binary in Mpc. Default is 100.0.</span>
+<span class="sd">        theta_jn : `numpy.ndarray` or `float`</span>
+<span class="sd">            Inclination angle of the binary in radian. Default is 0.0.</span>
+<span class="sd">        psi : `numpy.ndarray` or `float`</span>
+<span class="sd">            Polarization angle of the binary in radian. Default is 0.0.</span>
+<span class="sd">        phase : `numpy.ndarray` or `float`</span>
+<span class="sd">            Phase of the binary in radian. Default is 0.0.</span>
+<span class="sd">        geocent_time : `numpy.ndarray` or `float`</span>
+<span class="sd">            Geocentric time of the binary in gps. Default is 1246527224.169434.</span>
+<span class="sd">        ra : `numpy.ndarray` or `float`</span>
+<span class="sd">            Right ascension of the binary in radian. Default is 0.0.</span>
+<span class="sd">        dec : `numpy.ndarray` or `float`</span>
+<span class="sd">            Declination of the binary in radian. Default is 0.0.</span>
+<span class="sd">        output_jsonfile : `str` or `bool`</span>
+<span class="sd">            If str, the SNR dictionary will be saved as a json file with the given name. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        snr_dict : `dict`</span>
+<span class="sd">            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        ----------</span>
+<span class="sd">        &gt;&gt;&gt; from gwsnr import GWSNR</span>
+<span class="sd">        &gt;&gt;&gt; snr = GWSNR(snrs_type=&#39;interpolation&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; snr.snr_with_interpolation(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># setting up the parameters</span>
+        <span class="n">detector_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector_tensor_list</span><span class="p">)</span>
+        <span class="n">detectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector_list</span><span class="p">)</span>
+        <span class="n">snr_halfscaled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">snr_halfsacaled_list</span><span class="p">)</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mass_1</span><span class="p">)</span>
+        <span class="c1"># this allows mass_1, mass_2 to pass as float or array</span>
+        <span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mass_1</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mass_2</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># Broadcasting parameters to the desired size</span>
+        <span class="p">(</span>
+            <span class="n">mass_1</span><span class="p">,</span>
+            <span class="n">mass_2</span><span class="p">,</span>
+            <span class="n">luminosity_distance</span><span class="p">,</span>
+            <span class="n">theta_jn</span><span class="p">,</span>
+            <span class="n">psi</span><span class="p">,</span>
+            <span class="n">phase</span><span class="p">,</span>
+            <span class="n">geocent_time</span><span class="p">,</span>
+            <span class="n">ra</span><span class="p">,</span>
+            <span class="n">dec</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_arrays</span><span class="p">(</span>
+            <span class="n">mass_1</span><span class="p">,</span>
+            <span class="n">mass_2</span><span class="p">,</span>
+            <span class="n">luminosity_distance</span><span class="p">,</span>
+            <span class="n">theta_jn</span><span class="p">,</span>
+            <span class="n">psi</span><span class="p">,</span>
+            <span class="n">phase</span><span class="p">,</span>
+            <span class="n">geocent_time</span><span class="p">,</span>
+            <span class="n">ra</span><span class="p">,</span>
+            <span class="n">dec</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">mtot</span> <span class="o">=</span> <span class="n">mass_1</span> <span class="o">+</span> <span class="n">mass_2</span>
+        <span class="n">idx2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">mtot</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_min</span><span class="p">,</span> <span class="n">mtot</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_max</span><span class="p">)</span>
+        <span class="n">idx_tracker</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">idx2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">size_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_tracker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">size_</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;mass_1 and mass_2 must be within the range of mtot_min and mtot_max&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Get interpolated SNR</span>
+        <span class="n">snr</span><span class="p">,</span> <span class="n">snr_effective</span> <span class="o">=</span> <span class="n">get_interpolated_snr</span><span class="p">(</span>
+            <span class="n">mass_1</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">mass_2</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">luminosity_distance</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">theta_jn</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">psi</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">geocent_time</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">ra</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">dec</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">detector_tensor</span><span class="p">,</span>
+            <span class="n">snr_halfscaled</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ratio_arr</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mtot_arr</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create optimal_snr dictionary using dictionary comprehension</span>
+        <span class="n">optimal_snr</span> <span class="o">=</span> <span class="p">{</span><span class="n">det</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="k">for</span> <span class="n">det</span> <span class="ow">in</span> <span class="n">detectors</span><span class="p">}</span>
+        <span class="n">optimal_snr</span><span class="p">[</span><span class="s2">&quot;optimal_snr_net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">det</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">detectors</span><span class="p">):</span>
+            <span class="n">optimal_snr</span><span class="p">[</span><span class="n">det</span><span class="p">][</span><span class="n">idx_tracker</span><span class="p">]</span> <span class="o">=</span> <span class="n">snr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">optimal_snr</span><span class="p">[</span><span class="s2">&quot;optimal_snr_net&quot;</span><span class="p">][</span><span class="n">idx_tracker</span><span class="p">]</span> <span class="o">=</span> <span class="n">snr_effective</span>
+
+        <span class="c1"># Save as JSON file</span>
+        <span class="k">if</span> <span class="n">output_jsonfile</span><span class="p">:</span>
+            <span class="n">output_filename</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">output_jsonfile</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_jsonfile</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;snr.json&quot;</span>
+            <span class="p">)</span>
+            <span class="n">save_json_dict</span><span class="p">(</span><span class="n">optimal_snr</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">optimal_snr</span></div>
+
+
+<div class="viewcode-block" id="GWSNR.init_halfscaled">
+<a class="viewcode-back" href="../../autoapi/gwsnr/index.html#gwsnr.gwsnr.GWSNR.init_halfscaled">[docs]</a>
+    <span class="k">def</span> <span class="nf">init_halfscaled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function to generate halfscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">mtot_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_min</span>
+        <span class="n">detectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">detector_tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_tensor_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">num_det</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">mtot_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_arr</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating interpolator for </span><span class="si">{</span><span class="n">detectors</span><span class="si">}</span><span class="s2"> detectors&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mtot_min</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error: mass too low&quot;</span><span class="p">)</span>
+
+        <span class="c1"># geocent_time cannot be array here</span>
+        <span class="c1"># this geocent_time is only to get halfScaledSNR</span>
+        <span class="n">geocent_time_</span> <span class="o">=</span> <span class="mf">1246527224.169434</span>  <span class="c1"># random time from O3</span>
+        <span class="n">theta_jn_</span><span class="p">,</span> <span class="n">ra_</span><span class="p">,</span> <span class="n">dec_</span><span class="p">,</span> <span class="n">psi_</span><span class="p">,</span> <span class="n">phase_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">luminosity_distance_</span> <span class="o">=</span> <span class="mf">100.0</span>
+
+        <span class="c1"># Vectorized computation for effective luminosity distance</span>
+        <span class="n">Fp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">antenna_response</span><span class="p">(</span><span class="n">ra_</span><span class="p">,</span> <span class="n">dec_</span><span class="p">,</span> <span class="n">geocent_time_</span><span class="p">,</span> <span class="n">psi_</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="s2">&quot;plus&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">detector_tensor</span><span class="p">])</span>
+        <span class="n">Fc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">antenna_response</span><span class="p">(</span><span class="n">ra_</span><span class="p">,</span> <span class="n">dec_</span><span class="p">,</span> <span class="n">geocent_time_</span><span class="p">,</span> <span class="n">psi_</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="s2">&quot;cross&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">detector_tensor</span><span class="p">])</span>
+        <span class="n">dl_eff</span> <span class="o">=</span> <span class="n">luminosity_distance_</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">Fp</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta_jn_</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">Fc</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta_jn_</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span>
+
+        <span class="n">ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_arr</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">snr_half_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># interpolation along mtot for each mass_ratio</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="n">ratio</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;interpolation for each mass_ratios&quot;</span><span class="p">,</span>
+            <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ratio</span><span class="p">),</span>
+            <span class="n">ncols</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">mass_1_</span> <span class="o">=</span> <span class="n">mtot_table</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">q</span><span class="p">)</span>
+            <span class="n">mass_2_</span> <span class="o">=</span> <span class="n">mass_1_</span> <span class="o">*</span> <span class="n">q</span>
+            <span class="c1"># calling bilby_snr</span>
+            <span class="n">optimal_snr_unscaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_bilby_snr</span><span class="p">(</span>
+                <span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1_</span><span class="p">,</span>
+                <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_2_</span><span class="p">,</span>
+                <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance_</span><span class="p">,</span>
+                <span class="n">theta_jn</span><span class="o">=</span><span class="n">theta_jn_</span><span class="p">,</span>
+                <span class="n">psi</span><span class="o">=</span><span class="n">psi_</span><span class="p">,</span>
+                <span class="n">phase</span><span class="o">=</span><span class="n">phase_</span><span class="p">,</span>
+                <span class="n">geocent_time</span><span class="o">=</span><span class="n">geocent_time_</span><span class="p">,</span>
+                <span class="n">ra</span><span class="o">=</span><span class="n">ra_</span><span class="p">,</span>
+                <span class="n">dec</span><span class="o">=</span><span class="n">dec_</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># for halfscaledSNR</span>
+            <span class="n">mchirp</span> <span class="o">=</span> <span class="p">((</span><span class="n">mass_1_</span> <span class="o">*</span> <span class="n">mass_2_</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">5</span><span class="p">))</span> <span class="o">/</span> <span class="p">((</span><span class="n">mtot_table</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">5</span><span class="p">))</span>
+            <span class="n">a2</span> <span class="o">=</span> <span class="n">mchirp</span> <span class="o">**</span> <span class="p">(</span><span class="mf">5.0</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span>
+            <span class="c1"># filling in interpolation table for different detectors</span>
+            <span class="n">snr_half_buffer</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">num_det</span><span class="p">:</span>
+                <span class="n">snr_half_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">CubicSpline</span><span class="p">(</span>
+                        <span class="n">mtot_table</span><span class="p">,</span>
+                        <span class="p">(</span><span class="n">dl_eff</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">a2</span><span class="p">)</span> <span class="o">*</span> <span class="n">optimal_snr_unscaled</span><span class="p">[</span><span class="n">detectors</span><span class="p">[</span><span class="n">j</span><span class="p">]],</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">c</span>
+                <span class="p">)</span>
+            <span class="n">snr_half_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">snr_half_buffer</span><span class="p">))</span>
+        <span class="n">snr_half_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">snr_half_</span><span class="p">)</span>
+
+        <span class="c1"># save the interpolators for each detectors</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">num_det</span><span class="p">:</span>
+            <span class="n">save_json</span><span class="p">(</span><span class="n">snr_half_</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_interpolator</span><span class="p">[</span><span class="n">j</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="GWSNR.compute_bilby_snr">
+<a class="viewcode-back" href="../../autoapi/gwsnr/index.html#gwsnr.gwsnr.GWSNR.compute_bilby_snr">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_bilby_snr</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mass_1</span><span class="p">,</span>
+        <span class="n">mass_2</span><span class="p">,</span>
+        <span class="n">luminosity_distance</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+        <span class="n">theta_jn</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">psi</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">phase</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">geocent_time</span><span class="o">=</span><span class="mf">1246527224.169434</span><span class="p">,</span>
+        <span class="n">ra</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">dec</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">a_1</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">a_2</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">tilt_1</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">tilt_2</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">phi_12</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">phi_jl</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">output_jsonfile</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        SNR calculated using inner product method. This is similar to the SNR calculation method used in bilby.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mass_1 : float</span>
+<span class="sd">            The mass of the heavier object in the binary in solar masses.</span>
+<span class="sd">        mass_2 : float</span>
+<span class="sd">            The mass of the lighter object in the binary in solar masses.</span>
+<span class="sd">        luminosity_distance : float</span>
+<span class="sd">            The luminosity distance to the binary in megaparsecs.</span>
+<span class="sd">        theta_jn : float, optional</span>
+<span class="sd">            The angle between the total angular momentum and the line of sight.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        psi : float, optional</span>
+<span class="sd">            The gravitational wave polarisation angle.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        phase : float, optional</span>
+<span class="sd">            The gravitational wave phase at coalescence.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        geocent_time : float, optional</span>
+<span class="sd">            The GPS time of coalescence.</span>
+<span class="sd">            Default is 1249852157.0.</span>
+<span class="sd">        ra : float, optional</span>
+<span class="sd">            The right ascension of the source.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        dec : float, optional</span>
+<span class="sd">            The declination of the source.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        a_1 : float, optional</span>
+<span class="sd">            The spin magnitude of the heavier object in the binary.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        tilt_1 : float, optional</span>
+<span class="sd">            The tilt angle of the heavier object in the binary.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        phi_12 : float, optional</span>
+<span class="sd">            The azimuthal angle between the two spins.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        a_2 : float, optional</span>
+<span class="sd">            The spin magnitude of the lighter object in the binary.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        tilt_2 : float, optional</span>
+<span class="sd">            The tilt angle of the lighter object in the binary.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        phi_jl : float, optional</span>
+<span class="sd">            The azimuthal angle between the total angular momentum and the orbital angular momentum.</span>
+<span class="sd">            Default is 0.</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If true, print the SNR.</span>
+<span class="sd">            Default is True.</span>
+<span class="sd">        jsonFile : bool, optional</span>
+<span class="sd">            If true, save the SNR parameters and values in a json file.</span>
+<span class="sd">            Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snr_dict : `dict`</span>
+<span class="sd">            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        ----------</span>
+<span class="sd">        &gt;&gt;&gt; from gwsnr import GWSNR</span>
+<span class="sd">        &gt;&gt;&gt; snr = GWSNR(snrs_type=&#39;inner_product&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; snr.compute_bilby_snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">npool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">npool</span>
+        <span class="n">sampling_frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_frequency</span>
+        <span class="n">detectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">detector_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector_tensor_list</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">approximant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">waveform_approximant</span>
+        <span class="n">f_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span>
+        <span class="n">num_det</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">detectors</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="c1"># get the psds for the required detectors</span>
+        <span class="n">psd_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">detectors</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">psds_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">num_det</span><span class="p">}</span>
+
+        <span class="c1"># reshape(-1) is so that either a float value is given or the input is an numpy array</span>
+        <span class="c1"># make sure all parameters are of same length</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mass_1</span><span class="p">)</span>
+        <span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mass_1</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mass_2</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">(</span>
+            <span class="n">mass_1</span><span class="p">,</span>
+            <span class="n">mass_2</span><span class="p">,</span>
+            <span class="n">luminosity_distance</span><span class="p">,</span>
+            <span class="n">theta_jn</span><span class="p">,</span>
+            <span class="n">psi</span><span class="p">,</span>
+            <span class="n">phase</span><span class="p">,</span>
+            <span class="n">geocent_time</span><span class="p">,</span>
+            <span class="n">ra</span><span class="p">,</span>
+            <span class="n">dec</span><span class="p">,</span>
+            <span class="n">a_1</span><span class="p">,</span>
+            <span class="n">a_2</span><span class="p">,</span>
+            <span class="n">tilt_1</span><span class="p">,</span>
+            <span class="n">tilt_2</span><span class="p">,</span>
+            <span class="n">phi_12</span><span class="p">,</span>
+            <span class="n">phi_jl</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_arrays</span><span class="p">(</span>
+            <span class="n">mass_1</span><span class="p">,</span>
+            <span class="n">mass_2</span><span class="p">,</span>
+            <span class="n">luminosity_distance</span><span class="p">,</span>
+            <span class="n">theta_jn</span><span class="p">,</span>
+            <span class="n">psi</span><span class="p">,</span>
+            <span class="n">phase</span><span class="p">,</span>
+            <span class="n">geocent_time</span><span class="p">,</span>
+            <span class="n">ra</span><span class="p">,</span>
+            <span class="n">dec</span><span class="p">,</span>
+            <span class="n">a_1</span><span class="p">,</span>
+            <span class="n">a_2</span><span class="p">,</span>
+            <span class="n">tilt_1</span><span class="p">,</span>
+            <span class="n">tilt_2</span><span class="p">,</span>
+            <span class="n">phi_12</span><span class="p">,</span>
+            <span class="n">phi_jl</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1">#############################################</span>
+        <span class="c1"># setting up parameters for multiprocessing #</span>
+        <span class="c1">#############################################</span>
+        <span class="n">mtot</span> <span class="o">=</span> <span class="n">mass_1</span> <span class="o">+</span> <span class="n">mass_2</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">mtot</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_min</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">mtot</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtot_max</span><span class="p">)</span>
+        <span class="n">size1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">iterations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">size1</span><span class="p">)</span>  <span class="c1"># to keep track of index</span>
+
+        <span class="n">dectector_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">detectors</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">size1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">detectors</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span>
+        <span class="p">)</span>
+        <span class="n">psds_dict_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size1</span><span class="p">,</span> <span class="n">psd_dict</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
+        <span class="c1"># IMPORTANT: time duration calculation for each of the mass combination</span>
+        <span class="n">safety</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="n">approx_duration</span> <span class="o">=</span> <span class="n">safety</span> <span class="o">*</span> <span class="n">findchirp_chirptime</span><span class="p">(</span><span class="n">mass_1</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">mass_2</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">f_min</span><span class="p">)</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">approx_duration</span> <span class="o">+</span> <span class="mf">2.0</span><span class="p">)</span>
+
+        <span class="n">input_arguments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">mass_1</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">mass_2</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">luminosity_distance</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">theta_jn</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">psi</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">phase</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">ra</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">dec</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">geocent_time</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">a_1</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">a_2</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">tilt_1</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">tilt_2</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">phi_12</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">phi_jl</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size1</span><span class="p">,</span> <span class="n">approximant</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size1</span><span class="p">,</span> <span class="n">f_min</span><span class="p">),</span>
+                <span class="n">duration</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size1</span><span class="p">,</span> <span class="n">sampling_frequency</span><span class="p">),</span>
+                <span class="n">iterations</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">input_arguments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">input_arguments</span><span class="p">,</span> <span class="n">psds_dict_list</span><span class="p">,</span> <span class="n">dectector_arr</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="c1"># np.shape(hp_inner_hp) = (len(num_det), size1)</span>
+        <span class="n">hp_inner_hp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">num_det</span><span class="p">),</span> <span class="n">size1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="n">hc_inner_hc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">num_det</span><span class="p">),</span> <span class="n">size1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">npool</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+            <span class="c1"># call the same function with different data in parallel</span>
+            <span class="c1"># imap-&gt;retain order in the list, while map-&gt;doesn&#39;t</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiprocessing_verbose</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+                    <span class="n">pool</span><span class="o">.</span><span class="n">imap_unordered</span><span class="p">(</span><span class="n">noise_weighted_inner_prod</span><span class="p">,</span> <span class="n">input_arguments</span><span class="p">),</span>
+                    <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">input_arguments</span><span class="p">),</span>
+                    <span class="n">ncols</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="c1"># but, np.shape(hp_inner_hp_i) = (size1, len(num_det))</span>
+                    <span class="n">hp_inner_hp_i</span><span class="p">,</span> <span class="n">hc_inner_hc_i</span><span class="p">,</span> <span class="n">iter_i</span> <span class="o">=</span> <span class="n">result</span>
+                    <span class="n">hp_inner_hp</span><span class="p">[:,</span> <span class="n">iter_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">hp_inner_hp_i</span>
+                    <span class="n">hc_inner_hc</span><span class="p">[:,</span> <span class="n">iter_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">hc_inner_hc_i</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># with map, without tqdm</span>
+                <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">noise_weighted_inner_prod</span><span class="p">,</span> <span class="n">input_arguments</span><span class="p">):</span>
+                    <span class="n">hp_inner_hp_i</span><span class="p">,</span> <span class="n">hc_inner_hc_i</span><span class="p">,</span> <span class="n">iter_i</span> <span class="o">=</span> <span class="n">result</span>
+                    <span class="n">hp_inner_hp</span><span class="p">[:,</span> <span class="n">iter_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">hp_inner_hp_i</span>
+                    <span class="n">hc_inner_hc</span><span class="p">[:,</span> <span class="n">iter_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">hc_inner_hc_i</span>
+
+        <span class="c1"># get polarization tensor</span>
+        <span class="c1"># np.shape(Fp) = (size1, len(num_det))</span>
+        <span class="n">Fp</span><span class="p">,</span> <span class="n">Fc</span> <span class="o">=</span> <span class="n">antenna_response_array</span><span class="p">(</span>
+            <span class="n">ra</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">dec</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">geocent_time</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">psi</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">detector_tensor</span>
+        <span class="p">)</span>
+        <span class="n">snrs_sq</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">((</span><span class="n">Fp</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">hp_inner_hp</span> <span class="o">+</span> <span class="p">(</span><span class="n">Fc</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">hc_inner_hc</span><span class="p">)</span>
+        <span class="n">snr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">snrs_sq</span><span class="p">)</span>
+        <span class="n">snr_effective</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">snrs_sq</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># organizing the snr dictionary</span>
+        <span class="n">optimal_snr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">det</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">detectors</span><span class="p">):</span>
+            <span class="n">snr_buffer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+            <span class="n">snr_buffer</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">snr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">optimal_snr</span><span class="p">[</span><span class="n">det</span><span class="p">]</span> <span class="o">=</span> <span class="n">snr_buffer</span>
+        <span class="n">snr_buffer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+        <span class="n">snr_buffer</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">snr_effective</span>
+        <span class="n">optimal_snr</span><span class="p">[</span><span class="s2">&quot;optimal_snr_net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">snr_buffer</span>
+
+        <span class="c1"># Save as JSON file</span>
+        <span class="k">if</span> <span class="n">output_jsonfile</span><span class="p">:</span>
+            <span class="n">output_filename</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">output_jsonfile</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_jsonfile</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;snr.json&quot;</span>
+            <span class="p">)</span>
+            <span class="n">save_json_dict</span><span class="p">(</span><span class="n">optimal_snr</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">optimal_snr</span></div>
+
+
+<div class="viewcode-block" id="GWSNR.pdet">
+<a class="viewcode-back" href="../../autoapi/gwsnr/index.html#gwsnr.gwsnr.GWSNR.pdet">[docs]</a>
+    <span class="k">def</span> <span class="nf">pdet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snr_dict</span><span class="p">,</span> <span class="n">rho_th</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">rho_net_th</span><span class="o">=</span><span class="mf">8.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Probaility of detection of GW for the given sensitivity of the detectors</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        snr_dict : `dict`</span>
+<span class="sd">            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).</span>
+<span class="sd">        rho_th : `float`</span>
+<span class="sd">            Threshold SNR for detection. Default is 8.0.</span>
+<span class="sd">        rho_net_th : `float`</span>
+<span class="sd">            Threshold net SNR for detection. Default is 8.0.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pdet_dict : `dict`</span>
+<span class="sd">            Dictionary of probability of detection for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=pdet_arrays).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">detectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector_list</span><span class="p">)</span>
+        <span class="n">pdet_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">det</span> <span class="ow">in</span> <span class="n">detectors</span><span class="p">:</span>
+            <span class="n">pdet_dict</span><span class="p">[</span><span class="s2">&quot;pdet_&quot;</span> <span class="o">+</span> <span class="n">det</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">rho_th</span> <span class="o">-</span> <span class="n">snr_dict</span><span class="p">[</span><span class="n">det</span><span class="p">])</span>
+
+        <span class="n">pdet_dict</span><span class="p">[</span><span class="s2">&quot;pdet_net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">rho_net_th</span> <span class="o">-</span> <span class="n">snr_dict</span><span class="p">[</span><span class="s2">&quot;optimal_snr_net&quot;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">pdet_dict</span></div>
+
+
+<div class="viewcode-block" id="GWSNR.detector_horizon">
+<a class="viewcode-back" href="../../autoapi/gwsnr/index.html#gwsnr.gwsnr.GWSNR.detector_horizon">[docs]</a>
+    <span class="k">def</span> <span class="nf">detector_horizon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mass_1</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span> <span class="n">snr_threshold</span><span class="o">=</span><span class="mf">8.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function for finding detector horizon distance for BNS (m1=m2=1.4)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mass_1 : `float`</span>
+<span class="sd">            Primary mass of the binary in solar mass. Default is 1.4.</span>
+<span class="sd">        mass_2 : `float`</span>
+<span class="sd">            Secondary mass of the binary in solar mass. Default is 1.4.</span>
+<span class="sd">        snr_threshold : `float`</span>
+<span class="sd">            SNR threshold for detection. Default is 8.0.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        horizon : `dict`</span>
+<span class="sd">            Dictionary of horizon distance for each detector (dict.keys()=detector_names, dict.values()=horizon_distance).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">detectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector_list</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">detector_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">detector_tensor_list</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">geocent_time_</span> <span class="o">=</span> <span class="mf">1246527224.169434</span>  <span class="c1"># random time from O3</span>
+        <span class="n">theta_jn_</span><span class="p">,</span> <span class="n">ra_</span><span class="p">,</span> <span class="n">dec_</span><span class="p">,</span> <span class="n">psi_</span><span class="p">,</span> <span class="n">phase_</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+        <span class="n">luminosity_distance_</span> <span class="o">=</span> <span class="mf">100.0</span>
+
+        <span class="c1"># calling bilby_snr </span>
+        <span class="n">optimal_snr_unscaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_bilby_snr</span><span class="p">(</span>
+            <span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span>
+            <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_2</span><span class="p">,</span>
+            <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance_</span><span class="p">,</span>
+            <span class="n">theta_jn</span><span class="o">=</span><span class="n">theta_jn_</span><span class="p">,</span>
+            <span class="n">psi</span><span class="o">=</span><span class="n">psi_</span><span class="p">,</span>
+            <span class="n">phase</span><span class="o">=</span><span class="n">phase_</span><span class="p">,</span>
+            <span class="n">ra</span><span class="o">=</span><span class="n">ra_</span><span class="p">,</span>
+            <span class="n">dec</span><span class="o">=</span><span class="n">dec_</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Vectorized computation for effective luminosity distance</span>
+        <span class="n">Fp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">antenna_response</span><span class="p">(</span><span class="n">ra_</span><span class="p">,</span> <span class="n">dec_</span><span class="p">,</span> <span class="n">geocent_time_</span><span class="p">,</span> <span class="n">psi_</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="s2">&quot;plus&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">detector_tensor</span><span class="p">])</span>
+        <span class="n">Fc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">antenna_response</span><span class="p">(</span><span class="n">ra_</span><span class="p">,</span> <span class="n">dec_</span><span class="p">,</span> <span class="n">geocent_time_</span><span class="p">,</span> <span class="n">psi_</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="s2">&quot;cross&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">detector_tensor</span><span class="p">])</span>
+        <span class="n">dl_eff</span> <span class="o">=</span> <span class="n">luminosity_distance_</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">Fp</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta_jn_</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">Fc</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta_jn_</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Horizon calculation</span>
+        <span class="n">horizon</span> <span class="o">=</span> <span class="p">{</span><span class="n">det</span><span class="p">:</span> <span class="p">(</span><span class="n">dl_eff</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="n">snr_threshold</span><span class="p">)</span> <span class="o">*</span> <span class="n">optimal_snr_unscaled</span><span class="p">[</span><span class="n">det</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">det</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">detectors</span><span class="p">)}</span>
+
+        <span class="k">return</span> <span class="n">horizon</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Phurailatpam Hemantakumar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gwsnr.multiprocessing_routine &mdash; gwsnr 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/tabs.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+        <script src="../../_static/tabs.js?v=3030b3cb"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            gwsnr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Summary.html">Summary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/gwsnr/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.gwsnr</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/njit_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.njit_functions</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/multiprocessing_routine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.multiprocessing_routine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/pdet/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.pdet</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autoapi/gwsnr/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.utils</span></code></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Short%20Example.html">Short Example</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">gwsnr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gwsnr.multiprocessing_routine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gwsnr.multiprocessing_routine</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Helper functions for multiprocessing in snr generation</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">bilby</span>
+
+<span class="kn">from</span> <span class="nn">.njit_functions</span> <span class="kn">import</span> <span class="n">noise_weighted_inner_product</span>
+
+
+<div class="viewcode-block" id="noise_weighted_inner_prod">
+<a class="viewcode-back" href="../../autoapi/gwsnr/multiprocessing_routine/index.html#gwsnr.multiprocessing_routine.noise_weighted_inner_prod">[docs]</a>
+<span class="k">def</span> <span class="nf">noise_weighted_inner_prod</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Probaility of detection of GW for the given sensitivity of the detectors</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : list</span>
+<span class="sd">        list of parameters for the inner product calculation</span>
+<span class="sd">        List contains: \n</span>
+<span class="sd">        params[0] : float</span>
+<span class="sd">            mass_1</span>
+<span class="sd">        params[1] : float</span>
+<span class="sd">            mass_2</span>
+<span class="sd">        params[2] : float</span>
+<span class="sd">            luminosity_distance</span>
+<span class="sd">        params[3] : float</span>
+<span class="sd">            theta_jn</span>
+<span class="sd">        params[4] : float</span>
+<span class="sd">            psi</span>
+<span class="sd">        params[5] : float</span>
+<span class="sd">            phase</span>
+<span class="sd">        params[6] : float</span>
+<span class="sd">            ra</span>
+<span class="sd">        params[7] : float</span>
+<span class="sd">            dec</span>
+<span class="sd">        params[8] : float</span>
+<span class="sd">            geocent_time</span>
+<span class="sd">        params[9] : float</span>
+<span class="sd">            a_1</span>
+<span class="sd">        params[10] : float</span>
+<span class="sd">            a_2</span>
+<span class="sd">        params[11] : float</span>
+<span class="sd">            tilt_1</span>
+<span class="sd">        params[12] : float</span>
+<span class="sd">            tilt_2</span>
+<span class="sd">        params[13] : float</span>
+<span class="sd">            phi_12</span>
+<span class="sd">        params[14] : float</span>
+<span class="sd">            phi_jl</span>
+<span class="sd">        params[15] : float</span>
+<span class="sd">            approximant</span>
+<span class="sd">        params[16] : float</span>
+<span class="sd">            f_min</span>
+<span class="sd">        params[17] : float</span>
+<span class="sd">            duration</span>
+<span class="sd">        params[18] : float</span>
+<span class="sd">            sampling_frequency</span>
+<span class="sd">        params[19] : int</span>
+<span class="sd">            index tracker</span>
+<span class="sd">        psds_list[20] : list</span>
+<span class="sd">            list of psds for each detector</span>
+<span class="sd">        detector_list[21:] : list</span>
+<span class="sd">            list of detectors</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SNRs_list : list</span>
+<span class="sd">        contains opt_snr for each detector and net_opt_snr</span>
+<span class="sd">    params[19] : int</span>
+<span class="sd">        index tracker</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">bilby</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">88170235</span><span class="p">)</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;mass_1&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="s2">&quot;mass_2&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;luminosity_distance&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;theta_jn&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+        <span class="s2">&quot;psi&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+        <span class="s2">&quot;phase&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+        <span class="s2">&quot;geocent_time&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span>
+        <span class="s2">&quot;ra&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
+        <span class="s2">&quot;dec&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span>
+        <span class="s2">&quot;a_1&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span>
+        <span class="s2">&quot;a_2&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span>
+        <span class="s2">&quot;tilt_1&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span>
+        <span class="s2">&quot;tilt_2&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span>
+        <span class="s2">&quot;phi_12&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span>
+        <span class="s2">&quot;phi_jl&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="n">waveform_arguments</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">waveform_approximant</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span>
+        <span class="n">reference_frequency</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span>
+        <span class="n">minimum_frequency</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">waveform_generator</span> <span class="o">=</span> <span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">WaveformGenerator</span><span class="p">(</span>
+        <span class="n">duration</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span>
+        <span class="n">sampling_frequency</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span>
+        <span class="n">frequency_domain_source_model</span><span class="o">=</span><span class="n">bilby</span><span class="o">.</span><span class="n">gw</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">lal_binary_black_hole</span><span class="p">,</span>
+        <span class="n">waveform_arguments</span><span class="o">=</span><span class="n">waveform_arguments</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">polas</span> <span class="o">=</span> <span class="n">waveform_generator</span><span class="o">.</span><span class="n">frequency_domain_strain</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+
+    <span class="c1"># h = F+.h+ + Fx.hx</span>
+    <span class="c1"># &lt;h|h&gt; = &lt;h+,h+&gt; + &lt;hx,hx&gt; + 2&lt;h+,hx&gt;</span>
+    <span class="c1"># &lt;h|h&gt; = &lt;h+,h+&gt; + &lt;hx,hx&gt;, if h+ and hx are orthogonal</span>
+    <span class="n">hp_inner_hp_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">hc_inner_hc_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">list_of_detectors</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">21</span><span class="p">:]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">psds_objects</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">20</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">det</span> <span class="ow">in</span> <span class="n">list_of_detectors</span><span class="p">:</span>
+
+        <span class="c1"># need to compute the inner product for</span>
+        <span class="n">p_array</span> <span class="o">=</span> <span class="n">psds_objects</span><span class="p">[</span><span class="n">det</span><span class="p">]</span><span class="o">.</span><span class="n">get_power_spectral_density_array</span><span class="p">(</span><span class="n">waveform_generator</span><span class="o">.</span><span class="n">frequency_array</span><span class="p">)</span>
+        <span class="n">idx2</span> <span class="o">=</span> <span class="p">(</span><span class="n">p_array</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">p_array</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">hp_inner_hp</span> <span class="o">=</span> <span class="n">noise_weighted_inner_product</span><span class="p">(</span>
+            <span class="n">polas</span><span class="p">[</span><span class="s2">&quot;plus&quot;</span><span class="p">][</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">polas</span><span class="p">[</span><span class="s2">&quot;plus&quot;</span><span class="p">][</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">p_array</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">waveform_generator</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">hc_inner_hc</span> <span class="o">=</span> <span class="n">noise_weighted_inner_product</span><span class="p">(</span>
+            <span class="n">polas</span><span class="p">[</span><span class="s2">&quot;cross&quot;</span><span class="p">][</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">polas</span><span class="p">[</span><span class="s2">&quot;cross&quot;</span><span class="p">][</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">p_array</span><span class="p">[</span><span class="n">idx2</span><span class="p">],</span>
+            <span class="n">waveform_generator</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># might need to add these lines in the future for waveform with multiple harmonics and h+ and hx are not orthogonal</span>
+        <span class="c1"># hp_inner_hc = bilby.gw.utils.noise_weighted_inner_product(</span>
+        <span class="c1">#     polas[&quot;plus&quot;][idx2],</span>
+        <span class="c1">#     polas[&quot;cross&quot;][idx2],</span>
+        <span class="c1">#     p_array[idx2],</span>
+        <span class="c1">#     waveform_generator.duration,</span>
+        <span class="c1"># )</span>
+
+        <span class="n">hp_inner_hp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hp_inner_hp</span><span class="p">)</span>
+        <span class="n">hc_inner_hc_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hc_inner_hc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">hp_inner_hp_list</span><span class="p">,</span> <span class="n">hc_inner_hc_list</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="mi">19</span><span class="p">])</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Phurailatpam Hemantakumar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

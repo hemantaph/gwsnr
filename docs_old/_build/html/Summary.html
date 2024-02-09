@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Summary &mdash; gwsnr 0.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=938c9ccc"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gwsnr.gwsnr" href="autoapi/gwsnr/gwsnr/index.html" />
+    <link rel="prev" title="Welcome to gwsnr’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            gwsnr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Summary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Description">Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Mathematical-Formulation">Mathematical Formulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Modified-FINDCHIRP-Method:-Half-Scaling-Approach">Modified FINDCHIRP Method: Half Scaling Approach</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Noise-Weighted-Inner-Product-Method">Noise-Weighted Inner Product Method</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/gwsnr/gwsnr/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.gwsnr</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/gwsnr/njit_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.njit_functions</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/gwsnr/multiprocessing_routine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.multiprocessing_routine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/gwsnr/pdet/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.pdet</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/gwsnr/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.utils</span></code></a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">gwsnr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Summary</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Summary.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Summary">
+<h1>Summary<a class="headerlink" href="#Summary" title="Link to this heading"></a></h1>
+<section id="Background">
+<h2>Background<a class="headerlink" href="#Background" title="Link to this heading"></a></h2>
+<p>Gravitational waves, ripples in spacetime predicted by Einstein’s theory of General Relativity, have revolutionized astrophysics since their first detection in 2015. These waves are emitted by cataclysmic events like the merging of black holes or neutron stars, providing a unique window into the cosmos. A critical aspect of gravitational wave analysis is the Signal-to-Noise Ratio (SNR). SNR quantifies the strength of a gravitational wave signal relative to the background noise in a detector,
+like LIGO or Virgo. This ratio is pivotal in confirming the detection of gravitational waves and extracting astrophysical information from them. However, specific scenarios in gravitational wave research, particularly in simulations of detectable gravitational wave events and in hierarchical Bayesian analysis where selection effects are considered, demand extensive and efficient computation of SNR. This requirement presents a significant challenge, as conventional computational approaches are
+typically time-consuming and impractical for such specialized and large-scale analyses.</p>
+</section>
+<section id="Description">
+<h2>Description<a class="headerlink" href="#Description" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">gwsnr</span></code> Python package addresses the need for efficient SNR computation in gravitational wave research. It innovatively streamlines SNR calculations, enhancing accuracy and efficiency with several advanced techniques. Firstly, it utilizes an innovative interpolation method, employing a half-scaling approach for accurately interpolating the SNR of gravitational waves from spin-less binary systems, focusing on the mass parameters. Secondly, the package features a noise-weighted inner product
+method, similar to that in the <code class="docutils literal notranslate"><span class="pre">bilby</span></code> package, but enhanced with multiprocessing capabilities. This integration allows for the parallel processing of complex calculations, thereby expediting the SNR computation. Lastly, <code class="docutils literal notranslate"><span class="pre">gwsnr</span></code> leverages the <code class="docutils literal notranslate"><span class="pre">numba</span></code> Just-In-Time (njit) compiler, which optimizes performance by compiling Python code into machine code at runtime, drastically reducing execution times. Beyond these technical merits, <code class="docutils literal notranslate"><span class="pre">gwsnr</span></code> stands out for its user-friendly features and
+seamless integration with other related software packages, making it not just a powerful tool but also an accessible one for researchers. These attributes position <code class="docutils literal notranslate"><span class="pre">gwsnr</span></code> as an invaluable asset in gravitational wave data analysis, particularly in simulations of detectable binary mergers, calculation of merger rates, determining gravitational wave lensing rates, and in the analysis of selection effects within hierarchical Bayesian frameworks. The package thus represents a significant step
+forward in gravitational wave research, enabling more precise and efficient exploration of the universe through gravitational wave observations and simulations. Additionally, <code class="docutils literal notranslate"><span class="pre">gwsnr</span></code> is instrumental in the <code class="docutils literal notranslate"><span class="pre">LeR</span></code> package for calculating detectable rates of both lensed and unlensed gravitational wave events, showcasing its utility in advanced gravitational wave studies.</p>
+</section>
+<section id="Mathematical-Formulation">
+<h2>Mathematical Formulation<a class="headerlink" href="#Mathematical-Formulation" title="Link to this heading"></a></h2>
+<section id="Modified-FINDCHIRP-Method:-Half-Scaling-Approach">
+<h3>Modified FINDCHIRP Method: Half Scaling Approach<a class="headerlink" href="#Modified-FINDCHIRP-Method:-Half-Scaling-Approach" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">gwsnr</span></code> package introduces the Half Scaling method for SNR calculations in spin-less binary systems. This method, rooted in the (FINDCHIRP)[<a class="reference external" href="https://arxiv.org/abs/gr-qc/0509116">https://arxiv.org/abs/gr-qc/0509116</a>] algorithm, focuses on non-spinning IMR waveforms and particularly interpolates the Half scaled SNR (<span class="math notranslate nohighlight">\(\rho_{1/2}\)</span>) based on mass parameters (<span class="math notranslate nohighlight">\(M_{tot},q\)</span>).</p>
+<ul>
+<li><p><strong>Interpolation Method</strong>: Utilizes a 2D cubic spline technique (njit-ted) for the ‘halfsnr’ segment.</p></li>
+<li><p><strong>Equations</strong>:</p>
+<ul>
+<li><p>For a simple inspiral waveform, the optimal SNR is given by,</p>
+<div class="math notranslate nohighlight">
+\[\rho = F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi) \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }\]</div>
+</li>
+<li><p><span class="math notranslate nohighlight">\(F\)</span> is defined as a function of luminosity distance (<span class="math notranslate nohighlight">\(D_l\)</span>), chirp mass (<span class="math notranslate nohighlight">\(\mathcal{M}\)</span>), inclination angle (<span class="math notranslate nohighlight">\(\iota\)</span>), polarization angles (<span class="math notranslate nohighlight">\(\psi\)</span>), right ascension (<span class="math notranslate nohighlight">\(\alpha\)</span>), and declination (<span class="math notranslate nohighlight">\(\delta\)</span>). <span class="math notranslate nohighlight">\(f\)</span> is the frequency, <span class="math notranslate nohighlight">\(f_{ISCO}\)</span> is the last stable orbit frequency and <span class="math notranslate nohighlight">\(S_n(f)\)</span> is the detector’s noise curve or power spectral density (psd).</p></li>
+<li><p>Then, half scaled SNR: <span class="math notranslate nohighlight">\(\rho_{1/2} = \sqrt{ 4\int_0^\infty \frac{f^{-7/3}}{S_n(f)}df } \approx \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }\)</span></p></li>
+<li><p>For an spinless frequency-domain IMR (Inspiral-Merger-Ringdown) waveform with optimal SNR equal to <span class="math notranslate nohighlight">\(\rho\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi)\]</div>
+</li>
+<li><p><span class="math notranslate nohighlight">\(\rho_{1/2}\)</span> is considered a function of <span class="math notranslate nohighlight">\(M_{tot}\)</span> and <span class="math notranslate nohighlight">\(q\)</span>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="Noise-Weighted-Inner-Product-Method">
+<h3>Noise-Weighted Inner Product Method<a class="headerlink" href="#Noise-Weighted-Inner-Product-Method" title="Link to this heading"></a></h3>
+<p>Designed for SNR calculations in systems characterized by frequency domain waveforms in <code class="docutils literal notranslate"><span class="pre">lalsimulation</span></code>, including spin-precessing binary systems.</p>
+<ul class="simple">
+<li><p><strong>Methodology</strong>: Combines waveform generation (multi-process), antenna pattern calculation (njit-ted), and noise-weighted inner product computation (njit-ted).</p></li>
+<li><p><strong>Equations</strong>:</p>
+<ul>
+<li><p>Inner product: <span class="math notranslate nohighlight">\(\left&lt; a | b \right&gt; = 4 \int_{f_{min}}^{f_{max}} \frac{\tilde{a}(f)\tilde{b}^*(f)}{S_n(f)} df\)</span></p></li>
+<li><p>Optimal SNR: <span class="math notranslate nohighlight">\(\rho = \sqrt{ F_+^2 \left&lt; \tilde{h}_+ | \tilde{h}_+ \right&gt; + F_{\times}^2 \left&lt; \tilde{h}_{\times} | \tilde{h}_{\times} \right&gt; }\)</span>, for orthogonal <span class="math notranslate nohighlight">\(h_+\)</span> and <span class="math notranslate nohighlight">\(h_{\times}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(h_{+\times}\)</span> are frequency domain waveform polarizations, and <span class="math notranslate nohighlight">\(F_{+\times}\)</span> are antenna patterns.</p></li>
+</ul>
+</li>
+</ul>
+<p>These formulations highlight <code class="docutils literal notranslate"><span class="pre">gwsnr</span></code>’s capability to efficiently process diverse gravitational wave signals, enhancing data analysis accuracy and efficiency.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to gwsnr’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="autoapi/gwsnr/gwsnr/index.html" class="btn btn-neutral float-right" title="gwsnr.gwsnr" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Phurailatpam Hemantakumar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
