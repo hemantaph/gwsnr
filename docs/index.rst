@@ -4,11 +4,11 @@ Welcome to gwsnr's documentation!
 .. image:: ../gwsnrlogo.png
    :align: center
    :width: 40%
-   :alt: ler logo
+   :alt: gwsnr logo
 
-======
+==================
 gwsnr
-======
+==================
 
 ``gwsnr``: Gravitational Wave Signal-to-Noise Ratio Computation Package
 
