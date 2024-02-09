@@ -4,7 +4,7 @@ import sys
 # read the contents of your README file
 from pathlib import Path
 this_directory = Path(__file__).parent
-long_description = (. / "README.md").read_text()
+long_description = (this_directory / "README.md").read_text()
 
 # check that python version is 3.7 or above
 python_version = sys.version_info

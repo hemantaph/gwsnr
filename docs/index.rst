@@ -1,6 +1,11 @@
 Welcome to gwsnr's documentation!
 ===============================
 
+.. image:: ../gwsnrlogo.png
+   :align: center
+   :width: 40%
+   :alt: ler logo
+
 ======
 gwsnr
 ======

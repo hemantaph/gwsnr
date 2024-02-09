@@ -52,7 +52,7 @@ Classes
 
 
 
-.. py:class:: GWSNR(npool=int(4), mtot_min=2.0, mtot_max=439.6, ratio_min=0.1, ratio_max=1.0, mtot_resolution=500, ratio_resolution=50, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', minimum_frequency=20.0, snr_type='interpolation', psds=None, isit_psd_file=False, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=True)
+.. py:class:: GWSNR(npool=int(4), mtot_min=2.0, mtot_max=439.6, ratio_min=0.1, ratio_max=1.0, mtot_resolution=500, ratio_resolution=50, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', minimum_frequency=20.0, snr_type='interpolation', psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=True)
 
 
    
@@ -109,9 +109,6 @@ Classes
 
            Example 3: when values are custom psd txt file. psds={'L1':'custom_psd.txt','H1':'custom_psd.txt'}. Custom created txt file has two columns. 1st column: frequency array, 2nd column: strain.
 
-       **isit_psd_file** : `bool` or `dict`
-           If set True, the given value of psds param should be of psds instead of asd. If asd, set isit_psd_file=False. Default is False. If dict, it should be of the form {'L1':True, 'H1':True, 'V1':True} and should have keys for all the detectors.
-
        **psd_with_time** : `bool` or `float`
            gps end time of strain data for which psd will be found. (this param will be given highest priority), example: psd_with_time=1246527224.169434. If False, psds given in psds param will be used. Default is False. If True (without gps time), psds will be calculated from strain data by setting gps end time as geocent_time-duration. Default is False.
 
@@ -133,7 +130,7 @@ Classes
                    yarm_azimuth = 117.6157 + 90.,
                    xarm_tilt = 0.,
                    yarm_tilt = 0.)
-           >>> snr = GWSNR(psds=dict(LIO='your_asd_file.txt'), ifos=[ifosLIO], isit_psd_file=[False])
+           >>> snr = GWSNR(psds=dict(LIO='your_asd_file.txt'), ifos=[ifosLIO])
 
        **interpolator_dir** : `str`
            Path to store the interpolator pickle file. Default is './interpolator_pickle'.
@@ -565,30 +562,6 @@ Classes
       ``dict``
 
       Dictionary of psds for different detectors.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:attribute:: isit_psd_file
-
-      
-      ``dict``
-
-      dict keys with detector names and values as bool.
 
 
 

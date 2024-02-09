@@ -1,7 +1,17 @@
 # gwsnr: Gravitational Wave Signal-to-Noise Ratio Computation Package
 [![DOI](https://zenodo.org/badge/626733473.svg)]() [![PyPI version](https://badge.fury.io/py/ler.svg)](https://badge.fury.io/py/gwsnr) [![DOCS](https://readthedocs.org/projects/gwsnr/badge/?version=latest)](https://gwsnr.readthedocs.io/en/latest/)
 
-## Summary
+<p align="center">
+  <img src="gwsnrlogo.png" alt="Your Logo" width="200" height="200">
+</p>
+
+## Installation
+
+```
+pip install gwsnr
+```
+
+## About
 
 Gravitational waves are ripples in spacetime predicted by Einstein's theory of General Relativity. Detected for the first time in 2015, these waves, emanating from events like black hole or neutron star mergers, have opened new avenues in astrophysics. The Signal-to-Noise Ratio (SNR) is a critical measure in gravitational wave analysis, representing the signal strength relative to background noise in detectors like LIGO or Virgo. However, efficient computation of SNR, especially in simulations and hierarchical Bayesian analyses, is a complex and time-consuming task. The `gwsnr` Python package addresses this challenge by providing efficient tools for SNR computation.
 
@@ -35,28 +45,8 @@ This method is suited for SNR calculations in systems with frequency domain wave
 
 These methods underscore the `gwsnr` package's ability to handle a wide range of gravitational wave signals with enhanced efficiency and accuracy.
 
-## Installation and Usage
+## Documentation
 
-Install `gwsnr` with `pip install gwsnr`
+The `gwsnr` package documentation is available at [ReadTheDocs](https://gwsnr.readthedocs.io/en/latest/).
 
-## Contributing
 
-[Guidelines for contributing to the package.]
-
-## License
-
-[License details.]
-
-## Contact
-
-[Contact information for support or collaboration.]
-
-## Acknowledgements
-
-[Acknowledgements and credits.]
-
-## References
-
-1. [Link to the FINDCHIRP paper and other relevant publications.]
-
-(Note: The above `readme.md` content provides a comprehensive overview of the `gwsnr` package, suitable for a GitHub repository. It outlines the package's purpose, key features, mathematical basis, and other essential information.)

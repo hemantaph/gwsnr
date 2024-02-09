@@ -104,7 +104,7 @@ Functions
           !! processed by numpydoc !!
 
 
-.. py:function:: dealing_with_psds(psds=None, isit_psd_file=False, ifos=None, f_min=20.0, sampling_frequency=2048.0)
+.. py:function:: dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.0)
 
    
    Function to deal with psds inputs and for creating bilby.gw.detector.PowerSpectralDensity objects.
