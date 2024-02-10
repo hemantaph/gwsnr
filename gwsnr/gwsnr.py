@@ -369,7 +369,15 @@ class GWSNR:
         self.detector_tensor_list = detector_tensor_list
         self.detector_list = detector_list
         self.multiprocessing_verbose = multiprocessing_verbose
-        self.path_interpolator = path_interpolator_all
+        if snr_type == "interpolation":
+            self.path_interpolator = path_interpolator_all
+
+        def print_no_interpolator(**kwargs):
+            print(
+                "No interpolator found. Please set snr_type=True to generate new interpolator."
+            )
+        if snr_type == "inner_product":
+            self.snr_with_interpolation = print_no_interpolator
 
     def calculate_mtot_max(self, mtot_max, minimum_frequency):
         """

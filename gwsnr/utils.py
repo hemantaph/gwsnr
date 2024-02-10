@@ -12,11 +12,11 @@ import bilby
 
 class NumpyEncoder(json.JSONEncoder):
     """
-    Custom JSON encoder for numpy data types. It converts numpy.ndarray objects (and any nested-list composition 
-    that includes ndarray objects) into regular lists for JSON serialization. This is particularly useful when 
+    Custom JSON encoder for numpy data types. It converts numpy.ndarray objects (and any nested-list composition
+    that includes ndarray objects) into regular lists for JSON serialization. This is particularly useful when
     serializing data structures that include numpy arrays.
     """
-    
+
     def default(self, obj):
         # Check if the object is an instance of numpy.ndarray
         if isinstance(obj, np.ndarray):
@@ -24,7 +24,8 @@ class NumpyEncoder(json.JSONEncoder):
         # Fallback to default behavior for other types
         return super(NumpyEncoder, self).default(obj)
 
-def dealing_with_psds(psds=None, ifos=None, f_min=20., sampling_frequency=2048.):
+
+def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.0):
     """
     Function to deal with psds inputs and for creating bilby.gw.detector.PowerSpectralDensity objects.
 
@@ -65,7 +66,7 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20., sampling_frequency=2048.)
         for ifo in ifos:
             if isinstance(ifo, str):
                 if ifo == "ET":
-                    ifos_ += (bilby.gw.detector.InterferometerList([ifo]))
+                    ifos_ += bilby.gw.detector.InterferometerList([ifo])
                     detector_list.append("ET1")
                     detector_list.append("ET2")
                     detector_list.append("ET3")
@@ -92,11 +93,11 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20., sampling_frequency=2048.)
             idx = detector_list.index("ET")
             detector_list.pop(idx)
             detector_list.insert(idx, "ET1")
-            detector_list.insert(idx+1, "ET2")
-            detector_list.insert(idx+2, "ET3")
+            detector_list.insert(idx + 1, "ET2")
+            detector_list.insert(idx + 2, "ET3")
 
-        for i, ifo in enumerate(ifos):
-            psds[ifo.name] = ifo.power_spectral_density.psd_file
+        # for i, ifo in enumerate(ifos):
+        #     psds[ifo.name] = ifo.power_spectral_density.psd_file
 
     elif psds and ifos:
         detector_list = []
@@ -105,7 +106,7 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20., sampling_frequency=2048.)
         for ifo in ifos:
             if isinstance(ifo, str):
                 if ifo == "ET":
-                    ifos_ += (bilby.gw.detector.InterferometerList([ifo]))
+                    ifos_ += bilby.gw.detector.InterferometerList([ifo])
                     detector_list.append("ET1")
                     detector_list.append("ET2")
                     detector_list.append("ET3")
@@ -135,32 +136,30 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20., sampling_frequency=2048.)
     # print(detector_list)
     for i, det in enumerate(detector_list):
         # either provided psd or what's available in bilby
-        
+
         if type(psds[det]) == str and psds[det][-3:] == "txt":
-            try:
-                psds_list.append(bilby.gw.detector.PowerSpectralDensity(
-                    psd_file=psds[det]))
-            except:
-                psds_list.append(bilby.gw.detector.PowerSpectralDensity(
-                    asd_file=psds[det]))
-                
-            # if isit_psd_file_dict[det]:
-            #     psds_list.append(
-            #         bilby.gw.detector.PowerSpectralDensity(
-            #             psd_file=psds[det]
-            #         )
-            #     )
-            # else:
-            #     psds_list.append(
-            #         bilby.gw.detector.PowerSpectralDensity(
-            #             asd_file=psds[det]
-            #         )
-            #     )
+
+            if psds[det][-7:] == "psd.txt":
+                psds_list.append(
+                    bilby.gw.detector.PowerSpectralDensity(psd_file=psds[det])
+                )
+
+            elif psds[det][-7:] == "asd.txt":
+                psds_list.append(
+                    bilby.gw.detector.PowerSpectralDensity(asd_file=psds[det])
+                )
+            else:
+                raise ValueError(
+                    "psd file name should end with either 'psd.txt' or 'asd.txt'"
+                )
+
             detector_tensor_list.append(ifos[i].detector_tensor)
 
         elif isinstance(psds[det], str):
             try:
-                psds_list.append(power_spectral_density_pycbc(psds[det]), f_min, sampling_frequency)
+                psds_list.append(
+                    power_spectral_density_pycbc(psds[det]), f_min, sampling_frequency
+                )
             except:
                 raise ValueError(error_msg)
         else:
@@ -168,7 +167,8 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20., sampling_frequency=2048.)
 
     return psds_list, detector_tensor_list, detector_list
 
-def power_spectral_density_pycbc(psd, f_min=20., sampling_frequency=2048.):
+
+def power_spectral_density_pycbc(psd, f_min=20.0, sampling_frequency=2048.0):
     """
     psd array finder from pycbc
 
@@ -199,9 +199,12 @@ def power_spectral_density_pycbc(psd, f_min=20., sampling_frequency=2048.):
         frequency_array=psd_.sample_frequencies, psd_array=psd_.data
     )
 
+
 # interpolator check and generation
 def interpolator_check(
-        param_dict_given, interpolator_dir, create_new,
+    param_dict_given,
+    interpolator_dir,
+    create_new,
 ):
     """
     Function for interpolator (snr_halfsacaled) check and generation if not exists.
@@ -262,13 +265,17 @@ def interpolator_check(
 
         path_interpolator_all.append(path_interpolator)
         k += 1
-    
-    
-    return psds_list_, detector_tensor_list_, detector_list_, path_interpolator_, path_interpolator_all
 
-def interpolator_pickle_path(
-    param_dict_given, path="./interpolator_pickle"
-):
+    return (
+        psds_list_,
+        detector_tensor_list_,
+        detector_list_,
+        path_interpolator_,
+        path_interpolator_all,
+    )
+
+
+def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
     """
     Function for storing or getting interpolator (snr_halfsacaled) pickle path
 
@@ -308,12 +315,10 @@ def interpolator_pickle_path(
             pickle.dump(dict_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     # for checking existing interpolator pickle in the det_path/param_dict_list.pickle file
-    param_dict_stored = pickle.load(
-        open(det_path + "/param_dict_list.pickle", "rb")
-    )
+    param_dict_stored = pickle.load(open(det_path + "/param_dict_list.pickle", "rb"))
 
     len_ = len(param_dict_stored)
-    #del param_dict_given["psds"]
+    # del param_dict_given["psds"]
     param_dict_given["detector_tensor"] = str(param_dict_given["detector_tensor"])
     # print("\n\n", param_dict_given)
     # print("\n\n",param_dict_stored)
@@ -346,6 +351,7 @@ def interpolator_pickle_path(
 
     return (path_interpolator, it_exist)
 
+
 def load_json(file_name):
     """Load a json file.
 
@@ -363,6 +369,7 @@ def load_json(file_name):
 
     return param
 
+
 def save_json(param, file_name):
     """Save a json file.
 
@@ -375,6 +382,7 @@ def save_json(param, file_name):
     """
     with open(file_name, "wb") as handle:
         pickle.dump(param, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 def save_json_dict(dict, file_name):
     """Save a json file.
@@ -404,7 +412,7 @@ def load_json_dict(file_name):
     ----------
     param : `dict`
     """
-    
+
     with open(file_name, "r", encoding="utf-8") as f:
         param = json.load(f)
 

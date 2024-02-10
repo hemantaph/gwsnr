@@ -1,0 +1,56 @@
+"""
+This script generates a set of BBH (Binary Black Hole) parameters and calculates the optimal SNR (Signal-to-Noise Ratio) for each set of parameters. The parameters are saved in a json file.
+"""
+
+import numpy as np
+from gwsnr import GWSNR
+
+gwsnr = GWSNR(npool=int(4),
+        mtot_min=2.0,
+        mtot_max=439.6,
+        ratio_min=0.1,
+        ratio_max=1.0,
+        mtot_resolution=500,
+        ratio_resolution=50,
+        sampling_frequency=2048.0,
+        waveform_approximant="IMRPhenomD",
+        minimum_frequency=20.0,
+        snr_type="interpolation",
+        psds=None,
+        ifos=None,
+        interpolator_dir="./interpolator_pickle",
+        create_new_interpolator=False,
+        gwsnr_verbose=True,
+        multiprocessing_verbose=True,
+        mtot_cut=True,
+    )
+
+# Setting up the BBH (Binary Black Hole) parameters
+# gerneral case, random parameters
+# chirp mass can go upto only 95 if f_min=20. to get non zero SNR
+nsamples = 1000
+chirp_mass = np.linspace(5,80,nsamples)
+mass_ratio = np.random.uniform(0.2,1,size=nsamples)
+mass_1 = (chirp_mass*(1+mass_ratio)**(1/5))/mass_ratio**(3/5)
+mass_2 = chirp_mass*mass_ratio**(2/5)*(1+mass_ratio)**(1/5)
+total_mass = mass_1+mass_2
+mass_ratio = mass_2/mass_1
+# Fix luminosity distance
+luminosity_distance = 80*np.ones(nsamples)
+# Randomly sample everything else:
+theta_jn = np.random.uniform(0,2*np.pi, size=nsamples)
+ra, dec, psi, phase = np.random.uniform(0,2*np.pi, size=nsamples), np.random.uniform(0,np.pi, size=nsamples), np.random.uniform(0,2*np.pi, size=nsamples), np.random.uniform(0,2*np.pi, size=nsamples)
+a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = 0,0,0,0,0,0 # Zero spin
+
+# Calculate the optimal SNR (Signal-to-Noise Ratio) for each set of parameters
+# with interpolation
+interp_snr = gwsnr.snr(mass_1=mass_1, mass_2=mass_1, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, ra=ra, dec=dec)
+
+# save the SNR and BBH parameters
+# create a dictionary
+data = {'mass_1': mass_1, 'mass_2': mass_2, 'luminosity_distance': luminosity_distance, 'theta_jn': theta_jn, 'psi': psi, 'phase': phase, 'ra': ra, 'dec': dec}
+data.update(interp_snr)
+
+# save the dictionary in json format
+from gwsnr.utils import save_json_dict
+save_json_dict(data, 'snr_data.json');
