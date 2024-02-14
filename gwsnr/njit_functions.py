@@ -89,6 +89,18 @@ def findchirp_chirptime(m1, m2, fmin):
 def einsum1(m,n):
     """
     Function to calculate einsum of two 3x1 vectors
+
+    Parameters
+    ----------
+    m : `numpy.ndarray`
+        3x1 vector.
+    n : `numpy.ndarray`
+        3x1 vector.
+        
+    Returns
+    -------
+    ans : `numpy.ndarray`
+        3x3 matrix.
     """
     ans = np.zeros((3,3))
     ans[0,0] = m[0]*n[0]
@@ -105,6 +117,18 @@ def einsum1(m,n):
 def einsum2(m,n):
     """
     Function to calculate einsum of two 3x3 matrices
+
+    Parameters
+    ----------
+    m : `numpy.ndarray`
+        3x3 matrix.
+    n : `numpy.ndarray`
+        3x3 matrix.
+
+    Returns
+    -------
+    ans : `numpy.ndarray`
+        3x3 matrix.
     """
     ans = m[0,0]*n[0,0] + m[0,1]*n[0,1] + m[0,2]*n[0,2] + m[1,0]*n[1,0] + m[1,1]*n[1,1] + m[1,2]*n[1,2] + m[2,0]*n[2,0] + m[2,1]*n[2,1] + m[2,2]*n[2,2]
     return ans
@@ -113,6 +137,16 @@ def einsum2(m,n):
 def gps_to_gmst(gps_time):
     """
     Function to convert gps time to greenwich mean sidereal time
+
+    Parameters
+    ----------
+    gps_time : `float`
+        GPS time in seconds.
+
+    Returns
+    -------
+    gmst : `float`
+        Greenwich mean sidereal time in radians.
     """
     slope = 7.292115855382993e-05
     time0 = 1126259642.413
@@ -123,6 +157,22 @@ def gps_to_gmst(gps_time):
 def ra_dec_to_theta_phi(ra, dec, gmst):
     """
     Function to convert ra and dec to theta and phi
+
+    Parameters
+    ----------
+    ra : `float`
+        Right ascension of the source in radians.
+    dec : `float`
+        Declination of the source in radians.
+    gmst : `float`
+        Greenwich mean sidereal time in radians.
+
+    Returns
+    -------
+    theta : `float`
+        Polar angle in radians.
+    phi : `float`
+        Azimuthal angle in radians.
     """
 
     phi = ra - gmst
@@ -133,6 +183,24 @@ def ra_dec_to_theta_phi(ra, dec, gmst):
 def get_polarization_tensor(ra, dec, time, psi, mode='plus'):
     """
     Function to calculate the polarization tensor
+
+    Parameters
+    ----------
+    ra : `float`
+        Right ascension of the source in radians.
+    dec : float
+        Declination of the source in radians.
+    time : `float`
+        GPS time of the source.
+    psi : `float`
+        Polarization angle of the source.
+    mode : `str`
+        Mode of the polarization. Default is 'plus'.
+
+    Returns
+    -------
+    polarization_tensor: `numpy.ndarray`
+        Polarization tensor of the detector.
     """
     gmst = np.fmod(gps_to_gmst(time), 2 * np.pi)
     theta, phi = ra_dec_to_theta_phi(ra, dec, gmst)
@@ -393,6 +461,16 @@ def cubic_spline_interpolator(xnew, coefficients, x):
 def coefficients_generator(y1, y2, y3, y4, z1, z2, z3, z4):
     """
     Function to generate the coefficients for the cubic spline interpolation of fn(y)=z.
+
+    Parameters
+    ----------
+    y1, y2, y3, y4, z1, z2, z3, z4: `float`
+        Values of y and z for the cubic spline interpolation.
+
+    Returns
+    -------
+    coefficients: `numpy.ndarray`
+        Coefficients for the cubic spline interpolation.
     """
     matrixA = np.array([
         [y1**3, y1**2, y1, 1, 0, 0, 0, 0, 0, 0, 0, 0],

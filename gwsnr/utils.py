@@ -33,10 +33,8 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
     ----------
     psds : dict
         dictionary of psds. psds.keys()=detector names, psds.values()=psds file names or pycbc psd names
-    isit_psd_file : `bool` or `dict`
-        If set True, the given value of psds param should be of psds instead of asd. If asd, set isit_psd_file=False. Default is False. If dict, it should be of the form {'L1':True, 'H1':True, 'V1':True} and should have keys for all the detectors.
     ifos : `list` or `None`
-        List of interferometer objects. Default is None. If None, bilby's default interferometer objects will be used.
+        List of interferometer objects or interferometer name list. Default is None. If None, bilby's default interferometer objects will be used.
     f_min : `float`
         Minimum frequency of the psds. Default is 20.
     sampling_frequency : `float`
@@ -46,6 +44,10 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
     ----------
     psds_list : `list`
         list of bilby.gw.detector.PowerSpectralDensity objects
+    detector_tensor_list : `list`
+        list of detector tensors
+    detector_list : `list`
+        list of detector names
     """
 
     if not psds and not ifos:

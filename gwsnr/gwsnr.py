@@ -71,10 +71,8 @@ class GWSNR:
         psds={'L1':'aLIGO_O4_high_asd.txt','H1':'aLIGO_O4_high_asd.txt', 'V1':'AdV_asd.txt', 'K1':'KAGRA_design_asd.txt'}.
         For other psd files, check https://github.com/lscsoft/bilby/tree/master/bilby/gw/detector/noise_curves \n
         Example 3: when values are custom psd txt file. psds={'L1':'custom_psd.txt','H1':'custom_psd.txt'}. Custom created txt file has two columns. 1st column: frequency array, 2nd column: strain.
-    psd_with_time : `bool` or `float`
-        gps end time of strain data for which psd will be found. (this param will be given highest priority), example: psd_with_time=1246527224.169434. If False, psds given in psds param will be used. Default is False. If True (without gps time), psds will be calculated from strain data by setting gps end time as geocent_time-duration. Default is False.
     ifos : `list` or `None`
-        List of interferometer objects. Default is None. If None, bilby's default interferometer objects will be used. For example for LIGO India detector, it can be defined as follows, \n
+        List of interferometer objects or detector names. Default is None. If None, bilby's default interferometer objects will be used. For example for LIGO India detector, it can be defined as follows, \n
         >>> import bilby
         >>> from gwsnr import GWSNR
         >>> ifosLIO = bilby.gw.detector.interferometer.Interferometer(

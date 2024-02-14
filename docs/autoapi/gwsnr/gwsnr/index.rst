@@ -81,11 +81,8 @@ Classes
 
            Example 3: when values are custom psd txt file. psds={'L1':'custom_psd.txt','H1':'custom_psd.txt'}. Custom created txt file has two columns. 1st column: frequency array, 2nd column: strain.
 
-       **psd_with_time** : `bool` or `float`
-           gps end time of strain data for which psd will be found. (this param will be given highest priority), example: psd_with_time=1246527224.169434. If False, psds given in psds param will be used. Default is False. If True (without gps time), psds will be calculated from strain data by setting gps end time as geocent_time-duration. Default is False.
-
        **ifos** : `list` or `None`
-           List of interferometer objects. Default is None. If None, bilby's default interferometer objects will be used. For example for LIGO India detector, it can be defined as follows,
+           List of interferometer objects or detector names. Default is None. If None, bilby's default interferometer objects will be used. For example for LIGO India detector, it can be defined as follows,
 
            >>> import bilby
            >>> from gwsnr import GWSNR
@@ -102,7 +99,7 @@ Classes
                    yarm_azimuth = 117.6157 + 90.,
                    xarm_tilt = 0.,
                    yarm_tilt = 0.)
-           >>> snr = GWSNR(psds=dict(LIO='your_asd_file.txt'), ifos=[ifosLIO])
+           >>> snr = GWSNR(psds=dict(LIO='your_asd.txt'), ifos=[ifosLIO])
 
        **interpolator_dir** : `str`
            Path to store the interpolator pickle file. Default is './interpolator_pickle'.

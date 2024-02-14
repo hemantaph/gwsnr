@@ -79,7 +79,18 @@ Functions
    Function to calculate einsum of two 3x1 vectors
 
 
+   :Parameters:
 
+       **m** : `numpy.ndarray`
+           3x1 vector.
+
+       **n** : `numpy.ndarray`
+           3x1 vector.
+
+   :Returns:
+
+       **ans** : `numpy.ndarray`
+           3x3 matrix.
 
 
 
@@ -102,7 +113,18 @@ Functions
    Function to calculate einsum of two 3x3 matrices
 
 
+   :Parameters:
 
+       **m** : `numpy.ndarray`
+           3x3 matrix.
+
+       **n** : `numpy.ndarray`
+           3x3 matrix.
+
+   :Returns:
+
+       **ans** : `numpy.ndarray`
+           3x3 matrix.
 
 
 
@@ -125,7 +147,15 @@ Functions
    Function to convert gps time to greenwich mean sidereal time
 
 
+   :Parameters:
 
+       **gps_time** : `float`
+           GPS time in seconds.
+
+   :Returns:
+
+       **gmst** : `float`
+           Greenwich mean sidereal time in radians.
 
 
 
@@ -148,7 +178,24 @@ Functions
    Function to convert ra and dec to theta and phi
 
 
+   :Parameters:
 
+       **ra** : `float`
+           Right ascension of the source in radians.
+
+       **dec** : `float`
+           Declination of the source in radians.
+
+       **gmst** : `float`
+           Greenwich mean sidereal time in radians.
+
+   :Returns:
+
+       **theta** : `float`
+           Polar angle in radians.
+
+       **phi** : `float`
+           Azimuthal angle in radians.
 
 
 
@@ -171,7 +218,27 @@ Functions
    Function to calculate the polarization tensor
 
 
+   :Parameters:
 
+       **ra** : `float`
+           Right ascension of the source in radians.
+
+       **dec** : float
+           Declination of the source in radians.
+
+       **time** : `float`
+           GPS time of the source.
+
+       **psi** : `float`
+           Polarization angle of the source.
+
+       **mode** : `str`
+           Mode of the polarization. Default is 'plus'.
+
+   :Returns:
+
+       polarization_tensor: `numpy.ndarray`
+           Polarization tensor of the detector.
 
 
 
@@ -463,7 +530,15 @@ Functions
    Function to generate the coefficients for the cubic spline interpolation of fn(y)=z.
 
 
+   :Parameters:
 
+       **y1, y2, y3, y4, z1, z2, z3, z4: `float`**
+           Values of y and z for the cubic spline interpolation.
+
+   :Returns:
+
+       coefficients: `numpy.ndarray`
+           Coefficients for the cubic spline interpolation.
 
 
 

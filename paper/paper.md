@@ -25,13 +25,13 @@ Gravitational waves, ripples in spacetime predicted by Einstein's theory of Gene
 
 # Statement of Need
 
-The ``gwsnr`` Python package addresses the need for efficient SNR computation in gravitational wave research. It innovatively streamlines SNR calculations, enhancing accuracy and efficiency with several advanced techniques. Firstly, it utilizes an innovative interpolation method, employing a half-scaling approach for accurately interpolating the SNR of gravitational waves from spin-less binary systems, focusing on the mass parameters. Secondly, the package features a noise-weighted inner product method, similar to that in the `bilby` package, but enhanced with multiprocessing capabilities. This integration allows for the parallel processing of complex calculations, thereby expediting the SNR computation. Lastly, `gwsnr` leverages the `numba` Just-In-Time (njit) compiler, which optimizes performance by compiling Python code into machine code at runtime, drastically reducing execution times. Beyond these technical merits, `gwsnr` stands out for its user-friendly features and seamless integration with other related software packages, making it not just a powerful tool but also an accessible one for researchers. These attributes position `gwsnr` as an invaluable asset in gravitational wave data analysis, particularly in simulations of detectable binary mergers, calculation of merger rates, determining gravitational wave lensing rates, and in the analysis of selection effects within hierarchical Bayesian frameworks. The package thus represents a significant step forward in gravitational wave research, enabling more precise and efficient exploration of the universe through gravitational wave observations and simulations. Additionally, `gwsnr` is instrumental in the `LeR` package for calculating detectable rates of both lensed and unlensed gravitational wave events, showcasing its utility in advanced gravitational wave studies.
+The *`gwsnr`* Python package addresses the need for efficient SNR computation in gravitational wave research. It innovatively streamlines SNR calculations, enhancing accuracy and efficiency with several advanced techniques. Firstly, it utilizes an innovative interpolation method, employing a half-scaling approach for accurately interpolating the SNR of gravitational waves from spin-less binary systems, focusing on the mass parameters. Secondly, the package features a noise-weighted inner product method, similar to that in the *`bilby`* package, but enhanced with multiprocessing capabilities. This integration allows for the parallel processing of complex calculations, thereby expediting the SNR computation. Lastly, *`gwsnr`* leverages the *`numba`* Just-In-Time (njit) compiler, which optimizes performance by compiling Python code into machine code at runtime, drastically reducing execution times. Beyond these technical merits, *`gwsnr`* stands out for its user-friendly features and seamless integration with other related software packages, making it not just a powerful tool but also an accessible one for researchers. These attributes position *`gwsnr`* as an invaluable asset in gravitational wave data analysis, particularly in simulations of detectable binary mergers, calculation of merger rates, determining gravitational wave lensing rates, and in the analysis of selection effects within hierarchical Bayesian frameworks. The package thus represents a significant step forward in gravitational wave research, enabling more precise and efficient exploration of the universe through gravitational wave observations and simulations. Additionally, *`gwsnr`* is instrumental in the *`LeR`* package for calculating detectable rates of both lensed and unlensed gravitational wave events, showcasing its utility in advanced gravitational wave studies.
 
 # Mathematical Formulation
 
 #### Modified FINDCHIRP Method: Half Scaling Approach
 
-The `gwsnr` package introduces the Half Scaling method for SNR calculations in spin-less binary systems. This method, rooted in the [FINDCHIRP](https://arxiv.org/abs/gr-qc/0509116) algorithm, focuses on non-spinning IMR waveforms and particularly interpolates the Half scaled SNR ($\rho_{1/2}$) based on mass parameters ($M_{tot},q$).
+The *`gwsnr`* package introduces the Half Scaling method for SNR calculations in spin-less binary systems. This method, rooted in the [FINDCHIRP](https://arxiv.org/abs/gr-qc/0509116) algorithm, focuses on non-spinning IMR waveforms and particularly interpolates the Half scaled SNR ($\rho_{1/2}$) based on mass parameters ($M_{tot},q$).
 
 - **Interpolation Method**: Utilizes a 2D cubic spline technique (njit-ted) for the 'halfsnr' segment.
 
@@ -50,7 +50,7 @@ The `gwsnr` package introduces the Half Scaling method for SNR calculations in s
 
 #### Noise-Weighted Inner Product Method
 
-Designed for SNR calculations in systems characterized by frequency domain waveforms in `lalsimulation`, including spin-precessing binary systems.
+Designed for SNR calculations in systems characterized by frequency domain waveforms in *`lalsimulation`*, including spin-precessing binary systems.
 
 - **Methodology**: Combines waveform generation (multi-process), antenna pattern calculation (njit-ted), and noise-weighted inner product computation (njit-ted).
 
@@ -62,7 +62,7 @@ Designed for SNR calculations in systems characterized by frequency domain wavef
 
   - $h_{+\times}$ are frequency domain waveform polarizations, and $F_{+\times}$ are antenna patterns. 
 
-These formulations highlight `gwsnr`'s capability to efficiently process diverse gravitational wave signals, enhancing data analysis accuracy and efficiency.
+These formulations highlight *`gwsnr`'s capability to efficiently process diverse gravitational wave signals, enhancing data analysis accuracy and efficiency.
 
 # Acknowledgements
 

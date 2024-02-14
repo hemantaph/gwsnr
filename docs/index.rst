@@ -36,7 +36,7 @@ The code is available at `github <https://github.com/hemantaph/gwsnr>`_
    :maxdepth: 2
    :caption: Examples:
 
-   snr generation
+   snr_generation
 
 Indices and tables
 ==================

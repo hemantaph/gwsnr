@@ -134,11 +134,8 @@ Functions
        **psds** : dict
            dictionary of psds. psds.keys()=detector names, psds.values()=psds file names or pycbc psd names
 
-       **isit_psd_file** : `bool` or `dict`
-           If set True, the given value of psds param should be of psds instead of asd. If asd, set isit_psd_file=False. Default is False. If dict, it should be of the form {'L1':True, 'H1':True, 'V1':True} and should have keys for all the detectors.
-
        **ifos** : `list` or `None`
-           List of interferometer objects. Default is None. If None, bilby's default interferometer objects will be used.
+           List of interferometer objects or interferometer name list. Default is None. If None, bilby's default interferometer objects will be used.
 
        **f_min** : `float`
            Minimum frequency of the psds. Default is 20.
@@ -150,6 +147,12 @@ Functions
 
        **psds_list** : `list`
            list of bilby.gw.detector.PowerSpectralDensity objects
+
+       **detector_tensor_list** : `list`
+           list of detector tensors
+
+       **detector_list** : `list`
+           list of detector names
 
 
 
@@ -598,11 +601,8 @@ Functions
 
            Example 3: when values are custom psd txt file. psds={'L1':'custom_psd.txt','H1':'custom_psd.txt'}. Custom created txt file has two columns. 1st column: frequency array, 2nd column: strain.
 
-       **psd_with_time** : `bool` or `float`
-           gps end time of strain data for which psd will be found. (this param will be given highest priority), example: psd_with_time=1246527224.169434. If False, psds given in psds param will be used. Default is False. If True (without gps time), psds will be calculated from strain data by setting gps end time as geocent_time-duration. Default is False.
-
        **ifos** : `list` or `None`
-           List of interferometer objects. Default is None. If None, bilby's default interferometer objects will be used. For example for LIGO India detector, it can be defined as follows,
+           List of interferometer objects or detector names. Default is None. If None, bilby's default interferometer objects will be used. For example for LIGO India detector, it can be defined as follows,
 
            >>> import bilby
            >>> from gwsnr import GWSNR
@@ -619,7 +619,7 @@ Functions
                    yarm_azimuth = 117.6157 + 90.,
                    xarm_tilt = 0.,
                    yarm_tilt = 0.)
-           >>> snr = GWSNR(psds=dict(LIO='your_asd_file.txt'), ifos=[ifosLIO])
+           >>> snr = GWSNR(psds=dict(LIO='your_asd.txt'), ifos=[ifosLIO])
 
        **interpolator_dir** : `str`
            Path to store the interpolator pickle file. Default is './interpolator_pickle'.
@@ -1588,7 +1588,18 @@ Functions
    Function to calculate einsum of two 3x1 vectors
 
 
+   :Parameters:
 
+       **m** : `numpy.ndarray`
+           3x1 vector.
+
+       **n** : `numpy.ndarray`
+           3x1 vector.
+
+   :Returns:
+
+       **ans** : `numpy.ndarray`
+           3x3 matrix.
 
 
 
@@ -1611,7 +1622,18 @@ Functions
    Function to calculate einsum of two 3x3 matrices
 
 
+   :Parameters:
 
+       **m** : `numpy.ndarray`
+           3x3 matrix.
+
+       **n** : `numpy.ndarray`
+           3x3 matrix.
+
+   :Returns:
+
+       **ans** : `numpy.ndarray`
+           3x3 matrix.
 
 
 
@@ -1634,7 +1656,15 @@ Functions
    Function to convert gps time to greenwich mean sidereal time
 
 
+   :Parameters:
 
+       **gps_time** : `float`
+           GPS time in seconds.
+
+   :Returns:
+
+       **gmst** : `float`
+           Greenwich mean sidereal time in radians.
 
 
 
@@ -1657,7 +1687,24 @@ Functions
    Function to convert ra and dec to theta and phi
 
 
+   :Parameters:
 
+       **ra** : `float`
+           Right ascension of the source in radians.
+
+       **dec** : `float`
+           Declination of the source in radians.
+
+       **gmst** : `float`
+           Greenwich mean sidereal time in radians.
+
+   :Returns:
+
+       **theta** : `float`
+           Polar angle in radians.
+
+       **phi** : `float`
+           Azimuthal angle in radians.
 
 
 
@@ -1680,7 +1727,27 @@ Functions
    Function to calculate the polarization tensor
 
 
+   :Parameters:
 
+       **ra** : `float`
+           Right ascension of the source in radians.
+
+       **dec** : float
+           Declination of the source in radians.
+
+       **time** : `float`
+           GPS time of the source.
+
+       **psi** : `float`
+           Polarization angle of the source.
+
+       **mode** : `str`
+           Mode of the polarization. Default is 'plus'.
+
+   :Returns:
+
+       polarization_tensor: `numpy.ndarray`
+           Polarization tensor of the detector.
 
 
 
@@ -1972,7 +2039,15 @@ Functions
    Function to generate the coefficients for the cubic spline interpolation of fn(y)=z.
 
 
+   :Parameters:
 
+       **y1, y2, y3, y4, z1, z2, z3, z4: `float`**
+           Values of y and z for the cubic spline interpolation.
+
+   :Returns:
+
+       coefficients: `numpy.ndarray`
+           Coefficients for the cubic spline interpolation.
 
 
 
@@ -2181,11 +2256,8 @@ Functions
        **psds** : dict
            dictionary of psds. psds.keys()=detector names, psds.values()=psds file names or pycbc psd names
 
-       **isit_psd_file** : `bool` or `dict`
-           If set True, the given value of psds param should be of psds instead of asd. If asd, set isit_psd_file=False. Default is False. If dict, it should be of the form {'L1':True, 'H1':True, 'V1':True} and should have keys for all the detectors.
-
        **ifos** : `list` or `None`
-           List of interferometer objects. Default is None. If None, bilby's default interferometer objects will be used.
+           List of interferometer objects or interferometer name list. Default is None. If None, bilby's default interferometer objects will be used.
 
        **f_min** : `float`
            Minimum frequency of the psds. Default is 20.
@@ -2197,6 +2269,12 @@ Functions
 
        **psds_list** : `list`
            list of bilby.gw.detector.PowerSpectralDensity objects
+
+       **detector_tensor_list** : `list`
+           list of detector tensors
+
+       **detector_list** : `list`
+           list of detector names
 
 
 
