@@ -90,7 +90,7 @@ class GWSNR:
                 yarm_azimuth = 117.6157 + 90.,
                 xarm_tilt = 0.,
                 yarm_tilt = 0.)
-        >>> snr = GWSNR(psds=dict(LIO='your_asd_file.txt'), ifos=[ifosLIO])
+        >>> snr = GWSNR(psds=dict(LIO='your_asd.txt'), ifos=[ifosLIO])
     interpolator_dir : `str`
         Path to store the interpolator pickle file. Default is './interpolator_pickle'.
     create_new_interpolator : `bool`

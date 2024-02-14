@@ -30,7 +30,7 @@ The package is particularly useful in simulations of binary mergers, calculation
 
 ### Modified FINDCHIRP Method: Half Scaling Approach
 
-The `gwsnr` package introduces a Half Scaling method for SNR calculations, based on the FINDCHIRP algorithm. It focuses on non-spinning IMR waveforms and interpolates the Half scaled SNR based on mass parameters. Key aspects include:
+The `gwsnr` package introduces a Half Scaling method for SNR calculations, based on the [FINDCHIRP](https://arxiv.org/abs/gr-qc/0509116) algorithm. It focuses on non-spinning IMR waveforms and interpolates the Half scaled SNR based on mass parameters. Key aspects include:
 
 - A 2D cubic spline interpolation method for the 'halfsnr' segment.
 - The optimal SNR for a simple inspiral waveform is functionally dependent on various parameters and the detector's noise curve.
