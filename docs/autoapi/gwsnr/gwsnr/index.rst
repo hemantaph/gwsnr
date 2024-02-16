@@ -24,7 +24,7 @@ Classes
 
 
 
-.. py:class:: GWSNR(npool=int(4), mtot_min=2.0, mtot_max=439.6, ratio_min=0.1, ratio_max=1.0, mtot_resolution=500, ratio_resolution=50, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', minimum_frequency=20.0, snr_type='interpolation', psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=True)
+.. py:class:: GWSNR(npool=int(4), mtot_min=2.0, mtot_max=439.6, ratio_min=0.1, ratio_max=1.0, mtot_resolution=500, ratio_resolution=50, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', minimum_frequency=20.0, snr_type='interpolation', psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=True, pdet=False, snr_th=8.0, snr_th_net=8.0)
 
 
    
@@ -66,7 +66,7 @@ Classes
 
        **snr_type** : `str`
            Type of SNR calculation. Default is 'interpolation'.
-           options: 'interpolation', 'inner_product', 'pdet'
+           options: 'interpolation', 'inner_product', 'pdet', 'ann'
 
        **psds** : `dict`
            Dictionary of psds for different detectors. Default is None. If None, bilby's default psds will be used. Other options:
@@ -205,7 +205,7 @@ Classes
    |:meth:`~print_all_params`            | Prints all the parameters of     |
    |                                     | the class instance.              |
    +-------------------------------------+----------------------------------+
-   |:meth:`~init_halfscaled`             | Generates halfscaled SNR         |
+   |:meth:`~init_partialscaled`             | Generates partialscaled SNR         |
    |                                     | interpolation coefficients.      |
    +-------------------------------------+----------------------------------+
 
@@ -405,12 +405,12 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:attribute:: snr_halfsacaled
+   .. py:attribute:: snr_partialsacaled
 
       
       ``numpy.ndarray``
 
-      Array of half scaled SNR interpolation coefficients.
+      Array of partial scaled SNR interpolation coefficients.
 
 
 
@@ -621,6 +621,78 @@ Classes
       ..
           !! processed by numpydoc !!
 
+   .. py:attribute:: pdet
+
+      
+      ``bool``
+
+      If True, it will calculate the probability of detection. Default is False. Can also be 'matched_filter' or 'bool'. The value 'True' and 'bool' will give the same result.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: snr_th
+
+      
+      ``float``
+
+      SNR threshold for individual detector. Use for pdet calculation. Default is 8.0.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:attribute:: snr_th_net
+
+      
+      ``float``
+
+      SNR threshold for network SNR. Use for pdet calculation. Default is 8.0.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
    .. py:method:: calculate_mtot_max(mtot_max, minimum_frequency)
 
       
@@ -766,6 +838,109 @@ Classes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: snr_with_ann(mass_1, mass_2, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, output_jsonfile=False)
+
+      
+      Function to calculate SNR using bicubic interpolation method.
+
+
+      :Parameters:
+
+          **mass_1** : `numpy.ndarray` or `float`
+              Primary mass of the binary in solar mass. Default is 10.0.
+
+          **mass_2** : `numpy.ndarray` or `float`
+              Secondary mass of the binary in solar mass. Default is 10.0.
+
+          **luminosity_distance** : `numpy.ndarray` or `float`
+              Luminosity distance of the binary in Mpc. Default is 100.0.
+
+          **theta_jn** : `numpy.ndarray` or `float`
+              Inclination angle of the binary in radian. Default is 0.0.
+
+          **psi** : `numpy.ndarray` or `float`
+              Polarization angle of the binary in radian. Default is 0.0.
+
+          **phase** : `numpy.ndarray` or `float`
+              Phase of the binary in radian. Default is 0.0.
+
+          **geocent_time** : `numpy.ndarray` or `float`
+              Geocentric time of the binary in gps. Default is 1246527224.169434.
+
+          **ra** : `numpy.ndarray` or `float`
+              Right ascension of the binary in radian. Default is 0.0.
+
+          **dec** : `numpy.ndarray` or `float`
+              Declination of the binary in radian. Default is 0.0.
+
+          **output_jsonfile** : `str` or `bool`
+              If str, the SNR dictionary will be saved as a json file with the given name. Default is False.
+
+      :Returns:
+
+          **snr_dict** : `dict`
+              Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).
+
+
+
+
+
+
+
+
+
+
+      .. rubric:: Examples
+
+      >>> from gwsnr import GWSNR
+      >>> snr = GWSNR(snr_type='ann', waveform_approximant='IMRPhenomXPHM')
+      >>> snr.snr_with_ann(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0)
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: output_ann(idx, params)
+
+      
+      Function to output the input data for ANN.
+
+
+      :Parameters:
+
+          **idx** : `numpy.ndarray`
+              Index array.
+
+          **params** : `dict`
+              Dictionary of input parameters.
+
+      :Returns:
+
+          **X_L1** : `numpy.ndarray`
+              Feature scaled input data for L1 detector.
+
+          **X_H1** : `numpy.ndarray`
+              Feature scaled input data for H1 detector.
+
+          **X_V1** : `numpy.ndarray`
+              Feature scaled input data for V1 detector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
    .. py:method:: snr_with_interpolation(mass_1, mass_2, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, output_jsonfile=False)
 
       
@@ -821,7 +996,7 @@ Classes
       .. rubric:: Examples
 
       >>> from gwsnr import GWSNR
-      >>> snr = GWSNR(snrs_type='interpolation')
+      >>> snr = GWSNR(snr_type='interpolation')
       >>> snr.snr_with_interpolation(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
 
 
@@ -829,10 +1004,10 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: init_halfscaled()
+   .. py:method:: init_partialscaled()
 
       
-      Function to generate halfscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.
+      Function to generate partialscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.
 
 
 
@@ -950,7 +1125,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: pdet(snr_dict, rho_th=8.0, rho_net_th=8.0)
+   .. py:method:: probability_of_detection(snr_dict, snr_th=None, snr_th_net=None, type='matched_filter')
 
       
       Probaility of detection of GW for the given sensitivity of the detectors
@@ -966,6 +1141,9 @@ Classes
 
           **rho_net_th** : `float`
               Threshold net SNR for detection. Default is 8.0.
+
+          **type** : `str`
+              Type of SNR calculation. Default is 'matched_filter'. Other option is 'bool'.
 
       :Returns:
 
@@ -987,7 +1165,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: detector_horizon(mass_1=1.4, mass_2=1.4, snr_threshold=8.0)
+   .. py:method:: detector_horizon(mass_1=1.4, mass_2=1.4, snr_th=None, snr_th_net=None)
 
       
       Function for finding detector horizon distance for BNS (m1=m2=1.4)
@@ -1001,7 +1179,7 @@ Classes
           **mass_2** : `float`
               Secondary mass of the binary in solar mass. Default is 1.4.
 
-          **snr_threshold** : `float`
+          **snr_th** : `float`
               SNR threshold for detection. Default is 8.0.
 
       :Returns:

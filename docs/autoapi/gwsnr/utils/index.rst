@@ -193,7 +193,7 @@ Functions
 .. py:function:: interpolator_check(param_dict_given, interpolator_dir, create_new)
 
    
-   Function for interpolator (snr_halfsacaled) check and generation if not exists.
+   Function for interpolator (snr_partialsacaled) check and generation if not exists.
 
 
    :Parameters:
@@ -237,7 +237,7 @@ Functions
 .. py:function:: interpolator_pickle_path(param_dict_given, path='./interpolator_pickle')
 
    
-   Function for storing or getting interpolator (snr_halfsacaled) pickle path
+   Function for storing or getting interpolator (snr_partialsacaled) pickle path
 
 
    :Parameters:
@@ -252,7 +252,7 @@ Functions
 
        **path_interpolator** : str
            path to the interpolator pickle file
-           e.g. './interpolator_pickle/L1/halfSNR_dict_0.pickle'
+           e.g. './interpolator_pickle/L1/partialSNR_dict_0.pickle'
 
        it_exist: bool
            True if the interpolator exists

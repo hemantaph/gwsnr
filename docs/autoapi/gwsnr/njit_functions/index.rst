@@ -380,7 +380,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, detector_tensor, snr_halfscaled, ratio_arr, mtot_arr)
+.. py:function:: get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr)
 
    
    Function to calculate the interpolated snr for a given set of parameters
@@ -415,14 +415,14 @@ Functions
        **detector_tensor** : array-like
            Detector tensor for the detector (3x3 matrix)
 
-       **snr_halfscaled** : `numpy.ndarray`
-           Array of snr_halfscaled coefficients for the detector.
+       **snr_partialscaled** : `numpy.ndarray`
+           Array of snr_partialscaled coefficients for the detector.
 
        **ratio_arr** : `numpy.ndarray`
-           Array of mass ratio values for the snr_halfscaled coefficients.
+           Array of mass ratio values for the snr_partialscaled coefficients.
 
        **mtot_arr** : `numpy.ndarray`
-           Array of total mass values for the snr_halfscaled coefficients.
+           Array of total mass values for the snr_partialscaled coefficients.
 
    :Returns:
 
@@ -447,7 +447,7 @@ Functions
 .. py:function:: cubic_spline_interpolator2d(xnew, ynew, coefficients, x, y)
 
    
-   Function to calculate the interpolated value of snr_halfscaled given the mass ratio (ynew) and total mass (xnew). This is based off 2D bicubic spline interpolation.
+   Function to calculate the interpolated value of snr_partialscaled given the mass ratio (ynew) and total mass (xnew). This is based off 2D bicubic spline interpolation.
 
 
    :Parameters:
@@ -470,7 +470,7 @@ Functions
    :Returns:
 
        **result** : `float`
-           Interpolated value of snr_halfscaled.
+           Interpolated value of snr_partialscaled.
 
 
 
@@ -490,7 +490,7 @@ Functions
 .. py:function:: cubic_spline_interpolator(xnew, coefficients, x)
 
    
-   Function to calculate the interpolated value of snr_halfscaled given the total mass (xnew). This is based off 1D cubic spline interpolation.
+   Function to calculate the interpolated value of snr_partialscaled given the total mass (xnew). This is based off 1D cubic spline interpolation.
 
 
    :Parameters:
@@ -507,7 +507,7 @@ Functions
    :Returns:
 
        **result** : `float`
-           Interpolated value of snr_halfscaled.
+           Interpolated value of snr_partialscaled.
 
 
 
