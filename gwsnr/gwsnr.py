@@ -16,6 +16,8 @@ from .utils import (
     interpolator_check,
     load_json,
     save_json_dict,
+    load_h5_dataset,
+    load_pkl_dataset,
 )
 from .njit_functions import (
     get_interpolated_snr,
@@ -61,7 +63,7 @@ class GWSNR:
         Minimum frequency of the waveform. Default is 20.0.
     snr_type : `str`
         Type of SNR calculation. Default is 'interpolation'.
-        options: 'interpolation', 'inner_product', 'pdet'
+        options: 'interpolation', 'inner_product', 'pdet', 'ann'
     psds : `dict`
         Dictionary of psds for different detectors. Default is None. If None, bilby's default psds will be used. Other options:\n
         Example 1: when values are psd name from pycbc analytical psds, psds={'L1':'aLIGOaLIGODesignSensitivityT1800044','H1':'aLIGOaLIGODesignSensitivityT1800044','V1':'AdvVirgo'}. To check available psd name run \n
@@ -177,7 +179,7 @@ class GWSNR:
     |:meth:`~print_all_params`            | Prints all the parameters of     |
     |                                     | the class instance.              |
     +-------------------------------------+----------------------------------+
-    |:meth:`~init_halfscaled`             | Generates halfscaled SNR         |
+    |:meth:`~init_partialscaled`             | Generates partialscaled SNR         |
     |                                     | interpolation coefficients.      |
     +-------------------------------------+----------------------------------+
     """
@@ -215,9 +217,9 @@ class GWSNR:
     """``numpy.ndarray`` \n
     Array of mass ratio."""
 
-    snr_halfsacaled = None
+    snr_partialsacaled = None
     """``numpy.ndarray`` \n
-    Array of half scaled SNR interpolation coefficients."""
+    Array of partial scaled SNR interpolation coefficients."""
 
     sampling_frequency = None
     """``float`` \n
@@ -251,6 +253,18 @@ class GWSNR:
     """``dict`` \n
     Dictionary of stored SNRs."""
 
+    pdet = None
+    """``bool`` \n
+    If True, it will calculate the probability of detection. Default is False. Can also be 'matched_filter' or 'bool'. The value 'True' and 'bool' will give the same result."""
+
+    snr_th = None
+    """``float`` \n
+    SNR threshold for individual detector. Use for pdet calculation. Default is 8.0."""
+
+    snr_th_net = None
+    """``float`` \n
+    SNR threshold for network SNR. Use for pdet calculation. Default is 8.0."""
+
     def __init__(
         self,
         npool=int(4),
@@ -271,9 +285,15 @@ class GWSNR:
         gwsnr_verbose=True,
         multiprocessing_verbose=True,
         mtot_cut=True,
+        pdet=False,
+        snr_th=8.0,
+        snr_th_net=8.0,
     ):
         # setting instance attributes
         self.npool = npool
+        self.pdet = pdet
+        self.snr_th = snr_th
+        self.snr_th_net = snr_th_net
 
         # dealing with mtot_max
         # set max cut off according to minimum_frequency
@@ -311,69 +331,109 @@ class GWSNR:
         # print some info
         self.print_all_params(gwsnr_verbose)
 
-        # now generate interpolator, if not exists
-        if snr_type != "inner_product":
-            # dealing with interpolator
-            # interpolator check and generation will be skipped if snr_type="inner_product"
-            # param_dict_given is an identifier for the interpolator
-            self.param_dict_given = {
-                "mtot_min": self.mtot_min,
-                "mtot_max": self.mtot_max,
-                "mtot_resolution": self.mtot_resolution,
-                "ratio_min": self.ratio_min,
-                "ratio_max": self.ratio_max,
-                "ratio_resolution": self.ratio_resolution,
-                "sampling_frequency": self.sampling_frequency,
-                "waveform_approximant": self.waveform_approximant,
-                "minimum_frequency": self.f_min,
-                "detector": detector_list,
-                "psds": psds_list,
-                "detector_tensor": detector_tensor_list,
-            }
+        # param_dict_given is an identifier for the interpolator
+        self.param_dict_given = {
+            "mtot_min": self.mtot_min,
+            "mtot_max": self.mtot_max,
+            "mtot_resolution": self.mtot_resolution,
+            "ratio_min": self.ratio_min,
+            "ratio_max": self.ratio_max,
+            "ratio_resolution": self.ratio_resolution,
+            "sampling_frequency": self.sampling_frequency,
+            "waveform_approximant": self.waveform_approximant,
+            "minimum_frequency": self.f_min,
+            "detector": detector_list,
+            "psds": psds_list,
+            "detector_tensor": detector_tensor_list,
+        }
+
+        # dealing with interpolator
+        def interpolator_setup():
             # Note: it will only select detectors that does not have interpolator stored yet
             (
                 self.psds_list,
                 self.detector_tensor_list,
                 self.detector_list,
                 self.path_interpolator,
-                path_interpolator_all
+                path_interpolator_all,
             ) = interpolator_check(
                 param_dict_given=self.param_dict_given.copy(),
                 interpolator_dir=interpolator_dir,
                 create_new=create_new_interpolator,
             )
 
-            # print(self.path_interpolator)
-            # print(self.detector_list)
-
             self.multiprocessing_verbose = False  # This lets multiprocessing to use map instead of imap_unordered function.
             # len(detector_list) == 0, means all the detectors have interpolator stored
             if len(self.detector_list) > 0:
                 print("Please be patient while the interpolator is generated")
-                self.init_halfscaled()
+                self.init_partialscaled()
             elif create_new_interpolator:
                 # change back to original
                 self.psds_list = psds_list
                 self.detector_tensor_list = detector_tensor_list
                 self.detector_list = detector_list
                 print("Please be patient while the interpolator is generated")
-                self.init_halfscaled()
-            
-            # get all halfscaledSNR from the stored interpolator
-            self.snr_halfsacaled_list = [load_json(path) for path in path_interpolator_all]
+                self.init_partialscaled()
+
+            # get all partialscaledSNR from the stored interpolator
+            self.snr_partialsacaled_list = [
+                load_json(path) for path in path_interpolator_all
+            ]
+
+            return path_interpolator_all
+
+        # now generate interpolator, if not exists
+        if snr_type == "interpolation":
+            # dealing with interpolator
+            path_interpolator_all = interpolator_setup()
+        # inner product method doesn't need interpolator generation
+        elif snr_type == "inner_product":
+            pass
+        # ANN method still needs the partialscaledSNR interpolator.
+        elif snr_type == "ann":
+            bool_ann = True
+            bool_ann &= self.mtot_min == 2.0
+            bool_ann &= self.mtot_max <= 184.98599853446768
+            bool_ann &= self.ratio_min == 0.1
+            bool_ann &= self.ratio_max == 1.0
+            bool_ann &= self.waveform_approximant == "IMRPhenomXPHM"
+            bool_ann &= self.sampling_frequency == 2048.0
+            bool_ann &= self.f_min == 20.0
+            bool_ann &= detector_list == ["L1", "H1", "V1"]
+            try:
+                bool_ann &= psds_list[0].asd_file[-21:] == "aLIGO_O4_high_asd.txt"
+                bool_ann &= psds_list[1].asd_file[-21:] == "aLIGO_O4_high_asd.txt"
+                bool_ann &= psds_list[2].asd_file[-11:] == "AdV_asd.txt"
+            except:
+                bool_ann = False
+
+            if not bool_ann:
+                raise ValueError(
+                    "The given input parameters are not suitable for ANN method."
+                )
+            else:
+                print("ANN method is selected.")
+                # dealing with interpolator
+                self.waveform_approximant = "IMRPhenomD"
+                print(
+                    "Please be patient while the interpolator is generated of partialscaledSNR for IMRPhenomD."
+                )
+                path_interpolator_all = interpolator_setup()
+                self.waveform_approximant = "IMRPhenomXPHM"
 
         # change back to original
         self.psds_list = psds_list
         self.detector_tensor_list = detector_tensor_list
         self.detector_list = detector_list
         self.multiprocessing_verbose = multiprocessing_verbose
-        if snr_type == "interpolation":
+        if (snr_type == "interpolation") or (snr_type == "ann"):
             self.path_interpolator = path_interpolator_all
 
         def print_no_interpolator(**kwargs):
             print(
                 "No interpolator found. Please set snr_type=True to generate new interpolator."
             )
+
         if snr_type == "inner_product":
             self.snr_with_interpolation = print_no_interpolator
 
@@ -394,12 +454,12 @@ class GWSNR:
             Maximum total mass of the binary in solar mass (use interpolation purpose).
         """
 
-        def func(x, mass_ratio = 1.0):
+        def func(x, mass_ratio=1.0):
             mass_1 = x / (1 + mass_ratio)
             mass_2 = x / (1 + mass_ratio) * mass_ratio
 
             return findchirp_chirptime(mass_1, mass_2, minimum_frequency) * 1.2
-        
+
         # find where func is zero
         mtot_max_generated = fsolve(func, 150)[
             0
@@ -430,6 +490,7 @@ class GWSNR:
             print(
                 f"max(mtot) (with the given fmin={self.f_min}): {self.mtot_max}",
             )
+            print("detectors: ", self.detector_list)
             if self.snr_type == "interpolation":
                 print("min(ratio): ", self.ratio_min)
                 print("max(ratio): ", self.ratio_max)
@@ -545,13 +606,9 @@ class GWSNR:
                 dec=dec,
                 output_jsonfile=output_jsonfile,
             )
-        else:
-            if self.snr_type == "inner_product":
-                print("solving SNR with inner product")
-            else:
-                raise ValueError(
-                    "SNR function type not recognised, using inner_product method instead"
-                )
+
+        elif self.snr_type == "inner_product":
+            print("solving SNR with inner product")
 
             snr_dict = self.compute_bilby_snr(
                 mass_1,
@@ -571,7 +628,257 @@ class GWSNR:
                 phi_jl=phi_jl,
                 output_jsonfile=output_jsonfile,
             )
-        return snr_dict
+
+        elif self.snr_type == "ann":
+            snr_dict = self.snr_with_ann(
+                mass_1,
+                mass_2,
+                luminosity_distance=luminosity_distance,
+                theta_jn=theta_jn,
+                psi=psi,
+                phase=phase,
+                geocent_time=geocent_time,
+                ra=ra,
+                dec=dec,
+                output_jsonfile=output_jsonfile,
+            )
+
+        else:
+            raise ValueError("SNR function type not recognised")
+        
+        if self.pdet:
+            pdet_dict = self.probability_of_detection(snr_dict=snr_dict, snr_th=8.0, snr_th_net=8.0, type=self.pdet)
+
+            return pdet_dict
+        else:
+            return snr_dict
+
+    def snr_with_ann(
+        self,
+        mass_1,
+        mass_2,
+        luminosity_distance=100.0,
+        theta_jn=0.0,
+        psi=0.0,
+        phase=0.0,
+        geocent_time=1246527224.169434,
+        ra=0.0,
+        dec=0.0,
+        a_1=0.0,
+        a_2=0.0,
+        tilt_1=0.0,
+        tilt_2=0.0,
+        phi_12=0.0,
+        phi_jl=0.0,
+        output_jsonfile=False,
+    ):
+        """
+        Function to calculate SNR using bicubic interpolation method.
+
+        Parameters
+        ----------
+        mass_1 : `numpy.ndarray` or `float`
+            Primary mass of the binary in solar mass. Default is 10.0.
+        mass_2 : `numpy.ndarray` or `float`
+            Secondary mass of the binary in solar mass. Default is 10.0.
+        luminosity_distance : `numpy.ndarray` or `float`
+            Luminosity distance of the binary in Mpc. Default is 100.0.
+        theta_jn : `numpy.ndarray` or `float`
+            Inclination angle of the binary in radian. Default is 0.0.
+        psi : `numpy.ndarray` or `float`
+            Polarization angle of the binary in radian. Default is 0.0.
+        phase : `numpy.ndarray` or `float`
+            Phase of the binary in radian. Default is 0.0.
+        geocent_time : `numpy.ndarray` or `float`
+            Geocentric time of the binary in gps. Default is 1246527224.169434.
+        ra : `numpy.ndarray` or `float`
+            Right ascension of the binary in radian. Default is 0.0.
+        dec : `numpy.ndarray` or `float`
+            Declination of the binary in radian. Default is 0.0.
+        output_jsonfile : `str` or `bool`
+            If str, the SNR dictionary will be saved as a json file with the given name. Default is False.
+
+        Returns
+        -------
+        snr_dict : `dict`
+            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).
+
+        Examples
+        ----------
+        >>> from gwsnr import GWSNR
+        >>> snr = GWSNR(snr_type='ann', waveform_approximant='IMRPhenomXPHM')
+        >>> snr.snr_with_ann(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0)
+        """
+
+        # setting up the parameters
+        detectors = np.array(self.detector_list)
+        size = len(mass_1)
+        # this allows mass_1, mass_2 to pass as float or array
+        mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
+        # Broadcasting parameters to the desired size
+        (
+            mass_1,
+            mass_2,
+            luminosity_distance,
+            theta_jn,
+            psi,
+            phase,
+            geocent_time,
+            ra,
+            dec,
+            a_1,
+            a_2,
+            tilt_1,
+            tilt_2,
+            phi_12,
+            phi_jl,
+        ) = np.broadcast_arrays(
+            mass_1,
+            mass_2,
+            luminosity_distance,
+            theta_jn,
+            psi,
+            phase,
+            geocent_time,
+            ra,
+            dec,
+            a_1,
+            a_2,
+            tilt_1,
+            tilt_2,
+            phi_12,
+            phi_jl,
+        )
+
+        mtot = mass_1 + mass_2
+        idx2 = np.logical_and(mtot >= self.mtot_min, mtot <= self.mtot_max)
+        idx_tracker = np.nonzero(idx2)[0]
+        size_ = len(idx_tracker)
+        if size_ == 0:
+            raise ValueError(
+                "mass_1 and mass_2 must be within the range of mtot_min and mtot_max"
+            )
+
+        # output data
+        params = dict(
+            mass_1=mass_1,
+            mass_2=mass_2,
+            luminosity_distance=luminosity_distance,
+            theta_jn=theta_jn,
+            psi=psi,
+            phase=phase,
+            geocent_time=geocent_time,
+            ra=ra,
+            dec=dec,
+            a_1=a_1,
+            a_2=a_2,
+            tilt_1=tilt_1,
+            tilt_2=tilt_2,
+            phi_12=phi_12,
+            phi_jl=phi_jl,
+        )
+        X_L1, X_H1, X_V1 = self.output_ann(idx2, params)
+
+        # load the model
+        modelL1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelL1.h5')
+        modelH1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelH1.h5')
+        modelV1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelV1.h5')
+        # load the scaler
+        scalerL1 = load_pkl_dataset('gwsnr', 'ann', 'scalerL1.pkl')
+        scalerH1 = load_pkl_dataset('gwsnr', 'ann', 'scalerH1.pkl')
+        scalerV1 = load_pkl_dataset('gwsnr', 'ann', 'scalerV1.pkl')
+
+        # predict the output
+        snr = []
+        x = scalerL1.transform(X_L1)
+        snr.append(modelL1.predict(x).flatten())
+        x = scalerH1.transform(X_H1)
+        snr.append(modelH1.predict(x).flatten())
+        x = scalerV1.transform(X_V1)
+        snr.append(modelV1.predict(x).flatten())
+        snr_effective = np.sqrt(snr[0] ** 2 + snr[1] ** 2 + snr[2] ** 2)
+
+        # Create optimal_snr dictionary using dictionary comprehension
+        optimal_snr = {det: np.zeros(size) for det in detectors}
+        optimal_snr["optimal_snr_net"] = np.zeros(size)
+        for j, det in enumerate(detectors):
+            optimal_snr[det][idx_tracker] = snr[j]
+        optimal_snr["optimal_snr_net"][idx_tracker] = snr_effective
+
+        # Save as JSON file
+        if output_jsonfile:
+            output_filename = (
+                output_jsonfile if isinstance(output_jsonfile, str) else "snr.json"
+            )
+            save_json_dict(optimal_snr, output_filename)
+
+        return optimal_snr
+
+    def output_ann(self, idx, params):
+        """
+        Function to output the input data for ANN.
+
+        Parameters
+        ----------
+        idx : `numpy.ndarray`
+            Index array.
+        params : `dict`
+            Dictionary of input parameters.
+
+        Returns
+        -------
+        X_L1 : `numpy.ndarray`
+            Feature scaled input data for L1 detector.
+        X_H1 : `numpy.ndarray`
+            Feature scaled input data for H1 detector.
+        X_V1 : `numpy.ndarray`
+            Feature scaled input data for V1 detector.
+        """
+
+        mass_1 = np.array(params["mass_1"][idx])
+        mass_2 = np.array(params["mass_2"][idx])
+        Mc = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
+        eta = mass_1 * mass_2 / (mass_1 + mass_2) ** 2.0
+        A1 = Mc ** (5.0 / 6.0)
+
+        _, _, snr_partial, d_eff = get_interpolated_snr(
+            mass_1,
+            mass_2,
+            params["luminosity_distance"][idx],
+            params["theta_jn"][idx],
+            params["psi"][idx],
+            params["geocent_time"][idx],
+            params["ra"][idx],
+            params["dec"][idx],
+            np.array(self.detector_tensor_list),
+            np.array(self.snr_partialsacaled_list),
+            np.array(self.ratio_arr),
+            np.array(self.mtot_arr),
+        )
+
+        # amp0
+        amp0 = A1 / d_eff
+
+        # get spin parameters
+        a_1 = np.array(params["a_1"][idx])
+        a_2 = np.array(params["a_2"][idx])
+        tilt_1 = np.array(params["tilt_1"][idx])
+        tilt_2 = np.array(params["tilt_2"][idx])
+        phi_12 = np.array(params["phi_12"][idx])
+        phi_jl = np.array(params["phi_jl"][idx])
+
+        # input data
+        X_L1 = np.vstack(
+            [snr_partial[0], amp0[0], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
+        ).T
+        X_H1 = np.vstack(
+            [snr_partial[1], amp0[1], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
+        ).T
+        X_V1 = np.vstack(
+            [snr_partial[2], amp0[2], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
+        ).T
+
+        return (X_L1, X_H1, X_V1)
 
     def snr_with_interpolation(
         self,
@@ -620,14 +927,14 @@ class GWSNR:
         Examples
         ----------
         >>> from gwsnr import GWSNR
-        >>> snr = GWSNR(snrs_type='interpolation')
+        >>> snr = GWSNR(snr_type='interpolation')
         >>> snr.snr_with_interpolation(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
         """
 
         # setting up the parameters
         detector_tensor = np.array(self.detector_tensor_list)
         detectors = np.array(self.detector_list)
-        snr_halfscaled = np.array(self.snr_halfsacaled_list)
+        snr_partialscaled = np.array(self.snr_partialsacaled_list)
         size = len(mass_1)
         # this allows mass_1, mass_2 to pass as float or array
         mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
@@ -664,7 +971,7 @@ class GWSNR:
             )
 
         # Get interpolated SNR
-        snr, snr_effective = get_interpolated_snr(
+        snr, snr_effective, _, _ = get_interpolated_snr(
             mass_1[idx2],
             mass_2[idx2],
             luminosity_distance[idx2],
@@ -674,7 +981,7 @@ class GWSNR:
             ra[idx2],
             dec[idx2],
             detector_tensor,
-            snr_halfscaled,
+            snr_partialscaled,
             self.ratio_arr,
             self.mtot_arr,
         )
@@ -695,9 +1002,9 @@ class GWSNR:
 
         return optimal_snr
 
-    def init_halfscaled(self):
+    def init_partialscaled(self):
         """
-        Function to generate halfscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.
+        Function to generate partialscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.
         """
 
         mtot_min = self.mtot_min
@@ -711,20 +1018,31 @@ class GWSNR:
             raise ValueError("Error: mass too low")
 
         # geocent_time cannot be array here
-        # this geocent_time is only to get halfScaledSNR
+        # this geocent_time is only to get partialScaledSNR
         geocent_time_ = 1246527224.169434  # random time from O3
         theta_jn_, ra_, dec_, psi_, phase_ = np.zeros(5)
         luminosity_distance_ = 100.0
 
         # Vectorized computation for effective luminosity distance
-        Fp = np.array([antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "plus") for tensor in detector_tensor])
-        Fc = np.array([antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "cross") for tensor in detector_tensor])
+        Fp = np.array(
+            [
+                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "plus")
+                for tensor in detector_tensor
+            ]
+        )
+        Fc = np.array(
+            [
+                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "cross")
+                for tensor in detector_tensor
+            ]
+        )
         dl_eff = luminosity_distance_ / np.sqrt(
-            Fp**2 * ((1 + np.cos(theta_jn_) ** 2) / 2) ** 2 + Fc**2 * np.cos(theta_jn_) ** 2
+            Fp**2 * ((1 + np.cos(theta_jn_) ** 2) / 2) ** 2
+            + Fc**2 * np.cos(theta_jn_) ** 2
         )
 
         ratio = self.ratio_arr.copy()
-        snr_half_ = []
+        snr_partial_ = []
         # interpolation along mtot for each mass_ratio
         for q in tqdm(
             ratio,
@@ -746,24 +1064,24 @@ class GWSNR:
                 ra=ra_,
                 dec=dec_,
             )
-            # for halfscaledSNR
+            # for partialscaledSNR
             mchirp = ((mass_1_ * mass_2_) ** (3 / 5)) / ((mtot_table) ** (1 / 5))
             a2 = mchirp ** (5.0 / 6.0)
             # filling in interpolation table for different detectors
-            snr_half_buffer = []
+            snr_partial_buffer = []
             for j in num_det:
-                snr_half_buffer.append(
+                snr_partial_buffer.append(
                     CubicSpline(
                         mtot_table,
                         (dl_eff[j] / a2) * optimal_snr_unscaled[detectors[j]],
                     ).c
                 )
-            snr_half_.append(np.array(snr_half_buffer))
-        snr_half_ = np.array(snr_half_)
+            snr_partial_.append(np.array(snr_partial_buffer))
+        snr_partial_ = np.array(snr_partial_)
 
         # save the interpolators for each detectors
         for j in num_det:
-            save_json(snr_half_[:, j], self.path_interpolator[j])
+            save_json(snr_partial_[:, j], self.path_interpolator[j])
 
     def compute_bilby_snr(
         self,
@@ -997,7 +1315,7 @@ class GWSNR:
 
         return optimal_snr
 
-    def pdet(self, snr_dict, rho_th=8.0, rho_net_th=8.0):
+    def probability_of_detection(self, snr_dict, snr_th=None, snr_th_net=None, type="matched_filter"):
         """
         Probaility of detection of GW for the given sensitivity of the detectors
 
@@ -1009,6 +1327,8 @@ class GWSNR:
             Threshold SNR for detection. Default is 8.0.
         rho_net_th : `float`
             Threshold net SNR for detection. Default is 8.0.
+        type : `str`
+            Type of SNR calculation. Default is 'matched_filter'. Other option is 'bool'.
 
         Returns
         ----------
@@ -1016,16 +1336,32 @@ class GWSNR:
             Dictionary of probability of detection for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=pdet_arrays).
         """
 
+        if snr_th:
+            snr_th = snr_th
+        else:
+            snr_th = self.snr_th
+
+        if snr_th_net:
+            snr_th_net = snr_th_net
+        else:
+            snr_th_net = self.snr_th_net
+
         detectors = np.array(self.detector_list)
         pdet_dict = {}
         for det in detectors:
-            pdet_dict["pdet_" + det] = 1 - norm.cdf(rho_th - snr_dict[det])
+            if type == "matched_filter":
+                pdet_dict["pdet_" + det] = np.array(1 - norm.cdf(snr_th - snr_dict[det]), dtype=int)
+            else:
+                pdet_dict["pdet_" + det] = np.array(snr_th < snr_dict[det], dtype=int)
 
-        pdet_dict["pdet_net"] = 1 - norm.cdf(rho_net_th - snr_dict["optimal_snr_net"])
+        if type == "matched_filter":
+            pdet_dict["pdet_net"] = np.array(1 - norm.cdf(snr_th_net - snr_dict["optimal_snr_net"]), dtype=int)
+        else:
+            pdet_dict["pdet_net"] = np.array(snr_th_net < snr_dict["optimal_snr_net"], dtype=int)
 
         return pdet_dict
 
-    def detector_horizon(self, mass_1=1.4, mass_2=1.4, snr_threshold=8.0):
+    def detector_horizon(self, mass_1=1.4, mass_2=1.4, snr_th=None, snr_th_net=None):
         """
         Function for finding detector horizon distance for BNS (m1=m2=1.4)
 
@@ -1035,7 +1371,7 @@ class GWSNR:
             Primary mass of the binary in solar mass. Default is 1.4.
         mass_2 : `float`
             Secondary mass of the binary in solar mass. Default is 1.4.
-        snr_threshold : `float`
+        snr_th : `float`
             SNR threshold for detection. Default is 8.0.
 
         Returns
@@ -1044,13 +1380,23 @@ class GWSNR:
             Dictionary of horizon distance for each detector (dict.keys()=detector_names, dict.values()=horizon_distance).
         """
 
+        if snr_th:
+            snr_th = snr_th
+        else:
+            snr_th = self.snr_th
+
+        if snr_th_net:
+            snr_th_net = snr_th_net
+        else:
+            snr_th_net = self.snr_th_net
+
         detectors = np.array(self.detector_list.copy())
         detector_tensor = np.array(self.detector_tensor_list.copy())
         geocent_time_ = 1246527224.169434  # random time from O3
         theta_jn_, ra_, dec_, psi_, phase_ = 0.0, 0.0, 0.0, 0.0, 0.0
         luminosity_distance_ = 100.0
 
-        # calling bilby_snr 
+        # calling bilby_snr
         optimal_snr_unscaled = self.compute_bilby_snr(
             mass_1=mass_1,
             mass_2=mass_2,
@@ -1063,13 +1409,28 @@ class GWSNR:
         )
 
         # Vectorized computation for effective luminosity distance
-        Fp = np.array([antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "plus") for tensor in detector_tensor])
-        Fc = np.array([antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "cross") for tensor in detector_tensor])
+        Fp = np.array(
+            [
+                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "plus")
+                for tensor in detector_tensor
+            ]
+        )
+        Fc = np.array(
+            [
+                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "cross")
+                for tensor in detector_tensor
+            ]
+        )
         dl_eff = luminosity_distance_ / np.sqrt(
-            Fp**2 * ((1 + np.cos(theta_jn_) ** 2) / 2) ** 2 + Fc**2 * np.cos(theta_jn_) ** 2
+            Fp**2 * ((1 + np.cos(theta_jn_) ** 2) / 2) ** 2
+            + Fc**2 * np.cos(theta_jn_) ** 2
         )
 
         # Horizon calculation
-        horizon = {det: (dl_eff[j] / snr_threshold) * optimal_snr_unscaled[det] for j, det in enumerate(detectors)}
+        horizon = {
+            det: (dl_eff[j] / snr_th) * optimal_snr_unscaled[det]
+            for j, det in enumerate(detectors)
+        }
+        horizon["net"] = (dl_eff / snr_th_net) * optimal_snr_unscaled["optimal_snr_net"]
 
         return horizon

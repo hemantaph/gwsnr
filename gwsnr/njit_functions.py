@@ -302,7 +302,7 @@ def noise_weighted_inner_product(
     return 4 / duration * np.sum(nwip_arr)
 
 @njit
-def get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, detector_tensor, snr_halfscaled, ratio_arr, mtot_arr):
+def get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr):
     """
     Function to calculate the interpolated snr for a given set of parameters
 
@@ -326,12 +326,12 @@ def get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geo
         Declination of the source in radians.
     detector_tensor : array-like
         Detector tensor for the detector (3x3 matrix)
-    snr_halfscaled : `numpy.ndarray`
-        Array of snr_halfscaled coefficients for the detector.
+    snr_partialscaled : `numpy.ndarray`
+        Array of snr_partialscaled coefficients for the detector.
     ratio_arr : `numpy.ndarray`
-        Array of mass ratio values for the snr_halfscaled coefficients.
+        Array of mass ratio values for the snr_partialscaled coefficients.
     mtot_arr : `numpy.ndarray`
-        Array of total mass values for the snr_halfscaled coefficients.
+        Array of total mass values for the snr_partialscaled coefficients.
     
     Returns
     -------
@@ -352,28 +352,28 @@ def get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geo
     ci_param = ((1 + np.cos(theta_jn) ** 2) / 2) ** 2
     
     size = len(mass_1)
-    snr_half_ = np.zeros((len_,size))
+    snr_partial_ = np.zeros((len_,size))
     d_eff = np.zeros((len_,size))
     snr = np.zeros((len_,size))
     # loop over the detectors
     for j in range(len_):
         # loop over the parameter points
         for i in range(size):
-            snr_half_coeff = snr_halfscaled[j]
-            snr_half_[j,i] = cubic_spline_interpolator2d(mtot[i], ratio[i], snr_half_coeff, mtot_arr, ratio_arr)
+            snr_partial_coeff = snr_partialscaled[j]
+            snr_partial_[j,i] = cubic_spline_interpolator2d(mtot[i], ratio[i], snr_partial_coeff, mtot_arr, ratio_arr)
             d_eff[j,i] =luminosity_distance[i] / np.sqrt(
                     Fp[j,i]**2 * ci_param[i] + Fc[j,i]**2 * ci_2[i]
                 )
 
-    snr = snr_half_ * A1 / d_eff
+    snr = snr_partial_ * A1 / d_eff
     snr_effective = np.sqrt(np.sum(snr ** 2, axis=0))
 
-    return snr, snr_effective
+    return snr, snr_effective, snr_partial_, d_eff
 
 @njit
 def cubic_spline_interpolator2d(xnew, ynew, coefficients, x, y):
     """
-    Function to calculate the interpolated value of snr_halfscaled given the mass ratio (ynew) and total mass (xnew). This is based off 2D bicubic spline interpolation.
+    Function to calculate the interpolated value of snr_partialscaled given the mass ratio (ynew) and total mass (xnew). This is based off 2D bicubic spline interpolation.
 
     Parameters
     ----------
@@ -391,7 +391,7 @@ def cubic_spline_interpolator2d(xnew, ynew, coefficients, x, y):
     Returns
     -------
     result : `float`
-        Interpolated value of snr_halfscaled.
+        Interpolated value of snr_partialscaled.
     """
 
     len_y = len(y)
@@ -429,7 +429,7 @@ def cubic_spline_interpolator2d(xnew, ynew, coefficients, x, y):
 @njit
 def cubic_spline_interpolator(xnew, coefficients, x):
     """
-    Function to calculate the interpolated value of snr_halfscaled given the total mass (xnew). This is based off 1D cubic spline interpolation.
+    Function to calculate the interpolated value of snr_partialscaled given the total mass (xnew). This is based off 1D cubic spline interpolation.
 
     Parameters
     ----------
@@ -443,7 +443,7 @@ def cubic_spline_interpolator(xnew, coefficients, x):
     Returns
     -------
     result : `float`
-        Interpolated value of snr_halfscaled.
+        Interpolated value of snr_partialscaled.
     """
     # Handling extrapolation
     i = np.searchsorted(x, xnew) - 1 if xnew > x[0] else 0

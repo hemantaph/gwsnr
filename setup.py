@@ -29,5 +29,7 @@ setup(name='gwsnr',
         "scipy>=1.9.0",
         "tqdm>=4.64.0",
         "gwpy>=2.1.5",
+        "tensorflow==2.13.1",
+        "scikit-learn==1.3.2",
       ]
      )

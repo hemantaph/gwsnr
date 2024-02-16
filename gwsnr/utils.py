@@ -5,11 +5,21 @@ Helper functions for gwsnr
 
 import os
 import json
+from tensorflow.keras.models import load_model
+from importlib import resources
 import pickle
 import numpy as np
 import bilby
 
-
+# Function to load a specific dataset from an .h5 file within the package
+def load_h5_dataset(package, directory, filename):
+    with resources.path(package + '.' + directory, filename) as h5_path:
+        return load_model(h5_path)
+    
+def load_pkl_dataset(package, directory, filename):
+    with resources.path(package + '.' + directory, filename) as pkl_path:
+        return pickle.load(open(pkl_path, "rb"))
+        
 class NumpyEncoder(json.JSONEncoder):
     """
     Custom JSON encoder for numpy data types. It converts numpy.ndarray objects (and any nested-list composition
@@ -209,7 +219,7 @@ def interpolator_check(
     create_new,
 ):
     """
-    Function for interpolator (snr_halfsacaled) check and generation if not exists.
+    Function for interpolator (snr_partialsacaled) check and generation if not exists.
 
     Parameters
     ----------
@@ -279,7 +289,7 @@ def interpolator_check(
 
 def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
     """
-    Function for storing or getting interpolator (snr_halfsacaled) pickle path
+    Function for storing or getting interpolator (snr_partialsacaled) pickle path
 
     Parameters
     ----------
@@ -292,7 +302,7 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
     -------
     path_interpolator : str
         path to the interpolator pickle file
-        e.g. './interpolator_pickle/L1/halfSNR_dict_0.pickle'
+        e.g. './interpolator_pickle/L1/partialSNR_dict_0.pickle'
     it_exist: bool
         True if the interpolator exists
         False if the interpolator does not exists
@@ -330,8 +340,8 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
         # also, if the user delete the file by mistake, it will generate in the next run
         idx = param_dict_stored.index(param_dict_given)
         # check if interpolator pickle exists
-        # get halfSNR interpolator if exists
-        path_interpolator = det_path + "/halfSNR_dict_" + str(idx) + ".pickle"
+        # get partialSNR interpolator if exists
+        path_interpolator = det_path + "/partialSNR_dict_" + str(idx) + ".pickle"
         # there will be exception if the file is deleted by mistake
         if os.path.exists(path_interpolator):
             it_exist = True
@@ -341,7 +351,7 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
     # if related dict not found in the param_dict_list.pickle
     else:
         it_exist = False
-        path_interpolator = det_path + "/halfSNR_dict_" + str(len_) + ".pickle"
+        path_interpolator = det_path + "/partialSNR_dict_" + str(len_) + ".pickle"
         # print("related dict not found in the param_dict_list.pickle, new interpolator will be generated")
 
         # store the pickle dict
