@@ -789,13 +789,14 @@ class GWSNR:
         scalerV1 = load_pkl_dataset('gwsnr', 'ann', 'scalerV1.pkl')
 
         # predict the output
+        # supress printing
         snr = []
         x = scalerL1.transform(X_L1)
-        snr.append(modelL1.predict(x).flatten())
+        snr.append(modelL1.predict(x,verbose = 0).flatten())
         x = scalerH1.transform(X_H1)
-        snr.append(modelH1.predict(x).flatten())
+        snr.append(modelH1.predict(x, verbose = 0).flatten())
         x = scalerV1.transform(X_V1)
-        snr.append(modelV1.predict(x).flatten())
+        snr.append(modelV1.predict(x, verbose = 0).flatten())
         snr_effective = np.sqrt(snr[0] ** 2 + snr[1] ** 2 + snr[2] ** 2)
 
         # Create optimal_snr dictionary using dictionary comprehension
@@ -1085,8 +1086,8 @@ class GWSNR:
 
     def compute_bilby_snr(
         self,
-        mass_1,
-        mass_2,
+        mass_1=10,
+        mass_2=10,
         luminosity_distance=100.0,
         theta_jn=0.0,
         psi=0.0,
@@ -1100,6 +1101,7 @@ class GWSNR:
         tilt_2=0.0,
         phi_12=0.0,
         phi_jl=0.0,
+        gw_param_dict=False,
         output_jsonfile=False,
     ):
         """
@@ -1167,6 +1169,28 @@ class GWSNR:
         >>> snr = GWSNR(snrs_type='inner_product')
         >>> snr.compute_bilby_snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
         """
+
+        # if gw_param_dict is given, then use that
+        if gw_param_dict is not False:
+            mass_1 = gw_param_dict["mass_1"]
+            mass_2 = gw_param_dict["mass_2"]
+            luminosity_distance = gw_param_dict["luminosity_distance"]
+            theta_jn = gw_param_dict["theta_jn"]
+            psi = gw_param_dict["psi"]
+            phase = gw_param_dict["phase"]
+            geocent_time = gw_param_dict["geocent_time"]
+            ra = gw_param_dict["ra"]
+            dec = gw_param_dict["dec"]
+            # a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl exist in the dictionary
+            # if exists, then use that, else pass
+            if "a_1" and "a2" in gw_param_dict:
+                a_1 = gw_param_dict["a_1"]
+                a_2 = gw_param_dict["a_2"]
+            if "tilt_1" and "tilt_2" and "phi_12" and "phi_jl" in gw_param_dict:
+                tilt_1 = gw_param_dict["tilt_1"]
+                tilt_2 = gw_param_dict["tilt_2"]
+                phi_12 = gw_param_dict["phi_12"]
+                phi_jl = gw_param_dict["phi_jl"]
 
         npool = self.npool
         sampling_frequency = self.sampling_frequency

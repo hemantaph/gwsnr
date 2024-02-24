@@ -89,6 +89,8 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
                     ifos_.append(bilby.gw.detector.InterferometerList([ifo])[0])
                     detector_list.append(ifo)
                     psds[ifo] = ifos_[-1].power_spectral_density.psd_file
+                    if not psds[ifo]:
+                        psds[ifo] = ifos_[-1].power_spectral_density.asd_file
 
             else:
                 ifos_.append(ifo)

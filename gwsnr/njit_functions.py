@@ -406,6 +406,9 @@ def cubic_spline_interpolator2d(xnew, ynew, coefficients, x, y):
     elif y_idx+1 == len_y:  # upper end point
         result = cubic_spline_interpolator(xnew, coefficients[-1], x)
         # print("b")
+    elif y_idx+2 == len_y:  # upper end point
+        result = cubic_spline_interpolator(xnew, coefficients[-1], x)
+        # print("b")
     else:
         y_idx1 = y_idx - 1
         y_idx2 = y_idx
