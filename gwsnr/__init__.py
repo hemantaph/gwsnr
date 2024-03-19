@@ -7,7 +7,11 @@ warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
 
 __author__ = 'hemanta_ph <hemantaphurailatpam@gmail.com>'
 
-__version__ = "0.2.3"
+__version__ = "0.2.4"
+
+# add __file__
+import os
+__file__ = os.path.abspath(__file__)
 
 from .gwsnr import *
 from .njit_functions import *

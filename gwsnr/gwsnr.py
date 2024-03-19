@@ -572,15 +572,24 @@ class GWSNR:
 
         # if gw_param_dict is given, then use that
         if gw_param_dict is not False:
-            mass_1 = gw_param_dict["mass_1"]
-            mass_2 = gw_param_dict["mass_2"]
-            luminosity_distance = gw_param_dict["luminosity_distance"]
-            theta_jn = gw_param_dict["theta_jn"]
-            psi = gw_param_dict["psi"]
-            phase = gw_param_dict["phase"]
-            geocent_time = gw_param_dict["geocent_time"]
-            ra = gw_param_dict["ra"]
-            dec = gw_param_dict["dec"]
+            mass_1 = gw_param_dict.get("mass_1", np.array([10.0]))
+            mass_2 = gw_param_dict.get("mass_2", np.array([10.0]))
+            luminosity_distance = gw_param_dict.get("luminosity_distance", np.array([100.0]))
+            theta_jn = gw_param_dict.get("theta_jn", np.array([0.0]))
+            psi = gw_param_dict.get("psi", np.array([0.0]))
+            phase = gw_param_dict.get("phase", np.array([0.0]))
+            geocent_time = gw_param_dict.get("geocent_time", np.array([1246527224.169434]))
+            ra = gw_param_dict.get("ra", np.array([0.0]))
+            dec = gw_param_dict.get("dec", np.array([0.0]))
+            # mass_1 = gw_param_dict["mass_1"]
+            # mass_2 = gw_param_dict["mass_2"]
+            # luminosity_distance = gw_param_dict["luminosity_distance"]
+            # theta_jn = gw_param_dict["theta_jn"]
+            # psi = gw_param_dict["psi"]
+            # phase = gw_param_dict["phase"]
+            # geocent_time = gw_param_dict["geocent_time"]
+            # ra = gw_param_dict["ra"]
+            # dec = gw_param_dict["dec"]
             size = len(mass_1)
 
             # Extract spin parameters or initialize to zeros
@@ -936,9 +945,9 @@ class GWSNR:
         detector_tensor = np.array(self.detector_tensor_list)
         detectors = np.array(self.detector_list)
         snr_partialscaled = np.array(self.snr_partialsacaled_list)
-        size = len(mass_1)
         # this allows mass_1, mass_2 to pass as float or array
         mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
+        size = len(mass_1)
         # Broadcasting parameters to the desired size
         (
             mass_1,
@@ -966,10 +975,10 @@ class GWSNR:
         idx2 = np.logical_and(mtot >= self.mtot_min, mtot <= self.mtot_max)
         idx_tracker = np.nonzero(idx2)[0]
         size_ = len(idx_tracker)
-        if size_ == 0:
-            raise ValueError(
-                "mass_1 and mass_2 must be within the range of mtot_min and mtot_max"
-            )
+        # if size_ == 0:
+        #     raise ValueError(
+        #         "mass_1 and mass_2 must be within the range of mtot_min and mtot_max"
+        #     )
 
         # Get interpolated SNR
         snr, snr_effective, _, _ = get_interpolated_snr(
@@ -1374,9 +1383,9 @@ class GWSNR:
         pdet_dict = {}
         for det in detectors:
             if type == "matched_filter":
-                pdet_dict["pdet_" + det] = np.array(1 - norm.cdf(snr_th - snr_dict[det]), dtype=int)
+                pdet_dict[det] = np.array(1 - norm.cdf(snr_th - snr_dict[det]), dtype=int)
             else:
-                pdet_dict["pdet_" + det] = np.array(snr_th < snr_dict[det], dtype=int)
+                pdet_dict[det] = np.array(snr_th < snr_dict[det], dtype=int)
 
         if type == "matched_filter":
             pdet_dict["pdet_net"] = np.array(1 - norm.cdf(snr_th_net - snr_dict["optimal_snr_net"]), dtype=int)

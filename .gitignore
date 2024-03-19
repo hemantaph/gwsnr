@@ -4,14 +4,29 @@ docs/_build/
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
-# ignore json file
+# ignore json
 *.json
 .json
 **.json
-# ignore pickle file
+**/*.json
+**/**/*.json
+**/**/**/*.json
+**/**/**/**/*.json
+**/**/**/**/**/*.json
+
+# ignore pickle
 *.pickle
 .pickle
 **.pickle
+**/*.pickle
+**/**/*.pickle
+**/**/**/*.pickle
+**/**/**/**/*.pickle
+**/**/**/**/**/*.pickle
+*.pkl
+.pkl
+**.pkl
+**/*.pkl
 
 .DS_Store
 
