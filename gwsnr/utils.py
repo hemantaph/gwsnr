@@ -5,7 +5,6 @@ Helper functions for gwsnr
 
 import os
 import json
-from tensorflow.keras.models import load_model
 from importlib import resources
 import pickle
 import numpy as np
@@ -13,6 +12,7 @@ import bilby
 
 # Function to load a specific dataset from an .h5 file within the package
 def load_h5_dataset(package, directory, filename):
+    from tensorflow.keras.models import load_model
     with resources.path(package + '.' + directory, filename) as h5_path:
         return load_model(h5_path)
     
