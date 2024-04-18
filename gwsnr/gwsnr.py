@@ -874,19 +874,26 @@ class GWSNR:
         a_2 = np.array(params["a_2"][idx])
         tilt_1 = np.array(params["tilt_1"][idx])
         tilt_2 = np.array(params["tilt_2"][idx])
-        phi_12 = np.array(params["phi_12"][idx])
-        phi_jl = np.array(params["phi_jl"][idx])
+        # phi_12 = np.array(params["phi_12"][idx])
+        # phi_jl = np.array(params["phi_jl"][idx])
+
+        # effective spin
+        chi_eff = (mass_1 * a_1 * np.cos(tilt_1) + mass_2 * a_2 * np.cos(tilt_2)) / (mass_1 + mass_2)
+
+        X_L1 = np.vstack([snr_partial[0], amp0[0], eta, chi_eff]).T
+        X_H1 = np.vstack([snr_partial[1], amp0[1], eta, chi_eff]).T
+        X_V1 = np.vstack([snr_partial[2], amp0[2], eta, chi_eff]).T
 
         # input data
-        X_L1 = np.vstack(
-            [snr_partial[0], amp0[0], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
-        ).T
-        X_H1 = np.vstack(
-            [snr_partial[1], amp0[1], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
-        ).T
-        X_V1 = np.vstack(
-            [snr_partial[2], amp0[2], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
-        ).T
+        # X_L1 = np.vstack(
+        #     [snr_partial[0], amp0[0], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
+        # ).T
+        # X_H1 = np.vstack(
+        #     [snr_partial[1], amp0[1], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
+        # ).T
+        # X_V1 = np.vstack(
+        #     [snr_partial[2], amp0[2], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
+        # ).T
 
         return (X_L1, X_H1, X_V1)
 
