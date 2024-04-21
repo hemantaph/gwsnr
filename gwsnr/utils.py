@@ -253,11 +253,13 @@ def interpolator_check(
     path_interpolator_all = []
 
     # getting interpolator if exists
+    # for each detector, one by one
     k = 0
     for det in detector_list:
         param_dict_given["detector"] = det
         param_dict_given["psds"] = psds_list[k]
         param_dict_given["detector_tensor"] = detector_tensor_list[k]
+        # checking 
         path_interpolator, it_exist = interpolator_pickle_path(
             param_dict_given, interpolator_dir
         )

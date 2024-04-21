@@ -23,10 +23,10 @@ docs/_build/
 **/**/**/*.pickle
 **/**/**/**/*.pickle
 **/**/**/**/**/*.pickle
-*.pkl
-.pkl
-**.pkl
-**/*.pkl
+# *.pkl
+# .pkl
+# **.pkl
+# **/*.pkl
 
 .DS_Store
 

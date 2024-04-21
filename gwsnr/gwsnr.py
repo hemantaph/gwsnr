@@ -3,12 +3,15 @@
 This module contains functions for calculating the SNR of a CBC signal. It has two methods: interpolation (bicubic) and inner product. Interpolation method is much faster than inner product method. Interpolation method is tested for IMRPhenomD and TaylorF2 waveform approximants for the spinless scenario.
 """
 
+import os
+import pickle
 from multiprocessing import Pool
 import numpy as np
 from tqdm import tqdm
 from scipy.stats import norm
 from scipy.interpolate import CubicSpline
 from scipy.optimize import fsolve
+from tensorflow.keras.models import load_model
 
 from .utils import (
     save_json,
@@ -288,6 +291,8 @@ class GWSNR:
         pdet=False,
         snr_th=8.0,
         snr_th_net=8.0,
+        ann_path_dict=None,
+        ann_dir="ann_data/",
     ):
         # setting instance attributes
         self.npool = npool
@@ -328,8 +333,6 @@ class GWSNR:
         psds_list, detector_tensor_list, detector_list = dealing_with_psds(
             psds, ifos, minimum_frequency, sampling_frequency
         )
-        # print some info
-        self.print_all_params(gwsnr_verbose)
 
         # param_dict_given is an identifier for the interpolator
         self.param_dict_given = {
@@ -391,42 +394,94 @@ class GWSNR:
             pass
         # ANN method still needs the partialscaledSNR interpolator.
         elif snr_type == "ann":
-            bool_ann = True
-            bool_ann &= self.mtot_min == 2.0
-            bool_ann &= self.mtot_max <= 184.98599853446768
-            bool_ann &= self.ratio_min == 0.1
-            bool_ann &= self.ratio_max == 1.0
-            bool_ann &= self.waveform_approximant == "IMRPhenomXPHM"
-            bool_ann &= self.sampling_frequency == 2048.0
-            bool_ann &= self.f_min == 20.0
-            bool_ann &= detector_list == ["L1", "H1", "V1"]
-            try:
-                bool_ann &= psds_list[0].asd_file[-21:] == "aLIGO_O4_high_asd.txt"
-                bool_ann &= psds_list[1].asd_file[-21:] == "aLIGO_O4_high_asd.txt"
-                bool_ann &= psds_list[2].asd_file[-11:] == "AdV_asd.txt"
-            except:
-                bool_ann = False
+            self.ann_path_dict = ann_path_dict
+            # create dir if not exists
+            if not os.path.exists(ann_dir):
+                os.makedirs(ann_dir)
 
-            if not bool_ann:
-                raise ValueError(
-                    "The given input parameters are not suitable for ANN method."
+            if self.ann_path_dict is None:
+                print("You have chosen default ANN model. This model only works for gwsnr default parameters.")
+                print("ANN model will be save and loaded from 'ann_data' directory. To create new model, follow instructions from the 'gwsnr' documentation.")
+                # load the model
+                # save it in ANN directory
+                if not os.path.exists(f"{ann_dir}/ann_model_L1_O4.h5"):
+                    modelL1 = load_h5_dataset('gwsnr', 'ann', 'ann_model_L1_O4.h5')
+                    modelL1.save(f"{ann_dir}/ann_model_L1_O4.h5")
+                    del modelL1
+                if not os.path.exists(f"{ann_dir}/ann_model_H1_O4.h5"):
+                    modelH1 = load_h5_dataset('gwsnr', 'ann', 'ann_model_H1_O4.h5')
+                    modelH1.save(f"{ann_dir}/ann_model_H1_O4.h5")
+                    del modelH1
+                if not os.path.exists(f"{ann_dir}/ann_model_V1_O4.h5"):
+                    modelV1 = load_h5_dataset('gwsnr', 'ann', 'ann_model_V1_O4.h5')
+                    modelV1.save(f"{ann_dir}/ann_model_V1_O4.h5")
+                    del modelV1
+
+                    # load the scaler
+                if not os.path.exists(f"{ann_dir}/scaler_L1_O4.pkl"):
+                    scalerL1 = load_pkl_dataset('gwsnr', 'ann', 'scaler_L1_O4.pkl')
+                    pickle.dump(scalerL1, open(f"{ann_dir}/scaler_L1_O4.pkl", 'wb'))
+                    del scalerL1
+                if not os.path.exists(f"{ann_dir}/scaler_H1_O4.pkl"):
+                    scalerH1 = load_pkl_dataset('gwsnr', 'ann', 'scaler_H1_O4.pkl')
+                    pickle.dump(scalerH1, open(f"{ann_dir}/scaler_H1_O4.pkl", 'wb'))
+                    del scalerH1
+                if not os.path.exists(f"{ann_dir}/scaler_V1_O4.pkl"):
+                    scalerV1 = load_pkl_dataset('gwsnr', 'ann', 'scaler_V1_O4.pkl')
+                    pickle.dump(scalerV1, open(f"{ann_dir}/scaler_V1_O4.pkl", 'wb'))
+                    del scalerV1
+
+                # redefine the path
+                self.ann_path_dict = dict(
+                    L1=[f"{ann_dir}/ann_model_L1_O4.h5", f"{ann_dir}/scaler_L1_O4.pkl"],
+                    H1=[f"{ann_dir}/ann_model_H1_O4.h5", f"{ann_dir}/scaler_H1_O4.pkl"],
+                    V1=[f"{ann_dir}/ann_model_V1_O4.h5", f"{ann_dir}/scaler_V1_O4.pkl"],
                 )
-            else:
-                print("ANN method is selected.")
-                # dealing with interpolator
-                self.waveform_approximant = "IMRPhenomD"
-                print(
-                    "Please be patient while the interpolator is generated of partialscaledSNR for IMRPhenomD."
-                )
-                path_interpolator_all = interpolator_setup()
-                self.waveform_approximant = "IMRPhenomXPHM"
+
+            # dealing with interpolator
+            self.waveform_approximant = "IMRPhenomD"
+            print(
+                "Please be patient while the interpolator is generated for partialscaledSNR."
+            )
+            path_interpolator_all = interpolator_setup()
+            self.waveform_approximant = waveform_approximant
+
+                # bool_ann = True
+                # bool_ann &= self.mtot_min == 2.0
+                # bool_ann &= self.mtot_max <= 184.98599853446768
+                # bool_ann &= self.ratio_min == 0.1
+                # bool_ann &= self.ratio_max == 1.0
+                # bool_ann &= self.waveform_approximant == "IMRPhenomXPHM"
+                # bool_ann &= self.sampling_frequency == 2048.0
+                # bool_ann &= self.f_min == 20.0
+                # bool_ann &= detector_list == ["L1", "H1", "V1"]
+                # try:
+                #     bool_ann &= psds_list[0].asd_file[-21:] == "aLIGO_O4_high_asd.txt"
+                #     bool_ann &= psds_list[1].asd_file[-21:] == "aLIGO_O4_high_asd.txt"
+                #     bool_ann &= psds_list[2].asd_file[-11:] == "AdV_asd.txt"
+                # except:
+                #     bool_ann = False
+
+                # if not bool_ann:
+                #     raise ValueError(
+                #         "The given input parameters are not suitable for ANN method."
+                #     )
+                # else:
+                #     print("ANN method is selected.")
+                #     # dealing with interpolator
+                #     self.waveform_approximant = "IMRPhenomD"
+                #     print(
+                #         "Please be patient while the interpolator is generated of partialscaledSNR for IMRPhenomD."
+                #     )
+                #     path_interpolator_all = interpolator_setup()
+                #     self.waveform_approximant = "IMRPhenomXPHM"
 
         # change back to original
         self.psds_list = psds_list
         self.detector_tensor_list = detector_tensor_list
         self.detector_list = detector_list
         self.multiprocessing_verbose = multiprocessing_verbose
-        if (snr_type == "interpolation") or (snr_type == "ann"):
+        if snr_type == "interpolation":
             self.path_interpolator = path_interpolator_all
 
         def print_no_interpolator(**kwargs):
@@ -436,6 +491,9 @@ class GWSNR:
 
         if snr_type == "inner_product":
             self.snr_with_interpolation = print_no_interpolator
+
+        # print some info
+        self.print_all_params(gwsnr_verbose)
 
     def calculate_mtot_max(self, mtot_max, minimum_frequency):
         """
@@ -480,6 +538,7 @@ class GWSNR:
         """
 
         if verbose:
+            print("\nChosen GWSNR initialization parameters:\n")
             print("npool: ", self.npool)
             print("snr type: ", self.snr_type)
             print("waveform approximant: ", self.waveform_approximant)
@@ -491,6 +550,7 @@ class GWSNR:
                 f"max(mtot) (with the given fmin={self.f_min}): {self.mtot_max}",
             )
             print("detectors: ", self.detector_list)
+            print("psds: ", self.psds_list)
             if self.snr_type == "interpolation":
                 print("min(ratio): ", self.ratio_min)
                 print("max(ratio): ", self.ratio_max)
@@ -581,15 +641,6 @@ class GWSNR:
             geocent_time = gw_param_dict.get("geocent_time", np.array([1246527224.169434]))
             ra = gw_param_dict.get("ra", np.array([0.0]))
             dec = gw_param_dict.get("dec", np.array([0.0]))
-            # mass_1 = gw_param_dict["mass_1"]
-            # mass_2 = gw_param_dict["mass_2"]
-            # luminosity_distance = gw_param_dict["luminosity_distance"]
-            # theta_jn = gw_param_dict["theta_jn"]
-            # psi = gw_param_dict["psi"]
-            # phase = gw_param_dict["phase"]
-            # geocent_time = gw_param_dict["geocent_time"]
-            # ra = gw_param_dict["ra"]
-            # dec = gw_param_dict["dec"]
             size = len(mass_1)
 
             # Extract spin parameters or initialize to zeros
@@ -786,34 +837,41 @@ class GWSNR:
             phi_12=phi_12,
             phi_jl=phi_jl,
         )
-        X_L1, X_H1, X_V1 = self.output_ann(idx2, params)
+        
+        # ann inputs for all detectors
+        ann_input = self.output_ann(idx2, params)
 
-        # load the model
-        modelL1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelL1.h5')
-        modelH1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelH1.h5')
-        modelV1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelV1.h5')
-        # load the scaler
-        scalerL1 = load_pkl_dataset('gwsnr', 'ann', 'scalerL1.pkl')
-        scalerH1 = load_pkl_dataset('gwsnr', 'ann', 'scalerH1.pkl')
-        scalerV1 = load_pkl_dataset('gwsnr', 'ann', 'scalerV1.pkl')
-
-        # predict the output
-        # supress printing
-        snr = []
-        x = scalerL1.transform(X_L1)
-        snr.append(modelL1.predict(x,verbose = 0).flatten())
-        x = scalerH1.transform(X_H1)
-        snr.append(modelH1.predict(x, verbose = 0).flatten())
-        x = scalerV1.transform(X_V1)
-        snr.append(modelV1.predict(x, verbose = 0).flatten())
-        snr_effective = np.sqrt(snr[0] ** 2 + snr[1] ** 2 + snr[2] ** 2)
-
-        # Create optimal_snr dictionary using dictionary comprehension
+        # 1. load the model 2. load feature scaler 3. predict snr
         optimal_snr = {det: np.zeros(size) for det in detectors}
         optimal_snr["optimal_snr_net"] = np.zeros(size)
-        for j, det in enumerate(detectors):
-            optimal_snr[det][idx_tracker] = snr[j]
-        optimal_snr["optimal_snr_net"][idx_tracker] = snr_effective
+        for i, det in enumerate(detectors):
+            model = load_model(self.ann_path_dict[det][0])
+            scaler = pickle.load(open(self.ann_path_dict[det][1], 'rb'))
+            x = scaler.transform(ann_input[i])
+            optimal_snr[det][idx_tracker] = model.predict(x, verbose=0).flatten()
+            optimal_snr["optimal_snr_net"] += optimal_snr[det] ** 2
+        optimal_snr["optimal_snr_net"] = np.sqrt(optimal_snr["optimal_snr_net"])
+
+        # # load the model
+        # modelL1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelL1.h5')
+        # modelH1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelH1.h5')
+        # modelV1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelV1.h5')
+        # # load the scaler
+        # scalerL1 = load_pkl_dataset('gwsnr', 'ann', 'scalerL1.pkl')
+        # scalerH1 = load_pkl_dataset('gwsnr', 'ann', 'scalerH1.pkl')
+        # scalerV1 = load_pkl_dataset('gwsnr', 'ann', 'scalerV1.pkl')
+
+        # # predict the output
+        # # supress printing
+        # snr = []
+        # x = scalerL1.transform(X_L1)
+        # snr.append(modelL1.predict(x,verbose = 0).flatten())
+        # x = scalerH1.transform(X_H1)
+        # snr.append(modelH1.predict(x, verbose = 0).flatten())
+        # x = scalerV1.transform(X_V1)
+        # snr.append(modelV1.predict(x, verbose = 0).flatten())
+        # calculate the effective snr
+        # snr_effective = np.sqrt(snr[0] ** 2 + snr[1] ** 2 + snr[2] ** 2)
 
         # Save as JSON file
         if output_jsonfile:
@@ -880,9 +938,12 @@ class GWSNR:
         # effective spin
         chi_eff = (mass_1 * a_1 * np.cos(tilt_1) + mass_2 * a_2 * np.cos(tilt_2)) / (mass_1 + mass_2)
 
-        X_L1 = np.vstack([snr_partial[0], amp0[0], eta, chi_eff]).T
-        X_H1 = np.vstack([snr_partial[1], amp0[1], eta, chi_eff]).T
-        X_V1 = np.vstack([snr_partial[2], amp0[2], eta, chi_eff]).T
+        # for the detectors
+        ann_input = []
+        for i, det in enumerate(self.detector_list):
+            ann_input.append(
+                np.vstack([snr_partial[i], amp0[i], eta, chi_eff]).T
+            )
 
         # input data
         # X_L1 = np.vstack(
@@ -895,7 +956,7 @@ class GWSNR:
         #     [snr_partial[2], amp0[2], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
         # ).T
 
-        return (X_L1, X_H1, X_V1)
+        return (ann_input)
 
     def snr_with_interpolation(
         self,
