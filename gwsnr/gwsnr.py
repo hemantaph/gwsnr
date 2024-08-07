@@ -14,13 +14,16 @@ from scipy.optimize import fsolve
 from tensorflow.keras.models import load_model
 
 from .utils import (
-    save_json,
     dealing_with_psds,
     interpolator_check,
     load_json,
-    save_json_dict,
-    load_h5_dataset,
-    load_pkl_dataset,
+    load_pickle,
+    save_pickle,
+    save_json,
+    load_ann_h5_from_module,
+    load_ann_h5,
+    load_pickle_from_module,
+    load_json_from_module,
 )
 from .njit_functions import (
     get_interpolated_snr,
@@ -292,7 +295,7 @@ class GWSNR:
         snr_th=8.0,
         snr_th_net=8.0,
         ann_path_dict=None,
-        ann_dir="ann_data/",
+        ann_partialscaled_approximant="IMRPhenomXPHM",
     ):
         # setting instance attributes
         self.npool = npool
@@ -350,150 +353,182 @@ class GWSNR:
             "detector_tensor": detector_tensor_list,
         }
 
-        # dealing with interpolator
-        def interpolator_setup():
-            # Note: it will only select detectors that does not have interpolator stored yet
-            (
-                self.psds_list,
-                self.detector_tensor_list,
-                self.detector_list,
-                self.path_interpolator,
-                path_interpolator_all,
-            ) = interpolator_check(
-                param_dict_given=self.param_dict_given.copy(),
-                interpolator_dir=interpolator_dir,
-                create_new=create_new_interpolator,
-            )
-
-            self.multiprocessing_verbose = False  # This lets multiprocessing to use map instead of imap_unordered function.
-            # len(detector_list) == 0, means all the detectors have interpolator stored
-            if len(self.detector_list) > 0:
-                print("Please be patient while the interpolator is generated")
-                self.init_partialscaled()
-            elif create_new_interpolator:
-                # change back to original
-                self.psds_list = psds_list
-                self.detector_tensor_list = detector_tensor_list
-                self.detector_list = detector_list
-                print("Please be patient while the interpolator is generated")
-                self.init_partialscaled()
-
-            # get all partialscaledSNR from the stored interpolator
-            self.snr_partialsacaled_list = [
-                load_json(path) for path in path_interpolator_all
-            ]
-
-            return path_interpolator_all
-
         # now generate interpolator, if not exists
         if snr_type == "interpolation":
             # dealing with interpolator
-            path_interpolator_all = interpolator_setup()
+            self.path_interpolator = self.interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
+
         # inner product method doesn't need interpolator generation
         elif snr_type == "inner_product":
             pass
+
         # ANN method still needs the partialscaledSNR interpolator.
         elif snr_type == "ann":
-            self.ann_path_dict = ann_path_dict
-            # create dir if not exists
-            if not os.path.exists(ann_dir):
-                os.makedirs(ann_dir)
-
-            if self.ann_path_dict is None:
-                print("You have chosen default ANN model. This model only works for gwsnr default parameters.")
-                print("ANN model will be save and loaded from 'ann_data' directory. To create new model, follow instructions from the 'gwsnr' documentation.")
-                # load the model
-                # save it in ANN directory
-                if not os.path.exists(f"{ann_dir}/ann_model_L1_O4.h5"):
-                    modelL1 = load_h5_dataset('gwsnr', 'ann', 'ann_model_L1_O4.h5')
-                    modelL1.save(f"{ann_dir}/ann_model_L1_O4.h5")
-                    del modelL1
-                if not os.path.exists(f"{ann_dir}/ann_model_H1_O4.h5"):
-                    modelH1 = load_h5_dataset('gwsnr', 'ann', 'ann_model_H1_O4.h5')
-                    modelH1.save(f"{ann_dir}/ann_model_H1_O4.h5")
-                    del modelH1
-                if not os.path.exists(f"{ann_dir}/ann_model_V1_O4.h5"):
-                    modelV1 = load_h5_dataset('gwsnr', 'ann', 'ann_model_V1_O4.h5')
-                    modelV1.save(f"{ann_dir}/ann_model_V1_O4.h5")
-                    del modelV1
-
-                    # load the scaler
-                if not os.path.exists(f"{ann_dir}/scaler_L1_O4.pkl"):
-                    scalerL1 = load_pkl_dataset('gwsnr', 'ann', 'scaler_L1_O4.pkl')
-                    pickle.dump(scalerL1, open(f"{ann_dir}/scaler_L1_O4.pkl", 'wb'))
-                    del scalerL1
-                if not os.path.exists(f"{ann_dir}/scaler_H1_O4.pkl"):
-                    scalerH1 = load_pkl_dataset('gwsnr', 'ann', 'scaler_H1_O4.pkl')
-                    pickle.dump(scalerH1, open(f"{ann_dir}/scaler_H1_O4.pkl", 'wb'))
-                    del scalerH1
-                if not os.path.exists(f"{ann_dir}/scaler_V1_O4.pkl"):
-                    scalerV1 = load_pkl_dataset('gwsnr', 'ann', 'scaler_V1_O4.pkl')
-                    pickle.dump(scalerV1, open(f"{ann_dir}/scaler_V1_O4.pkl", 'wb'))
-                    del scalerV1
-
-                # redefine the path
-                self.ann_path_dict = dict(
-                    L1=[f"{ann_dir}/ann_model_L1_O4.h5", f"{ann_dir}/scaler_L1_O4.pkl"],
-                    H1=[f"{ann_dir}/ann_model_H1_O4.h5", f"{ann_dir}/scaler_H1_O4.pkl"],
-                    V1=[f"{ann_dir}/ann_model_V1_O4.h5", f"{ann_dir}/scaler_V1_O4.pkl"],
-                )
-
+            self.model_dict, self.scaler_dict, self.error_adjustment, self.ann_catalogue = self.ann_initilization(ann_path_dict, detector_list, sampling_frequency, minimum_frequency, waveform_approximant, snr_th)
             # dealing with interpolator
-            self.waveform_approximant = "IMRPhenomD"
-            print(
-                "Please be patient while the interpolator is generated for partialscaledSNR."
-            )
-            path_interpolator_all = interpolator_setup()
-            self.waveform_approximant = waveform_approximant
+            # Note: by default the partialscaledSNR interpolator used in ANN method corresponds to 'IMRPhenomD' waveform approximant.
+            self.param_dict_given["waveform_approximant"] = ann_partialscaled_approximant
+            self.path_interpolator = self.interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
 
-                # bool_ann = True
-                # bool_ann &= self.mtot_min == 2.0
-                # bool_ann &= self.mtot_max <= 184.98599853446768
-                # bool_ann &= self.ratio_min == 0.1
-                # bool_ann &= self.ratio_max == 1.0
-                # bool_ann &= self.waveform_approximant == "IMRPhenomXPHM"
-                # bool_ann &= self.sampling_frequency == 2048.0
-                # bool_ann &= self.f_min == 20.0
-                # bool_ann &= detector_list == ["L1", "H1", "V1"]
-                # try:
-                #     bool_ann &= psds_list[0].asd_file[-21:] == "aLIGO_O4_high_asd.txt"
-                #     bool_ann &= psds_list[1].asd_file[-21:] == "aLIGO_O4_high_asd.txt"
-                #     bool_ann &= psds_list[2].asd_file[-11:] == "AdV_asd.txt"
-                # except:
-                #     bool_ann = False
-
-                # if not bool_ann:
-                #     raise ValueError(
-                #         "The given input parameters are not suitable for ANN method."
-                #     )
-                # else:
-                #     print("ANN method is selected.")
-                #     # dealing with interpolator
-                #     self.waveform_approximant = "IMRPhenomD"
-                #     print(
-                #         "Please be patient while the interpolator is generated of partialscaledSNR for IMRPhenomD."
-                #     )
-                #     path_interpolator_all = interpolator_setup()
-                #     self.waveform_approximant = "IMRPhenomXPHM"
+        else:
+            raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'inner_product', 'ann'.")
 
         # change back to original
         self.psds_list = psds_list
         self.detector_tensor_list = detector_tensor_list
         self.detector_list = detector_list
         self.multiprocessing_verbose = multiprocessing_verbose
-        if snr_type == "interpolation":
-            self.path_interpolator = path_interpolator_all
-
-        def print_no_interpolator(**kwargs):
-            print(
-                "No interpolator found. Please set snr_type=True to generate new interpolator."
-            )
 
         if snr_type == "inner_product":
-            self.snr_with_interpolation = print_no_interpolator
+            self.snr_with_interpolation = self._print_no_interpolator
 
         # print some info
         self.print_all_params(gwsnr_verbose)
+
+    # dealing with interpolator
+    def interpolator_setup(self, interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list):
+        """
+        Function to generate the partialscaled SNR interpolator and return its pickle file paths.
+
+        Parameters
+        ----------
+        interpolator_dir : `str`
+            Path to store the interpolator pickle file.
+        create_new_interpolator : `bool`
+            If set True, new interpolator will be generated or replace the existing one.
+        psds_list : `list`
+            List of psds for different detectors.
+        detector_tensor_list : `list`
+            List of detector tensor.
+        detector_list : `list`
+            List of detectors.
+
+
+        Returns
+        ----------
+        path_interpolator_all : `list`
+            List of partialscaled SNR interpolator pickle file paths.
+        """
+
+        # Note: it will only select detectors that does not have interpolator stored yet
+        (
+            self.psds_list,
+            self.detector_tensor_list,
+            self.detector_list,
+            self.path_interpolator,
+            path_interpolator_all,
+        ) = interpolator_check(
+            param_dict_given=self.param_dict_given.copy(),
+            interpolator_dir=interpolator_dir,
+            create_new=create_new_interpolator,
+        )
+
+        self.multiprocessing_verbose = False  # This lets multiprocessing to use map instead of imap_unordered function.
+        # len(detector_list) == 0, means all the detectors have interpolator stored
+        if len(self.detector_list) > 0:
+            print("Please be patient while the interpolator is generated")
+            self.init_partialscaled()
+        elif create_new_interpolator:
+            # change back to original
+            self.psds_list = psds_list
+            self.detector_tensor_list = detector_tensor_list
+            self.detector_list = detector_list
+            print("Please be patient while the interpolator is generated")
+            self.init_partialscaled()
+
+        # get all partialscaledSNR from the stored interpolator
+        self.snr_partialsacaled_list = [
+            load_pickle(path) for path in path_interpolator_all
+        ]
+
+        return path_interpolator_all
+
+    def ann_initilization(self, ann_path_dict, detector_list, sampling_frequency, minimum_frequency, waveform_approximant, snr_th):
+        """
+        Function to initialize ANN model and scaler for the given detector list. It also generates the partialscaledSNR interpolator for the required waveform approximant.
+
+        """
+
+        # check the content ann_path_dict.json in gwsnr/ann module directory
+        # e.g. ann_path_dict = dict(L1=dict(model_path='path_to_model', scaler_path='path_to_scaler', sampling_frequency=2048.0, minimum_frequency=20.0, waveform_approximant='IMRPhenomXPHM', snr_th=8.0))
+        # there will be existing ANN model and scaler for default parameters
+        ann_path_dict_default = load_json_from_module('gwsnr', 'ann', 'ann_path_dict.json')
+        if ann_path_dict is None:
+            ann_path_dict = ann_path_dict_default
+        else:
+            if isinstance(ann_path_dict, str):
+                ann_path_dict = load_json(ann_path_dict)
+            elif isinstance(ann_path_dict, dict):
+                pass
+            else:
+                raise ValueError("ann_path_dict should be a dictionary or a path to the json file.")
+            # if 'L1' key already exist in the dict, you can still give new dict value for 'L1' when initializing GWSNR.
+            # if no new dict value is given for 'L1', it will take the default value from ann_path_dict_default.
+            ann_path_dict_default.update(ann_path_dict)
+            ann_path_dict = ann_path_dict_default
+        del ann_path_dict_default
+
+        model_dict = {}
+        scaler_dict = {}
+        error_adjustment = {}
+        # loop through the detectors
+        for detector in detector_list:
+            if detector not in ann_path_dict.keys():
+                # check if the model and scaler is available
+                raise ValueError(f"ANN model and scaler for {detector} is not available. Please provide the path to the model and scaler. Refer to the 'gwsnr' documentation for more information on how to add new ANN model.")
+            else:
+                # check of model parameters
+                check = True
+                check &= (sampling_frequency == ann_path_dict[detector]['sampling_frequency'])
+                check &= (minimum_frequency == ann_path_dict[detector]['minimum_frequency'])
+                check &= (waveform_approximant == ann_path_dict[detector]['waveform_approximant'])
+                check &= (snr_th == ann_path_dict[detector]['snr_th'])
+                # check for the model and scaler keys exit or not
+                check &= ('model_path' in ann_path_dict[detector].keys())
+                check &= ('scaler_path' in ann_path_dict[detector].keys())
+
+                if not check:
+                    raise ValueError(f"ANN model parameters for {detector} is not suitable for the given gwsnr parameters. Existing parameters are: {ann_path_dict[detector]}")
+
+            # get ann model
+            if not os.path.exists(ann_path_dict[detector]['model_path']):
+                # load the model from gwsnr/ann directory
+                model_dict[detector] = load_ann_h5_from_module('gwsnr', 'ann', ann_path_dict[detector]['model_path'])
+            else:
+                # load the model from the given path
+                model_dict[detector] = load_ann_h5(ann_path_dict[detector]['model_path'])
+
+            # get ann scaler
+            if not os.path.exists(ann_path_dict[detector]['scaler_path']):
+                # load the scaler from gwsnr/ann directory
+                scaler_dict[detector] = load_pickle_from_module('gwsnr', 'ann', ann_path_dict[detector]['scaler_path'])
+            else:
+                # load the scaler from the given path
+                scaler_dict[detector] = load_pickle(ann_path_dict[detector]['scaler_path'])
+
+            # get error_adjustment
+            if not os.path.exists(ann_path_dict[detector]['error_adjustment_path']):
+                # load the error_adjustment from gwsnr/ann directory
+                error_adjustment[detector] = load_json_from_module('gwsnr', 'ann', ann_path_dict[detector]['error_adjustment_path'])
+            else:
+                # load the error_adjustment from the given path
+                error_adjustment[detector] = load_pickle(ann_path_dict[detector]['error_adjustment_path'])
+
+        return model_dict, scaler_dict, error_adjustment, ann_path_dict
+
+    def _print_no_interpolator(self, **kwargs):
+        """
+        Helper function to print error message when no interpolator is found.
+
+        Parameters
+        ----------
+        kwargs : `dict`
+            Dictionary of parameters.
+        """
+
+        raise ValueError(
+            'No interpolator found. Please set snr_type="interpolation" to generate new interpolator.'
+        )
 
     def calculate_mtot_max(self, mtot_max, minimum_frequency):
         """
@@ -560,8 +595,8 @@ class GWSNR:
 
     def snr(
         self,
-        mass_1=10.0,
-        mass_2=10.0,
+        mass_1=np.array([10.0,]),
+        mass_2=np.array([10.0,]),
         luminosity_distance=100.0,
         theta_jn=0.0,
         psi=0.0,
@@ -771,6 +806,8 @@ class GWSNR:
         """
 
         # setting up the parameters
+        model = self.model_dict
+        scaler = self.scaler_dict
         detectors = np.array(self.detector_list)
         size = len(mass_1)
         # this allows mass_1, mass_2 to pass as float or array
@@ -845,40 +882,18 @@ class GWSNR:
         optimal_snr = {det: np.zeros(size) for det in detectors}
         optimal_snr["optimal_snr_net"] = np.zeros(size)
         for i, det in enumerate(detectors):
-            model = load_model(self.ann_path_dict[det][0])
-            scaler = pickle.load(open(self.ann_path_dict[det][1], 'rb'))
-            x = scaler.transform(ann_input[i])
-            optimal_snr[det][idx_tracker] = model.predict(x, verbose=0).flatten()
+            x = scaler[det].transform(ann_input[i])
+            optimal_snr_ = model[det].predict(x, verbose=0).flatten()
+            optimal_snr[det][idx_tracker] = optimal_snr_ - (self.error_adjustment[det]['slope']*optimal_snr_ + self.error_adjustment[det]['intercept'])
             optimal_snr["optimal_snr_net"] += optimal_snr[det] ** 2
         optimal_snr["optimal_snr_net"] = np.sqrt(optimal_snr["optimal_snr_net"])
-
-        # # load the model
-        # modelL1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelL1.h5')
-        # modelH1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelH1.h5')
-        # modelV1 = load_h5_dataset('gwsnr', 'ann', 'ann_modelV1.h5')
-        # # load the scaler
-        # scalerL1 = load_pkl_dataset('gwsnr', 'ann', 'scalerL1.pkl')
-        # scalerH1 = load_pkl_dataset('gwsnr', 'ann', 'scalerH1.pkl')
-        # scalerV1 = load_pkl_dataset('gwsnr', 'ann', 'scalerV1.pkl')
-
-        # # predict the output
-        # # supress printing
-        # snr = []
-        # x = scalerL1.transform(X_L1)
-        # snr.append(modelL1.predict(x,verbose = 0).flatten())
-        # x = scalerH1.transform(X_H1)
-        # snr.append(modelH1.predict(x, verbose = 0).flatten())
-        # x = scalerV1.transform(X_V1)
-        # snr.append(modelV1.predict(x, verbose = 0).flatten())
-        # calculate the effective snr
-        # snr_effective = np.sqrt(snr[0] ** 2 + snr[1] ** 2 + snr[2] ** 2)
 
         # Save as JSON file
         if output_jsonfile:
             output_filename = (
                 output_jsonfile if isinstance(output_jsonfile, str) else "snr.json"
             )
-            save_json_dict(optimal_snr, output_filename)
+            save_json(output_filename, optimal_snr)
 
         return optimal_snr
 
@@ -927,6 +942,9 @@ class GWSNR:
         # amp0
         amp0 = A1 / d_eff
 
+        # inclination angle
+        theta_jn = np.array(params["theta_jn"][idx])
+
         # get spin parameters
         a_1 = np.array(params["a_1"][idx])
         a_2 = np.array(params["a_2"][idx])
@@ -940,21 +958,10 @@ class GWSNR:
 
         # for the detectors
         ann_input = []
-        for i, det in enumerate(self.detector_list):
+        for i in range(len(self.detector_list)):
             ann_input.append(
-                np.vstack([snr_partial[i], amp0[i], eta, chi_eff]).T
+                np.vstack([snr_partial[i], amp0[i], eta, chi_eff, theta_jn]).T
             )
-
-        # input data
-        # X_L1 = np.vstack(
-        #     [snr_partial[0], amp0[0], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
-        # ).T
-        # X_H1 = np.vstack(
-        #     [snr_partial[1], amp0[1], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
-        # ).T
-        # X_V1 = np.vstack(
-        #     [snr_partial[2], amp0[2], eta, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl]
-        # ).T
 
         return (ann_input)
 
@@ -1076,7 +1083,7 @@ class GWSNR:
             output_filename = (
                 output_jsonfile if isinstance(output_jsonfile, str) else "snr.json"
             )
-            save_json_dict(optimal_snr, output_filename)
+            save_json(output_filename, optimal_snr)
 
         return optimal_snr
 
@@ -1159,7 +1166,7 @@ class GWSNR:
 
         # save the interpolators for each detectors
         for j in num_det:
-            save_json(snr_partial_[:, j], self.path_interpolator[j])
+            save_pickle(self.path_interpolator[j], snr_partial_[:, j])
 
     def compute_bilby_snr(
         self,
@@ -1260,7 +1267,7 @@ class GWSNR:
             dec = gw_param_dict["dec"]
             # a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl exist in the dictionary
             # if exists, then use that, else pass
-            if "a_1" and "a2" in gw_param_dict:
+            if "a_1" and "a_2" in gw_param_dict:
                 a_1 = gw_param_dict["a_1"]
                 a_2 = gw_param_dict["a_2"]
             if "tilt_1" and "tilt_2" and "phi_12" and "phi_jl" in gw_param_dict:
@@ -1282,8 +1289,8 @@ class GWSNR:
 
         # reshape(-1) is so that either a float value is given or the input is an numpy array
         # make sure all parameters are of same length
-        num = len(mass_1)
         mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
+        num = len(mass_1)
         (
             mass_1,
             mass_2,
@@ -1412,7 +1419,7 @@ class GWSNR:
             output_filename = (
                 output_jsonfile if isinstance(output_jsonfile, str) else "snr.json"
             )
-            save_json_dict(optimal_snr, output_filename)
+            save_json(output_filename, optimal_snr)
 
         return optimal_snr
 
@@ -1468,9 +1475,9 @@ class GWSNR:
 
         Parameters
         ----------
-        mass_1 : `float`
+        mass_1 : `numpy.ndarray` or `float`
             Primary mass of the binary in solar mass. Default is 1.4.
-        mass_2 : `float`
+        mass_2 : `numpy.ndarray` or `float`
             Secondary mass of the binary in solar mass. Default is 1.4.
         snr_th : `float`
             SNR threshold for detection. Default is 8.0.
@@ -1478,7 +1485,7 @@ class GWSNR:
         Returns
         ----------
         horizon : `dict`
-            Dictionary of horizon distance for each detector (dict.keys()=detector_names, dict.values()=horizon_distance).
+            Dictionary of horizon distance for each detector in Mpc (dict.keys()=detector_names, dict.values()=horizon_distance).
         """
 
         if snr_th:
@@ -1532,6 +1539,10 @@ class GWSNR:
             det: (dl_eff[j] / snr_th) * optimal_snr_unscaled[det]
             for j, det in enumerate(detectors)
         }
+
+        dl_eff = np.sqrt(np.sum(dl_eff**2))
         horizon["net"] = (dl_eff / snr_th_net) * optimal_snr_unscaled["optimal_snr_net"]
+        print('dl_eff', dl_eff)
+        print('optimal_snr_unscaled', optimal_snr_unscaled["optimal_snr_net"])
 
         return horizon

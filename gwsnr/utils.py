@@ -11,15 +11,6 @@ import pickle
 import numpy as np
 import bilby
 
-# Function to load a specific dataset from an .h5 file within the package
-def load_h5_dataset(package, directory, filename):
-    with resources.path(package + '.' + directory, filename) as h5_path:
-        return load_model(h5_path)
-    
-def load_pkl_dataset(package, directory, filename):
-    with resources.path(package + '.' + directory, filename) as pkl_path:
-        return pickle.load(open(pkl_path, "rb"))
-        
 class NumpyEncoder(json.JSONEncoder):
     """
     Custom JSON encoder for numpy data types. It converts numpy.ndarray objects (and any nested-list composition
@@ -34,6 +25,153 @@ class NumpyEncoder(json.JSONEncoder):
         # Fallback to default behavior for other types
         return super(NumpyEncoder, self).default(obj)
 
+def save_json(file_name, param):
+    """Save a dictionary as a json file.
+
+    Parameters
+    ----------
+    file_name : `str`
+        json file name for storing the parameters.
+    param : `dict`
+        dictionary to be saved as a json file.
+    """
+    with open(file_name, "w", encoding="utf-8") as write_file:
+        try:
+            json.dump(param, write_file)
+        except:
+            json.dump(param, write_file, indent=4, cls=NumpyEncoder)
+
+
+def load_json(file_name):
+    """Load a json file.
+
+    Parameters
+    ----------
+    file_name : `str`
+        json file name for storing the parameters.
+
+    Returns
+    ----------
+    param : `dict`
+    """
+    with open(file_name, "r", encoding="utf-8") as f:
+        param = json.load(f)
+
+    return param
+
+def save_pickle(file_name, param):
+    """Save a dictionary as a pickle file.
+
+    Parameters
+    ----------
+    file_name : `str`
+        pickle file name for storing the parameters.
+    param : `dict`
+        dictionary to be saved as a pickle file.
+    """
+    with open(file_name, "wb") as handle:
+        pickle.dump(param, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+def load_pickle(file_name):
+    """Load a pickle file.
+
+    Parameters
+    ----------
+    file_name : `str`
+        pickle file name for storing the parameters.
+
+    Returns
+    ----------
+    param : `dict`
+    """
+    with open(file_name, "rb") as f:
+        param = pickle.load(f)
+
+    return param
+
+def load_ann_h5(filename):
+    """
+    Function to load a specific dataset from an .h5 file
+
+    Parameters
+    ----------
+    filename : str
+        name of the .h5 file
+        
+    Returns
+    ----------
+    model : `keras.models.Model`
+        Keras model loaded from the .h5 file
+    """
+
+    return load_model(filename)
+
+def load_ann_h5_from_module(package, directory, filename):
+    """
+    Function to load a specific dataset from an .h5 file within the package
+
+    Parameters
+    ----------
+    package : str
+        name of the package
+    directory : str
+        name of the directory within the package
+    filename : str
+        name of the .h5 file
+
+    Returns
+    ----------
+    model : `keras.models.Model`
+        Keras model loaded from the .h5 file
+    """
+
+    with resources.path(package + '.' + directory, filename) as h5_path:
+        return load_model(h5_path)
+
+def load_json_from_module(package, directory, filename):
+    """
+    Function to load a specific dataset from a .json file within the package
+
+    Parameters
+    ----------
+    package : str
+        name of the package
+    directory : str
+        name of the directory within the package
+    filename : str
+        name of the .json file
+
+    Returns
+    ----------
+    data : `dict`
+        Dictionary loaded from the .json file
+    """
+
+    with resources.path(package + '.' + directory, filename) as json_path:
+        with open(json_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    
+def load_pickle_from_module(package, directory, filename):
+    """
+    Function to load a specific dataset from a .pkl file within the package
+
+    Parameters
+    ----------
+    package : str
+        name of the package
+    directory : str
+        name of the directory within the package
+    filename : str
+        name of the .pkl file
+
+    Returns
+    ----------
+    data : `dict`
+        Dictionary loaded from the .pkl file
+    """
+    
+    with resources.path(package + '.' + directory, filename) as pkl_path:
+        return pickle.load(open(pkl_path, "rb"))
 
 def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.0):
     """
@@ -366,70 +504,3 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
     # print(f"In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {path_interpolator} \n")
 
     return (path_interpolator, it_exist)
-
-
-def load_json(file_name):
-    """Load a json file.
-
-    Parameters
-    ----------
-    file_name : `str`
-        json file name for storing the parameters.
-
-    Returns
-    ----------
-    param : `dict`
-    """
-    with open(file_name, "rb") as handle:
-        param = pickle.load(handle)
-
-    return param
-
-
-def save_json(param, file_name):
-    """Save a json file.
-
-    Parameters
-    ----------
-    param : `dict`
-        dictionary of parameters.
-    file_name : `str`
-        json file name for storing the parameters.
-    """
-    with open(file_name, "wb") as handle:
-        pickle.dump(param, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-def save_json_dict(dict, file_name):
-    """Save a json file.
-
-    Parameters
-    ----------
-    param : `dict`
-        dictionary of parameters.
-    file_name : `str`
-        json file name for storing the parameters.
-    """
-
-    json_dump = json.dumps(dict, cls=NumpyEncoder)
-    with open(file_name, "w") as write_file:
-        json.dump(json.loads(json_dump), write_file, indent=4)
-
-
-def load_json_dict(file_name):
-    """Load a json file.
-
-    Parameters
-    ----------
-    file_name : `str`
-        json file name for storing the parameters.
-
-    Returns
-    ----------
-    param : `dict`
-    """
-
-    with open(file_name, "r", encoding="utf-8") as f:
-        param = json.load(f)
-
-    return param

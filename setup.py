@@ -14,7 +14,7 @@ if python_version < (3, 10):
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 setup(name='gwsnr',
-      version='0.2.4',
+      version='0.2.6',
       description='Fast SNR interpolator',
       author='Hemantakumar Phurailatpam',
       license="MIT",
@@ -26,10 +26,10 @@ setup(name='gwsnr',
         "numpy>=1.18",
         "bilby>=1.0.2",
         "pycbc>=2.0.4",
-        "scipy>=1.9.0",
+        "scipy<1.14.0",
         "tqdm>=4.64.0",
         "gwpy>=2.1.5",
-        "tensorflow==2.13.1",
-        "scikit-learn==1.3.2",
+        "tensorflow>=2.16",
+        "scikit-learn>=1.5",
       ]
      )

@@ -5,28 +5,69 @@ docs/_build/
 */.ipynb_checkpoints/*
 
 # ignore json
-*.json
-.json
-**.json
-**/*.json
-**/**/*.json
-**/**/**/*.json
-**/**/**/**/*.json
-**/**/**/**/**/*.json
+# *.json
+# .json
+# **.json
+# **/*.json
+# **/**/*.json
+# **/**/**/*.json
+# **/**/**/**/*.json
+# **/**/**/**/**/*.json
+examples/*.json
+examples/**/*.json
+examples/**/**/*.json
+examples/**/**/**/*.json
+examples/**/**/**/**/*.json
+dev/*.json
+dev/**/*.json
+dev/**/**/*.json
+dev/**/**/**/*.json
+dev/**/**/**/**/*.json
+docs/*.json
+docs/**/*.json
+docs/**/**/*.json
+docs/**/**/**/*.json
+docs/**/**/**/**/*.json
 
 # ignore pickle
-*.pickle
-.pickle
-**.pickle
-**/*.pickle
-**/**/*.pickle
-**/**/**/*.pickle
-**/**/**/**/*.pickle
-**/**/**/**/**/*.pickle
-# *.pkl
-# .pkl
-# **.pkl
-# **/*.pkl
+# *.pickle
+# .pickle
+# **.pickle
+# **/*.pickle
+# **/**/*.pickle
+# **/**/**/*.pickle
+# **/**/**/**/*.pickle
+# **/**/**/**/**/*.pickle
+examples/*.pickle
+examples/**/*.pickle
+examples/**/**/*.pickle
+examples/**/**/**/*.pickle
+examples/**/**/**/**/*.pickle
+dev/*.pickle
+dev/**/*.pickle
+dev/**/**/*..pickle
+dev/**/**/**/*.pickle
+dev/**/**/**/**/*.pickle
+docs/*.pickle
+docs/**/*.pickle
+docs/**/**/*.pickle
+docs/**/**/**/*.pickle
+docs/**/**/**/**/*.pickle
+examples/*.pkl
+examples/**/*.pkl
+examples/**/**/*.pkl
+examples/**/**/**/*.pkl
+examples/**/**/**/**/*.pkl
+dev/*.pkl
+dev/**/*.pkl
+dev/**/**/*.pkl
+dev/**/**/**/*.pkl
+dev/**/**/**/**/*.pkl
+docs/*.pkl
+docs/**/*.pkl
+docs/**/**/*.pkl
+docs/**/**/**/*.pkl
+docs/**/**/**/**/*.pkl
 
 .DS_Store
 
