@@ -11,7 +11,6 @@ from tqdm import tqdm
 from scipy.stats import norm
 from scipy.interpolate import CubicSpline
 from scipy.optimize import fsolve
-from tensorflow.keras.models import load_model
 
 from .utils import (
     dealing_with_psds,

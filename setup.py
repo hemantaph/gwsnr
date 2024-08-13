@@ -14,22 +14,29 @@ if python_version < (3, 10):
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 setup(name='gwsnr',
-      version='0.2.6',
+      version='0.3.0',
       description='Fast SNR interpolator',
       author='Hemantakumar Phurailatpam',
       license="MIT",
       author_email='hemantaphurailatpam@gmail.com',
       url='https://github.com/hemantaph/gwsnr',
       packages=find_packages(),
+      package_data={
+        'gwsnr': ['ann/*.json', 'ann/*.pkl', 'ann/*.h5'],
+      },
       install_requires=[
-        "setuptools>=61.1.0",
+        "setuptools>=65.5.0",
+        "matplotlib>=3.4.2",
         "numpy>=1.18",
         "bilby>=1.0.2",
         "pycbc>=2.0.4",
         "scipy<1.14.0",
         "tqdm>=4.64.0",
         "gwpy>=2.1.5",
-        "tensorflow>=2.16",
-        "scikit-learn>=1.5",
+        "h5py>=3.11.0,<3.12.0",
+        "numba>=0.57.1,<0.58.0",
+        "tensorflow>=2.17.0,<2.18.0",
+        "scikit-learn>=1.5.0,<1.6.0",
+        "numexpr>=2.8.4",
       ]
      )

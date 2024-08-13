@@ -7,7 +7,7 @@ warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
 
 __author__ = 'hemanta_ph <hemantaphurailatpam@gmail.com>'
 
-__version__ = "0.2.6"
+__version__ = "0.3.0"
 
 # add __file__
 import os
@@ -18,5 +18,7 @@ from .njit_functions import *
 from .multiprocessing_routine import *
 # from .pdet import *
 from .utils import *
+
+from . import ann
 
 
