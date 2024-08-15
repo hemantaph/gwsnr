@@ -5,6 +5,9 @@ Helper functions for gwsnr
 
 import os
 import json
+# supress warning
+import absl.logging
+absl.logging.set_verbosity(absl.logging.ERROR)
 from tensorflow.keras.models import load_model
 from importlib import resources
 import pickle

@@ -294,8 +294,7 @@ class GWSNR:
         pdet=False,
         snr_th=8.0,
         snr_th_net=8.0,
-        ann_path_dict=None,
-        ann_partialscaled_approximant="IMRPhenomXPHM",
+        ann_path_dict=None
     ):
         # setting instance attributes
         self.npool = npool
@@ -353,6 +352,10 @@ class GWSNR:
             "psds": psds_list,
             "detector_tensor": detector_tensor_list,
         }
+        if waveform_approximant=="IMRPhenomXPHM" and duration_max is None:
+            print("Intel processor has trouble allocating memory when the data is huge. So, by default for IMRPhenomXPHM, duration_max = 64.0. Otherwise, set to some max value like duration_max = 600.0 (10 mins)")
+            duration_max = 64.0
+
 
         # now generate interpolator, if not exists
         if snr_type == "interpolation":
@@ -367,8 +370,6 @@ class GWSNR:
         elif snr_type == "ann":
             self.model_dict, self.scaler_dict, self.error_adjustment, self.ann_catalogue = self.ann_initilization(ann_path_dict, detector_list, sampling_frequency, minimum_frequency, waveform_approximant, snr_th)
             # dealing with interpolator
-            # Note: by default the partialscaledSNR interpolator used in ANN method corresponds to 'IMRPhenomD' waveform approximant.
-            self.param_dict_given["waveform_approximant"] = ann_partialscaled_approximant
             self.path_interpolator = self.interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
 
         else:
