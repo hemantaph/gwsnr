@@ -282,6 +282,7 @@ class GWSNR:
         sampling_frequency=2048.0,
         waveform_approximant="IMRPhenomD",
         minimum_frequency=20.0,
+        duration_max=None,
         snr_type="interpolation",
         psds=None,
         ifos=None,
@@ -301,6 +302,7 @@ class GWSNR:
         self.pdet = pdet
         self.snr_th = snr_th
         self.snr_th_net = snr_th_net
+        self.duration_max = duration_max
 
         # dealing with mtot_max
         # set max cut off according to minimum_frequency
@@ -1340,6 +1342,9 @@ class GWSNR:
         safety = 1.2
         approx_duration = safety * findchirp_chirptime(mass_1[idx], mass_2[idx], f_min)
         duration = np.ceil(approx_duration + 2.0)
+        if self.duration_max:
+            duration[duration > self.duration_max] = self.duration_max  # IMRPheonomXPHM has maximum duration of 371s
+
 
         input_arguments = np.array(
             [
