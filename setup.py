@@ -14,7 +14,7 @@ if python_version < (3, 10):
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 setup(name='gwsnr',
-      version='0.3.0',
+      version='0.3.2',
       description='Fast SNR interpolator',
       author='Hemantakumar Phurailatpam',
       license="MIT",

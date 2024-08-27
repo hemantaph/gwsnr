@@ -354,7 +354,7 @@ class GWSNR:
         }
         if waveform_approximant=="IMRPhenomXPHM" and duration_max is None:
             print("Intel processor has trouble allocating memory when the data is huge. So, by default for IMRPhenomXPHM, duration_max = 64.0. Otherwise, set to some max value like duration_max = 600.0 (10 mins)")
-            duration_max = 64.0
+            self.duration_max = 64.0
 
 
         # now generate interpolator, if not exists

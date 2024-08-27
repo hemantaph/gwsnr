@@ -8,6 +8,7 @@ import json
 # supress warning
 import absl.logging
 absl.logging.set_verbosity(absl.logging.ERROR)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 from tensorflow.keras.models import load_model
 from importlib import resources
 import pickle
