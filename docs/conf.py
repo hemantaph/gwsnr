@@ -112,6 +112,10 @@ def skip_member(app, what, name, obj, skip, options):
 
 def setup(sphinx):
     sphinx.connect("autoapi-skip-member", skip_member)
+    roles.register_local_role('orange', orange_role)
+    roles.register_local_role('orange_first', orange_first_letter)
+    roles.register_local_role('red', red_role)
+    roles.register_local_role('red_first', red_first_letter)
 
 from docutils import nodes
 from docutils.parsers.rst import roles
@@ -140,8 +144,8 @@ def red_first_letter(role, rawtext, text, lineno, inliner, options={}, content=[
     rest = nodes.inline(rawtext, text[1:], classes=[])
     return [first_letter, rest], []
 
-def setup(app):
-    roles.register_local_role('orange', orange_role)
-    roles.register_local_role('orange_first', orange_first_letter)
-    roles.register_local_role('red', red_role)
-    roles.register_local_role('red_first', red_first_letter)
+# def setup(app):
+#     roles.register_local_role('orange', orange_role)
+#     roles.register_local_role('orange_first', orange_first_letter)
+#     roles.register_local_role('red', red_role)
+#     roles.register_local_role('red_first', red_first_letter)
