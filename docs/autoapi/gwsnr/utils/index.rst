@@ -28,14 +28,18 @@ Functions
 
 .. autoapisummary::
 
+   gwsnr.utils.save_json
+   gwsnr.utils.load_json
+   gwsnr.utils.save_pickle
+   gwsnr.utils.load_pickle
+   gwsnr.utils.load_ann_h5
+   gwsnr.utils.load_ann_h5_from_module
+   gwsnr.utils.load_json_from_module
+   gwsnr.utils.load_pickle_from_module
    gwsnr.utils.dealing_with_psds
    gwsnr.utils.power_spectral_density_pycbc
    gwsnr.utils.interpolator_check
    gwsnr.utils.interpolator_pickle_path
-   gwsnr.utils.load_json
-   gwsnr.utils.save_json
-   gwsnr.utils.save_json_dict
-   gwsnr.utils.load_json_dict
 
 
 
@@ -103,6 +107,270 @@ Functions
       ..
           !! processed by numpydoc !!
 
+
+.. py:function:: save_json(file_name, param)
+
+   
+   Save a dictionary as a json file.
+
+
+   :Parameters:
+
+       **file_name** : `str`
+           json file name for storing the parameters.
+
+       **param** : `dict`
+           dictionary to be saved as a json file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_json(file_name)
+
+   
+   Load a json file.
+
+
+   :Parameters:
+
+       **file_name** : `str`
+           json file name for storing the parameters.
+
+   :Returns:
+
+       **param** : `dict`
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: save_pickle(file_name, param)
+
+   
+   Save a dictionary as a pickle file.
+
+
+   :Parameters:
+
+       **file_name** : `str`
+           pickle file name for storing the parameters.
+
+       **param** : `dict`
+           dictionary to be saved as a pickle file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_pickle(file_name)
+
+   
+   Load a pickle file.
+
+
+   :Parameters:
+
+       **file_name** : `str`
+           pickle file name for storing the parameters.
+
+   :Returns:
+
+       **param** : `dict`
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_ann_h5(filename)
+
+   
+   Function to load a specific dataset from an .h5 file
+
+
+   :Parameters:
+
+       **filename** : str
+           name of the .h5 file
+
+   :Returns:
+
+       **model** : `keras.models.Model`
+           Keras model loaded from the .h5 file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_ann_h5_from_module(package, directory, filename)
+
+   
+   Function to load a specific dataset from an .h5 file within the package
+
+
+   :Parameters:
+
+       **package** : str
+           name of the package
+
+       **directory** : str
+           name of the directory within the package
+
+       **filename** : str
+           name of the .h5 file
+
+   :Returns:
+
+       **model** : `keras.models.Model`
+           Keras model loaded from the .h5 file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_json_from_module(package, directory, filename)
+
+   
+   Function to load a specific dataset from a .json file within the package
+
+
+   :Parameters:
+
+       **package** : str
+           name of the package
+
+       **directory** : str
+           name of the directory within the package
+
+       **filename** : str
+           name of the .json file
+
+   :Returns:
+
+       **data** : `dict`
+           Dictionary loaded from the .json file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_pickle_from_module(package, directory, filename)
+
+   
+   Function to load a specific dataset from a .pkl file within the package
+
+
+   :Parameters:
+
+       **package** : str
+           name of the package
+
+       **directory** : str
+           name of the directory within the package
+
+       **filename** : str
+           name of the .pkl file
+
+   :Returns:
+
+       **data** : `dict`
+           Dictionary loaded from the .pkl file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.0)
 
@@ -257,128 +525,6 @@ Functions
        it_exist: bool
            True if the interpolator exists
            False if the interpolator does not exists
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: load_json(file_name)
-
-   
-   Load a json file.
-
-
-   :Parameters:
-
-       **file_name** : `str`
-           json file name for storing the parameters.
-
-   :Returns:
-
-       **param** : `dict`
-           ..
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: save_json(param, file_name)
-
-   
-   Save a json file.
-
-
-   :Parameters:
-
-       **param** : `dict`
-           dictionary of parameters.
-
-       **file_name** : `str`
-           json file name for storing the parameters.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: save_json_dict(dict, file_name)
-
-   
-   Save a json file.
-
-
-   :Parameters:
-
-       **param** : `dict`
-           dictionary of parameters.
-
-       **file_name** : `str`
-           json file name for storing the parameters.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: load_json_dict(file_name)
-
-   
-   Load a json file.
-
-
-   :Parameters:
-
-       **file_name** : `str`
-           json file name for storing the parameters.
-
-   :Returns:
-
-       **param** : `dict`
-           ..
 
 
 

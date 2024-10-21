@@ -28,14 +28,6 @@ gwsnr.njit\_functions module
    :undoc-members:
    :show-inheritance:
 
-gwsnr.pdet module
------------------
-
-.. automodule:: gwsnr.pdet
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 gwsnr.utils module
 ------------------
 

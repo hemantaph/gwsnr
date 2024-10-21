@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gwsnr.utils &mdash; gwsnr 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/tabs.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=938c9ccc"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="SNR (optimal) generation and comparison" href="../../../snr_generation.html" />
+    <link rel="prev" title="gwsnr.multiprocessing_routine" href="../multiprocessing_routine/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            gwsnr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Summary.html">Summary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../gwsnr/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.gwsnr</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../njit_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.njit_functions</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multiprocessing_routine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.multiprocessing_routine</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.utils</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gwsnr.utils.NumpyEncoder"><code class="docutils literal notranslate"><span class="pre">NumpyEncoder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gwsnr.utils.dealing_with_psds"><code class="docutils literal notranslate"><span class="pre">dealing_with_psds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gwsnr.utils.power_spectral_density_pycbc"><code class="docutils literal notranslate"><span class="pre">power_spectral_density_pycbc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gwsnr.utils.interpolator_check"><code class="docutils literal notranslate"><span class="pre">interpolator_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gwsnr.utils.interpolator_pickle_path"><code class="docutils literal notranslate"><span class="pre">interpolator_pickle_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gwsnr.utils.load_json"><code class="docutils literal notranslate"><span class="pre">load_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gwsnr.utils.save_json"><code class="docutils literal notranslate"><span class="pre">save_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gwsnr.utils.save_json_dict"><code class="docutils literal notranslate"><span class="pre">save_json_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gwsnr.utils.load_json_dict"><code class="docutils literal notranslate"><span class="pre">load_json_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../snr_generation.html">SNR (optimal) generation and comparison</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">gwsnr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.utils</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/gwsnr/utils/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gwsnr.utils">
+<span id="gwsnr-utils"></span><h1><a class="reference internal" href="#module-gwsnr.utils" title="gwsnr.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.utils</span></code></a><a class="headerlink" href="#module-gwsnr.utils" title="Link to this heading"></a></h1>
+<p>Helper functions for gwsnr</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Link to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gwsnr.utils.NumpyEncoder" title="gwsnr.utils.NumpyEncoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NumpyEncoder</span></code></a></p></td>
+<td><p>Custom JSON encoder for numpy data types. It converts numpy.ndarray objects (and any nested-list composition</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gwsnr.utils.dealing_with_psds" title="gwsnr.utils.dealing_with_psds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dealing_with_psds</span></code></a>([psds, ifos, f_min, sampling_frequency])</p></td>
+<td><p>Function to deal with psds inputs and for creating bilby.gw.detector.PowerSpectralDensity objects.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gwsnr.utils.power_spectral_density_pycbc" title="gwsnr.utils.power_spectral_density_pycbc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">power_spectral_density_pycbc</span></code></a>(psd[, f_min, ...])</p></td>
+<td><p>psd array finder from pycbc</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gwsnr.utils.interpolator_check" title="gwsnr.utils.interpolator_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolator_check</span></code></a>(param_dict_given, interpolator_dir, ...)</p></td>
+<td><p>Function for interpolator (snr_partialsacaled) check and generation if not exists.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gwsnr.utils.interpolator_pickle_path" title="gwsnr.utils.interpolator_pickle_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolator_pickle_path</span></code></a>(param_dict_given[, path])</p></td>
+<td><p>Function for storing or getting interpolator (snr_partialsacaled) pickle path</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gwsnr.utils.load_json" title="gwsnr.utils.load_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_json</span></code></a>(file_name)</p></td>
+<td><p>Load a json file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gwsnr.utils.save_json" title="gwsnr.utils.save_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_json</span></code></a>(param, file_name)</p></td>
+<td><p>Save a json file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gwsnr.utils.save_json_dict" title="gwsnr.utils.save_json_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_json_dict</span></code></a>(dict, file_name)</p></td>
+<td><p>Save a json file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gwsnr.utils.load_json_dict" title="gwsnr.utils.load_json_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_json_dict</span></code></a>(file_name)</p></td>
+<td><p>Load a json file.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="gwsnr.utils.NumpyEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gwsnr.utils.</span></span><span class="sig-name descname"><span class="pre">NumpyEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_circular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#NumpyEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.NumpyEncoder" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">json.JSONEncoder</span></code></p>
+<p>Custom JSON encoder for numpy data types. It converts numpy.ndarray objects (and any nested-list composition
+that includes ndarray objects) into regular lists for JSON serialization. This is particularly useful when
+serializing data structures that include numpy arrays.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gwsnr.utils.NumpyEncoder.default">
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#NumpyEncoder.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.NumpyEncoder.default" title="Link to this definition"></a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gwsnr.utils.dealing_with_psds">
+<span class="sig-prename descclassname"><span class="pre">gwsnr.utils.</span></span><span class="sig-name descname"><span class="pre">dealing_with_psds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ifos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2048.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#dealing_with_psds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.dealing_with_psds" title="Link to this definition"></a></dt>
+<dd><p>Function to deal with psds inputs and for creating bilby.gw.detector.PowerSpectralDensity objects.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>psds</strong><span class="classifier">dict</span></dt><dd><p>dictionary of psds. psds.keys()=detector names, psds.values()=psds file names or pycbc psd names</p>
+</dd>
+<dt><strong>ifos</strong><span class="classifier"><cite>list</cite> or <cite>None</cite></span></dt><dd><p>List of interferometer objects or interferometer name list. Default is None. If None, bilby’s default interferometer objects will be used.</p>
+</dd>
+<dt><strong>f_min</strong><span class="classifier"><cite>float</cite></span></dt><dd><p>Minimum frequency of the psds. Default is 20.</p>
+</dd>
+<dt><strong>sampling_frequency</strong><span class="classifier"><cite>float</cite></span></dt><dd><p>Sampling frequency of the psds. Default is 2048.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>psds_list</strong><span class="classifier"><cite>list</cite></span></dt><dd><p>list of bilby.gw.detector.PowerSpectralDensity objects</p>
+</dd>
+<dt><strong>detector_tensor_list</strong><span class="classifier"><cite>list</cite></span></dt><dd><p>list of detector tensors</p>
+</dd>
+<dt><strong>detector_list</strong><span class="classifier"><cite>list</cite></span></dt><dd><p>list of detector names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gwsnr.utils.power_spectral_density_pycbc">
+<span class="sig-prename descclassname"><span class="pre">gwsnr.utils.</span></span><span class="sig-name descname"><span class="pre">power_spectral_density_pycbc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2048.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#power_spectral_density_pycbc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.power_spectral_density_pycbc" title="Link to this definition"></a></dt>
+<dd><p>psd array finder from pycbc</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>psd</strong><span class="classifier">str</span></dt><dd><p>name of the psd
+e.g. ‘aLIGOaLIGODesignSensitivityT1800044’</p>
+</dd>
+<dt><strong>f_min</strong><span class="classifier">float</span></dt><dd><p>minimum frequency of the psd
+default: 20.</p>
+</dd>
+<dt><strong>sampling_frequency</strong><span class="classifier">float</span></dt><dd><p>sampling frequency of the psd
+default: 2048.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>psd_array</strong><span class="classifier">bilby.gw.detector.psd.PowerSpectralDensity object</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gwsnr.utils.interpolator_check">
+<span class="sig-prename descclassname"><span class="pre">gwsnr.utils.</span></span><span class="sig-name descname"><span class="pre">interpolator_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict_given</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolator_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_new</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#interpolator_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.interpolator_check" title="Link to this definition"></a></dt>
+<dd><p>Function for interpolator (snr_partialsacaled) check and generation if not exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>param_dict_given</strong><span class="classifier">dict</span></dt><dd><p>dictionary of parameters based on which the existence of interpolator will be checked</p>
+</dd>
+<dt><strong>interpolator_dir</strong><span class="classifier">str</span></dt><dd><p>path to the interpolator pickle file</p>
+</dd>
+<dt><strong>create_new</strong><span class="classifier">bool</span></dt><dd><p>if True, new interpolator will be generated even if the interpolator exists
+if False, existing interpolator will be used if exists, otherwise new interpolator will be generated</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>psds_list_</strong><span class="classifier">list</span></dt><dd><p>list of psd objects</p>
+</dd>
+<dt><strong>detector_tensor_list_</strong><span class="classifier">list</span></dt><dd><p>list of detector tensors</p>
+</dd>
+<dt><strong>detector_list_</strong><span class="classifier">list</span></dt><dd><p>list of detector names</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gwsnr.utils.interpolator_pickle_path">
+<span class="sig-prename descclassname"><span class="pre">gwsnr.utils.</span></span><span class="sig-name descname"><span class="pre">interpolator_pickle_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict_given</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./interpolator_pickle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#interpolator_pickle_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.interpolator_pickle_path" title="Link to this definition"></a></dt>
+<dd><p>Function for storing or getting interpolator (snr_partialsacaled) pickle path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>param_dict_given</strong><span class="classifier">dict</span></dt><dd><p>dictionary of parameters based on which the existence of interpolator will be checked</p>
+</dd>
+<dt><strong>path</strong><span class="classifier">str</span></dt><dd><p>path to the directory where the interpolator pickle file will be stored</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>path_interpolator</strong><span class="classifier">str</span></dt><dd><p>path to the interpolator pickle file
+e.g. ‘./interpolator_pickle/L1/partialSNR_dict_0.pickle’</p>
+</dd>
+<dt>it_exist: bool</dt><dd><p>True if the interpolator exists
+False if the interpolator does not exists</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gwsnr.utils.load_json">
+<span class="sig-prename descclassname"><span class="pre">gwsnr.utils.</span></span><span class="sig-name descname"><span class="pre">load_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#load_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.load_json" title="Link to this definition"></a></dt>
+<dd><p>Load a json file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>file_name</strong><span class="classifier"><cite>str</cite></span></dt><dd><p>json file name for storing the parameters.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>param</strong><span class="classifier"><cite>dict</cite></span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gwsnr.utils.save_json">
+<span class="sig-prename descclassname"><span class="pre">gwsnr.utils.</span></span><span class="sig-name descname"><span class="pre">save_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#save_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.save_json" title="Link to this definition"></a></dt>
+<dd><p>Save a json file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>param</strong><span class="classifier"><cite>dict</cite></span></dt><dd><p>dictionary of parameters.</p>
+</dd>
+<dt><strong>file_name</strong><span class="classifier"><cite>str</cite></span></dt><dd><p>json file name for storing the parameters.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gwsnr.utils.save_json_dict">
+<span class="sig-prename descclassname"><span class="pre">gwsnr.utils.</span></span><span class="sig-name descname"><span class="pre">save_json_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#save_json_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.save_json_dict" title="Link to this definition"></a></dt>
+<dd><p>Save a json file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>param</strong><span class="classifier"><cite>dict</cite></span></dt><dd><p>dictionary of parameters.</p>
+</dd>
+<dt><strong>file_name</strong><span class="classifier"><cite>str</cite></span></dt><dd><p>json file name for storing the parameters.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gwsnr.utils.load_json_dict">
+<span class="sig-prename descclassname"><span class="pre">gwsnr.utils.</span></span><span class="sig-name descname"><span class="pre">load_json_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/gwsnr/utils.html#load_json_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gwsnr.utils.load_json_dict" title="Link to this definition"></a></dt>
+<dd><p>Load a json file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>file_name</strong><span class="classifier"><cite>str</cite></span></dt><dd><p>json file name for storing the parameters.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>param</strong><span class="classifier"><cite>dict</cite></span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../multiprocessing_routine/index.html" class="btn btn-neutral float-left" title="gwsnr.multiprocessing_routine" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../snr_generation.html" class="btn btn-neutral float-right" title="SNR (optimal) generation and comparison" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Phurailatpam Hemantakumar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -57,11 +57,16 @@ Functions
 
 .. autoapisummary::
 
-   gwsnr.save_json
    gwsnr.dealing_with_psds
    gwsnr.interpolator_check
    gwsnr.load_json
-   gwsnr.save_json_dict
+   gwsnr.load_pickle
+   gwsnr.save_pickle
+   gwsnr.save_json
+   gwsnr.load_ann_h5_from_module
+   gwsnr.load_ann_h5
+   gwsnr.load_pickle_from_module
+   gwsnr.load_json_from_module
    gwsnr.get_interpolated_snr
    gwsnr.findchirp_chirptime
    gwsnr.antenna_response
@@ -82,46 +87,20 @@ Functions
    gwsnr.coefficients_generator
    gwsnr.noise_weighted_inner_product
    gwsnr.noise_weighted_inner_prod
+   gwsnr.save_json
+   gwsnr.load_json
+   gwsnr.save_pickle
+   gwsnr.load_pickle
+   gwsnr.load_ann_h5
+   gwsnr.load_ann_h5_from_module
+   gwsnr.load_json_from_module
+   gwsnr.load_pickle_from_module
    gwsnr.dealing_with_psds
    gwsnr.power_spectral_density_pycbc
    gwsnr.interpolator_check
    gwsnr.interpolator_pickle_path
-   gwsnr.load_json
-   gwsnr.save_json
-   gwsnr.save_json_dict
-   gwsnr.load_json_dict
 
 
-
-.. py:function:: save_json(param, file_name)
-
-   
-   Save a json file.
-
-
-   :Parameters:
-
-       **param** : `dict`
-           dictionary of parameters.
-
-       **file_name** : `str`
-           json file name for storing the parameters.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.0)
 
@@ -244,20 +223,223 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: save_json_dict(dict, file_name)
+.. py:function:: load_pickle(file_name)
 
    
-   Save a json file.
+   Load a pickle file.
 
 
    :Parameters:
 
+       **file_name** : `str`
+           pickle file name for storing the parameters.
+
+   :Returns:
+
        **param** : `dict`
-           dictionary of parameters.
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: save_pickle(file_name, param)
+
+   
+   Save a dictionary as a pickle file.
+
+
+   :Parameters:
+
+       **file_name** : `str`
+           pickle file name for storing the parameters.
+
+       **param** : `dict`
+           dictionary to be saved as a pickle file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: save_json(file_name, param)
+
+   
+   Save a dictionary as a json file.
+
+
+   :Parameters:
 
        **file_name** : `str`
            json file name for storing the parameters.
 
+       **param** : `dict`
+           dictionary to be saved as a json file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_ann_h5_from_module(package, directory, filename)
+
+   
+   Function to load a specific dataset from an .h5 file within the package
+
+
+   :Parameters:
+
+       **package** : str
+           name of the package
+
+       **directory** : str
+           name of the directory within the package
+
+       **filename** : str
+           name of the .h5 file
+
+   :Returns:
+
+       **model** : `keras.models.Model`
+           Keras model loaded from the .h5 file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_ann_h5(filename)
+
+   
+   Function to load a specific dataset from an .h5 file
+
+
+   :Parameters:
+
+       **filename** : str
+           name of the .h5 file
+
+   :Returns:
+
+       **model** : `keras.models.Model`
+           Keras model loaded from the .h5 file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_pickle_from_module(package, directory, filename)
+
+   
+   Function to load a specific dataset from a .pkl file within the package
+
+
+   :Parameters:
+
+       **package** : str
+           name of the package
+
+       **directory** : str
+           name of the directory within the package
+
+       **filename** : str
+           name of the .pkl file
+
+   :Returns:
+
+       **data** : `dict`
+           Dictionary loaded from the .pkl file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_json_from_module(package, directory, filename)
+
+   
+   Function to load a specific dataset from a .json file within the package
+
+
+   :Parameters:
+
+       **package** : str
+           name of the package
+
+       **directory** : str
+           name of the directory within the package
+
+       **filename** : str
+           name of the .json file
+
+   :Returns:
+
+       **data** : `dict`
+           Dictionary loaded from the .json file
 
 
 
@@ -544,7 +726,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:class:: GWSNR(npool=int(4), mtot_min=2.0, mtot_max=439.6, ratio_min=0.1, ratio_max=1.0, mtot_resolution=500, ratio_resolution=50, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', minimum_frequency=20.0, snr_type='interpolation', psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=True, pdet=False, snr_th=8.0, snr_th_net=8.0)
+.. py:class:: GWSNR(npool=int(4), mtot_min=2.0, mtot_max=439.6, ratio_min=0.1, ratio_max=1.0, mtot_resolution=500, ratio_resolution=50, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', minimum_frequency=20.0, duration_max=None, snr_type='interpolation', psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=True, pdet=False, snr_th=8.0, snr_th_net=8.0, ann_path_dict=None)
 
 
    
@@ -1213,6 +1395,72 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
+
+      
+      Function to generate the partialscaled SNR interpolator and return its pickle file paths.
+
+
+      :Parameters:
+
+          **interpolator_dir** : `str`
+              Path to store the interpolator pickle file.
+
+          **create_new_interpolator** : `bool`
+              If set True, new interpolator will be generated or replace the existing one.
+
+          **psds_list** : `list`
+              List of psds for different detectors.
+
+          **detector_tensor_list** : `list`
+              List of detector tensor.
+
+          **detector_list** : `list`
+              List of detectors.
+
+      :Returns:
+
+          **path_interpolator_all** : `list`
+              List of partialscaled SNR interpolator pickle file paths.
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: ann_initilization(ann_path_dict, detector_list, sampling_frequency, minimum_frequency, waveform_approximant, snr_th)
+
+      
+      Function to initialize ANN model and scaler for the given detector list. It also generates the partialscaledSNR interpolator for the required waveform approximant.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
    .. py:method:: calculate_mtot_max(mtot_max, minimum_frequency)
 
       
@@ -1274,7 +1522,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, gw_param_dict=False, output_jsonfile=False)
+   .. py:method:: snr(mass_1=np.array([10.0]), mass_2=np.array([10.0]), luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, gw_param_dict=False, output_jsonfile=False)
 
       
       Function for calling SNR calculation function depending on the value of snr_type attribute. If snr_type is 'interpolation', it calls snr_with_interpolation function. If snr_type is 'inner_product', it calls compute_bilby_snr function.
@@ -1547,7 +1795,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: compute_bilby_snr(mass_1, mass_2, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, output_jsonfile=False)
+   .. py:method:: compute_bilby_snr(mass_1=10, mass_2=10, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, gw_param_dict=False, output_jsonfile=False)
 
       
       SNR calculated using inner product method. This is similar to the SNR calculation method used in bilby.
@@ -1693,10 +1941,10 @@ Functions
 
       :Parameters:
 
-          **mass_1** : `float`
+          **mass_1** : `numpy.ndarray` or `float`
               Primary mass of the binary in solar mass. Default is 1.4.
 
-          **mass_2** : `float`
+          **mass_2** : `numpy.ndarray` or `float`
               Secondary mass of the binary in solar mass. Default is 1.4.
 
           **snr_th** : `float`
@@ -1705,7 +1953,7 @@ Functions
       :Returns:
 
           **horizon** : `dict`
-              Dictionary of horizon distance for each detector (dict.keys()=detector_names, dict.values()=horizon_distance).
+              Dictionary of horizon distance for each detector in Mpc (dict.keys()=detector_names, dict.values()=horizon_distance).
 
 
 
@@ -2423,6 +2671,270 @@ Functions
           !! processed by numpydoc !!
 
 
+.. py:function:: save_json(file_name, param)
+
+   
+   Save a dictionary as a json file.
+
+
+   :Parameters:
+
+       **file_name** : `str`
+           json file name for storing the parameters.
+
+       **param** : `dict`
+           dictionary to be saved as a json file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_json(file_name)
+
+   
+   Load a json file.
+
+
+   :Parameters:
+
+       **file_name** : `str`
+           json file name for storing the parameters.
+
+   :Returns:
+
+       **param** : `dict`
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: save_pickle(file_name, param)
+
+   
+   Save a dictionary as a pickle file.
+
+
+   :Parameters:
+
+       **file_name** : `str`
+           pickle file name for storing the parameters.
+
+       **param** : `dict`
+           dictionary to be saved as a pickle file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_pickle(file_name)
+
+   
+   Load a pickle file.
+
+
+   :Parameters:
+
+       **file_name** : `str`
+           pickle file name for storing the parameters.
+
+   :Returns:
+
+       **param** : `dict`
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_ann_h5(filename)
+
+   
+   Function to load a specific dataset from an .h5 file
+
+
+   :Parameters:
+
+       **filename** : str
+           name of the .h5 file
+
+   :Returns:
+
+       **model** : `keras.models.Model`
+           Keras model loaded from the .h5 file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_ann_h5_from_module(package, directory, filename)
+
+   
+   Function to load a specific dataset from an .h5 file within the package
+
+
+   :Parameters:
+
+       **package** : str
+           name of the package
+
+       **directory** : str
+           name of the directory within the package
+
+       **filename** : str
+           name of the .h5 file
+
+   :Returns:
+
+       **model** : `keras.models.Model`
+           Keras model loaded from the .h5 file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_json_from_module(package, directory, filename)
+
+   
+   Function to load a specific dataset from a .json file within the package
+
+
+   :Parameters:
+
+       **package** : str
+           name of the package
+
+       **directory** : str
+           name of the directory within the package
+
+       **filename** : str
+           name of the .json file
+
+   :Returns:
+
+       **data** : `dict`
+           Dictionary loaded from the .json file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: load_pickle_from_module(package, directory, filename)
+
+   
+   Function to load a specific dataset from a .pkl file within the package
+
+
+   :Parameters:
+
+       **package** : str
+           name of the package
+
+       **directory** : str
+           name of the directory within the package
+
+       **filename** : str
+           name of the .pkl file
+
+   :Returns:
+
+       **data** : `dict`
+           Dictionary loaded from the .pkl file
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
 .. py:function:: dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.0)
 
    
@@ -2576,128 +3088,6 @@ Functions
        it_exist: bool
            True if the interpolator exists
            False if the interpolator does not exists
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: load_json(file_name)
-
-   
-   Load a json file.
-
-
-   :Parameters:
-
-       **file_name** : `str`
-           json file name for storing the parameters.
-
-   :Returns:
-
-       **param** : `dict`
-           ..
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: save_json(param, file_name)
-
-   
-   Save a json file.
-
-
-   :Parameters:
-
-       **param** : `dict`
-           dictionary of parameters.
-
-       **file_name** : `str`
-           json file name for storing the parameters.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: save_json_dict(dict, file_name)
-
-   
-   Save a json file.
-
-
-   :Parameters:
-
-       **param** : `dict`
-           dictionary of parameters.
-
-       **file_name** : `str`
-           json file name for storing the parameters.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: load_json_dict(file_name)
-
-   
-   Load a json file.
-
-
-   :Parameters:
-
-       **file_name** : `str`
-           json file name for storing the parameters.
-
-   :Returns:
-
-       **param** : `dict`
-           ..
 
 
 

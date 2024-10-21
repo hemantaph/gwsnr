@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SNR (optimal) generation and comparison &mdash; gwsnr 0.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/tabs.css" type="text/css" />
+      <link rel="stylesheet" href="_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=938c9ccc"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="gwsnr.utils" href="autoapi/gwsnr/utils/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            gwsnr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Summary.html">Summary</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/gwsnr/gwsnr/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.gwsnr</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/gwsnr/njit_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.njit_functions</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/gwsnr/multiprocessing_routine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.multiprocessing_routine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/gwsnr/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gwsnr.utils</span></code></a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SNR (optimal) generation and comparison</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Initialization">Initialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#calculate-the-SNR-for-given-BBH-(binary-black-hole)-masses">calculate the SNR for given BBH (binary-black-hole) masses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Testing-speed-and-accurarcy-between-the-interpolation-method-and-inner-product-method.">Testing speed and accurarcy between the interpolation method and inner product method.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pdet-(probaility-of-detection)-calculation">pdet (probaility of detection) calculation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Changing-the-input-parameters">Changing the input parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#SNR-and-Pdet-with-ANN-(artificial-neural-network)-model">SNR and Pdet with ANN (artificial neural network) model</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">gwsnr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SNR (optimal) generation and comparison</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/snr_generation.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="SNR-(optimal)-generation-and-comparison">
+<h1>SNR (optimal) generation and comparison<a class="headerlink" href="#SNR-(optimal)-generation-and-comparison" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">gwsnr</span> <span class="kn">import</span> <span class="n">GWSNR</span>
+</pre></div>
+</div>
+</div>
+<section id="Initialization">
+<h2>Initialization<a class="headerlink" href="#Initialization" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>run the following, if you want to see the documentation and the input parameters</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># GWSNR?</span>
+</pre></div>
+</div>
+</div>
+<ul class="simple">
+<li><p>class initialization with default parameters</p></li>
+<li><p>IMPORTANT: set the npool parameter to the number of cores you want to use for the parallel processing</p></li>
+<li><p>parallel processing is use in the interpolator generation and in the SNR generation with inner-product method.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># gwsnr = GWSNR(gwsnr_verbose=False) # if you don&#39;t want to see the print statements</span>
+<span class="n">gwsnr</span> <span class="o">=</span> <span class="n">GWSNR</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+psds not given. Choosing bilby&#39;s default psds
+npool:  4
+snr type:  interpolation
+waveform approximant:  IMRPhenomD
+sampling frequency:  2048.0
+minimum frequency (fmin):  20.0
+mtot=mass1+mass2
+min(mtot):  2.0
+max(mtot) (with the given fmin=20.0): 184.98599853446768
+min(ratio):  0.1
+max(ratio):  1.0
+mtot resolution:  500
+ratio resolution:  50
+interpolator directory:  ./interpolator_pickle
+Interpolator will be loaded for L1 detector from ./interpolator_pickle/L1/halfSNR_dict_1.pickle
+Interpolator will be loaded for H1 detector from ./interpolator_pickle/H1/halfSNR_dict_1.pickle
+Interpolator will be loaded for V1 detector from ./interpolator_pickle/V1/halfSNR_dict_1.pickle
+</pre></div></div>
+</div>
+</section>
+<section id="calculate-the-SNR-for-given-BBH-(binary-black-hole)-masses">
+<h2>calculate the SNR for given BBH (binary-black-hole) masses<a class="headerlink" href="#calculate-the-SNR-for-given-BBH-(binary-black-hole)-masses" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mass_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span><span class="mf">50.</span><span class="p">,</span><span class="mf">100.</span><span class="p">])</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.2</span><span class="p">])</span>
+<span class="n">gwsnr</span><span class="o">.</span><span class="n">snr</span><span class="p">(</span><span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_1</span><span class="o">*</span><span class="n">ratio</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;L1&#39;: array([ 74.07237228, 115.97500235, 310.36065119, 265.99021368]),
+ &#39;H1&#39;: array([ 47.11239983,  73.76381386, 197.39930883, 169.17829027]),
+ &#39;V1&#39;: array([22.22306148, 34.4041247 , 93.34870658, 78.61438369]),
+ &#39;optimal_snr_net&#39;: array([ 90.55472939, 141.68607977, 379.47885574, 324.88814843])}
+</pre></div></div>
+</div>
+</section>
+<section id="Testing-speed-and-accurarcy-between-the-interpolation-method-and-inner-product-method.">
+<h2>Testing speed and accurarcy between the interpolation method and inner product method.<a class="headerlink" href="#Testing-speed-and-accurarcy-between-the-interpolation-method-and-inner-product-method." title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>set up the BBH parameters</p></li>
+<li><p>simulate 1000 events</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># gerneral case, random parameters</span>
+<span class="c1"># chirp mass can go upto only 95 if f_min=20. to get non zero SNR</span>
+<span class="n">nsamples</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">chirp_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">80</span><span class="p">,</span><span class="n">nsamples</span><span class="p">)</span>
+<span class="n">mass_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="n">nsamples</span><span class="p">)</span>
+<span class="n">mass_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">chirp_mass</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mass_ratio</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">5</span><span class="p">))</span><span class="o">/</span><span class="n">mass_ratio</span><span class="o">**</span><span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">mass_2</span> <span class="o">=</span> <span class="n">chirp_mass</span><span class="o">*</span><span class="n">mass_ratio</span><span class="o">**</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mass_ratio</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">total_mass</span> <span class="o">=</span> <span class="n">mass_1</span><span class="o">+</span><span class="n">mass_2</span>
+<span class="n">mass_ratio</span> <span class="o">=</span> <span class="n">mass_2</span><span class="o">/</span><span class="n">mass_1</span>
+<span class="c1"># Fix luminosity distance</span>
+<span class="n">luminosity_distance</span> <span class="o">=</span> <span class="mi">80</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nsamples</span><span class="p">)</span>
+<span class="c1"># Randomly sample everything else:</span>
+<span class="n">theta_jn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nsamples</span><span class="p">)</span>
+<span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nsamples</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nsamples</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nsamples</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nsamples</span><span class="p">)</span>
+<span class="n">a_1</span><span class="p">,</span> <span class="n">a_2</span><span class="p">,</span> <span class="n">tilt_1</span><span class="p">,</span> <span class="n">tilt_2</span><span class="p">,</span> <span class="n">phi_12</span><span class="p">,</span> <span class="n">phi_jl</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span> <span class="c1"># Zero spin</span>
+</pre></div>
+</div>
+</div>
+<ul class="simple">
+<li><p>below calculation is with inner product method</p></li>
+<li><p>this is similar to how snr is calculated in the <code class="docutils literal notranslate"><span class="pre">bilby</span></code> package</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># error might occur for mchirp&gt;95., if f_min=20.</span>
+<span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="n">bilby_snr</span> <span class="o">=</span> <span class="n">gwsnr</span><span class="o">.</span><span class="n">compute_bilby_snr</span><span class="p">(</span><span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance</span><span class="p">,</span> <span class="n">theta_jn</span><span class="o">=</span><span class="n">theta_jn</span><span class="p">,</span> \
+                            <span class="n">psi</span><span class="o">=</span><span class="n">psi</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="n">phase</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="n">dec</span><span class="p">)</span>
+<span class="n">end_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Duration: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|████████████████████████████████████████████████████████████| 744/744 [00:01&lt;00:00, 441.31it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Duration: 0:00:01.726779
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="n">interp_snr</span> <span class="o">=</span> <span class="n">gwsnr</span><span class="o">.</span><span class="n">snr</span><span class="p">(</span><span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance</span><span class="p">,</span> <span class="n">theta_jn</span><span class="o">=</span><span class="n">theta_jn</span><span class="p">,</span> \
+            <span class="n">psi</span><span class="o">=</span><span class="n">psi</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="n">phase</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="n">dec</span><span class="p">)</span>
+<span class="n">end_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Duration: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Duration: 0:00:00.018197
+</pre></div></div>
+</div>
+<ul class="simple">
+<li><p>interpolation method is much faster than inner product method</p></li>
+<li><p><strong>Note:</strong> interpolation method is only for the spinless compact binary coalescence (CBC) frequency domain waveform models.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">total_mass</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">interp_snr</span><span class="p">[</span><span class="s1">&#39;optimal_snr_net&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">bilby_snr</span><span class="p">[</span><span class="s1">&#39;optimal_snr_net&#39;</span><span class="p">]),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cyan&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$m_</span><span class="si">{tot}</span><span class="s2">$ [$\rm M_\odot$]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;difference&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;SNR difference&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/snr_generation_16_0.png" src="_images/snr_generation_16_0.png" />
+</div>
+</div>
+</section>
+<section id="pdet-(probaility-of-detection)-calculation">
+<h2>pdet (probaility of detection) calculation<a class="headerlink" href="#pdet-(probaility-of-detection)-calculation" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mass_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mf">50.</span><span class="p">,</span><span class="mf">100.</span><span class="p">,])</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="n">dl</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">snr_dict</span> <span class="o">=</span> <span class="n">gwsnr</span><span class="o">.</span><span class="n">snr</span><span class="p">(</span><span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_1</span><span class="o">*</span><span class="n">ratio</span><span class="p">,</span> <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">dl</span><span class="p">)</span>
+<span class="c1"># with snr threshold equal to 8</span>
+<span class="n">pdet_dict</span> <span class="o">=</span> <span class="n">gwsnr</span><span class="o">.</span><span class="n">pdet</span><span class="p">(</span><span class="n">snr_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;snr: &#39;</span><span class="p">,</span> <span class="n">snr_dict</span><span class="p">[</span><span class="s2">&quot;optimal_snr_net&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;pdet: &#39;</span><span class="p">,</span> <span class="n">pdet_dict</span><span class="p">[</span><span class="s2">&quot;pdet_net&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+snr:  [  8.78159001 105.15382713   0.        ]
+pdet:  [7.82772219e-01 1.00000000e+00 6.66133815e-16]
+</pre></div></div>
+</div>
+</section>
+<section id="Changing-the-input-parameters">
+<h2>Changing the input parameters<a class="headerlink" href="#Changing-the-input-parameters" title="Link to this heading"></a></h2>
+<p>What will change? * Detectors: CE, ET. * Minimum frequency: 10 Hz * Maximum total mass: 500. Note that if this mass is above the allowed total mass for the given minimum frequency, i.e. the last stable orbit (LSO) frequency below the minimum frequency, then the maximum mass will be set to the maximum mass for the given minimum frequency. * Waveform model: IMRPhenomXPHM</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if snr_type = &#39;inner_product&#39;, interpolator will not be created</span>
+<span class="kn">from</span> <span class="nn">gwsnr</span> <span class="kn">import</span> <span class="n">GWSNR</span>
+<span class="n">gwsnr</span> <span class="o">=</span> <span class="n">GWSNR</span><span class="p">(</span>
+    <span class="n">npool</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+    <span class="n">mtot_min</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span>
+    <span class="n">mtot_max</span><span class="o">=</span><span class="mf">440.</span><span class="p">,</span>  <span class="c1"># highest total mass possible at 10Hz</span>
+    <span class="n">minimum_frequency</span> <span class="o">=</span> <span class="mf">10.</span><span class="p">,</span>
+    <span class="n">snr_type</span> <span class="o">=</span> <span class="s1">&#39;inner_product&#39;</span><span class="p">,</span>
+    <span class="c1">#psds = {&#39;CE&#39;:&#39;CE_psd.txt&#39;, &#39;ET&#39;:&#39;ET_B_psd.txt&#39;}, # if you want to use your own psd</span>
+    <span class="n">ifos</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CE&#39;</span><span class="p">,</span> <span class="s1">&#39;ET&#39;</span><span class="p">],</span>  <span class="c1"># this will considet bilby&#39;s default psd of CE and ET</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+npool:  4
+snr type:  inner_product
+waveform approximant:  IMRPhenomD
+sampling frequency:  2048.0
+minimum frequency (fmin):  10.0
+mtot=mass1+mass2
+min(mtot):  2.0
+max(mtot) (with the given fmin=10.0): 369.97199706893525
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mass_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span><span class="mf">50.</span><span class="p">,</span><span class="mf">100.</span><span class="p">])</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.2</span><span class="p">])</span>
+<span class="n">gwsnr</span><span class="o">.</span><span class="n">snr</span><span class="p">(</span><span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_1</span><span class="o">*</span><span class="n">ratio</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+solving SNR with inner product
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|█████████████████████████████████████████████████████████████████| 4/4 [00:01&lt;00:00,  2.96it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;CE&#39;: array([2148.90304551, 3418.3544206 , 9539.03962624, 9480.46037205]),
+ &#39;ET1&#39;: array([149.37771668, 236.23429377, 662.6230723 , 639.92876964]),
+ &#39;ET2&#39;: array([ 426.53991017,  674.55412147, 1892.0839869 , 1827.28164531]),
+ &#39;ET3&#39;: array([ 474.63277116,  750.61086744, 2105.4186128 , 2033.30973335]),
+ &#39;optimal_snr_net&#39;: array([2246.622034  , 3572.02932848, 9972.21718955, 9887.46400141])}
+</pre></div></div>
+</div>
+</section>
+<section id="SNR-and-Pdet-with-ANN-(artificial-neural-network)-model">
+<h2>SNR and Pdet with ANN (artificial neural network) model<a class="headerlink" href="#SNR-and-Pdet-with-ANN-(artificial-neural-network)-model" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Note:</strong> as of 2024-02-16, the ANN model is only available for the IMRPhenomXPHM waveform model. This pre-trained model considers the spin precession of the compact objects. SNR with ANN is much faster than ‘inner_product’ method. The ANN model is trained with the following <code class="docutils literal notranslate"><span class="pre">gwsnr</span></code> parameters. The corresponding Pdet generated is more accurate (accuracy=98%) than it’s SNR. So users are advise to use the ANN model for Pdet calculation rather than SNR calculation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gwsnr</span></code> params that are used to train the ANN model are:</p>
+<ul>
+<li><p>mtot_min=2.0</p></li>
+<li><p>mtot_max=184.98599853446768</p></li>
+<li><p>ratio_min=0.1</p></li>
+<li><p>ratio_max=1.0</p></li>
+<li><p>sampling_frequency=2048</p></li>
+<li><p>waveform_approximant=’IMRPhenomXPHM’</p></li>
+<li><p>minimum_frequency=20.0</p></li>
+<li><p>snr_type=’inner_product’</p></li>
+<li><p>psds=dict(L1=”aLIGO_O4_high_asd.txt”, H1=”aLIGO_O4_high_asd.txt”, V1=”AdV_asd.txt”)</p></li>
+</ul>
+</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">gwsnr</span> <span class="kn">import</span> <span class="n">GWSNR</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># innitialize the class for pdet calculation</span>
+<span class="n">gwsnr</span> <span class="o">=</span> <span class="n">GWSNR</span><span class="p">(</span><span class="n">snr_type</span><span class="o">=</span><span class="s1">&#39;ann&#39;</span><span class="p">,</span> <span class="n">waveform_approximant</span><span class="o">=</span><span class="s1">&#39;IMRPhenomXPHM&#39;</span><span class="p">,</span> <span class="n">pdet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+psds not given. Choosing bilby&#39;s default psds
+npool:  4
+snr type:  ann
+waveform approximant:  IMRPhenomXPHM
+sampling frequency:  2048.0
+minimum frequency (fmin):  20.0
+mtot=mass1+mass2
+min(mtot):  2.0
+max(mtot) (with the given fmin=20.0): 184.98599853446768
+detectors:  None
+ANN method is selected.
+Please be patient while the interpolator is generated of partialscaledSNR for IMRPhenomD.
+Interpolator will be generated for L1 detector at ./interpolator_pickle/L1/halfSNR_dict_2.pickle
+Interpolator will be generated for H1 detector at ./interpolator_pickle/H1/halfSNR_dict_2.pickle
+Interpolator will be generated for V1 detector at ./interpolator_pickle/V1/halfSNR_dict_2.pickle
+Please be patient while the interpolator is generated
+Generating interpolator for [&#39;L1&#39;, &#39;H1&#39;, &#39;V1&#39;] detectors
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+interpolation for each mass_ratios: 100%|███████████████████████████| 50/50 [02:38&lt;00:00,  3.17s/it]
+</pre></div></div>
+</div>
+<ul class="simple">
+<li><p>compare pdet (bool)</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># set the GW parameters</span>
+<span class="n">mass_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span><span class="mf">50.</span><span class="p">,</span><span class="mf">200.</span><span class="p">])</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.2</span><span class="p">])</span>
+<span class="n">luminosity_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">,</span> <span class="mi">4000</span><span class="p">])</span>
+<span class="n">a_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span>
+<span class="n">a_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span>
+<span class="n">tilt_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span>
+<span class="n">tilt_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span>
+<span class="n">phi_12</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span>
+<span class="n">phi_jl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">])</span>
+
+<span class="c1"># pdet calculation with ANN</span>
+<span class="n">gwsnr</span><span class="o">.</span><span class="n">snr</span><span class="p">(</span><span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_1</span><span class="o">*</span><span class="n">ratio</span><span class="p">,</span> <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance</span><span class="p">,</span> <span class="n">a_1</span><span class="o">=</span><span class="n">a_1</span><span class="p">,</span> <span class="n">a_2</span><span class="o">=</span><span class="n">a_2</span><span class="p">,</span> <span class="n">tilt_1</span><span class="o">=</span><span class="n">tilt_1</span><span class="p">,</span> <span class="n">tilt_2</span><span class="o">=</span><span class="n">tilt_2</span><span class="p">,</span> <span class="n">phi_12</span><span class="o">=</span><span class="n">phi_12</span><span class="p">,</span> <span class="n">phi_jl</span><span class="o">=</span><span class="n">phi_jl</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1/1 [==============================] - 0s 26ms/step
+1/1 [==============================] - 0s 27ms/step
+1/1 [==============================] - 0s 29ms/step
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;pdet_L1&#39;: array([0, 0, 1, 0]),
+ &#39;pdet_H1&#39;: array([0, 0, 0, 0]),
+ &#39;pdet_V1&#39;: array([0, 0, 0, 0]),
+ &#39;pdet_net&#39;: array([1, 0, 1, 0])}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># pdet calculation with inner product</span>
+<span class="n">snr_bilby</span> <span class="o">=</span> <span class="n">gwsnr</span><span class="o">.</span><span class="n">compute_bilby_snr</span><span class="p">(</span><span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_1</span><span class="o">*</span><span class="n">ratio</span><span class="p">,</span> <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance</span><span class="p">,</span> <span class="n">a_1</span><span class="o">=</span><span class="n">a_1</span><span class="p">,</span> <span class="n">a_2</span><span class="o">=</span><span class="n">a_2</span><span class="p">,</span> <span class="n">tilt_1</span><span class="o">=</span><span class="n">tilt_1</span><span class="p">,</span> <span class="n">tilt_2</span><span class="o">=</span><span class="n">tilt_2</span><span class="p">,</span> <span class="n">phi_12</span><span class="o">=</span><span class="n">phi_12</span><span class="p">,</span> <span class="n">phi_jl</span><span class="o">=</span><span class="n">phi_jl</span><span class="p">)</span>
+
+<span class="c1"># pdet calculation with inner product</span>
+<span class="n">pdet_bilby</span> <span class="o">=</span> <span class="n">gwsnr</span><span class="o">.</span><span class="n">probability_of_detection</span><span class="p">(</span><span class="n">snr_dict</span><span class="o">=</span><span class="n">snr_bilby</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
+<span class="n">pdet_bilby</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+  0%|                                                                         | 0/3 [00:00&lt;?, ?it/s]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|█████████████████████████████████████████████████████████████████| 3/3 [00:03&lt;00:00,  1.04s/it]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;pdet_L1&#39;: array([0, 0, 1, 0]),
+ &#39;pdet_H1&#39;: array([0, 0, 0, 0]),
+ &#39;pdet_V1&#39;: array([0, 0, 0, 0]),
+ &#39;pdet_net&#39;: array([1, 0, 1, 0])}
+</pre></div></div>
+</div>
+<ul class="simple">
+<li><p>compare the SNRs</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># looking at the SNRs</span>
+<span class="n">snr_ann</span> <span class="o">=</span> <span class="n">gwsnr</span><span class="o">.</span><span class="n">snr_with_ann</span><span class="p">(</span><span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_1</span><span class="o">*</span><span class="n">ratio</span><span class="p">,</span> <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance</span><span class="p">,</span> <span class="n">a_1</span><span class="o">=</span><span class="n">a_1</span><span class="p">,</span> <span class="n">a_2</span><span class="o">=</span><span class="n">a_2</span><span class="p">,</span> <span class="n">tilt_1</span><span class="o">=</span><span class="n">tilt_1</span><span class="p">,</span> <span class="n">tilt_2</span><span class="o">=</span><span class="n">tilt_2</span><span class="p">,</span> <span class="n">phi_12</span><span class="o">=</span><span class="n">phi_12</span><span class="p">,</span> <span class="n">phi_jl</span><span class="o">=</span><span class="n">phi_jl</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;snr_ann=&quot;</span><span class="p">,</span> <span class="n">snr_ann</span><span class="p">[</span><span class="s2">&quot;optimal_snr_net&quot;</span><span class="p">])</span>
+
+<span class="c1"># looking at the inner product SNRs</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;snr_bilby=&quot;</span><span class="p">,</span> <span class="n">snr_bilby</span><span class="p">[</span><span class="s2">&quot;optimal_snr_net&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1/1 [==============================] - 0s 30ms/step
+1/1 [==============================] - 0s 30ms/step
+1/1 [==============================] - 0s 28ms/step
+snr_ann= [ 8.71737957  7.07607508 14.14725018  0.        ]
+snr_bilby= [ 9.16681127  7.32604676 14.27370505  0.        ]
+</pre></div></div>
+</div>
+<ul class="simple">
+<li><p>Also lastly, let’s have look at the interpolated spinless SNRs with IMRPhenomD.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">snr_interp</span> <span class="o">=</span> <span class="n">gwsnr</span><span class="o">.</span><span class="n">snr_with_interpolation</span><span class="p">(</span><span class="n">mass_1</span><span class="o">=</span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span><span class="o">=</span><span class="n">mass_1</span><span class="o">*</span><span class="n">ratio</span><span class="p">,</span> <span class="n">luminosity_distance</span><span class="o">=</span><span class="n">luminosity_distance</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;snr_interp=&quot;</span><span class="p">,</span> <span class="n">snr_interp</span><span class="p">[</span><span class="s2">&quot;optimal_snr_net&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+snr_interp= [ 9.05547294  7.08430399 12.64929519  0.        ]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="autoapi/gwsnr/utils/index.html" class="btn btn-neutral float-left" title="gwsnr.utils" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Phurailatpam Hemantakumar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

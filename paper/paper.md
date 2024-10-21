@@ -44,7 +44,7 @@ The *`gwsnr`* package introduces the Partial Scaling method for SNR calculations
 
   - Then, partial scaled SNR: $\rho_{1/2} = \sqrt{ 4\int_0^\infty \frac{f^{-7/3}}{S_n(f)}df } \approx \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }$
 
-  - For an spinless frequency-domain IMR (Inspiral-Merger-Ringdown) waveform with optimal SNR equal to $\rho$: $$\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi)$$
+  - For an spinless frequency-domain IMR (Inspiral-Merger-Ringdown) waveform with optimal SNR equal to $\rho$: $\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi)$
 
   - $\rho_{1/2}$ is considered a function of $M_{tot}$ and $q$.
 
@@ -66,7 +66,7 @@ These formulations highlight *`gwsnr`'s capability to efficiently process divers
 
 #### Artificial Neural Network (ANN) Model for Pdet Estimation
 
-The *`gwsnr`* package now includes an artificial neural network (ANN) model for rapid estimation of the 'probability of detection' (Pdet) in binary black hole (BBH) systems using the IMRPhenomXPHM waveform approximant. This complex inspiral-merger-ringdown (IMR) waveform model accounts for spin-precessing systems with subdominant harmonics. The ANN model is especially useful when precise signal-to-noise ratio (SNR) calculations are not critical, providing a quick and effective means of estimating Pdet. This value indicates detectability under Gaussian noise by determining if the SNR exceeds a certain threshold. Trained on a large dataset from the *`LeR`* package, the ANN model uses 'partial scaled SNR' values as a primary input, reducing input dimensionality from 15 to 9 and enhancing accuracy. This approach offers a practical solution for assessing detectability under specified conditions.
+The *`gwsnr`* package now includes an artificial neural network (ANN) model for rapid estimation of the 'probability of detection' (Pdet) in binary black hole (BBH) systems using the IMRPhenomXPHM waveform approximant. This complex inspiral-merger-ringdown (IMR) waveform model accounts for spin-precessing systems with subdominant harmonics. The ANN model is especially useful when precise signal-to-noise ratio (SNR) calculations are not critical, providing a quick and effective means of estimating Pdet. This value indicates detectability under Gaussian noise by determining if the SNR exceeds a certain threshold. Trained on a large dataset from the *`LeR`* package, the ANN model uses 'partial scaled SNR' values as a primary input, reducing input dimensionality from 15 to 5 and enhancing accuracy. This approach offers a practical solution for assessing detectability under specified conditions.
 
 # Acknowledgements
 

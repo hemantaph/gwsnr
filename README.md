@@ -11,43 +11,58 @@
 pip install gwsnr
 ```
 
+# How to use? (Simple Example)
+
+```
+from gwsnr import GWSNR
+gwsnr = GWSNR()
+snr = gwsnr.snr(mass_1=30, mass_2=30, luminosity_distance=1000)
+```
+
 ## About
 
-Gravitational waves are ripples in spacetime predicted by Einstein's theory of General Relativity. Detected for the first time in 2015, these waves, emanating from events like black hole or neutron star mergers, have opened new avenues in astrophysics. The Signal-to-Noise Ratio (SNR) is a critical measure in gravitational wave analysis, representing the signal strength relative to background noise in detectors like LIGO or Virgo. However, efficient computation of SNR, especially in simulations and hierarchical Bayesian analyses, is a complex and time-consuming task. The `gwsnr` Python package addresses this challenge by providing efficient tools for SNR computation.
+The *`gwsnr`* Python package addresses the need for efficient SNR computation in gravitational wave research. It innovatively streamlines SNR calculations, enhancing accuracy and efficiency with several advanced techniques. Firstly, it utilizes an innovative interpolation method, employing a partial-scaling approach for accurately interpolating the SNR of gravitational waves from spin-less binary systems, focusing on the mass parameters. Secondly, the package features a noise-weighted inner product method, similar to that in the *`bilby`* package, but enhanced with multiprocessing capabilities. This integration allows for the parallel processing of complex calculations, thereby expediting the SNR computation. Thirdly, a trained Artificial Neural Network (ANN) model is incorporated for rapid 'probability of detection' (Pdet) estimation for BBH systems with spin precession.Lastly, *`gwsnr`* leverages the *`numba`* Just-In-Time (njit) compiler, which optimizes performance by compiling Python code into machine code at runtime, drastically reducing execution times. Beyond these technical merits, *`gwsnr`* stands out for its user-friendly features and seamless integration with other related software packages, making it not just a powerful tool but also an accessible one for researchers. These attributes position *`gwsnr`* as an invaluable asset in gravitational wave data analysis, particularly in simulations of detectable binary mergers, calculation of merger rates, determining gravitational wave lensing rates, and in the analysis of selection effects within hierarchical Bayesian frameworks. The package thus represents a significant step forward in gravitational wave research, enabling more precise and efficient exploration of the universe through gravitational wave observations and simulations. Additionally, *`gwsnr`* is instrumental in the *`LeR`* package for calculating detectable rates of both lensed and unlensed gravitational wave events, showcasing its utility in advanced gravitational wave studies.
 
-## Statement of Need
+# Mathematical Formulation
 
-The `gwsnr` package is designed to facilitate efficient and accurate SNR computations in gravitational wave research. It implements advanced techniques for enhancing calculation speed and precision, making it a valuable tool for researchers in this field. Key features include:
+#### Modified FINDCHIRP Method: Partial Scaling Approach
 
-- An innovative partial-scaling interpolation method for spin-less binary systems, focusing on mass parameters.
-- A noise-weighted inner product method, similar to the one in `bilby`, enhanced with multiprocessing for parallel processing.
-- Integration of the `numba` Just-In-Time (njit) compiler for optimized performance.
-- User-friendly interface and compatibility with other gravitational wave analysis software.
+The *`gwsnr`* package introduces the Partial Scaling method for SNR calculations in spin-less binary systems. This method, rooted in the [FINDCHIRP](https://arxiv.org/abs/gr-qc/0509116) algorithm, focuses on non-spinning IMR waveforms and particularly interpolates the Partial scaled SNR ($\rho_{1/2}$) based on mass parameters ($M_{tot},q$).
 
-The package is particularly useful in simulations of binary mergers, calculation of merger rates, gravitational wave lensing rates analysis, and in hierarchical Bayesian frameworks for analyzing selection effects. Additionally, it supports the `LeR` package for calculating detectable rates of lensed and unlensed gravitational wave events.
+- **Interpolation Method**: Utilizes a 2D cubic spline technique (njit-ted) for the 'partialsnr' segment.
 
-## Mathematical Formulation
+- **Equations**:
 
-### Modified FINDCHIRP Method: Partial Scaling Approach
+  - For a simple inspiral waveform, the optimal SNR is given by,
+    $$\rho = F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi) \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }$$
 
-The `gwsnr` package introduces a Partial Scaling method for SNR calculations, based on the [FINDCHIRP](https://arxiv.org/abs/gr-qc/0509116) algorithm. It focuses on non-spinning IMR waveforms and interpolates the Partial scaled SNR based on mass parameters. Key aspects include:
+  - $F$ is defined as a function of luminosity distance ($D_l$), chirp mass ($\mathcal{M}$), inclination angle ($\iota$), polarization angles ($\psi$), right ascension ($\alpha$), and declination ($\delta$). $f$ is the frequency, $f_{ISCO}$ is the last stable orbit frequency and $S_n(f)$ is the detector's noise curve or power spectral density (psd).
 
-- A 2D cubic spline interpolation method for the 'partialsnr' segment.
-- The optimal SNR for a simple inspiral waveform is functionally dependent on various parameters and the detector's noise curve.
-- The partial scaled SNR is approximated and considered a function of total mass and mass ratio.
+  - Then, partial scaled SNR: $\rho_{1/2} = \sqrt{ 4\int_0^\infty \frac{f^{-7/3}}{S_n(f)}df } \approx \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }$
 
-### Noise-Weighted Inner Product Method
+  - For an spinless frequency-domain IMR (Inspiral-Merger-Ringdown) waveform with optimal SNR equal to $\rho$: $\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi)$
 
-This method is suited for SNR calculations in systems with frequency domain waveforms, including spin-precessing binary systems. It involves:
+  - $\rho_{1/2}$ is considered a function of $M_{tot}$ and $q$.
 
-- Multi-process waveform generation, antenna pattern calculation, and noise-weighted inner product computation.
-- The calculation of the optimal SNR involves integrating over frequency domain waveform polarizations and antenna patterns.
+#### Noise-Weighted Inner Product Method
 
-These methods underscore the `gwsnr` package's ability to handle a wide range of gravitational wave signals with enhanced efficiency and accuracy.
+Designed for SNR calculations in systems characterized by frequency domain waveforms in *`lalsimulation`*, including spin-precessing binary systems.
 
-### Artificial Neural Network (ANN) Model for Pdet Estimation
+- **Methodology**: Combines waveform generation (multi-process), antenna pattern calculation (njit-ted), and noise-weighted inner product computation (njit-ted).
 
-The `gwsnr` package now includes an artificial neural network (ANN) model for rapid estimation of the 'probability of detection' (Pdet) in binary black hole (BBH) systems using the IMRPhenomXPHM waveform approximant. This complex inspiral-merger-ringdown (IMR) waveform model accounts for spin-precessing systems with subdominant harmonics. The ANN model is especially useful when precise signal-to-noise ratio (SNR) calculations are not critical, providing a quick and effective means of estimating Pdet. This value indicates detectability under Gaussian noise by determining if the SNR exceeds a certain threshold. Trained on a large dataset from the `LeR` package, the ANN model uses 'partial scaled SNR' values as a primary input, reducing input dimensionality from 15 to 9 and enhancing accuracy. This approach offers a practical solution for assessing detectability under specified conditions.
+- **Equations**:
+
+  - Inner product: $\left< a | b \right> = 4 \int_{f_{min}}^{f_{max}} \frac{\tilde{a}(f)\tilde{b}^*(f)}{S_n(f)} df$
+
+  - Optimal SNR: $\rho = \sqrt{ F_+^2 \left< \tilde{h}_+ | \tilde{h}_+ \right> + F_{\times}^2 \left< \tilde{h}_{\times} | \tilde{h}_{\times} \right> }$, for orthogonal $h_+$ and $h_{\times}$.
+
+  - $h_{+\times}$ are frequency domain waveform polarizations, and $F_{+\times}$ are antenna patterns. 
+
+These formulations highlight *`gwsnr`'s capability to efficiently process diverse gravitational wave signals, enhancing data analysis accuracy and efficiency.
+
+#### Artificial Neural Network (ANN) Model for Pdet Estimation
+
+The *`gwsnr`* package now includes an artificial neural network (ANN) model for rapid estimation of the 'probability of detection' (Pdet) in binary black hole (BBH) systems using the IMRPhenomXPHM waveform approximant. This complex inspiral-merger-ringdown (IMR) waveform model accounts for spin-precessing systems with subdominant harmonics. The ANN model is especially useful when precise signal-to-noise ratio (SNR) calculations are not critical, providing a quick and effective means of estimating Pdet. This value indicates detectability under Gaussian noise by determining if the SNR exceeds a certain threshold. Trained on a large dataset from the *`LeR`* package, the ANN model uses 'partial scaled SNR' values as a primary input, reducing input dimensionality from 15 to 9 and enhancing accuracy. This approach offers a practical solution for assessing detectability under specified conditions.
 
 ## Documentation
 

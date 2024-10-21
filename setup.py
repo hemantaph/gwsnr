@@ -15,7 +15,7 @@ if python_version < (3, 10):
 from setuptools import setup, find_packages
 setup(name='gwsnr',
       version='0.3.2',
-      description='Fast SNR interpolator',
+      description='gwsnr: A Python Package for Efficient SNR Calculation of Gravitational Waves',
       author='Hemantakumar Phurailatpam',
       license="MIT",
       author_email='hemantaphurailatpam@gmail.com',

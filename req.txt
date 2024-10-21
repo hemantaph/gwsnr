@@ -1,0 +1,8 @@
+sphinx
+sphinx-autoapi
+autoapi
+nbsphinx
+sphinx-rtd-theme
+numpydoc
+sphinx-tabs
+sphinx-jupyterbook-latex

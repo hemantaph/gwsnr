@@ -1,0 +1,12 @@
+name: gwsnr
+channels:
+  - conda-forge
+  - defaults
+  - pip
+dependencies:
+  - python=3.10
+  - numba
+  - bilby
+  - pip:
+    - gwsnr
+prefix: $HOME/anaconda3/envs/ler

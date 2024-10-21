@@ -1,0 +1,143 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Short Example"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import gwsnr\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "psds not given. Choosing bilby's default psds\n",
+      "npool:  4\n",
+      "snr type:  interpolation\n",
+      "waveform approximant:  IMRPhenomD\n",
+      "sampling frequency:  2048\n",
+      "minimum frequency (fmin):  20.0\n",
+      "mtot=mass1+mass2\n",
+      "min(mtot):  2.0\n",
+      "max(mtot) (with the given fmin=20.0): 184.98599853446768\n",
+      "min(ratio):  0.1\n",
+      "max(ratio):  1.0\n",
+      "mtot resolution:  500\n",
+      "ratio resolution:  50\n",
+      "interpolator directory:  ./interpolator_pickle\n",
+      "Interpolator will be generated for L1 detector at ./interpolator_pickle/L1/halfSNR_dict_0.pickle\n",
+      "Interpolator will be generated for H1 detector at ./interpolator_pickle/H1/halfSNR_dict_0.pickle\n",
+      "Interpolator will be generated for V1 detector at ./interpolator_pickle/V1/halfSNR_dict_0.pickle\n",
+      "Please be patient while the interpolator is generated\n",
+      "Generating interpolator for ['L1', 'H1', 'V1'] detectors\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "interpolation for each mass_ratios: 100%|███████████████████████████| 50/50 [01:12<00:00,  1.44s/it]\n"
+     ]
+    }
+   ],
+   "source": [
+    "gwsnr = gwsnr.GWSNR(snr_type='interpolation', create_new_interpolator=False, mtot_resolution=500, ratio_resolution=50, mtot_max=200, sampling_frequency=2048, minimum_frequency = 20.)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'L1': array([115.97500235, 310.36065119, 265.99021368,   0.        ]),\n",
+       " 'H1': array([ 73.76381386, 197.39930883, 169.17829027,   0.        ]),\n",
+       " 'V1': array([34.4041247 , 93.34870658, 78.61438369,  0.        ]),\n",
+       " 'optimal_snr_net': array([141.68607977, 379.47885574, 324.88814843,   0.        ])}"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# with interpolation\n",
+    "mass_1 = np.array([10.,50.,100., 200.])\n",
+    "ratio = np.array([0.8,0.5,0.2, 1])\n",
+    "mass_2 = mass_1*ratio\n",
+    "gwsnr.snr(mass_1, mass_2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "100%|█████████████████████████████████████████████████████████████████| 3/3 [00:01<00:00,  2.18it/s]\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "{'L1': array([115.9746314 , 310.35671092, 265.98690968,   0.        ]),\n",
+       " 'H1': array([ 73.76357793, 197.39680269, 169.17618882,   0.        ]),\n",
+       " 'V1': array([34.40403504, 93.34736252, 78.61324627,  0.        ]),\n",
+       " 'optimal_snr_net': array([141.68563154, 379.47399887, 324.88407391,   0.        ])}"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# with inner product\n",
+    "gwsnr.compute_bilby_snr(mass_1=mass_1, mass_2=mass_1*ratio)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "ler",
+   "language": "python",
+   "name": "ler"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
