@@ -4,6 +4,7 @@ This script generates a set of BBH (Binary Black Hole) parameters and calculates
 
 import numpy as np
 from gwsnr import GWSNR
+from gwsnr.utils import save_json
 
 gwsnr = GWSNR(npool=int(4),
         mtot_min=2.0,
@@ -52,5 +53,4 @@ data = {'mass_1': mass_1, 'mass_2': mass_2, 'luminosity_distance': luminosity_di
 data.update(interp_snr)
 
 # save the dictionary in json format
-from gwsnr.utils import save_json_dict
-save_json_dict(data, 'snr_data.json');
+save_json('snr_data.json', data);
