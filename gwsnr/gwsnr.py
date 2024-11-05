@@ -1547,7 +1547,7 @@ class GWSNR:
 
         dl_eff = np.sqrt(np.sum(dl_eff**2))
         horizon["net"] = (dl_eff / snr_th_net) * optimal_snr_unscaled["optimal_snr_net"]
-        print('dl_eff', dl_eff)
-        print('optimal_snr_unscaled', optimal_snr_unscaled["optimal_snr_net"])
+        #print('dl_eff', dl_eff)
+        #print('optimal_snr_unscaled', optimal_snr_unscaled["optimal_snr_net"])
 
         return horizon

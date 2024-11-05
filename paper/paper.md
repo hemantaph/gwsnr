@@ -62,7 +62,7 @@ Designed for SNR calculations in systems characterized by frequency domain wavef
 
   - $h_{+\times}$ are frequency domain waveform polarizations, and $F_{+\times}$ are antenna patterns. 
 
-These formulations highlight *`gwsnr`'s capability to efficiently process diverse gravitational wave signals, enhancing data analysis accuracy and efficiency.
+These formulations highlight `gwsnr`'s capability to efficiently process diverse gravitational wave signals, enhancing data analysis accuracy and efficiency.
 
 #### Artificial Neural Network (ANN) Model for Pdet Estimation
 
