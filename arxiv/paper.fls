@@ -302,6 +302,9 @@ INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/grffile
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/parskip/parskip.sty
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/parskip/parskip.sty
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/parskip/parskip.sty
+INPUT ./paper.aux
+INPUT ./paper.aux
+INPUT paper.aux
 OUTPUT paper.aux
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -312,6 +315,12 @@ INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/latexco
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/color.sty
+INPUT ./paper.out
+INPUT ./paper.out
+INPUT paper.out
+INPUT paper.out
+INPUT ./paper.out
+INPUT ./paper.out
 OUTPUT paper.out
 OUTPUT paper.pdf
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/lbx/english.lbx
@@ -384,7 +393,6 @@ INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/jknappe
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/jknappen/ec/ecsx1440.tfm
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/jknappen/ec/ecsi1000.tfm
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/jknappen/ec/ecit1000.tfm
-INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/jknappen/ec/ecsx1000.tfm
 INPUT ./logo.png
 INPUT ./logo.png
 INPUT ./logo.png
@@ -401,6 +409,7 @@ INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/public/
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
 INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/jknappen/ec/tcss1000.tfm
+INPUT /opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/tfm/jknappen/ec/ecsx1000.tfm
 INPUT ./logo.png
 INPUT ./logo.png
 INPUT ./logo.png

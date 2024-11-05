@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Homebrew) (preloaded format=pdflatex 2024.10.6)  5 NOV 2024 16:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Homebrew) (preloaded format=pdflatex 2024.10.6)  5 NOV 2024 16:59
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -833,7 +833,7 @@ Package biblatex Warning: Load 'inputenc' before biblatex.
 
 \@quotelevel=\count454
 \@quotereset=\count455
-No file paper.aux.
+(./paper.aux)
 \openout1 = `paper.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 296.
@@ -854,7 +854,7 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 296.
 LaTeX Font Info:    ... okay on input line 296.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 296.
 LaTeX Font Info:    ... okay on input line 296.
-(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+ (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count456
 \scratchdimen=\dimen287
@@ -874,6 +874,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
 Package hyperref Info: Link coloring ON on input line 296.
+ (./paper.out) (./paper.out)
 \@outlinefile=\write5
 \openout5 = `paper.out'.
 
@@ -1315,6 +1316,18 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
+File: logo.png Graphic file (type png)
+<use logo.png>
+Package pdftex.def Info: logo.png  used on input line 570.
+(pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
+
+Package fancyhdr Warning: \headheight is too small (62.59596pt): 
+(fancyhdr)                Make it at least 63.5501pt, for example:
+(fancyhdr)                \setlength{\headheight}{63.5501pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
+
+[3]
 
 /Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:571: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
@@ -1343,18 +1356,6 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-File: logo.png Graphic file (type png)
-<use logo.png>
-Package pdftex.def Info: logo.png  used on input line 576.
-(pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
-
-Package fancyhdr Warning: \headheight is too small (62.59596pt): 
-(fancyhdr)                Make it at least 63.5501pt, for example:
-(fancyhdr)                \setlength{\headheight}{63.5501pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-(fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
-
-[3]
 
 /Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:576: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
@@ -1446,8 +1447,8 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.594 \bibitem[\citeproctext]{ref-Taylor:2018}
-                                              
+l.594 \bibitem[\citeproctext]{ref-ler}
+                                      
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
@@ -1457,9 +1458,37 @@ Underfull \hbox (badness 10000) detected at line 594
  []
 
 /Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:594: Undefined control sequence.
+<write> \string \bibcite {ref-ler}{\citeproctext 
+                                                 }
+l.594 \bibitem[\citeproctext]{ref-ler}
+                                      
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:601: LaTeX Error: Lonely \item--perhaps a missing list environment.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.601 \bibitem[\citeproctext]{ref-Taylor:2018}
+                                              
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \hbox (badness 10000) detected at line 601
+[][]
+ []
+
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:601: Undefined control sequence.
 <write> ...ibcite {ref-Taylor:2018}{\citeproctext 
                                                   }
-l.594 \bibitem[\citeproctext]{ref-Taylor:2018}
+l.601 \bibitem[\citeproctext]{ref-Taylor:2018}
                                               
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1468,26 +1497,26 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:600: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:607: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.600 \bibitem[\citeproctext]{ref-LIGO2015}
+l.607 \bibitem[\citeproctext]{ref-LIGO2015}
                                            
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 600
+Underfull \hbox (badness 10000) detected at line 607
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:600: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:607: Undefined control sequence.
 <write> ... \bibcite {ref-LIGO2015}{\citeproctext 
                                                   }
-l.600 \bibitem[\citeproctext]{ref-LIGO2015}
+l.607 \bibitem[\citeproctext]{ref-LIGO2015}
                                            
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1496,26 +1525,26 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:606: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:613: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.606 \bibitem[\citeproctext]{ref-Thrane:2019}
+l.613 \bibitem[\citeproctext]{ref-Thrane:2019}
                                               
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 606
+Underfull \hbox (badness 10000) detected at line 613
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:606: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:613: Undefined control sequence.
 <write> ...ibcite {ref-Thrane:2019}{\citeproctext 
                                                   }
-l.606 \bibitem[\citeproctext]{ref-Thrane:2019}
+l.613 \bibitem[\citeproctext]{ref-Thrane:2019}
                                               
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1525,7 +1554,7 @@ and I'll forget about whatever was undefined.
 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 615.
+Package pdftex.def Info: logo.png  used on input line 622.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
@@ -1552,7 +1581,7 @@ Package rerunfilecheck Warning: File `paper.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `paper.out':
-(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             Before: D41D8CD98F00B204E9800998ECF8427E;0
 (rerunfilecheck)             After:  91C978D74E43D0B5229A2113B18F161D;599.
 
 Package biblatex Warning: Please (re)run Biber on the file:
@@ -1564,18 +1593,18 @@ Package logreq Info: Writing requests to 'paper.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 34578 strings out of 474116
- 670710 string characters out of 5732613
- 1952187 words of memory out of 5000000
- 56261 multiletter control sequences out of 15000+600000
- 584036 words of font info for 168 fonts, out of 8000000 for 9000
+ 34585 strings out of 474116
+ 670805 string characters out of 5732613
+ 1951187 words of memory out of 5000000
+ 56264 multiletter control sequences out of 15000+600000
+ 583959 words of font info for 167 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,15n,87p,1253b,858s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfit1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsi0800.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsi1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss0800.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss0900.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss1728.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx0900.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1200.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1440.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sftt1728.pfb>
-Output written on paper.pdf (4 pages, 421997 bytes).
+Output written on paper.pdf (4 pages, 420314 bytes).
 PDF statistics:
- 193 PDF objects out of 1000 (max. 8388607)
- 135 compressed objects within 2 object streams
+ 194 PDF objects out of 1000 (max. 8388607)
+ 136 compressed objects within 2 object streams
  13 named destinations out of 1000 (max. 500000)
  45074 words of extra memory for PDF output out of 51595 (max. 10000000)
 
