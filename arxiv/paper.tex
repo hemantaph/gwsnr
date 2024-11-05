@@ -129,8 +129,8 @@
 \renewcommand{\footrulewidth}{0.25pt}
 
 \fancyfoot[L]{\parbox[t]{0.98\headwidth}{\footnotesize{\sffamily Hemantakumar Phurailatpam, Otto Akseli Hannuksela, (2024). \texttt{gwsnr}:
-A Python Package for Efficient SNR Calculation of Gravitational
-Waves. \textit{PendingJournal of Open Source Software}, Pending(Pending), Pending. \url{https://doi.org/10.xxxxxx/draft}}}}
+A Python Package for Efficient SNR Calculation of
+GWs. \textit{PendingJournal of Open Source Software}, Pending(Pending), Pending. \url{https://doi.org/10.xxxxxx/draft}}}}
 
 
 \fancyfoot[R]{\sffamily \thepage}
@@ -236,7 +236,7 @@ Waves. \textit{PendingJournal of Open Source Software}, Pending(Pending), Pendin
 
 \usepackage{hyperref}
 \hypersetup{unicode=true,
-            pdftitle={gwsnr: A Python Package for Efficient SNR Calculation of Gravitational Waves},
+            pdftitle={gwsnr: A Python Package for Efficient SNR Calculation of GWs},
             pdfborder={0 0 0},
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
@@ -284,7 +284,7 @@ Waves. \textit{PendingJournal of Open Source Software}, Pending(Pending), Pendin
 \fi
 
 \title{\texttt{gwsnr}: A Python Package for Efficient SNR Calculation of
-Gravitational Waves}
+GWs}
 
         \author[1]{Phurailatpam Hemantakumar}
           \author[1]{Otto Akseli HANNUKSELA}
@@ -343,41 +343,38 @@ Kong, Shatin, New Territories, Hong Kong}
 
 \section{Summary}\label{summary}
 
-Gravitational waves, ripples in spacetime predicted by Einstein's theory
-of General Relativity, have revolutionized astrophysics since their
-first detection in 2015 (Abbott, B. P. et al. (2016a)). These waves are
-emitted by cataclysmic events like the merging of binary black holes
-(BBHs), binary neutron stars (BNSs) and BH-NS pairs, providing a unique
-window into the cosmos. A critical aspect of gravitational wave analysis
-is the Signal-to-Noise Ratio (SNR). SNR quantifies the strength of a
-gravitational wave signal relative to the background noise in a
-detector, like LIGO (The LIGO Scientific Collaboration et al. (2015)) or
-Virgo (Acernese et al. (2014)). This ratio is pivotal in confirming the
-detection of gravitational waves and extracting astrophysical
-information from them (Abbott, B. P. et al. (2016b)). However, specific
-scenarios in gravitational wave research, particularly in simulations of
-detectable gravitational wave events (Abbott et al. (2016)) and in
+Gravitational waves (GWs), ripples in spacetime predicted by Einstein's
+theory of General Relativity, have revolutionized astrophysics since
+their first detection in 2015 (Abbott, B. P. et al. (2016a)). These
+waves are emitted by cataclysmic events like the merging of binary black
+holes (BBHs), binary neutron stars (BNSs) and BH-NS pairs, providing a
+unique window into the cosmos. A critical aspect of GW analysis is the
+Signal-to-Noise Ratio (SNR). SNR quantifies the strength of a GW signal
+relative to the background noise in a detector, like LIGO (The LIGO
+Scientific Collaboration et al. (2015)) or Virgo (Acernese et al.
+(2014)). This ratio is pivotal in confirming the detection of GWs and
+extracting astrophysical information from them (Abbott, B. P. et al.
+(2016b)). However, specific scenarios in GW research, particularly in
+simulations of detectable GW events (Abbott et al. (2016)) and in
 hierarchical Bayesian analysis (Thrane and Talbot (2019)) where
 selection effects are considered, demand extensive and efficient
 computation of SNR. This requirement presents a significant challenge,
-as conventional computational approaches are typically time-consuming
-and impractical for such specialized and large-scale analyses (Taylor
-and Gerosa (2018), Davide, Pratten, and Vecchio (2020)).
+as conventional computational approaches, such as noise-weighted inner
+product, are typically time-consuming and impractical for such
+specialized and large-scale analyses (Taylor and Gerosa (2018), Davide,
+Pratten, and Vecchio (2020)).
 
 \section{Statement of Need}\label{statement-of-need}
 
 The \emph{\texttt{gwsnr}} Python package addresses the need for
-efficient SNR computation in gravitational wave research. It
-innovatively streamlines SNR calculations, enhancing accuracy and
-efficiency with several advanced techniques. Firstly, it utilizes an
-innovative interpolation method, employing a partial-scaling approach
-for accurately interpolating the SNR of gravitational waves from
-spin-less binary systems wrt to their mass parameters. Secondly, the
-package features a noise-weighted inner product method, similar to that
-in the \emph{\texttt{bilby}} package (Ashton, Gregory and Biscoveanu,
-Sylvia and Cornish, Neil and Dal Canto, Isaac and Kumar, Prayush and
-Meacher, Duncan and Middleton, Hannah and Mistry, Divyansh and Smith,
-Rory and Stevenson, Tom (2022)), but enhanced with multiprocessing
+efficient SNR computation in GW research. It innovatively streamlines
+SNR calculations, enhancing accuracy and efficiency with several
+advanced techniques. Firstly, it utilizes an innovative interpolation
+method, employing a partial-scaling approach for accurately
+interpolating the SNR of GWs from spin-less binary systems wrt to their
+mass parameters. Secondly, the package features a noise-weighted inner
+product method, similar to that in the \emph{\texttt{bilby}} package
+(Ashton, Gregory et al. (2022)), but enhanced with multiprocessing
 capabilities. This integration allows for the parallel processing of
 complex calculations, thereby expediting the SNR computation. Thirdly, a
 trained Artificial Neural Network (ANN) model is incorporated for rapid
@@ -390,18 +387,18 @@ Beyond these technical merits, \emph{\texttt{gwsnr}} stands out for its
 user-friendly features and seamless integration with other related
 software packages, making it not just a powerful tool but also an
 accessible one for researchers. These attributes position
-\emph{\texttt{gwsnr}} as an invaluable asset in gravitational wave data
-analysis, particularly in simulations of detectable binary mergers,
-calculation of merger rates, determining gravitational wave lensing
-rates (Phurailatpam et al. (2024), Ng et al. (2024)), and in the
-analysis of selection effects within hierarchical Bayesian frameworks.
-The package thus represents a significant step forward in gravitational
-wave research, enabling more precise and efficient exploration of the
-universe through gravitational wave observations and simulations.
+\emph{\texttt{gwsnr}} as an invaluable asset in GW data analysis,
+particularly in simulations of detectable compact binary mergers,
+determining rates of GW events, ascertain to both lensed and un-lensed
+events (Phurailatpam et al. (2024), Ng et al. (2024)), and in the
+analysis of selection effects within hierarchical Bayesian frameworks
+(Thrane and Talbot (2019)). The package thus represents a significant
+step forward in aiding GW research, enabling more precise and efficient
+exploration of the universe through GW observations and simulations.
 Additionally, \emph{\texttt{gwsnr}} is instrumental in the
 \emph{\texttt{ler}} (Phurailatpam et al. (2024)) package for calculating
-detectable rates of both lensed and unlensed gravitational wave events,
-showcasing its utility in advanced gravitational wave studies.
+detectable rates of both lensed and unlensed GW events, showcasing its
+utility in advanced GW studies.
 
 \section{Mathematical Formulation}\label{mathematical-formulation}
 
@@ -411,7 +408,9 @@ Approach}\label{modified-findchirp-method-partial-scaling-approach}
 The \emph{\texttt{gwsnr}} package introduces the Partial Scaling method
 for SNR calculations in spin-less binary systems. This method, rooted in
 the FINDCHIRP algorithm (Allen et al. (2012)), focuses on non-spinning
-IMR waveforms and particularly interpolates the Partial scaled SNR
+inspiral-merger-ringdown (IMR) waveforms, in lalsimulation library (LIGO
+Scientific Collaboration, Virgo Collaboration, and KAGRA Collaboration
+(2018)), and particularly interpolates the Partial scaled SNR
 (\(\rho_{1/2}\)) based on mass parameters (\(M_{tot},q\)).
 
 \begin{itemize}
@@ -424,7 +423,7 @@ IMR waveforms and particularly interpolates the Partial scaled SNR
   \begin{itemize}
   \item
     For a simple inspiral waveform, the optimal SNR is given by,
-    \[\rho = F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi) \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }\]
+    \[\rho = F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta) \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }\]
   \item
     \(F\) is defined as a function of luminosity distance (\(D_l\)),
     chirp mass (\(\mathcal{M}\)), inclination angle (\(\iota\)),
@@ -436,16 +435,16 @@ IMR waveforms and particularly interpolates the Partial scaled SNR
     Then, partial scaled SNR:
     \(\rho_{1/2} = \sqrt{ 4\int_0^\infty \frac{f^{-7/3}}{S_n(f)}df } \approx \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }\)
   \item
-    For an spinless frequency-domain IMR (Inspiral-Merger-Ringdown)
-    waveform with optimal SNR equal to \(\rho\):
+    For an spinless frequency-domain IMR waveform with optimal SNR equal
+    to \(\rho\):
     \(\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi)\)
   \item
     \(\rho_{1/2}\) is considered a function of \(M_{tot}\) and \(q\).
   \end{itemize}
 \end{itemize}
 
-\paragraph{Noise-Weighted Inner Product
-Method}\label{noise-weighted-inner-product-method}
+\paragraph{Noise-Weighted Inner Product Method with
+Multiprocessing}\label{noise-weighted-inner-product-method-with-multiprocessing}
 
 Designed for SNR calculations in systems characterized by frequency
 domain waveforms in \emph{\texttt{lalsimulation}} (LIGO Scientific
@@ -475,8 +474,8 @@ including spin-precessing binary systems.
 \end{itemize}
 
 These formulations highlight \emph{\texttt{gwsnr}}'s capability to
-efficiently process diverse gravitational wave signals, enhancing data
-analysis accuracy and efficiency.
+efficiently process diverse GW signals, enhancing data analysis accuracy
+and efficiency.
 
 \paragraph{Artificial Neural Network (ANN) Model for Pdet
 Estimation}\label{artificial-neural-network-ann-model-for-pdet-estimation}
@@ -484,15 +483,14 @@ Estimation}\label{artificial-neural-network-ann-model-for-pdet-estimation}
 The \emph{\texttt{gwsnr}} package now incorporates an artificial neural
 network (ANN) model, developed using \emph{\texttt{TensorFlow}} (Abadi
 et al. (2015)) and \emph{\texttt{sklearn}} (Pedregosa et al. (2011)), to
-rapidly estimate the `probability of detection' (Pdet) in binary black
-hole (BBH) systems using the IMRPhenomXPHM waveform approximant. This
-complex inspiral-merger-ringdown (IMR) waveform model accounts for
-spin-precessing systems with subdominant harmonics. The ANN model is
-especially useful when precise signal-to-noise ratio (SNR) calculations
-are not critical, providing a quick and effective means of estimating
-Pdet. This value indicates detectability under Gaussian noise by
-determining if the SNR exceeds a certain threshold. Trained on a large
-dataset from the \emph{\texttt{ler}} package, the ANN model uses
+rapidly estimate the Pdet in binary black hole (BBH) systems using the
+IMRPhenomXPHM waveform approximant. This complex IMR waveform model
+accounts for spin-precessing systems with subdominant harmonics. The ANN
+model is especially useful when precise signal-to-noise ratio (SNR)
+calculations are not critical, providing a quick and effective means of
+estimating Pdet. This value indicates detectability under Gaussian noise
+by determining if the SNR exceeds a certain threshold. Trained on a
+large dataset from the \emph{\texttt{ler}} package, the ANN model uses
 `partial scaled SNR' values as a primary input, reducing input
 dimensionality from 15 to 5 and enhancing accuracy. This approach offers
 a practical solution for assessing detectability under specified
@@ -556,11 +554,11 @@ of Gravitational Waves from Inspiraling Compact Binaries.''}
 \url{https://doi.org/10.1103/physrevd.85.122006}.
 
 \bibitem[\citeproctext]{ref-bilby}
-Ashton, Gregory and Biscoveanu, Sylvia and Cornish, Neil and Dal Canto,
-Isaac and Kumar, Prayush and Meacher, Duncan and Middleton, Hannah and
-Mistry, Divyansh and Smith, Rory and Stevenson, Tom. 2022. {``{bilby: a
-user-friendly Bayesian inference library}.''} \emph{GitHub Repository}.
-GitHub. \url{https://github.com/GregoryAshton/Bilby}.
+Ashton, Gregory, Sylvia Biscoveanu, Neil Cornish, Isaac Dal Canto,
+Prayush Kumar, Duncan Meacher, Hannah Middleton, Divyansh Mistry, Rory
+Smith, and Tom Stevenson. 2022. {``{bilby: a user-friendly Bayesian
+inference library}.''} \emph{GitHub Repository}. GitHub.
+\url{https://github.com/GregoryAshton/Bilby}.
 
 \bibitem[\citeproctext]{ref-Gerosa:2020}
 Davide, Gerosa, Geraint Pratten, and Alberto Vecchio. 2020.
