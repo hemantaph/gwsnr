@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Homebrew) (preloaded format=pdflatex 2024.10.6)  5 NOV 2024 23:16
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Homebrew) (preloaded format=pdflatex 2024.10.6)  7 NOV 2024 23:19
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1022,7 +1022,7 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 {/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/map/pdftex/updmap/pdftex.map}{/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc} <./logo.png>]
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 498.
+Package pdftex.def Info: logo.png  used on input line 499.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 
@@ -1033,8 +1033,8 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 (fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
 
 [2]
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:516: Undefined control sequence.
-l.516 \bibitem[\citeproctext
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:517: Undefined control sequence.
+l.517 \bibitem[\citeproctext
                             ]{ref-tensorflow2015}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1043,26 +1043,26 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:522: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:523: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.522 ...tem[\citeproctext]{ref-Abbott:2016:rates}
+l.523 ...tem[\citeproctext]{ref-Abbott:2016:rates}
                                                   
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 522
+Underfull \hbox (badness 10000) detected at line 523
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:522: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:523: Undefined control sequence.
 <write> ... {ref-Abbott:2016:rates}{\citeproctext 
                                                   }
-l.522 ...tem[\citeproctext]{ref-Abbott:2016:rates}
+l.523 ...tem[\citeproctext]{ref-Abbott:2016:rates}
                                                   
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1071,26 +1071,26 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:529: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:530: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.529 \bibitem[\citeproctext]{ref-Abbott:2016}
+l.530 \bibitem[\citeproctext]{ref-Abbott:2016}
                                               
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 529
+Underfull \hbox (badness 10000) detected at line 530
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:529: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:530: Undefined control sequence.
 <write> ...ibcite {ref-Abbott:2016}{\citeproctext 
                                                   }
-l.529 \bibitem[\citeproctext]{ref-Abbott:2016}
+l.530 \bibitem[\citeproctext]{ref-Abbott:2016}
                                               
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1099,65 +1099,65 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:530: LaTeX Error: Unicode character   (U+2009)
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:531: LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.530 Abbott, B. 
+l.531 Abbott, B. 
                    P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acer...
 You may provide a definition with
 \DeclareUnicodeCharacter 
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:530: LaTeX Error: Unicode character   (U+2009)
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:531: LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.530 Abbott, B. P., R. Abbott, T. 
+l.531 Abbott, B. P., R. Abbott, T. 
                                        D. Abbott, M. R. Abernathy, F. Acer...
 You may provide a definition with
 \DeclareUnicodeCharacter 
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:530: LaTeX Error: Unicode character   (U+2009)
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:531: LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.530 ...B. P., R. Abbott, T. D. Abbott, M. 
+l.531 ...B. P., R. Abbott, T. D. Abbott, M. 
                                                   R. Abernathy, F. Acernese, K.
 You may provide a definition with
 \DeclareUnicodeCharacter 
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:535: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:536: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.535 ...\citeproctext]{ref-Abbott:2016:detection}
+l.536 ...\citeproctext]{ref-Abbott:2016:detection}
                                                   
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 535
+Underfull \hbox (badness 10000) detected at line 536
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:535: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:536: Undefined control sequence.
 <write> ...f-Abbott:2016:detection}{\citeproctext 
                                                   }
-l.535 ...\citeproctext]{ref-Abbott:2016:detection}
+l.536 ...\citeproctext]{ref-Abbott:2016:detection}
                                                   
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1166,65 +1166,65 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:536: LaTeX Error: Unicode character   (U+2009)
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:537: LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.536 Abbott, B. 
+l.537 Abbott, B. 
                    P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acer...
 You may provide a definition with
 \DeclareUnicodeCharacter 
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:536: LaTeX Error: Unicode character   (U+2009)
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:537: LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.536 Abbott, B. P., R. Abbott, T. 
+l.537 Abbott, B. P., R. Abbott, T. 
                                        D. Abbott, M. R. Abernathy, F. Acer...
 You may provide a definition with
 \DeclareUnicodeCharacter 
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:536: LaTeX Error: Unicode character   (U+2009)
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:537: LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.536 ...B. P., R. Abbott, T. D. Abbott, M. 
+l.537 ...B. P., R. Abbott, T. D. Abbott, M. 
                                                   R. Abernathy, F. Acernese, K.
 You may provide a definition with
 \DeclareUnicodeCharacter 
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:542: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:543: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.542 \bibitem[\citeproctext]{ref-VIRGO2015}
+l.543 \bibitem[\citeproctext]{ref-VIRGO2015}
                                             
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 542
+Underfull \hbox (badness 10000) detected at line 543
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:542: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:543: Undefined control sequence.
 <write> ...\bibcite {ref-VIRGO2015}{\citeproctext 
                                                   }
-l.542 \bibitem[\citeproctext]{ref-VIRGO2015}
+l.543 \bibitem[\citeproctext]{ref-VIRGO2015}
                                             
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1233,26 +1233,26 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:549: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:550: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.549 \bibitem[\citeproctext]{ref-Allen:2012}
+l.550 \bibitem[\citeproctext]{ref-Allen:2012}
                                              
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 549
+Underfull \hbox (badness 10000) detected at line 550
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:549: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:550: Undefined control sequence.
 <write> ...bibcite {ref-Allen:2012}{\citeproctext 
                                                   }
-l.549 \bibitem[\citeproctext]{ref-Allen:2012}
+l.550 \bibitem[\citeproctext]{ref-Allen:2012}
                                              
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1261,26 +1261,26 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:556: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:557: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.556 \bibitem[\citeproctext]{ref-bilby}
+l.557 \bibitem[\citeproctext]{ref-bilby}
                                         
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 556
+Underfull \hbox (badness 10000) detected at line 557
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:556: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:557: Undefined control sequence.
 <write> ...ing \bibcite {ref-bilby}{\citeproctext 
                                                   }
-l.556 \bibitem[\citeproctext]{ref-bilby}
+l.557 \bibitem[\citeproctext]{ref-bilby}
                                         
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1289,26 +1289,54 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:563: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:564: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.563 \bibitem[\citeproctext]{ref-Gerosa:2020}
+l.564 \bibitem[\citeproctext]{ref-ChapmanBird2023}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \hbox (badness 10000) detected at line 564
+[][]
+ []
+
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:564: Undefined control sequence.
+<write> ...te {ref-ChapmanBird2023}{\citeproctext 
+                                                  }
+l.564 \bibitem[\citeproctext]{ref-ChapmanBird2023}
+                                                  
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:570: LaTeX Error: Lonely \item--perhaps a missing list environment.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.570 \bibitem[\citeproctext]{ref-Gerosa:2020}
                                               
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 563
+Underfull \hbox (badness 10000) detected at line 570
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:563: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:570: Undefined control sequence.
 <write> ...ibcite {ref-Gerosa:2020}{\citeproctext 
                                                   }
-l.563 \bibitem[\citeproctext]{ref-Gerosa:2020}
+l.570 \bibitem[\citeproctext]{ref-Gerosa:2020}
                                               
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1317,55 +1345,27 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:569: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:575: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.569 \bibitem[\citeproctext]{ref-numba}
+l.575 \bibitem[\citeproctext]{ref-numba}
                                         
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 569
+Underfull \hbox (badness 10000) detected at line 575
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:569: Undefined control sequence.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:575: Undefined control sequence.
 <write> ...ing \bibcite {ref-numba}{\citeproctext 
                                                   }
-l.569 \bibitem[\citeproctext]{ref-numba}
+l.575 \bibitem[\citeproctext]{ref-numba}
                                         
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:574: LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.574 \bibitem[\citeproctext]{ref-lalsuite}
-                                           
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-Underfull \hbox (badness 10000) detected at line 574
-[][]
- []
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:574: Undefined control sequence.
-<write> ... \bibcite {ref-lalsuite}{\citeproctext 
-                                                  }
-l.574 \bibitem[\citeproctext]{ref-lalsuite}
-                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -1385,27 +1385,27 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 
 [3]
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:579: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:580: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.579 \bibitem[\citeproctext]{ref-ng2024}
-                                         
+l.580 \bibitem[\citeproctext]{ref-lalsuite}
+                                           
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 579
+Underfull \hbox (badness 10000) detected at line 580
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:579: Undefined control sequence.
-<write> ...ng \bibcite {ref-ng2024}{\citeproctext 
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:580: Undefined control sequence.
+<write> ... \bibcite {ref-lalsuite}{\citeproctext 
                                                   }
-l.579 \bibitem[\citeproctext]{ref-ng2024}
-                                         
+l.580 \bibitem[\citeproctext]{ref-lalsuite}
+                                           
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -1413,27 +1413,27 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:586: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:585: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.586 \bibitem[\citeproctext]{ref-scikitlearn}
-                                              
+l.585 \bibitem[\citeproctext]{ref-ng2024}
+                                         
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 586
+Underfull \hbox (badness 10000) detected at line 585
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:586: Undefined control sequence.
-<write> ...ibcite {ref-scikitlearn}{\citeproctext 
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:585: Undefined control sequence.
+<write> ...ng \bibcite {ref-ng2024}{\citeproctext 
                                                   }
-l.586 \bibitem[\citeproctext]{ref-scikitlearn}
-                                              
+l.585 \bibitem[\citeproctext]{ref-ng2024}
+                                         
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -1447,8 +1447,8 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.592 \bibitem[\citeproctext]{ref-ler}
-                                      
+l.592 \bibitem[\citeproctext]{ref-scikitlearn}
+                                              
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
@@ -1458,10 +1458,10 @@ Underfull \hbox (badness 10000) detected at line 592
  []
 
 /Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:592: Undefined control sequence.
-<write> \string \bibcite {ref-ler}{\citeproctext 
-                                                 }
-l.592 \bibitem[\citeproctext]{ref-ler}
-                                      
+<write> ...ibcite {ref-scikitlearn}{\citeproctext 
+                                                  }
+l.592 \bibitem[\citeproctext]{ref-scikitlearn}
+                                              
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -1469,27 +1469,27 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:599: LaTeX Error: Lonely \item--perhaps a missing list environment.
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:598: LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.599 \bibitem[\citeproctext]{ref-Taylor:2018}
-                                              
+l.598 \bibitem[\citeproctext]{ref-ler}
+                                      
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) detected at line 599
+Underfull \hbox (badness 10000) detected at line 598
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:599: Undefined control sequence.
-<write> ...ibcite {ref-Taylor:2018}{\citeproctext 
-                                                  }
-l.599 \bibitem[\citeproctext]{ref-Taylor:2018}
-                                              
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:598: Undefined control sequence.
+<write> \string \bibcite {ref-ler}{\citeproctext 
+                                                 }
+l.598 \bibitem[\citeproctext]{ref-ler}
+                                      
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -1503,8 +1503,8 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.605 \bibitem[\citeproctext]{ref-LIGO2015}
-                                           
+l.605 \bibitem[\citeproctext]{ref-Taylor:2018}
+                                              
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
@@ -1514,10 +1514,10 @@ Underfull \hbox (badness 10000) detected at line 605
  []
 
 /Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:605: Undefined control sequence.
-<write> ... \bibcite {ref-LIGO2015}{\citeproctext 
+<write> ...ibcite {ref-Taylor:2018}{\citeproctext 
                                                   }
-l.605 \bibitem[\citeproctext]{ref-LIGO2015}
-                                           
+l.605 \bibitem[\citeproctext]{ref-Taylor:2018}
+                                              
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -1531,8 +1531,8 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.611 \bibitem[\citeproctext]{ref-Thrane:2019}
-                                              
+l.611 \bibitem[\citeproctext]{ref-LIGO2015}
+                                           
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
@@ -1542,9 +1542,37 @@ Underfull \hbox (badness 10000) detected at line 611
  []
 
 /Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:611: Undefined control sequence.
+<write> ... \bibcite {ref-LIGO2015}{\citeproctext 
+                                                  }
+l.611 \bibitem[\citeproctext]{ref-LIGO2015}
+                                           
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:617: LaTeX Error: Lonely \item--perhaps a missing list environment.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.617 \bibitem[\citeproctext]{ref-Thrane:2019}
+                                              
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \hbox (badness 10000) detected at line 617
+[][]
+ []
+
+/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:617: Undefined control sequence.
 <write> ...ibcite {ref-Thrane:2019}{\citeproctext 
                                                   }
-l.611 \bibitem[\citeproctext]{ref-Thrane:2019}
+l.617 \bibitem[\citeproctext]{ref-Thrane:2019}
                                               
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1554,7 +1582,7 @@ and I'll forget about whatever was undefined.
 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 620.
+Package pdftex.def Info: logo.png  used on input line 626.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
@@ -1593,15 +1621,15 @@ Package logreq Info: Writing requests to 'paper.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 34577 strings out of 474116
- 670744 string characters out of 5732613
+ 34572 strings out of 474116
+ 670699 string characters out of 5732613
  1951187 words of memory out of 5000000
- 56264 multiletter control sequences out of 15000+600000
- 583653 words of font info for 163 fonts, out of 8000000 for 9000
+ 56265 multiletter control sequences out of 15000+600000
+ 583367 words of font info for 160 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,16n,87p,1253b,858s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfit1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsi0800.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsi1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss0800.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss0900.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss1728.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx0900.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1200.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1440.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sftt1728.pfb>
-Output written on paper.pdf (4 pages, 419963 bytes).
+Output written on paper.pdf (4 pages, 420213 bytes).
 PDF statistics:
  195 PDF objects out of 1000 (max. 8388607)
  137 compressed objects within 2 object streams

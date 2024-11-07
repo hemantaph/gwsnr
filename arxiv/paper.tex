@@ -361,8 +361,8 @@ selection effects are considered, demand extensive and efficient
 computation of SNR. This requirement presents a significant challenge,
 as conventional computational approaches, such as noise-weighted inner
 product, are typically time-consuming and impractical for such
-specialized and large-scale analyses (Taylor and Gerosa (2018), Davide,
-Pratten, and Vecchio (2020)).
+specialized and large-scale analyses (Taylor and Gerosa (2018), Gerosa
+et al. (2020)).
 
 \section{Statement of Need}\label{statement-of-need}
 
@@ -494,7 +494,8 @@ large dataset from the \emph{\texttt{ler}} package, the ANN model uses
 `partial scaled SNR' values as a primary input, reducing input
 dimensionality from 15 to 5 and enhancing accuracy. This approach offers
 a practical solution for assessing detectability under specified
-conditions.
+conditions. Other similar efforts with ANN models are detailed in
+Chapman-Bird et al. (2023), Gerosa et al. (2020) etc.
 
 \section{Acknowledgements}\label{acknowledgements}
 
@@ -560,10 +561,15 @@ Smith, and Tom Stevenson. 2022. {``{bilby: a user-friendly Bayesian
 inference library}.''} \emph{GitHub Repository}. GitHub.
 \url{https://github.com/GregoryAshton/Bilby}.
 
+\bibitem[\citeproctext]{ref-ChapmanBird2023}
+Chapman-Bird, Christian E A et al. 2023. {``Rapid Determination of LISA
+Sensitivity to Extreme Mass Ratio Inspirals with Machine Learning.''}
+\emph{Monthly Notices of the Royal Astronomical Society} 522 (4):
+6043--54. \url{https://doi.org/10.1093/mnras/stad1397}.
+
 \bibitem[\citeproctext]{ref-Gerosa:2020}
-Davide, Gerosa, Geraint Pratten, and Alberto Vecchio. 2020.
-{``Gravitational-Wave Selection Effects Using Neural-Network
-Classifiers.''} \emph{Physical Review D} 102 (10).
+Gerosa, Davide et al. 2020. {``Gravitational-Wave Selection Effects
+Using Neural-Network Classifiers.''} \emph{Physical Review D} 102 (10).
 \url{https://doi.org/10.1103/physrevd.102.103020}.
 
 \bibitem[\citeproctext]{ref-numba}

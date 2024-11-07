@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber paper"] 1730806042.7234 "paper.bcf" "paper.bbl" "paper" 1730828803.53034 2
-  "paper.bcf" 1730828803.36737 108069 3288707a673968f323d9d50ddda5dcea "pdflatex"
+["biber paper"] 1730806042.7234 "paper.bcf" "paper.bbl" "paper" 1731001798.74444 2
+  "paper.bcf" 1731001798.58527 108069 3288707a673968f323d9d50ddda5dcea "pdflatex"
   (generated)
   "paper.bbl"
   "paper.blg"
   (rewritten before read)
-["pdflatex"] 1730828802.36168 "/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex" "paper.pdf" "paper" 1730828803.53062 2
-  "/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex" 1730828802.08982 24696 5e8a1fc4e6a58d20edc47469ec3c3aae ""
+["pdflatex"] 1731001797.54239 "/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex" "paper.pdf" "paper" 1731001798.74475 2
+  "/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex" 1731001797.26143 25067 59cea92f719fbf1d3dae3d61d64b017e ""
   "/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1710106625 2971 def0b6c1f0b107b3b936def894055589 ""
   "/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1710106625 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/map/fontname/texfonts.map" 1710106625 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -242,10 +242,10 @@
   "/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/web2c/texmf.cnf" 1710106625 41652 e14926ab86fde7902cad99d9eeaa5ca5 ""
   "/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-var/web2c/pdftex/pdflatex.fmt" 1710106625 8221848 a964b4b30d7029e209b5bf1ea55ab6d2 ""
   "logo.png" 1730742397.70006 98285 362704720fe7d823a3fcebfbb7af335e ""
-  "paper.aux" 1730828803.36612 2379 d9ab709bb7667ac5e82587e1d494d608 "pdflatex"
+  "paper.aux" 1731001798.58382 2411 8b0e9f35b331d39424b4d6d20c8135fd "pdflatex"
   "paper.bbl" 1730806045.08698 0 d41d8cd98f00b204e9800998ecf8427e "biber paper"
-  "paper.out" 1730828803.36661 599 91c978d74e43d0b5229a2113b18f161d "pdflatex"
-  "paper.tex" 1730828802.08982 24696 5e8a1fc4e6a58d20edc47469ec3c3aae ""
+  "paper.out" 1731001798.58441 599 91c978d74e43d0b5229a2113b18f161d "pdflatex"
+  "paper.tex" 1731001797.26143 25067 59cea92f719fbf1d3dae3d61d64b017e ""
   (generated)
   "paper.aux"
   "paper.bcf"
