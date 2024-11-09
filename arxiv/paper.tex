@@ -351,18 +351,19 @@ holes (BBHs), binary neutron stars (BNSs) and BH-NS pairs, providing a
 unique window into the cosmos. A critical aspect of GW analysis is the
 Signal-to-Noise Ratio (SNR). SNR quantifies the strength of a GW signal
 relative to the background noise in a detector, like LIGO (The LIGO
-Scientific Collaboration et al. (2015)) or Virgo (Acernese et al.
-(2014)). This ratio is pivotal in confirming the detection of GWs and
-extracting astrophysical information from them (Abbott, B. P. et al.
-(2016b)). However, specific scenarios in GW research, particularly in
-simulations of detectable GW events (Abbott et al. (2016)) and in
-hierarchical Bayesian analysis (Thrane and Talbot (2019)) where
-selection effects are considered, demand extensive and efficient
-computation of SNR. This requirement presents a significant challenge,
-as conventional computational approaches, such as noise-weighted inner
-product, are typically time-consuming and impractical for such
-specialized and large-scale analyses (Taylor and Gerosa (2018), Gerosa
-et al. (2020)).
+Scientific Collaboration et al. (2015), Abbott et al. (2020), Buikema et
+al. (2020)), Virgo (F. Acernese et al. (2014), F. Acernese et al.
+(2019)) or KAGRA (Akutsu et al. (2020), Aso et al. (2013)). This ratio
+is pivotal in confirming the detection of GWs and extracting
+astrophysical information from them (Abbott, B. P. et al. (2016b)).
+However, specific scenarios in GW research, particularly in simulations
+of detectable GW events (Abbott et al. (2016)) and in hierarchical
+Bayesian analysis (Thrane and Talbot (2019)) where selection effects are
+considered, demand extensive and efficient computation of SNR. This
+requirement presents a significant challenge, as conventional
+computational approaches, such as noise-weighted inner product, are
+typically time-consuming and impractical for such specialized and
+large-scale analyses (Taylor and Gerosa (2018), Gerosa et al. (2020)).
 
 \section{Statement of Need}\label{statement-of-need}
 
@@ -389,7 +390,7 @@ software packages, making it not just a powerful tool but also an
 accessible one for researchers. These attributes position
 \emph{\texttt{gwsnr}} as an invaluable asset in GW data analysis,
 particularly in simulations of detectable compact binary mergers,
-determining rates of GW events, ascertain to both lensed and un-lensed
+determining rates of GW events, related to both lensed and un-lensed
 events (Phurailatpam et al. (2024), Ng et al. (2024)), and in the
 analysis of selection effects within hierarchical Bayesian frameworks
 (Thrane and Talbot (2019)). The package thus represents a significant
@@ -428,16 +429,17 @@ Scientific Collaboration, Virgo Collaboration, and KAGRA Collaboration
     \(F\) is defined as a function of luminosity distance (\(D_l\)),
     chirp mass (\(\mathcal{M}\)), inclination angle (\(\iota\)),
     polarization angles (\(\psi\)), right ascension (\(\alpha\)), and
-    declination (\(\delta\)). \(f\) is the frequency, \(f_{ISCO}\) is
-    the last stable orbit frequency and \(S_n(f)\) is the detector's
-    noise curve or power spectral density (psd).
+    declination (\(\delta\)), refer to Eqn(D1) of Allen et al. (2012).
+    \(f\) is the frequency, \(f_{ISCO}\) is the last stable orbit
+    frequency and \(S_n(f)\) is the detector's noise curve or power
+    spectral density (psd).
   \item
     Then, partial scaled SNR:
     \(\rho_{1/2} = \sqrt{ 4\int_0^\infty \frac{f^{-7/3}}{S_n(f)}df } \approx \sqrt{ 4\int_0^{f_{ISCO}} \frac{f^{-7/3}}{S_n(f)}df }\)
   \item
     For an spinless frequency-domain IMR waveform with optimal SNR equal
     to \(\rho\):
-    \(\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta, \psi)\)
+    \(\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta)\)
   \item
     \(\rho_{1/2}\) is considered a function of \(M_{tot}\) and \(q\).
   \end{itemize}
@@ -540,12 +542,31 @@ Search for Binary Black Hole Coalescence with Advanced LIGO.''}
 \emph{Physical Review D} 93 (12).
 \url{https://doi.org/10.1103/physrevd.93.122003}.
 
+\bibitem[\citeproctext]{ref-Abbott2020}
+Abbott, B. P., R. Abbott, T. D. Abbott, S. Abraham, F. Acernese, K.
+Ackley, C. Adams, et al. 2020. {``Prospects for Observing and Localizing
+Gravitational-Wave Transients with Advanced LIGO, Advanced Virgo and
+KAGRA.''} \emph{Living Reviews in Relativity} 23 (1).
+\url{https://doi.org/10.1007/s41114-020-00026-9}.
+
+\bibitem[\citeproctext]{ref-virgo:2019}
+Acernese, F., M. Agathos, L. Aiello, A. Allocca, A. Amato, S. Ansoldi,
+S. Antier, et al. 2019. {``Increasing the Astrophysical Reach of the
+Advanced Virgo Detector via the Application of Squeezed Vacuum States of
+Light.''} \emph{Phys. Rev. Lett.} 123 (December): 231108.
+\url{https://doi.org/10.1103/PhysRevLett.123.231108}.
+
 \bibitem[\citeproctext]{ref-VIRGO2015}
 Acernese, F, M Agathos, K Agatsuma, D Aisa, N Allemandou, A Allocca, J
 Amarni, et al. 2014. {``Advanced Virgo: A Second-Generation
 Interferometric Gravitational Wave Detector.''} \emph{Classical and
 Quantum Gravity} 32 (2): 024001.
 \url{https://doi.org/10.1088/0264-9381/32/2/024001}.
+
+\bibitem[\citeproctext]{ref-akutsu2020overviewkagradetectordesign}
+Akutsu, T., M. Ando, K. Arai, Y. Arai, S. Araki, A. Araya, N. Aritomi,
+et al. 2020. {``Overview of KAGRA: Detector Design and Construction
+History.''} \url{https://arxiv.org/abs/2005.05574}.
 
 \bibitem[\citeproctext]{ref-Allen:2012}
 Allen, Bruce, Warren G. Anderson, Patrick R. Brady, Duncan A. Brown, and
@@ -560,6 +581,20 @@ Prayush Kumar, Duncan Meacher, Hannah Middleton, Divyansh Mistry, Rory
 Smith, and Tom Stevenson. 2022. {``{bilby: a user-friendly Bayesian
 inference library}.''} \emph{GitHub Repository}. GitHub.
 \url{https://github.com/GregoryAshton/Bilby}.
+
+\bibitem[\citeproctext]{ref-PhysRevD:88:043007}
+Aso, Yoichi, Yuta Michimura, Kentaro Somiya, Masaki Ando, Osamu
+Miyakawa, Takanori Sekiguchi, Daisuke Tatsumi, and Hiroaki Yamamoto.
+2013. {``Interferometer Design of the KAGRA Gravitational Wave
+Detector.''} \emph{Phys. Rev. D} 88 (August): 043007.
+\url{https://doi.org/10.1103/PhysRevD.88.043007}.
+
+\bibitem[\citeproctext]{ref-PhysRevD.102.062003}
+Buikema, A., C. Cahillane, G. L. Mansell, C. D. Blair, R. Abbott, C.
+Adams, R. X. Adhikari, et al. 2020. {``Sensitivity and Performance of
+the Advanced LIGO Detectors in the Third Observing Run.''} \emph{Phys.
+Rev. D} 102 (September): 062003.
+\url{https://doi.org/10.1103/PhysRevD.102.062003}.
 
 \bibitem[\citeproctext]{ref-ChapmanBird2023}
 Chapman-Bird, Christian E A et al. 2023. {``Rapid Determination of LISA
