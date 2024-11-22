@@ -39,5 +39,6 @@ setup(name='gwsnr',
         "tensorflow>=2.17.0,<2.18.0",
         "scikit-learn==1.5.0",
         "numexpr>=2.8.4",
+        "ripplegw",
       ]
      )

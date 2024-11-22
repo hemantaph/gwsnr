@@ -62,7 +62,7 @@ Designed for SNR calculations in systems characterized by frequency domain wavef
 
   - $h_{+\times}$ are frequency domain waveform polarizations, and $F_{+\times}$ are antenna patterns. 
 
-These formulations highlight *`gwsnr`*'s capability to efficiently process diverse GW signals, enhancing data analysis accuracy and efficiency.
+These formulations highlight *`gwsnr`*'s capability to efficiently process diverse GW signals, enhancing data analysis accuracy and efficiency. Newer version of `gwsnr` (version>0.3.2) also include JAX assited inner product. The waveform is called through `ripple` package. Some important functions are written using `jax.jit` and multiprocess through `jax.vmap`. 
 
 #### Artificial Neural Network (ANN) Model for Pdet Estimation
 

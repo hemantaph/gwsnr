@@ -14,6 +14,7 @@ from importlib import resources
 import pickle
 import numpy as np
 import bilby
+from gwpy.timeseries import TimeSeries
 
 class NumpyEncoder(json.JSONEncoder):
     """
@@ -309,7 +310,30 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
                     "psd file name should end with either 'psd.txt' or 'asd.txt'"
                 )
 
-            detector_tensor_list.append(ifos[i].detector_tensor)
+        elif isinstance(psds[det], float):
+            duration = 16
+            sample_rate = 2048
+            psd_duration = duration * 32
+            analysis_start = psds[det]
+            psd_start_time = analysis_start - psd_duration
+
+            # set up empty interferometer
+            X1 = bilby.gw.detector.get_empty_interferometer(det)
+
+            # download the data
+            X1_psd_data = TimeSeries.fetch_open_data(
+                det, psd_start_time, psd_start_time + psd_duration, sample_rate=sample_rate, cache=True)
+
+            # calculate the psd
+            psd_alpha = 2 * X1.strain_data.roll_off / duration
+            X1_psd = X1_psd_data.psd(fftlength=duration, overlap=0, window=("tukey", psd_alpha), method="median")
+
+            # initialize the psd
+            psds_list.append(
+                bilby.gw.detector.PowerSpectralDensity(
+                    frequency_array=X1_psd.frequencies.value, psd_array=X1_psd.value
+                )
+            )
 
         elif isinstance(psds[det], str):
             try:
@@ -320,6 +344,8 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
                 raise ValueError(error_msg)
         else:
             raise ValueError(error_msg)
+        
+        detector_tensor_list.append(ifos[i].detector_tensor)
 
     return psds_list, detector_tensor_list, detector_list
 

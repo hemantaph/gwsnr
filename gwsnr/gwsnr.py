@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module contains functions for calculating the SNR of a CBC signal. It has two methods: interpolation (bicubic) and inner product. Interpolation method is much faster than inner product method. Interpolation method is tested for IMRPhenomD and TaylorF2 waveform approximants for the spinless scenario.
+This module contains functions for calculating the SNR of a CBC signal. It has two methods: interpolation (bicubic) and inner product (multiprocessing and jax.jit+jax.vmap). Interpolation method is much faster than inner product method. Interpolation method is tested for IMRPhenomD and TaylorF2 waveform approximants for the spinless scenario.
 """
 
 import os
@@ -11,6 +11,14 @@ from tqdm import tqdm
 from scipy.stats import norm
 from scipy.interpolate import CubicSpline
 from scipy.optimize import fsolve
+
+# warning suppression lal
+import warnings
+warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
+import lal
+lal.swig_redirect_standard_output_error(False)
+
+from .ripple_class import RippleInnerProduct
 
 from .utils import (
     dealing_with_psds,
@@ -68,7 +76,7 @@ class GWSNR:
         Minimum frequency of the waveform. Default is 20.0.
     snr_type : `str`
         Type of SNR calculation. Default is 'interpolation'.
-        options: 'interpolation', 'inner_product', 'pdet', 'ann'
+        options: 'interpolation', 'inner_product', 'inner_product_jax', 'pdet', 'ann'
     psds : `dict`
         Dictionary of psds for different detectors. Default is None. If None, bilby's default psds will be used. Other options:\n
         Example 1: when values are psd name from pycbc analytical psds, psds={'L1':'aLIGOaLIGODesignSensitivityT1800044','H1':'aLIGOaLIGODesignSensitivityT1800044','V1':'AdvVirgo'}. To check available psd name run \n
@@ -177,6 +185,11 @@ class GWSNR:
     +-------------------------------------+----------------------------------+
     |:meth:`~compute_bilby_snr`           | Calculates SNR using             |
     |                                     | inner product method.            |
+    |                                     | (python multiprocessing)         |
+    +-------------------------------------+----------------------------------+
+    |:meth:`~compute_ripple_snr`          | Calculates SNR using             |
+    |                                     | inner product method.            |
+    |                                     | (jax.jit+jax.vmap)               |
     +-------------------------------------+----------------------------------+
     |:meth:`~bns_horizon`                 | Calculates BNS horizon           |
     |                                     | distance.                        |
@@ -184,7 +197,7 @@ class GWSNR:
     |:meth:`~print_all_params`            | Prints all the parameters of     |
     |                                     | the class instance.              |
     +-------------------------------------+----------------------------------+
-    |:meth:`~init_partialscaled`             | Generates partialscaled SNR         |
+    |:meth:`~init_partialscaled`             | Generates partialscaled SNR   |
     |                                     | interpolation coefficients.      |
     +-------------------------------------+----------------------------------+
     """
@@ -283,6 +296,7 @@ class GWSNR:
         waveform_approximant="IMRPhenomD",
         minimum_frequency=20.0,
         duration_max=None,
+        duration_min=None,
         snr_type="interpolation",
         psds=None,
         ifos=None,
@@ -296,12 +310,14 @@ class GWSNR:
         snr_th_net=8.0,
         ann_path_dict=None
     ):
+
         # setting instance attributes
         self.npool = npool
         self.pdet = pdet
         self.snr_th = snr_th
         self.snr_th_net = snr_th_net
         self.duration_max = duration_max
+        self.duration_min = duration_min
 
         # dealing with mtot_max
         # set max cut off according to minimum_frequency
@@ -355,6 +371,7 @@ class GWSNR:
         if waveform_approximant=="IMRPhenomXPHM" and duration_max is None:
             print("Intel processor has trouble allocating memory when the data is huge. So, by default for IMRPhenomXPHM, duration_max = 64.0. Otherwise, set to some max value like duration_max = 600.0 (10 mins)")
             self.duration_max = 64.0
+            self.durarion_min = 4.0
 
 
         # now generate interpolator, if not exists
@@ -365,6 +382,17 @@ class GWSNR:
         # inner product method doesn't need interpolator generation
         elif snr_type == "inner_product":
             pass
+        
+        # need to initialize RippleInnerProduct class
+        elif snr_type == "inner_product_jax":
+            ripple_class = RippleInnerProduct(
+                waveform_name=waveform_approximant, 
+                minimum_frequency=minimum_frequency, 
+                sampling_frequency=sampling_frequency, 
+                reference_frequency=minimum_frequency
+                )
+
+            self.noise_weighted_inner_product_jax = ripple_class.noise_weighted_inner_product_jax
 
         # ANN method still needs the partialscaledSNR interpolator.
         elif snr_type == "ann":
@@ -373,7 +401,7 @@ class GWSNR:
             self.path_interpolator = self.interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
 
         else:
-            raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'inner_product', 'ann'.")
+            raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'inner_product', 'inner_product_jax', 'ann'.")
 
         # change back to original
         self.psds_list = psds_list
@@ -381,7 +409,7 @@ class GWSNR:
         self.detector_list = detector_list
         self.multiprocessing_verbose = multiprocessing_verbose
 
-        if snr_type == "inner_product":
+        if (snr_type == "inner_product") or (snr_type == "inner_product_jax"):
             self.snr_with_interpolation = self._print_no_interpolator
 
         # print some info
@@ -612,6 +640,8 @@ class GWSNR:
         tilt_2=0.0,
         phi_12=0.0,
         phi_jl=0.0,
+        lambda_1=0.0,
+        lambda_2=0.0,
         gw_param_dict=False,
         output_jsonfile=False,
     ):
@@ -690,6 +720,8 @@ class GWSNR:
             phi_12 = gw_param_dict.get("phi_12", np.zeros(size))
             phi_jl = gw_param_dict.get("phi_jl", np.zeros(size))
 
+            # Extract tidal deformation parameters 
+
         if self.snr_type == "interpolation":
             snr_dict = self.snr_with_interpolation(
                 mass_1,
@@ -708,6 +740,28 @@ class GWSNR:
             print("solving SNR with inner product")
 
             snr_dict = self.compute_bilby_snr(
+                mass_1,
+                mass_2,
+                luminosity_distance=luminosity_distance,
+                theta_jn=theta_jn,
+                psi=psi,
+                phase=phase,
+                geocent_time=geocent_time,
+                ra=ra,
+                dec=dec,
+                a_1=a_1,
+                a_2=a_2,
+                tilt_1=tilt_1,
+                tilt_2=tilt_2,
+                phi_12=phi_12,
+                phi_jl=phi_jl,
+                output_jsonfile=output_jsonfile,
+            )
+
+        elif self.snr_type == "inner_product_jax":
+            print("solving SNR with inner product JAX")
+
+            snr_dict = self.compute_ripple_snr(
                 mass_1,
                 mass_2,
                 luminosity_distance=luminosity_distance,
@@ -1152,8 +1206,8 @@ class GWSNR:
                 dec=dec_,
             )
             # for partialscaledSNR
-            mchirp = ((mass_1_ * mass_2_) ** (3 / 5)) / ((mtot_table) ** (1 / 5))
-            a2 = mchirp ** (5.0 / 6.0)
+            Mchirp = ((mass_1_ * mass_2_) ** (3 / 5)) / ((mtot_table) ** (1 / 5))
+            a2 = Mchirp ** (5.0 / 6.0)
             # filling in interpolation table for different detectors
             snr_partial_buffer = []
             for j in num_det:
@@ -1345,6 +1399,8 @@ class GWSNR:
         duration = np.ceil(approx_duration + 2.0)
         if self.duration_max:
             duration[duration > self.duration_max] = self.duration_max  # IMRPheonomXPHM has maximum duration of 371s
+        if self.duration_min:
+            duration[duration < self.duration_min] = self.duration_min
 
 
         input_arguments = np.array(
@@ -1424,6 +1480,235 @@ class GWSNR:
             output_filename = (
                 output_jsonfile if isinstance(output_jsonfile, str) else "snr.json"
             )
+            save_json(output_filename, optimal_snr)
+
+        return optimal_snr
+
+    def compute_ripple_snr(
+        self,
+        mass_1=10,
+        mass_2=10,
+        luminosity_distance=100.0,
+        theta_jn=0.0,
+        psi=0.0,
+        phase=0.0,
+        lambda_1=0.0,
+        lambda_2=0.0,
+        geocent_time=1246527224.169434,
+        ra=0.0,
+        dec=0.0,
+        a_1=0.0,
+        a_2=0.0,
+        tilt_1=0.0,
+        tilt_2=0.0,
+        phi_12=0.0,
+        phi_jl=0.0,
+        gw_param_dict=False,
+        output_jsonfile=False,
+    ):
+        """
+        SNR calculated using inner product method with ripple generated waveform.
+
+        Parameters
+        ----------
+        mass_1 : float
+            The mass of the heavier object in the binary in solar masses.
+        mass_2 : float
+            The mass of the lighter object in the binary in solar masses.
+        luminosity_distance : float
+            The luminosity distance to the binary in megaparsecs.
+        theta_jn : float, optional
+            The angle between the total angular momentum and the line of sight.
+            Default is 0.
+        psi : float, optional
+            The gravitational wave polarisation angle.
+            Default is 0.
+        phase : float, optional
+            The gravitational wave phase at coalescence.
+            Default is 0.
+        geocent_time : float, optional
+            The GPS time of coalescence.
+            Default is 1249852157.0.
+        ra : float, optional
+            The right ascension of the source.
+            Default is 0.
+        dec : float, optional
+            The declination of the source.
+            Default is 0.
+        a_1 : float, optional
+            The spin magnitude of the heavier object in the binary.
+            Default is 0.
+        tilt_1 : float, optional
+            The tilt angle of the heavier object in the binary.
+            Default is 0.
+        phi_12 : float, optional
+            The azimuthal angle between the two spins.
+            Default is 0.
+        a_2 : float, optional
+            The spin magnitude of the lighter object in the binary.
+            Default is 0.
+        tilt_2 : float, optional
+            The tilt angle of the lighter object in the binary.
+            Default is 0.
+        phi_jl : float, optional
+            The azimuthal angle between the total angular momentum and the orbital angular momentum.
+            Default is 0.
+        verbose : bool, optional
+            If true, print the SNR.
+            Default is True.
+        jsonFile : bool, optional
+            If true, save the SNR parameters and values in a json file.
+            Default is False.
+
+        Returns
+        ----------
+        snr_dict : `dict`
+            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).
+
+        Examples
+        ----------
+        >>> from gwsnr import GWSNR
+        >>> snr = GWSNR(snrs_type='inner_product')
+        >>> snr.compute_bilby_snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+        """
+
+        # if gw_param_dict is given, then use that
+        if gw_param_dict is not False:
+            mass_1 = gw_param_dict["mass_1"]
+            mass_2 = gw_param_dict["mass_2"]
+            luminosity_distance = gw_param_dict["luminosity_distance"]
+            theta_jn = gw_param_dict["theta_jn"]
+            psi = gw_param_dict["psi"]
+            phase = gw_param_dict["phase"]
+            geocent_time = gw_param_dict["geocent_time"]
+            ra = gw_param_dict["ra"]
+            dec = gw_param_dict["dec"]
+            # a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl exist in the dictionary
+            # if exists, then use that, else pass
+            if "a_1" and "a_2" in gw_param_dict:
+                a_1 = gw_param_dict["a_1"]
+                a_2 = gw_param_dict["a_2"]
+            if "tilt_1" and "tilt_2" and "phi_12" and "phi_jl" in gw_param_dict:
+                tilt_1 = gw_param_dict["tilt_1"]
+                tilt_2 = gw_param_dict["tilt_2"]
+                phi_12 = gw_param_dict["phi_12"]
+                phi_jl = gw_param_dict["phi_jl"]
+            if "lambda_1" and "lambda_2" in gw_param_dict:
+                lambda_1 = gw_param_dict["lambda_1"]
+                lambda_2 = gw_param_dict["lambda_2"]
+
+        npool = self.npool
+        detectors = self.detector_list.copy()
+        detector_tensor = np.array(self.detector_tensor_list.copy())
+        num_det = np.arange(len(detectors), dtype=int)
+        # get the psds for the required detectors
+        psd_list = self.psds_list.copy()
+
+        # reshape(-1) is so that either a float value is given or the input is an numpy array
+        # make sure all parameters are of same length
+        mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
+        num = len(mass_1)
+        (
+            mass_1,
+            mass_2,
+            luminosity_distance,
+            theta_jn,
+            psi,
+            phase,
+            lambda_1, 
+            lambda_2,
+            geocent_time,
+            ra,
+            dec,
+            a_1,
+            a_2,
+            tilt_1,
+            tilt_2,
+            phi_12,
+            phi_jl,
+        ) = np.broadcast_arrays(
+            mass_1,
+            mass_2,
+            luminosity_distance,
+            theta_jn,
+            psi,
+            phase,
+            lambda_1,
+            lambda_2,
+            geocent_time,
+            ra,
+            dec,
+            a_1,
+            a_2,
+            tilt_1,
+            tilt_2,
+            phi_12,
+            phi_jl,
+        )
+
+        #############################################
+        # setting up parameters for multiprocessing #
+        #############################################
+        mtot = mass_1 + mass_2
+        idx = (mtot >= self.mtot_min) & (mtot <= self.mtot_max)
+        # size1 = np.sum(idx)
+        # iterations = np.arange(size1)  # to keep track of index
+
+        input_dict = dict(
+            mass_1=mass_1[idx],
+            mass_2=mass_2[idx],
+            luminosity_distance=luminosity_distance[idx],
+            theta_jn=theta_jn[idx],
+            psi=psi[idx],
+            phase=phase[idx],
+            lambda_1=lambda_1[idx],
+            lambda_2=lambda_2[idx],
+            geocent_time=geocent_time[idx],
+            ra=ra[idx],
+            dec=dec[idx],
+            a_1=a_1[idx],
+            a_2=a_2[idx],
+            tilt_1=tilt_1[idx],
+            tilt_2=tilt_2[idx],
+            phi_12=phi_12[idx],
+            phi_jl=phi_jl[idx],
+        )
+
+        hp_inner_hp, hc_inner_hc = self.noise_weighted_inner_product_jax(
+            gw_param_dict=input_dict, 
+            psd_list=psd_list,
+            detector_list=detectors, 
+            duration_min=self.duration_min,
+            duration_max=self.duration_max,
+            npool=npool,
+            multiprocessing_verbose=self.multiprocessing_verbose
+        )
+
+        # gw_param_dict, psd_object_list, detector_list, duration=None, duration_min=2, duration_max=128
+
+        # get polarization tensor
+        # np.shape(Fp) = (size1, len(num_det))
+        Fp, Fc = antenna_response_array(
+            ra[idx], dec[idx], geocent_time[idx], psi[idx], detector_tensor
+        )
+        snrs_sq = abs((Fp**2) * hp_inner_hp + (Fc**2) * hc_inner_hc)
+        snr = np.sqrt(snrs_sq)
+        snr_effective = np.sqrt(np.sum(snrs_sq, axis=0))
+
+        # organizing the snr dictionary
+        optimal_snr = dict()
+        for j, det in enumerate(detectors):
+            snr_buffer = np.zeros(num)
+            snr_buffer[idx] = snr[j]
+            optimal_snr[det] = snr_buffer
+
+        snr_buffer = np.zeros(num)
+        snr_buffer[idx] = snr_effective
+        optimal_snr["optimal_snr_net"] = snr_buffer
+
+        # Save as JSON file
+        if output_jsonfile:
+            output_filename = (output_jsonfile if isinstance(output_jsonfile, str) else "snr.json")
             save_json(output_filename, optimal_snr)
 
         return optimal_snr

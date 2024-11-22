@@ -4,7 +4,7 @@ Helper functions for gwsnr. All functions are njit compiled.
 """
 
 import numpy as np
-from numba import njit
+from numba import njit, jit
 
 Gamma = 0.5772156649015329
 Pi = np.pi
@@ -492,3 +492,62 @@ def coefficients_generator(y1, y2, y3, y4, z1, z2, z3, z4):
     matrixC = np.array([z1, z2, z2, z3, z3, z4, 0, 0, 0, 0, 0, 0])
     return np.dot(np.linalg.inv(matrixA), matrixC)
 
+@njit
+def linear_interpolator(xnew, coefficients, x, bounds_error=False, fill_value=None):
+    """
+    """
+
+    idx_max = len(x)-1
+    if bounds_error:
+        if (xnew < x[0]) or (xnew > x[idx_max]):
+            raise ValueError("Chosen x values out of bound")
+
+    # Handling extrapolation
+    i = np.searchsorted(x, xnew) - 1 
+    idx1 = xnew <= x[0]
+    i[idx1] = 0
+    idx2 = xnew > x[idx_max]
+    i[idx2] = idx_max - 1
+
+    # Calculate the relative position within the interval
+    dx = xnew - x[i]
+
+    # Calculate the interpolated value
+    # linear polynomial: a + b*dx 
+    const, slope = coefficients[i].T
+    ynew = const + slope*dx
+
+    if fill_value is not None:
+        ynew[idx1] = fill_value
+        ynew[idx2] = fill_value
+
+    return ynew
+
+@njit
+def coefficients_generator_linear(x, y):
+    """
+    """
+
+    lenx = len(x)
+    x2 = x[1:lenx]
+    x1 = x[0:lenx-1]
+    y2 = y[1:lenx]
+    y1 = y[0:lenx-1]
+
+    slope = (y2-y1)/(x2-x1)
+    const = y1
+
+    return const,slope
+
+# @njit
+# def _helper_hphc(hp,hc,fsize_arr,fs,size,f_l,i):
+#     # remove the np.nan padding
+#     hp_ = np.array(hp[i][:fsize_arr[i]], dtype=np.complex128)
+#     hc_ = np.array(hc[i][:fsize_arr[i]], dtype=np.complex128)
+#     # find the index of 20Hz or nearby
+#     # set all elements to zero below this index
+#     idx = np.abs(fs[i] - f_l).argmin()
+#     hp_[i][0:idx] = 0.0 + 0.0j
+#     hc_[i][0:idx] = 0.0 + 0.0j
+
+#     return hp_,hc_
