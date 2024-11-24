@@ -429,7 +429,7 @@ Scientific Collaboration, Virgo Collaboration, and KAGRA Collaboration
     \(F\) is defined as a function of luminosity distance (\(D_l\)),
     chirp mass (\(\mathcal{M}\)), inclination angle (\(\iota\)),
     polarization angles (\(\psi\)), right ascension (\(\alpha\)), and
-    declination (\(\delta\)), refer to Eqn(D1) of Allen et al. (2012).
+    declination (\(\delta\)); refer to Eqn(D1) of Allen et al. (2012).
     \(f\) is the frequency, \(f_{ISCO}\) is the last stable orbit
     frequency and \(S_n(f)\) is the detector's noise curve or power
     spectral density (psd).
@@ -448,10 +448,14 @@ Scientific Collaboration, Virgo Collaboration, and KAGRA Collaboration
 \paragraph{Noise-Weighted Inner Product Method with
 Multiprocessing}\label{noise-weighted-inner-product-method-with-multiprocessing}
 
-Designed for SNR calculations in systems characterized by frequency
-domain waveforms in \emph{\texttt{lalsimulation}} (LIGO Scientific
+This method is tailored for SNR calculations using frequency domain
+waveforms as defined in \emph{\texttt{lalsimulation}} (LIGO Scientific
 Collaboration, Virgo Collaboration, and KAGRA Collaboration (2018)),
-including spin-precessing binary systems.
+including spin-precessing binary systems. \texttt{gwsnr} also supports
+JAX assited inner product, where the waveform generation is facilitated
+through the \texttt{ripple} package (Edwards et al. (2024)). Key
+functions are optimized using \texttt{jax.jit} and parallelized with
+\texttt{jax.vmap}.
 
 \begin{itemize}
 \item
@@ -601,6 +605,13 @@ Chapman-Bird, Christian E A et al. 2023. {``Rapid Determination of LISA
 Sensitivity to Extreme Mass Ratio Inspirals with Machine Learning.''}
 \emph{Monthly Notices of the Royal Astronomical Society} 522 (4):
 6043--54. \url{https://doi.org/10.1093/mnras/stad1397}.
+
+\bibitem[\citeproctext]{ref-Edwards:2023sak}
+Edwards, Thomas D. P., Kaze W. K. Wong, Kelvin K. H. Lam, Adam Coogan,
+Daniel Foreman-Mackey, Maximiliano Isi, and Aaron Zimmerman. 2024.
+{``{Differentiable and hardware-accelerated waveforms for gravitational
+wave data analysis}.''} \emph{Phys. Rev. D} 110 (6): 064028.
+\url{https://doi.org/10.1103/PhysRevD.110.064028}.
 
 \bibitem[\citeproctext]{ref-Gerosa:2020}
 Gerosa, Davide et al. 2020. {``Gravitational-Wave Selection Effects

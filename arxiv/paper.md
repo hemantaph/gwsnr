@@ -50,7 +50,7 @@ The *`gwsnr`* package introduces the Partial Scaling method for SNR calculations
 
 #### Noise-Weighted Inner Product Method with Multiprocessing
 
-Designed for SNR calculations in systems characterized by frequency domain waveforms in *`lalsimulation`* (@lalsuite), including spin-precessing binary systems.
+This method is tailored for SNR calculations using frequency domain waveforms as defined in *`lalsimulation`* (@lalsuite), including spin-precessing binary systems. `gwsnr` also supports JAX assited inner product, where the waveform generation is facilitated through the `ripple` package (@Edwards:2023sak). Key functions are optimized using `jax.jit` and parallelized with `jax.vmap`.
 
 - **Methodology**: Combines waveform generation (multi-process), antenna pattern calculation (njit-ted), and noise-weighted inner product computation (njit-ted).
 
@@ -62,7 +62,7 @@ Designed for SNR calculations in systems characterized by frequency domain wavef
 
   - $h_{+\times}$ are frequency domain waveform polarizations, and $F_{+\times}$ are antenna patterns. 
 
-These formulations highlight *`gwsnr`*'s capability to efficiently process diverse GW signals, enhancing data analysis accuracy and efficiency. Newer version of `gwsnr` (version>0.3.2) also include JAX assited inner product. The waveform is called through `ripple` package. Some important functions are written using `jax.jit` and multiprocess through `jax.vmap`. 
+These formulations highlight *`gwsnr`*'s capability to efficiently process diverse GW signals, enhancing data analysis accuracy and efficiency. 
 
 #### Artificial Neural Network (ANN) Model for Pdet Estimation
 

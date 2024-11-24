@@ -1,15 +1,18 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Homebrew) (preloaded format=pdflatex 2024.10.6)  9 NOV 2024 23:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Homebrew) (preloaded format=pdflatex 2024.10.6)  24 NOV 2024 23:56
 entering extended mode
  restricted \write18 enabled.
- file:line:error style messages enabled.
  %&-line parsing enabled.
-**/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex
-(/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex
+**paper.tex
+(./paper.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
-(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/article.cls
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/articl
+e.cls
 Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
-(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/size10.clo
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/size10
+.clo
 File: size10.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
 )
 \c@part=\count188
@@ -23,34 +26,54 @@ File: size10.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
 \abovecaptionskip=\skip48
 \belowcaptionskip=\skip49
 \bibindent=\dimen140
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/marginnote/marginnote.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/marginnote/
+marginnote.sty
 Package: marginnote 2018/08/09 1.4b non floating margin notes for LaTeX
 \c@mn@abspage=\count196
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/graphicx.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/gr
+aphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/keyval.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/ke
+yval.sty
 Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
 \KV@toks@=\toks17
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/graphics.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/gr
+aphics.sty
 Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/trig.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/tr
+ig.sty
 Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics-cf
+g/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 107.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics-def/pdftex.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics-de
+f/pdftex.def
 File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
 ))
 \Gin@req@height=\dimen141
 \Gin@req@width=\dimen142
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/xcolor/xcolor.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/xcolor/xcol
+or.sty
 Package: xcolor 2023/11/15 v3.01 LaTeX color extensions (UK)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics-cfg/color.cfg
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics-cf
+g/color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
 Package xcolor Info: Driver file: pdftex.def on input line 274.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/mathcolor.ltx)
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/graphics/ma
+thcolor.ltx)
 Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1350.
 Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1354.
 Package xcolor Info: Model `RGB' extended on input line 1366.
@@ -60,17 +83,23 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1370.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1371.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1372.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1373.
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/preprint/authblk.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/preprint/au
+thblk.sty
 Package: authblk 2001/02/27 1.3 (PWD)
 \affilsep=\skip50
 \@affilsep=\skip51
 \c@Maxaffil=\count197
 \c@authors=\count198
 \c@affil=\count199
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/etoolbox/et
+oolbox.sty
 Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count266
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/titlesec/titlesec.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/titlesec/ti
+tlesec.sty
 Package: titlesec 2023/10/27 v2.16 Sectioning titles
 \ttl@box=\box51
 \beforetitleunit=\skip52
@@ -81,7 +110,9 @@ Package: titlesec 2023/10/27 v2.16 Sectioning titles
 \titlewidth=\dimen145
 \titlewidthlast=\dimen146
 \titlewidthfirst=\dimen147
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/tools/calc.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/tools/calc.
+sty
 Package: calc 2023/07/08 v4.3 Infix arithmetic (KKT,FJ)
 \calc@Acount=\count267
 \calc@Bcount=\count268
@@ -93,22 +124,46 @@ LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
 \calc@Ccount=\count269
 \calc@Cskip=\skip56
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/fronten
+dlayer/tikz.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/basicla
+yer/pgf.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/utiliti
+es/pgfrcs.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utili
+ties/pgfutil-common.tex
 \pgfutil@everybye=\toks19
 \pgfutil@tempdima=\dimen150
 \pgfutil@tempdimb=\dimen151
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utili
+ties/pgfutil-latex.def
 \pgfutil@abb=\box52
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utili
+ties/pgfrcs.code.tex
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/pgf.r
+evision.tex)
 Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
 ))
 Package: pgf 2023-01-15 v3.1.10 (3.1.10)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/basicla
+yer/pgfcore.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/systeml
+ayer/pgfsys.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/syste
+mlayer/pgfsys.code.tex
 Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utili
+ties/pgfkeys.code.tex
 \pgfkeys@pathtoks=\toks20
 \pgfkeys@temptoks=\toks21
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibraryfiltered.code.tex
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utili
+ties/pgfkeyslibraryfiltered.code.tex
 \pgfkeys@tmptoks=\toks22
 ))
 \pgf@x=\dimen152
@@ -131,32 +186,76 @@ Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
 \t@pgf@tokb=\toks24
 \t@pgf@tokc=\toks25
 \pgf@sys@id@count=\count274
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/syste
+mlayer/pgf.cfg
 File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
 )
 Driver file for pgf: pgfsys-pdftex.def
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdftex.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/syste
+mlayer/pgfsys-pdftex.def
 File: pgfsys-pdftex.def 2023-01-15 v3.1.10 (3.1.10)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-common-pdf.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/syste
+mlayer/pgfsys-common-pdf.def
 File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
-))) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoftpath.code.tex
+)))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/syste
+mlayer/pgfsyssoftpath.code.tex
 File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfsyssoftpath@smallbuffer@items=\count275
 \pgfsyssoftpath@bigbuffer@items=\count276
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprotocol.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/syste
+mlayer/pgfsysprotocol.code.tex
 File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.code.tex
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcore.code.tex
 Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmath.code.tex
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathutil.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathparser.code.tex
 \pgfmath@dimen=\dimen162
 \pgfmath@count=\count277
 \pgfmath@box=\box53
 \pgfmath@toks=\toks26
 \pgfmath@stack@operand=\toks27
 \pgfmath@stack@operation=\toks28
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigonometric.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.random.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.comparison.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integerarithmetics.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfunctions.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfunctions.basic.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfunctions.trigonometric.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfunctions.random.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfunctions.comparison.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfunctions.base.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfunctions.round.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfunctions.misc.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfunctions.integerarithmetics.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathcalc.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmathfloat.code.tex
 \c@pgfmathroundto@lastzeros=\count278
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfint.code.tex) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.code.tex
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfint.code.tex)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorepoints.code.tex
 File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@picminx=\dimen163
 \pgf@picmaxx=\dimen164
@@ -172,75 +271,131 @@ File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@yy=\dimen174
 \pgf@zx=\dimen175
 \pgf@zy=\dimen176
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathconstruct.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorepathconstruct.code.tex
 File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@path@lastx=\dimen177
 \pgf@path@lasty=\dimen178
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorepathusage.code.tex
 File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@shorten@end@additional=\dimen179
 \pgf@shorten@start@additional=\dimen180
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorescopes.code.tex
 File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfpic=\box54
 \pgf@hbox=\box55
 \pgf@layerbox@main=\box56
 \pgf@picture@serial@count=\count279
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicstate.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcoregraphicstate.code.tex
 File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgflinewidth=\dimen181
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransformations.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcoretransformations.code.tex
 File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@pt@x=\dimen182
 \pgf@pt@y=\dimen183
 \pgf@pt@temp=\dimen184
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequick.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorequick.code.tex
 File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobjects.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcoreobjects.code.tex
 File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathprocessing.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorepathprocessing.code.tex
 File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearrows.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorearrows.code.tex
 File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfarrowsep=\dimen185
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshade.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcoreshade.code.tex
 File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@max=\dimen186
 \pgf@sys@shading@range@num=\count280
 \pgf@shadingcount=\count281
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimage.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcoreimage.code.tex
 File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcoreexternal.code.tex
 File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfexternal@startupbox=\box57
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorelayers.code.tex
 File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransparency.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcoretransparency.code.tex
 File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatterns.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorepatterns.code.tex
 File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/basic
+layer/pgfcorerdf.code.tex
 File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
-))) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.code.tex
+)))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/modul
+es/pgfmoduleshapes.code.tex
 File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfnodeparttextbox=\box58
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/modul
+es/pgfmoduleplot.code.tex
 File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-0-65.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/compati
+bility/pgfcomp-version-0-65.sty
 Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
 \pgf@nodesepstart=\dimen187
 \pgf@nodesepend=\dimen188
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-1-18.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/compati
+bility/pgfcomp-version-1-18.sty
 Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/utilities/pgffor.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/math/pgfmath.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/utiliti
+es/pgffor.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/utiliti
+es/pgfkeys.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utili
+ties/pgfkeys.code.tex))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/pgf/math/pg
+fmath.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/math/
+pgfmath.code.tex))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/utili
+ties/pgffor.code.tex
 Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
 \pgffor@iter=\dimen189
 \pgffor@skip=\dimen190
 \pgffor@stack=\toks29
 \pgffor@toks=\toks30
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.code.tex
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/front
+endlayer/tikz/tikz.code.tex
 Package: tikz 2023-01-15 v3.1.10 (3.1.10)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothandlers.code.tex
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/libra
+ries/pgflibraryplothandlers.code.tex
 File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@plot@mark@count=\count282
 \pgfplotmarksize=\dimen191
@@ -261,46 +416,79 @@ File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \tikznumberofchildren=\count284
 \tikznumberofcurrentchild=\count285
 \tikz@fig@count=\count286
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/modules/pgfmodulematrix.code.tex
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/modul
+es/pgfmodulematrix.code.tex
 File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfmatrixcurrentrow=\count287
 \pgfmatrixcurrentcolumn=\count288
 \pgf@matrix@numberofcolumns=\count289
 )
 \tikz@expandcount=\count290
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarytopaths.code.tex
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pgf/front
+endlayer/tikz/libraries/tikzlibrarytopaths.code.tex
 File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
-))) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/hyperref.sty
+)))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/hy
+perref.sty
 Package: hyperref 2024-01-20 v7.01h Hypertext links for LaTeX
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/iftex/iftex.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/iftex/ift
+ex.sty
 Package: iftex 2022/02/03 v1.0f TeX engine tests
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/kvsetkeys/k
+vsetkeys.sty
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/kvdefinek
+eys/kvdefinekeys.sty
 Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pdfescape
+/pdfescape.sty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/ltxcmds/l
+txcmds.sty
 Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
-Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/pdftexcmd
+s/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/infwarerr
+/infwarerr.sty
 Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
 )
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hycolor/hycolor.sty
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hycolor/hyc
+olor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/auxhook/auxhook.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/auxhook/aux
+hook.sty
 Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/nameref.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/na
+meref.sty
 Package: nameref 2023-11-26 v2.56 Cross-referencing by name of section
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/refcount/refcount.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/refcount/re
+fcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/gettitles
+tring/gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/kvoptions/k
+voptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
 \c@section@level=\count291
@@ -308,15 +496,21 @@ Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 \@linkdim=\dimen256
 \Hy@linkcounter=\count292
 \Hy@pagecounter=\count293
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/pd1enc.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/pd
+1enc.def
 File: pd1enc.def 2024-01-20 v7.01h Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/intcalc/intcalc.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/intcalc/i
+ntcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
 \Hy@SavedSpaceFactor=\count294
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/puenc.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/pu
+enc.def
 File: puenc.def 2024-01-20 v7.01h Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
@@ -329,17 +523,22 @@ Package hyperref Info: Backreferencing OFF on input line 4199.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4446.
 \c@Hy@tempcnt=\count295
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/url/url.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip16
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4784.
 \XeTeXLinkMargin=\dimen257
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/bitset/bitset.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/bitset/bi
+tset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 
-(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
-Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/bigintcal
+c/bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
 ))
 \Fld@menulength=\count296
 \Field@Width=\dimen258
@@ -351,7 +550,9 @@ Package hyperref Info: backreferencing OFF on input line 6078.
 Package hyperref Info: Link coloring OFF on input line 6083.
 Package hyperref Info: Link coloring with OCG OFF on input line 6088.
 Package hyperref Info: PDF/A mode OFF on input line 6093.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/atbegshi-ltx.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/atbegs
+hi-ltx.sty
 Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
 package with kernel methods
 )
@@ -360,28 +561,42 @@ package with kernel methods
 \c@Hfootnote=\count299
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/hpdftex.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/hyperref/hp
+dftex.def
 File: hpdftex.def 2024-01-20 v7.01h Hyperref driver for pdfTeX
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/atveryend-ltx.sty
-Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend package
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/atvery
+end-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
+kage
 with kernel methods
 )
 \Fld@listcount=\count300
 \c@bookmark@seq@number=\count301
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/rerunfilech
+eck/rerunfilecheck.sty
 Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/uniquecou
+nter/uniquecounter.sty
 Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 )
-Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+85.
 )
 \Hy@SectionHShift=\skip57
 )
 Package hyperref Info: Option `colorlinks' set `true' on input line 12.
 Package hyperref Info: Option `breaklinks' set `true' on input line 12.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/caption/caption.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/caption/cap
+tion.sty
 Package: caption 2023/08/05 v3.6o Customizing captions (AR)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/caption/caption3.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/caption/cap
+tion3.sty
 Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
 \caption@tempdima=\dimen260
 \captionmargin=\dimen261
@@ -396,16 +611,24 @@ Package caption Info: Standard document class detected.
 \c@caption@flags=\count302
 \c@continuedfloat=\count303
 Package caption Info: hyperref package is loaded.
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/tcolorbox/tcolorbox.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/tcolorbox/t
+colorbox.sty
 Package: tcolorbox 2024/01/10 version 6.2.0 text color boxes
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/tools/verbatim.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/tools/verba
+tim.sty
 Package: verbatim 2023-11-06 v1.5v LaTeX2e package for verbatim enhancements
 \every@verbatim=\toks31
 \verbatim@line=\toks32
 \verbatim@in@stream=\read3
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/environ/environ.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/environ/env
+iron.sty
 Package: environ 2014/05/04 v0.3 A new way to define environments
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/trimspaces/trimspaces.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/trimspaces/
+trimspaces.sty
 Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
 )
 \@envbody=\toks33
@@ -423,9 +646,13 @@ Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
 \tcb@temp=\box69
 \tcb@temp=\box70
 \tcb@temp=\box71
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsfonts/amssymb.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsfonts/am
+ssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsfonts/am
+sfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \@emptytoks=\toks34
 \symAMSa=\mathgroup4
@@ -433,21 +660,31 @@ Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/amsmath.sty
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/ams
+math.sty
 Package: amsmath 2023/05/13 v2.17o AMS math features
 \@mathmargin=\skip58
 
 For additional information on amsmath, use the `?' option.
-(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/amstext.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/ams
+text.sty
 Package: amstext 2021/08/26 v2.01 AMS text
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/amsgen.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/ams
+gen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks35
 \ex@=\dimen269
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/amsbsy.sty
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/ams
+bsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 \pmbraise@=\dimen270
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/amsopn.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsmath/ams
+opn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
 \inf@bad=\count307
@@ -497,25 +734,40 @@ LaTeX Info: Redefining \Relbar on input line 971.
 \mathdisplay@stack=\toks39
 LaTeX Info: Redefining \[ on input line 2953.
 LaTeX Info: Redefining \] on input line 2954.
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/iftex/ifxetex.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/iftex/ifx
+etex.sty
 Package: ifxetex 2019/10/25 v0.7 ifxetex legacy package. Use iftex instead.
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/iftex/ifluatex.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/iftex/ifl
+uatex.sty
 Package: ifluatex 2019/10/25 v1.5 ifluatex legacy package. Use iftex instead.
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/seqsplit/seqsplit.sty
-Package: seqsplit 2006/08/07 v0.1 Splitting long sequences (DNA, RNA, proteins, etc.) 
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/xstring/xstring.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/xstring/xstring.tex
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/seqsplit/se
+qsplit.sty
+Package: seqsplit 2006/08/07 v0.1 Splitting long sequences (DNA, RNA, proteins,
+ etc.) 
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/xstring/x
+string.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/xstring/x
+string.tex
 \xs_counta=\count319
 \xs_countb=\count320
 )
 Package: xstring 2023/08/22 v1.86 String manipulations (CT)
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/float/float.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/float/float
+.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count321
 \float@exts=\toks40
 \float@box=\box74
 \@float@everytoks=\toks41
 \@floatcapt=\box75
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/fixltx2e.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/fixltx
+2e.sty
 Package: fixltx2e 2016/12/29 v2.1a fixes to LaTeX (obsolete)
 Applying: [2015/01/01] Old fixltx2e package on input line 46.
 
@@ -525,14 +777,22 @@ Package fixltx2e Warning: fixltx2e is not required with releases after 2015
 (fixltx2e)                See the latexrelease package for details.
 
 Already applied: [0000/00/00] Old fixltx2e package on input line 53.
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/biblatex.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bi
+blatex.sty
 Package: biblatex 2024/03/21 v3.20 programmable bibliographies (PK/MW)
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/logreq/logreq.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/logreq/logr
+eq.sty
 Package: logreq 2010/08/04 v1.0 xml request logger
 \lrq@indent=\count322
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/logreq/logreq.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/logreq/logr
+eq.def
 File: logreq.def 2010/08/04 v1.0 logreq spec v1.0
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/ifthen.sty
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/ifthen
+.sty
 Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
 )
 \c@tabx@nest=\count323
@@ -594,7 +854,9 @@ Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
 \c@mincompwidth=\count368
 Package biblatex Info: Trying to load biblatex default data model...
 Package biblatex Info: ... file 'blx-dm.def' found.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/blx-dm.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bl
+x-dm.def
 File: blx-dm.def 2024/03/21 v3.20 biblatex datamodel (PK/MW)
 )
 Package biblatex Info: Trying to load biblatex custom data model...
@@ -683,12 +945,16 @@ Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
 \localshorteditorwidth=\skip82
 Package biblatex Info: Trying to load compatibility code...
 Package biblatex Info: ... file 'blx-compat.def' found.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/blx-compat.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bl
+x-compat.def
 File: blx-compat.def 2024/03/21 v3.20 biblatex compatibility (PK/MW)
 )
 Package biblatex Info: Trying to load generic definitions...
 Package biblatex Info: ... file 'biblatex.def' found.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/biblatex.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bi
+blatex.def
 File: biblatex.def 2024/03/21 v3.20 biblatex compatibility (PK/MW)
 \c@textcitecount=\count437
 \c@textcitetotal=\count438
@@ -706,18 +972,24 @@ File: biblatex.def 2024/03/21 v3.20 biblatex compatibility (PK/MW)
 )
 Package biblatex Info: Trying to load bibliography style 'numeric'...
 Package biblatex Info: ... file 'numeric.bbx' found.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bbx/numeric.bbx
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bb
+x/numeric.bbx
 File: numeric.bbx 2024/03/21 v3.20 biblatex bibliography style (PK/MW)
 Package biblatex Info: Trying to load bibliography style 'standard'...
 Package biblatex Info: ... file 'standard.bbx' found.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bbx/standard.bbx
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bb
+x/standard.bbx
 File: standard.bbx 2024/03/21 v3.20 biblatex bibliography style (PK/MW)
 \c@bbx:relatedcount=\count446
 \c@bbx:relatedtotal=\count447
 ))
 Package biblatex Info: Trying to load citation style 'numeric'...
 Package biblatex Info: ... file 'numeric.cbx' found.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/cbx/numeric.cbx
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/cb
+x/numeric.cbx
 File: numeric.cbx 2024/03/21 v3.20 biblatex citation style (PK/MW)
 Package biblatex Info: Redefining '\cite'.
 Package biblatex Info: Redefining '\parencite'.
@@ -733,14 +1005,20 @@ Package biblatex Info: Redefining '\smartcites'.
 )
 Package biblatex Info: Trying to load configuration file...
 Package biblatex Info: ... file 'biblatex.cfg' found.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/biblatex.cfg
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bi
+blatex.cfg
 File: biblatex.cfg 
 )
 Package biblatex Info: Input encoding 'utf8' detected.
 Package biblatex Info: Document encoding is UTF8 ....
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/l3kernel/expl3.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/l3kernel/ex
+pl3.sty
 Package: expl3 2024-02-20 L3 programming layer (loader) 
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/l3backend/l
+3backend-pdftex.def
 File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count448
 \l__pdf_internal_box=\box76
@@ -749,16 +1027,24 @@ Package biblatex Info: ... and expl3
 (biblatex)             2024-02-20 L3 programming layer (loader) 
 (biblatex)             is new enough (at least 2020/04/06),
 (biblatex)             setting 'casechanger=expl3'.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/blx-case-expl3.sty (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/bl
+x-case-expl3.sty
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/l3packages/
+xparse/xparse.sty
 Package: xparse 2024-02-18 L3 Experimental document command parser
 )
 Package: blx-case-expl3 2024/03/21 v3.20 expl3 case changing code for biblatex
 ))
 \cslhangindent=\skip83
 \csllabelwidth=\skip84
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/geometry/geometry.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/geometry/ge
+ometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/iftex/ifvtex.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/generic/iftex/ifv
+tex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
 \Gm@cnth=\count449
@@ -773,8 +1059,11 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layouthoffset=\dimen284
 \Gm@layoutvoffset=\dimen285
 \Gm@dimlist=\toks42
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/fancyhdr/fa
+ncyhdr.sty
 Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
+
 \f@nch@headwidth=\skip85
 \f@nch@O@elh=\skip86
 \f@nch@O@erh=\skip87
@@ -784,20 +1073,34 @@ Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 \f@nch@O@erf=\skip91
 \f@nch@O@olf=\skip92
 \f@nch@O@orf=\skip93
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/fontenc.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/fonten
+c.sty
 Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
-LaTeX Font Info:    Trying to load font information for T1+cmss on input line 112.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/t1cmss.fd
+LaTeX Font Info:    Trying to load font information for T1+cmss on input line 1
+12.
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/t1cmss
+.fd
 File: t1cmss.fd 2023/04/13 v2.5m Standard LaTeX font definitions
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/inputenc.sty
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/inpute
+nc.sty
 Package: inputenc 2021/02/14 v1.3d Input encoding file
 \inpenc@prehook=\toks43
 \inpenc@posthook=\toks44
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/upquote/upquote.sty
-Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verbatim
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/textcomp.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/upquote/upq
+uote.sty
+Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
+tim
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/textco
+mp.sty
 Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
-)) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/microtype.sty
+))
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/m
+icrotype.sty
 Package: microtype 2023/03/13 v3.1a Micro-typographical refinements (RS)
 \MT@toks=\toks45
 \MT@tempbox=\box77
@@ -810,22 +1113,33 @@ LaTeX Info: Redefining \textls on input line 1368.
 \MT@outer@kern=\dimen286
 LaTeX Info: Redefining \textmicrotypecontext on input line 1988.
 \MT@listname@count=\count453
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/microtype-pdftex.def
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/m
+icrotype-pdftex.def
 File: microtype-pdftex.def 2023/03/13 v3.1a Definitions specific to pdftex (RS)
+
 LaTeX Info: Redefining \lsstyle on input line 902.
 LaTeX Info: Redefining \lslig on input line 902.
 \MT@outer@space=\skip94
 )
 Package microtype Info: Loading configuration file microtype.cfg.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/microtype.cfg
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/m
+icrotype.cfg
 File: microtype.cfg 2023/03/13 v3.1a microtype main configuration file (RS)
 ))
 Package hyperref Info: Option `unicode' set `true' on input line 241.
 Package hyperref Info: Option `breaklinks' set `true' on input line 241.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/grffile/grffile.sty
-Package: grffile 2019/11/11 v2.1 Extended file name support for graphics (legacy)
-Package grffile Info: This package is an empty stub for compatibility on input line 40.
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/parskip/parskip.sty
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/grffile/grf
+file.sty
+Package: grffile 2019/11/11 v2.1 Extended file name support for graphics (legac
+y)
+Package grffile Info: This package is an empty stub for compatibility on input 
+line 40.
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/parskip/par
+skip.sty
 Package: parskip 2021-03-14 v2.0h non-zero parskip adjustments
 )
 
@@ -854,7 +1168,9 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 296.
 LaTeX Font Info:    ... okay on input line 296.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 296.
 LaTeX Font Info:    ... okay on input line 296.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/context/base/mkii
+/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count456
 \scratchdimen=\dimen287
@@ -867,11 +1183,17 @@ LaTeX Font Info:    ... okay on input line 296.
 \MPnumerator=\count460
 \makeMPintoPDFobject=\count461
 \everyMPtoPDFconversion=\toks48
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/epstopdf-pk
+g/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
-Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
-File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/latexconfig
+/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
 ))
 Package hyperref Info: Link coloring ON on input line 296.
  (./paper.out) (./paper.out)
@@ -883,7 +1205,9 @@ Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
 Package biblatex Info: Trying to load language 'english'...
 Package biblatex Info: ... file 'english.lbx' found.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/lbx/english.lbx
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/biblatex/lb
+x/english.lbx
 File: english.lbx 2024/03/21 v3.20 biblatex localization (PK/MW)
 )
 Package biblatex Info: Input encoding 'utf8' detected.
@@ -951,36 +1275,57 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `cmss' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 297.
-(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/t1cmtt.fd
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 2
+97.
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/t1cmtt
+.fd
 File: t1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/mt-cmr.cfg
-File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 297.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsfonts/umsa.fd
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/m
+t-cmr.cfg
+File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
+(RS)
+)
+LaTeX Font Info:    Trying to load font information for U+msa on input line 297
+.
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsfonts/um
+sa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/mt-msa.cfg
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/m
+t-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 297.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsfonts/umsb.fd
+LaTeX Font Info:    Trying to load font information for U+msb on input line 297
+.
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/amsfonts/um
+sb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/mt-msb.cfg
+)
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/microtype/m
+t-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-LaTeX Font Info:    Trying to load font information for TS1+cmss on input line 342.
- (/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/ts1cmss.fd
+LaTeX Font Info:    Trying to load font information for TS1+cmss on input line 
+342.
+
+(/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/tex/latex/base/ts1cms
+s.fd
 File: ts1cmss.fd 2023/04/13 v2.5m Standard LaTeX font definitions
 )
 
 Package hyperref Warning: Suppressing link with empty target on input line 342.
 
 
+
 Package hyperref Warning: Suppressing link with empty target on input line 342.
 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:348: LaTeX Error: Unicode character   (U+2009)
+
+! LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
@@ -989,11 +1334,9 @@ Type  H <return>  for immediate help.
                                                   
 l.348 their first detection in 2015 (Abbott, B. 
                                                   P. et al. (2016a)). These
-You may provide a definition with
-\DeclareUnicodeCharacter 
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:358: LaTeX Error: Unicode character   (U+2009)
+! LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
@@ -1002,10 +1345,8 @@ Type  H <return>  for immediate help.
                                                   
 l.358 ...ical information from them (Abbott, B. 
                                                   P. et al. (2016b)).
-You may provide a definition with
-\DeclareUnicodeCharacter 
-
-<logo.png, id=13, 156.585pt x 59.9841pt>
+? 
+<logo.png, id=32, 156.585pt x 59.9841pt>
 File: logo.png Graphic file (type png)
 <use logo.png>
 Package pdftex.def Info: logo.png  used on input line 404.
@@ -1015,14 +1356,18 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 (fancyhdr)                Make it at least 63.5501pt, for example:
 (fancyhdr)                \setlength{\headheight}{63.5501pt}.
 (fancyhdr)                You might also make \topmargin smaller to compensate:
+
 (fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
 
 [1
 
-{/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/map/pdftex/updmap/pdftex.map}{/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc} <./logo.png>]
+{/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/map/pdftex/updm
+ap/pdftex.map}{/opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/e
+nc/dvips/cm-super/cm-super-t1.enc}{/opt/homebrew/Cellar/texlive/20240312_2/shar
+e/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc} <./logo.png>]
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 501.
+Package pdftex.def Info: logo.png  used on input line 505.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 
@@ -1030,749 +1375,641 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 (fancyhdr)                Make it at least 63.5501pt, for example:
 (fancyhdr)                \setlength{\headheight}{63.5501pt}.
 (fancyhdr)                You might also make \topmargin smaller to compensate:
+
 (fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
 
 [2]
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:519: Undefined control sequence.
-l.519 \bibitem[\citeproctext
+! Undefined control sequence.
+l.523 \bibitem[\citeproctext
                             ]{ref-tensorflow2015}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:525: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.525 ...tem[\citeproctext]{ref-Abbott:2016:rates}
+l.529 ...tem[\citeproctext]{ref-Abbott:2016:rates}
                                                   
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 525
+Underfull \hbox (badness 10000) detected at line 529
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:525: Undefined control sequence.
+! Undefined control sequence.
 <write> ... {ref-Abbott:2016:rates}{\citeproctext 
                                                   }
-l.525 ...tem[\citeproctext]{ref-Abbott:2016:rates}
+l.529 ...tem[\citeproctext]{ref-Abbott:2016:rates}
                                                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:532: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.532 \bibitem[\citeproctext]{ref-Abbott:2016}
+l.536 \bibitem[\citeproctext]{ref-Abbott:2016}
                                               
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 532
+Underfull \hbox (badness 10000) detected at line 536
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:532: Undefined control sequence.
+! Undefined control sequence.
 <write> ...ibcite {ref-Abbott:2016}{\citeproctext 
                                                   }
-l.532 \bibitem[\citeproctext]{ref-Abbott:2016}
+l.536 \bibitem[\citeproctext]{ref-Abbott:2016}
                                               
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:533: LaTeX Error: Unicode character   (U+2009)
+! LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.533 Abbott, B. 
+l.537 Abbott, B. 
                    P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acer...
-You may provide a definition with
-\DeclareUnicodeCharacter 
 
+? 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:533: LaTeX Error: Unicode character   (U+2009)
+! LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.533 Abbott, B. P., R. Abbott, T. 
+l.537 Abbott, B. P., R. Abbott, T. 
                                        D. Abbott, M. R. Abernathy, F. Acer...
-You may provide a definition with
-\DeclareUnicodeCharacter 
 
+? 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:533: LaTeX Error: Unicode character   (U+2009)
+! LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.533 ...B. P., R. Abbott, T. D. Abbott, M. 
+l.537 ...B. P., R. Abbott, T. D. Abbott, M. 
                                                   R. Abernathy, F. Acernese, K.
-You may provide a definition with
-\DeclareUnicodeCharacter 
 
+? 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:538: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.538 ...\citeproctext]{ref-Abbott:2016:detection}
+l.542 ...\citeproctext]{ref-Abbott:2016:detection}
                                                   
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 538
+Underfull \hbox (badness 10000) detected at line 542
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:538: Undefined control sequence.
+! Undefined control sequence.
 <write> ...f-Abbott:2016:detection}{\citeproctext 
                                                   }
-l.538 ...\citeproctext]{ref-Abbott:2016:detection}
+l.542 ...\citeproctext]{ref-Abbott:2016:detection}
                                                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:539: LaTeX Error: Unicode character   (U+2009)
+! LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.539 Abbott, B. 
+l.543 Abbott, B. 
                    P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acer...
-You may provide a definition with
-\DeclareUnicodeCharacter 
 
+? 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:539: LaTeX Error: Unicode character   (U+2009)
+! LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.539 Abbott, B. P., R. Abbott, T. 
+l.543 Abbott, B. P., R. Abbott, T. 
                                        D. Abbott, M. R. Abernathy, F. Acer...
-You may provide a definition with
-\DeclareUnicodeCharacter 
 
+? 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:539: LaTeX Error: Unicode character   (U+2009)
+! LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.539 ...B. P., R. Abbott, T. D. Abbott, M. 
+l.543 ...B. P., R. Abbott, T. D. Abbott, M. 
                                                   R. Abernathy, F. Acernese, K.
-You may provide a definition with
-\DeclareUnicodeCharacter 
 
+? 
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:545: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.545 \bibitem[\citeproctext]{ref-Abbott2020}
+l.549 \bibitem[\citeproctext]{ref-Abbott2020}
                                              
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 545
+Underfull \hbox (badness 10000) detected at line 549
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:545: Undefined control sequence.
+! Undefined control sequence.
 <write> ...bibcite {ref-Abbott2020}{\citeproctext 
                                                   }
-l.545 \bibitem[\citeproctext]{ref-Abbott2020}
+l.549 \bibitem[\citeproctext]{ref-Abbott2020}
                                              
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:552: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.552 \bibitem[\citeproctext]{ref-virgo:2019}
+l.556 \bibitem[\citeproctext]{ref-virgo:2019}
                                              
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 552
+Underfull \hbox (badness 10000) detected at line 556
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:552: Undefined control sequence.
+! Undefined control sequence.
 <write> ...bibcite {ref-virgo:2019}{\citeproctext 
                                                   }
-l.552 \bibitem[\citeproctext]{ref-virgo:2019}
+l.556 \bibitem[\citeproctext]{ref-virgo:2019}
                                              
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:559: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.559 \bibitem[\citeproctext]{ref-VIRGO2015}
+l.563 \bibitem[\citeproctext]{ref-VIRGO2015}
                                             
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 559
+Underfull \hbox (badness 10000) detected at line 563
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:559: Undefined control sequence.
+! Undefined control sequence.
 <write> ...\bibcite {ref-VIRGO2015}{\citeproctext 
                                                   }
-l.559 \bibitem[\citeproctext]{ref-VIRGO2015}
+l.563 \bibitem[\citeproctext]{ref-VIRGO2015}
                                             
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:566: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.566 ...ef-akutsu2020overviewkagradetectordesign}
+l.570 ...ef-akutsu2020overviewkagradetectordesign}
                                                   
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 566
+Underfull \hbox (badness 10000) detected at line 570
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:566: Undefined control sequence.
+! Undefined control sequence.
 <write> ...viewkagradetectordesign}{\citeproctext 
                                                   }
-l.566 ...ef-akutsu2020overviewkagradetectordesign}
+l.570 ...ef-akutsu2020overviewkagradetectordesign}
                                                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:571: LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.571 \bibitem[\citeproctext]{ref-Allen:2012}
-                                             
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-Underfull \hbox (badness 10000) detected at line 571
-[][]
- []
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:571: Undefined control sequence.
-<write> ...bibcite {ref-Allen:2012}{\citeproctext 
-                                                  }
-l.571 \bibitem[\citeproctext]{ref-Allen:2012}
-                                             
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
+? 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 577.
+Package pdftex.def Info: logo.png  used on input line 574.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
 (fancyhdr)                Make it at least 63.5501pt, for example:
 (fancyhdr)                \setlength{\headheight}{63.5501pt}.
 (fancyhdr)                You might also make \topmargin smaller to compensate:
+
 (fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
 
 [3]
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:578: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.578 \bibitem[\citeproctext]{ref-bilby}
-                                        
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+l.575 \bibitem[\citeproctext]{ref-Allen:2012}
+                                             
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 578
+Underfull \hbox (badness 10000) detected at line 575
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:578: Undefined control sequence.
+! Undefined control sequence.
+<write> ...bibcite {ref-Allen:2012}{\citeproctext 
+                                                  }
+l.575 \bibitem[\citeproctext]{ref-Allen:2012}
+                                             
+? 
+
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.582 \bibitem[\citeproctext]{ref-bilby}
+                                        
+? 
+
+Underfull \hbox (badness 10000) detected at line 582
+[][]
+ []
+
+! Undefined control sequence.
 <write> ...ing \bibcite {ref-bilby}{\citeproctext 
                                                   }
-l.578 \bibitem[\citeproctext]{ref-bilby}
+l.582 \bibitem[\citeproctext]{ref-bilby}
                                         
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:585: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.585 ...em[\citeproctext]{ref-PhysRevD:88:043007}
+l.589 ...em[\citeproctext]{ref-PhysRevD:88:043007}
                                                   
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 585
+Underfull \hbox (badness 10000) detected at line 589
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:585: Undefined control sequence.
+! Undefined control sequence.
 <write> ...{ref-PhysRevD:88:043007}{\citeproctext 
                                                   }
-l.585 ...em[\citeproctext]{ref-PhysRevD:88:043007}
+l.589 ...em[\citeproctext]{ref-PhysRevD:88:043007}
                                                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:592: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.592 ...m[\citeproctext]{ref-PhysRevD.102.062003}
+l.596 ...m[\citeproctext]{ref-PhysRevD.102.062003}
                                                   
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 592
+Underfull \hbox (badness 10000) detected at line 596
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:592: Undefined control sequence.
+! Undefined control sequence.
 <write> ...ref-PhysRevD.102.062003}{\citeproctext 
                                                   }
-l.592 ...m[\citeproctext]{ref-PhysRevD.102.062003}
+l.596 ...m[\citeproctext]{ref-PhysRevD.102.062003}
                                                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:599: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.599 \bibitem[\citeproctext]{ref-ChapmanBird2023}
+l.603 \bibitem[\citeproctext]{ref-ChapmanBird2023}
                                                   
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 599
+Underfull \hbox (badness 10000) detected at line 603
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:599: Undefined control sequence.
+! Undefined control sequence.
 <write> ...te {ref-ChapmanBird2023}{\citeproctext 
                                                   }
-l.599 \bibitem[\citeproctext]{ref-ChapmanBird2023}
+l.603 \bibitem[\citeproctext]{ref-ChapmanBird2023}
                                                   
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:605: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.605 \bibitem[\citeproctext]{ref-Gerosa:2020}
-                                              
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+l.609 \bibitem[\citeproctext]{ref-Edwards:2023sak}
+                                                  
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 605
+Underfull \hbox (badness 10000) detected at line 609
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:605: Undefined control sequence.
+! Undefined control sequence.
+<write> ...te {ref-Edwards:2023sak}{\citeproctext 
+                                                  }
+l.609 \bibitem[\citeproctext]{ref-Edwards:2023sak}
+                                                  
+? 
+
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.616 \bibitem[\citeproctext]{ref-Gerosa:2020}
+                                              
+? 
+
+Underfull \hbox (badness 10000) detected at line 616
+[][]
+ []
+
+! Undefined control sequence.
 <write> ...ibcite {ref-Gerosa:2020}{\citeproctext 
                                                   }
-l.605 \bibitem[\citeproctext]{ref-Gerosa:2020}
+l.616 \bibitem[\citeproctext]{ref-Gerosa:2020}
                                               
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:610: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.610 \bibitem[\citeproctext]{ref-numba}
+l.621 \bibitem[\citeproctext]{ref-numba}
                                         
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 610
+Underfull \hbox (badness 10000) detected at line 621
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:610: Undefined control sequence.
+! Undefined control sequence.
 <write> ...ing \bibcite {ref-numba}{\citeproctext 
                                                   }
-l.610 \bibitem[\citeproctext]{ref-numba}
+l.621 \bibitem[\citeproctext]{ref-numba}
                                         
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:615: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.615 \bibitem[\citeproctext]{ref-lalsuite}
+l.626 \bibitem[\citeproctext]{ref-lalsuite}
                                            
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 615
+Underfull \hbox (badness 10000) detected at line 626
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:615: Undefined control sequence.
+! Undefined control sequence.
 <write> ... \bibcite {ref-lalsuite}{\citeproctext 
                                                   }
-l.615 \bibitem[\citeproctext]{ref-lalsuite}
+l.626 \bibitem[\citeproctext]{ref-lalsuite}
                                            
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:620: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.620 \bibitem[\citeproctext]{ref-ng2024}
+l.631 \bibitem[\citeproctext]{ref-ng2024}
                                          
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 620
+Underfull \hbox (badness 10000) detected at line 631
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:620: Undefined control sequence.
+! Undefined control sequence.
 <write> ...ng \bibcite {ref-ng2024}{\citeproctext 
                                                   }
-l.620 \bibitem[\citeproctext]{ref-ng2024}
+l.631 \bibitem[\citeproctext]{ref-ng2024}
                                          
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:627: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.627 \bibitem[\citeproctext]{ref-scikitlearn}
+l.638 \bibitem[\citeproctext]{ref-scikitlearn}
                                               
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 627
+Underfull \hbox (badness 10000) detected at line 638
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:627: Undefined control sequence.
+! Undefined control sequence.
 <write> ...ibcite {ref-scikitlearn}{\citeproctext 
                                                   }
-l.627 \bibitem[\citeproctext]{ref-scikitlearn}
+l.638 \bibitem[\citeproctext]{ref-scikitlearn}
                                               
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:633: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.633 \bibitem[\citeproctext]{ref-ler}
+l.644 \bibitem[\citeproctext]{ref-ler}
                                       
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 633
+Underfull \hbox (badness 10000) detected at line 644
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:633: Undefined control sequence.
+! Undefined control sequence.
 <write> \string \bibcite {ref-ler}{\citeproctext 
                                                  }
-l.633 \bibitem[\citeproctext]{ref-ler}
+l.644 \bibitem[\citeproctext]{ref-ler}
                                       
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:640: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.640 \bibitem[\citeproctext]{ref-Taylor:2018}
+l.651 \bibitem[\citeproctext]{ref-Taylor:2018}
                                               
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 640
+Underfull \hbox (badness 10000) detected at line 651
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:640: Undefined control sequence.
+! Undefined control sequence.
 <write> ...ibcite {ref-Taylor:2018}{\citeproctext 
                                                   }
-l.640 \bibitem[\citeproctext]{ref-Taylor:2018}
+l.651 \bibitem[\citeproctext]{ref-Taylor:2018}
                                               
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:646: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.646 \bibitem[\citeproctext]{ref-LIGO2015}
+l.657 \bibitem[\citeproctext]{ref-LIGO2015}
                                            
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 646
+Underfull \hbox (badness 10000) detected at line 657
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:646: Undefined control sequence.
+! Undefined control sequence.
 <write> ... \bibcite {ref-LIGO2015}{\citeproctext 
                                                   }
-l.646 \bibitem[\citeproctext]{ref-LIGO2015}
+l.657 \bibitem[\citeproctext]{ref-LIGO2015}
                                            
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+? 
 
-
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:652: LaTeX Error: Lonely \item--perhaps a missing list environment.
+! LaTeX Error: Lonely \item--perhaps a missing list environment.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.652 \bibitem[\citeproctext]{ref-Thrane:2019}
+l.663 \bibitem[\citeproctext]{ref-Thrane:2019}
                                               
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+? 
 
-
-Underfull \hbox (badness 10000) detected at line 652
+Underfull \hbox (badness 10000) detected at line 663
 [][]
  []
 
-/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex:652: Undefined control sequence.
+! Undefined control sequence.
 <write> ...ibcite {ref-Thrane:2019}{\citeproctext 
                                                   }
-l.652 \bibitem[\citeproctext]{ref-Thrane:2019}
+l.663 \bibitem[\citeproctext]{ref-Thrane:2019}
                                               
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
+? 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 661.
+Package pdftex.def Info: logo.png  used on input line 669.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
 (fancyhdr)                Make it at least 63.5501pt, for example:
 (fancyhdr)                \setlength{\headheight}{63.5501pt}.
 (fancyhdr)                You might also make \topmargin smaller to compensate:
+
 (fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
 
-[4] (./paper.aux)
+[4]
+File: logo.png Graphic file (type png)
+<use logo.png>
+Package pdftex.def Info: logo.png  used on input line 672.
+(pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
+
+
+Package fancyhdr Warning: \headheight is too small (62.59596pt): 
+(fancyhdr)                Make it at least 63.5501pt, for example:
+(fancyhdr)                \setlength{\headheight}{63.5501pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
+
+[5] (./paper.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
-
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package rerunfilecheck Warning: File `paper.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `paper.out':
-(rerunfilecheck)             Before: D41D8CD98F00B204E9800998ECF8427E;0
-(rerunfilecheck)             After:  91C978D74E43D0B5229A2113B18F161D;599.
-
-Package biblatex Warning: Please (re)run Biber on the file:
-(biblatex)                paper
-(biblatex)                and rerun LaTeX afterwards.
-
+Package rerunfilecheck Info: File `paper.out' has not changed.
+(rerunfilecheck)             Checksum: 91C978D74E43D0B5229A2113B18F161D;599.
 Package logreq Info: Writing requests to 'paper.run.xml'.
 \openout1 = `paper.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 34577 strings out of 474116
- 670827 string characters out of 5732613
+ 34590 strings out of 474116
+ 670812 string characters out of 5732613
  1952187 words of memory out of 5000000
- 56270 multiletter control sequences out of 15000+600000
- 583448 words of font info for 160 fonts, out of 8000000 for 9000
+ 56278 multiletter control sequences out of 15000+600000
+ 583970 words of font info for 163 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,15n,87p,1253b,858s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfit1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsi0800.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsi1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss0800.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss0900.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss1728.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx0900.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1200.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1440.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sftt1728.pfb>
-Output written on paper.pdf (4 pages, 421715 bytes).
+ 84i,15n,87p,1194b,858s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmex10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmmi10.pfb></opt/homebrew/Cellar/texlive/20240
+312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></opt/homebrew/
+Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7
+.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmr10.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmr5.pfb></opt/homebrew/Cellar/texlive/20240
+312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></opt/homebrew/C
+ellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10
+.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmsy5.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></opt/homebrew/Cellar/texlive/2024
+0312_2/share/texmf-dist/fonts/type1/public/cm-super/sfit1000.pfb></opt/homebrew
+/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsi080
+0.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/pub
+lic/cm-super/sfsi1000.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-
+dist/fonts/type1/public/cm-super/sfss0800.pfb></opt/homebrew/Cellar/texlive/202
+40312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss0900.pfb></opt/homebre
+w/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfss10
+00.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/pu
+blic/cm-super/sfss1728.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf
+-dist/fonts/type1/public/cm-super/sfsx0900.pfb></opt/homebrew/Cellar/texlive/20
+240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1000.pfb></opt/homebr
+ew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sfsx1
+200.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/p
+ublic/cm-super/sfsx1440.pfb></opt/homebrew/Cellar/texlive/20240312_2/share/texm
+f-dist/fonts/type1/public/cm-super/sftt0800.pfb></opt/homebrew/Cellar/texlive/2
+0240312_2/share/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb></opt/homeb
+rew/Cellar/texlive/20240312_2/share/texmf-dist/fonts/type1/public/cm-super/sftt
+1728.pfb>
+Output written on paper.pdf (5 pages, 450590 bytes).
 PDF statistics:
- 204 PDF objects out of 1000 (max. 8388607)
- 146 compressed objects within 2 object streams
- 13 named destinations out of 1000 (max. 500000)
- 45074 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 231 PDF objects out of 1000 (max. 8388607)
+ 170 compressed objects within 2 object streams
+ 14 named destinations out of 1000 (max. 500000)
+ 45114 words of extra memory for PDF output out of 51595 (max. 10000000)
 
