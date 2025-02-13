@@ -1,6 +1,7 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.7.4)  21 JAN 2025 18:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.7.4)  13 DEC 2024 13:51
 entering extended mode
  restricted \write18 enabled.
+ file:line:error style messages enabled.
  %&-line parsing enabled.
 **paper.tex
 (./paper.tex
@@ -1193,7 +1194,7 @@ Package hyperref Warning: Suppressing link with empty target on input line 342.
 
 
 
-! LaTeX Error: Unicode character   (U+2009)
+./paper.tex:348: LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
@@ -1204,7 +1205,7 @@ l.348 their first detection in 2015 (Abbott, B. 
                                                   P. et al. (2016a)). These
 ? 
 
-! LaTeX Error: Unicode character   (U+2009)
+./paper.tex:358: LaTeX Error: Unicode character   (U+2009)
                not set up for use with LaTeX.
 
 See the LaTeX manual or LaTeX Companion for explanation.
@@ -1235,7 +1236,7 @@ al/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/usr/local
 >]
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 499.
+Package pdftex.def Info: logo.png  used on input line 498.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 
@@ -1247,212 +1248,11 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 (fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
 
 [2]
-! Undefined control sequence.
-l.524 \bibitem[\citeproctext
-                            ]{ref-tensorflow2015}
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.530 ...tem[\citeproctext]{ref-Abbott:2016:rates}
-                                                  
-? 
-
-Underfull \hbox (badness 10000) detected at line 530
-[][]
- []
-
-! Undefined control sequence.
-<write> ... {ref-Abbott:2016:rates}{\citeproctext 
-                                                  }
-l.530 ...tem[\citeproctext]{ref-Abbott:2016:rates}
-                                                  
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.537 \bibitem[\citeproctext]{ref-Abbott:2016}
-                                              
-? 
-
-Underfull \hbox (badness 10000) detected at line 537
-[][]
- []
-
-! Undefined control sequence.
-<write> ...ibcite {ref-Abbott:2016}{\citeproctext 
-                                                  }
-l.537 \bibitem[\citeproctext]{ref-Abbott:2016}
-                                              
-? 
-
-! LaTeX Error: Unicode character   (U+2009)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.538 Abbott, B. 
-                   P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acer...
-
-? 
-
-! LaTeX Error: Unicode character   (U+2009)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.538 Abbott, B. P., R. Abbott, T. 
-                                       D. Abbott, M. R. Abernathy, F. Acer...
-
-? 
-
-! LaTeX Error: Unicode character   (U+2009)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.538 ...B. P., R. Abbott, T. D. Abbott, M. 
-                                                  R. Abernathy, F. Acernese, K.
-
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.543 ...\citeproctext]{ref-Abbott:2016:detection}
-                                                  
-? 
-
-Underfull \hbox (badness 10000) detected at line 543
-[][]
- []
-
-! Undefined control sequence.
-<write> ...f-Abbott:2016:detection}{\citeproctext 
-                                                  }
-l.543 ...\citeproctext]{ref-Abbott:2016:detection}
-                                                  
-? 
-
-! LaTeX Error: Unicode character   (U+2009)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.544 Abbott, B. 
-                   P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acer...
-
-? 
-
-! LaTeX Error: Unicode character   (U+2009)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.544 Abbott, B. P., R. Abbott, T. 
-                                       D. Abbott, M. R. Abernathy, F. Acer...
-
-? 
-
-! LaTeX Error: Unicode character   (U+2009)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.544 ...B. P., R. Abbott, T. D. Abbott, M. 
-                                                  R. Abernathy, F. Acernese, K.
-
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.550 \bibitem[\citeproctext]{ref-Abbott2020}
-                                             
-? 
-
-Underfull \hbox (badness 10000) detected at line 550
-[][]
- []
-
-! Undefined control sequence.
-<write> ...bibcite {ref-Abbott2020}{\citeproctext 
-                                                  }
-l.550 \bibitem[\citeproctext]{ref-Abbott2020}
-                                             
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.557 \bibitem[\citeproctext]{ref-virgo:2019}
-                                             
-? 
-
-Underfull \hbox (badness 10000) detected at line 557
-[][]
- []
-
-! Undefined control sequence.
-<write> ...bibcite {ref-virgo:2019}{\citeproctext 
-                                                  }
-l.557 \bibitem[\citeproctext]{ref-virgo:2019}
-                                             
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.564 \bibitem[\citeproctext]{ref-VIRGO2015}
-                                            
-? 
-
-Underfull \hbox (badness 10000) detected at line 564
-[][]
- []
-
-! Undefined control sequence.
-<write> ...\bibcite {ref-VIRGO2015}{\citeproctext 
-                                                  }
-l.564 \bibitem[\citeproctext]{ref-VIRGO2015}
-                                            
-? 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 571.
+Package pdftex.def Info: logo.png  used on input line 570.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
+
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
 (fancyhdr)                Make it at least 63.5501pt, for example:
@@ -1462,325 +1262,11 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 (fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
 
 [3]
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.571 ...ef-akutsu2020overviewkagradetectordesign}
-                                                  
-? 
-
-Underfull \hbox (badness 10000) detected at line 571
-[][]
- []
-
-! Undefined control sequence.
-<write> ...viewkagradetectordesign}{\citeproctext 
-                                                  }
-l.571 ...ef-akutsu2020overviewkagradetectordesign}
-                                                  
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.576 \bibitem[\citeproctext]{ref-Allen:2012}
-                                             
-? 
-
-Underfull \hbox (badness 10000) detected at line 576
-[][]
- []
-
-! Undefined control sequence.
-<write> ...bibcite {ref-Allen:2012}{\citeproctext 
-                                                  }
-l.576 \bibitem[\citeproctext]{ref-Allen:2012}
-                                             
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.583 \bibitem[\citeproctext]{ref-bilby}
-                                        
-? 
-
-Underfull \hbox (badness 10000) detected at line 583
-[][]
- []
-
-! Undefined control sequence.
-<write> ...ing \bibcite {ref-bilby}{\citeproctext 
-                                                  }
-l.583 \bibitem[\citeproctext]{ref-bilby}
-                                        
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.590 ...em[\citeproctext]{ref-PhysRevD:88:043007}
-                                                  
-? 
-
-Underfull \hbox (badness 10000) detected at line 590
-[][]
- []
-
-! Undefined control sequence.
-<write> ...{ref-PhysRevD:88:043007}{\citeproctext 
-                                                  }
-l.590 ...em[\citeproctext]{ref-PhysRevD:88:043007}
-                                                  
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.597 ...m[\citeproctext]{ref-PhysRevD.102.062003}
-                                                  
-? 
-
-Underfull \hbox (badness 10000) detected at line 597
-[][]
- []
-
-! Undefined control sequence.
-<write> ...ref-PhysRevD.102.062003}{\citeproctext 
-                                                  }
-l.597 ...m[\citeproctext]{ref-PhysRevD.102.062003}
-                                                  
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.604 \bibitem[\citeproctext]{ref-Callister2024}
-                                                
-? 
-
-Underfull \hbox (badness 10000) detected at line 604
-[][]
- []
-
-! Undefined control sequence.
-<write> ...cite {ref-Callister2024}{\citeproctext 
-                                                  }
-l.604 \bibitem[\citeproctext]{ref-Callister2024}
-                                                
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.609 \bibitem[\citeproctext]{ref-ChapmanBird2023}
-                                                  
-? 
-
-Underfull \hbox (badness 10000) detected at line 609
-[][]
- []
-
-! Undefined control sequence.
-<write> ...te {ref-ChapmanBird2023}{\citeproctext 
-                                                  }
-l.609 \bibitem[\citeproctext]{ref-ChapmanBird2023}
-                                                  
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.615 \bibitem[\citeproctext]{ref-Edwards:2023sak}
-                                                  
-? 
-
-Underfull \hbox (badness 10000) detected at line 615
-[][]
- []
-
-! Undefined control sequence.
-<write> ...te {ref-Edwards:2023sak}{\citeproctext 
-                                                  }
-l.615 \bibitem[\citeproctext]{ref-Edwards:2023sak}
-                                                  
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.622 \bibitem[\citeproctext]{ref-Gerosa:2020}
-                                              
-? 
-
-Underfull \hbox (badness 10000) detected at line 622
-[][]
- []
-
-! Undefined control sequence.
-<write> ...ibcite {ref-Gerosa:2020}{\citeproctext 
-                                                  }
-l.622 \bibitem[\citeproctext]{ref-Gerosa:2020}
-                                              
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.627 \bibitem[\citeproctext]{ref-numba}
-                                        
-? 
-
-Underfull \hbox (badness 10000) detected at line 627
-[][]
- []
-
-! Undefined control sequence.
-<write> ...ing \bibcite {ref-numba}{\citeproctext 
-                                                  }
-l.627 \bibitem[\citeproctext]{ref-numba}
-                                        
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.632 \bibitem[\citeproctext]{ref-lalsuite}
-                                           
-? 
-
-Underfull \hbox (badness 10000) detected at line 632
-[][]
- []
-
-! Undefined control sequence.
-<write> ... \bibcite {ref-lalsuite}{\citeproctext 
-                                                  }
-l.632 \bibitem[\citeproctext]{ref-lalsuite}
-                                           
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.637 \bibitem[\citeproctext]{ref-ng2024}
-                                         
-? 
-
-Underfull \hbox (badness 10000) detected at line 637
-[][]
- []
-
-! Undefined control sequence.
-<write> ...ng \bibcite {ref-ng2024}{\citeproctext 
-                                                  }
-l.637 \bibitem[\citeproctext]{ref-ng2024}
-                                         
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.644 \bibitem[\citeproctext]{ref-scikitlearn}
-                                              
-? 
-
-Underfull \hbox (badness 10000) detected at line 644
-[][]
- []
-
-! Undefined control sequence.
-<write> ...ibcite {ref-scikitlearn}{\citeproctext 
-                                                  }
-l.644 \bibitem[\citeproctext]{ref-scikitlearn}
-                                              
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.650 \bibitem[\citeproctext]{ref-ler}
-                                      
-? 
-
-Underfull \hbox (badness 10000) detected at line 650
-[][]
- []
-
-! Undefined control sequence.
-<write> \string \bibcite {ref-ler}{\citeproctext 
-                                                 }
-l.650 \bibitem[\citeproctext]{ref-ler}
-                                      
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.657 \bibitem[\citeproctext]{ref-Taylor:2018}
-                                              
-? 
-
-Underfull \hbox (badness 10000) detected at line 657
-[][]
- []
-
-! Undefined control sequence.
-<write> ...ibcite {ref-Taylor:2018}{\citeproctext 
-                                                  }
-l.657 \bibitem[\citeproctext]{ref-Taylor:2018}
-                                              
-? 
 File: logo.png Graphic file (type png)
 <use logo.png>
 Package pdftex.def Info: logo.png  used on input line 662.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
+
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
 (fancyhdr)                Make it at least 63.5501pt, for example:
@@ -1790,52 +1276,11 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 (fancyhdr)                \addtolength{\topmargin}{-0.95413pt}.
 
 [4]
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.663 \bibitem[\citeproctext]{ref-LIGO2015}
-                                           
-? 
-
-Underfull \hbox (badness 10000) detected at line 663
-[][]
- []
-
-! Undefined control sequence.
-<write> ... \bibcite {ref-LIGO2015}{\citeproctext 
-                                                  }
-l.663 \bibitem[\citeproctext]{ref-LIGO2015}
-                                           
-? 
-
-! LaTeX Error: Lonely \item--perhaps a missing list environment.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.669 \bibitem[\citeproctext]{ref-Thrane:2019}
-                                              
-? 
-
-Underfull \hbox (badness 10000) detected at line 669
-[][]
- []
-
-! Undefined control sequence.
-<write> ...ibcite {ref-Thrane:2019}{\citeproctext 
-                                                  }
-l.669 \bibitem[\citeproctext]{ref-Thrane:2019}
-                                              
-? 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 678.
+Package pdftex.def Info: logo.png  used on input line 670.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
+
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
 (fancyhdr)                Make it at least 63.5501pt, for example:
@@ -1849,27 +1294,18 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
-
-
-LaTeX Warning: There were undefined references.
-
 Package rerunfilecheck Info: File `paper.out' has not changed.
 (rerunfilecheck)             Checksum: 91C978D74E43D0B5229A2113B18F161D;599.
-
-Package biblatex Warning: Please (re)run Biber on the file:
-(biblatex)                paper
-(biblatex)                and rerun LaTeX afterwards.
-
 Package logreq Info: Writing requests to 'paper.run.xml'.
 \openout1 = `paper.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 34554 strings out of 474116
- 660727 string characters out of 5743683
+ 34551 strings out of 474116
+ 660602 string characters out of 5743683
  1950187 words of memory out of 5000000
- 56232 multiletter control sequences out of 15000+600000
- 584410 words of font info for 168 fonts, out of 8000000 for 9000
+ 56205 multiletter control sequences out of 15000+600000
+ 584355 words of font info for 168 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,16n,87p,1194b,858s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
@@ -1896,10 +1332,10 @@ onts/type1/public/cm-super/sfsx1440.pfb></usr/local/texlive/2024/texmf-dist/fon
 ts/type1/public/cm-super/sftt0800.pfb></usr/local/texlive/2024/texmf-dist/fonts
 /type1/public/cm-super/sftt1000.pfb></usr/local/texlive/2024/texmf-dist/fonts/t
 ype1/public/cm-super/sftt1728.pfb>
-Output written on paper.pdf (5 pages, 450790 bytes).
+Output written on paper.pdf (5 pages, 450866 bytes).
 PDF statistics:
- 233 PDF objects out of 1000 (max. 8388607)
- 172 compressed objects within 2 object streams
- 14 named destinations out of 1000 (max. 500000)
+ 261 PDF objects out of 1000 (max. 8388607)
+ 200 compressed objects within 2 object streams
+ 38 named destinations out of 1000 (max. 500000)
  45114 words of extra memory for PDF output out of 51595 (max. 10000000)
 

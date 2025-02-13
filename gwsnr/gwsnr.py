@@ -31,6 +31,7 @@ from .utils import (
     load_ann_h5,
     load_pickle_from_module,
     load_json_from_module,
+    get_gw_parameters,
 )
 from .njit_functions import (
     get_interpolated_snr,
@@ -308,9 +309,10 @@ class GWSNR:
         pdet=False,
         snr_th=8.0,
         snr_th_net=8.0,
-        ann_path_dict=None
+        ann_path_dict=None,
     ):
 
+        print("\nInitializing GWSNR class...\n")
         # setting instance attributes
         self.npool = npool
         self.pdet = pdet
@@ -524,25 +526,31 @@ class GWSNR:
             if not os.path.exists(ann_path_dict[detector]['model_path']):
                 # load the model from gwsnr/ann directory
                 model_dict[detector] = load_ann_h5_from_module('gwsnr', 'ann', ann_path_dict[detector]['model_path'])
+                print(f"ANN model for {detector} is loaded from gwsnr/ann directory.")
             else:
                 # load the model from the given path
                 model_dict[detector] = load_ann_h5(ann_path_dict[detector]['model_path'])
+                print(f"ANN model for {detector} is loaded from {ann_path_dict[detector]['model_path']}.")
 
             # get ann scaler
             if not os.path.exists(ann_path_dict[detector]['scaler_path']):
                 # load the scaler from gwsnr/ann directory
                 scaler_dict[detector] = load_pickle_from_module('gwsnr', 'ann', ann_path_dict[detector]['scaler_path'])
+                print(f"ANN scaler for {detector} is loaded from gwsnr/ann directory.")
             else:
                 # load the scaler from the given path
                 scaler_dict[detector] = load_pickle(ann_path_dict[detector]['scaler_path'])
+                print(f"ANN scaler for {detector} is loaded from {ann_path_dict[detector]['scaler_path']}.")
 
             # get error_adjustment
             if not os.path.exists(ann_path_dict[detector]['error_adjustment_path']):
                 # load the error_adjustment from gwsnr/ann directory
                 error_adjustment[detector] = load_json_from_module('gwsnr', 'ann', ann_path_dict[detector]['error_adjustment_path'])
+                print(f"ANN error_adjustment for {detector} is loaded from gwsnr/ann directory.")
             else:
                 # load the error_adjustment from the given path
-                error_adjustment[detector] = load_pickle(ann_path_dict[detector]['error_adjustment_path'])
+                error_adjustment[detector] = load_json(ann_path_dict[detector]['error_adjustment_path'])
+                print(f"ANN error_adjustment for {detector} is loaded from {ann_path_dict[detector]['error_adjustment_path']}.")
 
         return model_dict, scaler_dict, error_adjustment, ann_path_dict
 
@@ -697,31 +705,6 @@ class GWSNR:
         >>> snr.snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
         """
 
-        # if gw_param_dict is given, then use that
-        if gw_param_dict is not False:
-            mass_1 = gw_param_dict.get("mass_1", np.array([10.0]))
-            mass_2 = gw_param_dict.get("mass_2", np.array([10.0]))
-            luminosity_distance = gw_param_dict.get("luminosity_distance", np.array([100.0]))
-            theta_jn = gw_param_dict.get("theta_jn", np.array([0.0]))
-            psi = gw_param_dict.get("psi", np.array([0.0]))
-            phase = gw_param_dict.get("phase", np.array([0.0]))
-            geocent_time = gw_param_dict.get("geocent_time", np.array([1246527224.169434]))
-            ra = gw_param_dict.get("ra", np.array([0.0]))
-            dec = gw_param_dict.get("dec", np.array([0.0]))
-            size = len(mass_1)
-
-            # Extract spin parameters or initialize to zeros
-            a_1 = gw_param_dict.get("a_1", np.zeros(size))
-            a_2 = gw_param_dict.get("a_2", np.zeros(size))
-
-            # Extract precessing waveform parameters or initialize to zeros
-            tilt_1 = gw_param_dict.get("tilt_1", np.zeros(size))
-            tilt_2 = gw_param_dict.get("tilt_2", np.zeros(size))
-            phi_12 = gw_param_dict.get("phi_12", np.zeros(size))
-            phi_jl = gw_param_dict.get("phi_jl", np.zeros(size))
-
-            # Extract tidal deformation parameters 
-
         if self.snr_type == "interpolation":
             snr_dict = self.snr_with_interpolation(
                 mass_1,
@@ -733,6 +716,7 @@ class GWSNR:
                 geocent_time=geocent_time,
                 ra=ra,
                 dec=dec,
+                gw_param_dict=gw_param_dict,
                 output_jsonfile=output_jsonfile,
             )
 
@@ -755,6 +739,7 @@ class GWSNR:
                 tilt_2=tilt_2,
                 phi_12=phi_12,
                 phi_jl=phi_jl,
+                gw_param_dict=gw_param_dict,
                 output_jsonfile=output_jsonfile,
             )
 
@@ -777,6 +762,7 @@ class GWSNR:
                 tilt_2=tilt_2,
                 phi_12=phi_12,
                 phi_jl=phi_jl,
+                gw_param_dict=gw_param_dict,
                 output_jsonfile=output_jsonfile,
             )
 
@@ -791,6 +777,13 @@ class GWSNR:
                 geocent_time=geocent_time,
                 ra=ra,
                 dec=dec,
+                a_1=a_1,
+                a_2=a_2,
+                tilt_1=tilt_1,
+                tilt_2=tilt_2,
+                phi_12=phi_12,
+                phi_jl=phi_jl,
+                gw_param_dict=gw_param_dict,
                 output_jsonfile=output_jsonfile,
             )
 
@@ -821,6 +814,7 @@ class GWSNR:
         tilt_2=0.0,
         phi_12=0.0,
         phi_jl=0.0,
+        gw_param_dict=False,
         output_jsonfile=False,
     ):
         """
@@ -861,48 +855,16 @@ class GWSNR:
         >>> snr.snr_with_ann(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0)
         """
 
+        if gw_param_dict is not False:
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(gw_param_dict)
+        else:
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
+
         # setting up the parameters
         model = self.model_dict
         scaler = self.scaler_dict
         detectors = np.array(self.detector_list)
         size = len(mass_1)
-        # this allows mass_1, mass_2 to pass as float or array
-        mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
-        # Broadcasting parameters to the desired size
-        (
-            mass_1,
-            mass_2,
-            luminosity_distance,
-            theta_jn,
-            psi,
-            phase,
-            geocent_time,
-            ra,
-            dec,
-            a_1,
-            a_2,
-            tilt_1,
-            tilt_2,
-            phi_12,
-            phi_jl,
-        ) = np.broadcast_arrays(
-            mass_1,
-            mass_2,
-            luminosity_distance,
-            theta_jn,
-            psi,
-            phase,
-            geocent_time,
-            ra,
-            dec,
-            a_1,
-            a_2,
-            tilt_1,
-            tilt_2,
-            phi_12,
-            phi_jl,
-        )
-
         mtot = mass_1 + mass_2
         idx2 = np.logical_and(mtot >= self.mtot_min, mtot <= self.mtot_max)
         idx_tracker = np.nonzero(idx2)[0]
@@ -1033,6 +995,7 @@ class GWSNR:
         ra=0.0,
         dec=0.0,
         output_jsonfile=False,
+        gw_param_dict=False,
     ):
         """
         Function to calculate SNR using bicubic interpolation method.
@@ -1072,36 +1035,18 @@ class GWSNR:
         >>> snr.snr_with_interpolation(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
         """
 
+        # getting the parameters from the dictionary
+        if gw_param_dict is not False:
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, _, _, _, _, _, _ = get_gw_parameters(gw_param_dict)
+        else:
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, _, _, _, _, _, _ = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec))
+
         # setting up the parameters
         detector_tensor = np.array(self.detector_tensor_list)
         detectors = np.array(self.detector_list)
         snr_partialscaled = np.array(self.snr_partialsacaled_list)
-        # this allows mass_1, mass_2 to pass as float or array
-        mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
-        size = len(mass_1)
-        # Broadcasting parameters to the desired size
-        (
-            mass_1,
-            mass_2,
-            luminosity_distance,
-            theta_jn,
-            psi,
-            phase,
-            geocent_time,
-            ra,
-            dec,
-        ) = np.broadcast_arrays(
-            mass_1,
-            mass_2,
-            luminosity_distance,
-            theta_jn,
-            psi,
-            phase,
-            geocent_time,
-            ra,
-            dec,
-        )
 
+        size = len(mass_1)
         mtot = mass_1 + mass_2
         idx2 = np.logical_and(mtot >= self.mtot_min, mtot <= self.mtot_max)
         idx_tracker = np.nonzero(idx2)[0]
@@ -1312,25 +1257,9 @@ class GWSNR:
 
         # if gw_param_dict is given, then use that
         if gw_param_dict is not False:
-            mass_1 = gw_param_dict["mass_1"]
-            mass_2 = gw_param_dict["mass_2"]
-            luminosity_distance = gw_param_dict["luminosity_distance"]
-            theta_jn = gw_param_dict["theta_jn"]
-            psi = gw_param_dict["psi"]
-            phase = gw_param_dict["phase"]
-            geocent_time = gw_param_dict["geocent_time"]
-            ra = gw_param_dict["ra"]
-            dec = gw_param_dict["dec"]
-            # a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl exist in the dictionary
-            # if exists, then use that, else pass
-            if "a_1" and "a_2" in gw_param_dict:
-                a_1 = gw_param_dict["a_1"]
-                a_2 = gw_param_dict["a_2"]
-            if "tilt_1" and "tilt_2" and "phi_12" and "phi_jl" in gw_param_dict:
-                tilt_1 = gw_param_dict["tilt_1"]
-                tilt_2 = gw_param_dict["tilt_2"]
-                phi_12 = gw_param_dict["phi_12"]
-                phi_jl = gw_param_dict["phi_jl"]
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(gw_param_dict)
+        else:
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
 
         npool = self.npool
         sampling_frequency = self.sampling_frequency
@@ -1342,44 +1271,7 @@ class GWSNR:
 
         # get the psds for the required detectors
         psd_dict = {detectors[i]: self.psds_list[i] for i in num_det}
-
-        # reshape(-1) is so that either a float value is given or the input is an numpy array
-        # make sure all parameters are of same length
-        mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
         num = len(mass_1)
-        (
-            mass_1,
-            mass_2,
-            luminosity_distance,
-            theta_jn,
-            psi,
-            phase,
-            geocent_time,
-            ra,
-            dec,
-            a_1,
-            a_2,
-            tilt_1,
-            tilt_2,
-            phi_12,
-            phi_jl,
-        ) = np.broadcast_arrays(
-            mass_1,
-            mass_2,
-            luminosity_distance,
-            theta_jn,
-            psi,
-            phase,
-            geocent_time,
-            ra,
-            dec,
-            a_1,
-            a_2,
-            tilt_1,
-            tilt_2,
-            phi_12,
-            phi_jl,
-        )
 
         #############################################
         # setting up parameters for multiprocessing #
@@ -1574,28 +1466,9 @@ class GWSNR:
 
         # if gw_param_dict is given, then use that
         if gw_param_dict is not False:
-            mass_1 = gw_param_dict["mass_1"]
-            mass_2 = gw_param_dict["mass_2"]
-            luminosity_distance = gw_param_dict["luminosity_distance"]
-            theta_jn = gw_param_dict["theta_jn"]
-            psi = gw_param_dict["psi"]
-            phase = gw_param_dict["phase"]
-            geocent_time = gw_param_dict["geocent_time"]
-            ra = gw_param_dict["ra"]
-            dec = gw_param_dict["dec"]
-            # a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl exist in the dictionary
-            # if exists, then use that, else pass
-            if "a_1" and "a_2" in gw_param_dict:
-                a_1 = gw_param_dict["a_1"]
-                a_2 = gw_param_dict["a_2"]
-            if "tilt_1" and "tilt_2" and "phi_12" and "phi_jl" in gw_param_dict:
-                tilt_1 = gw_param_dict["tilt_1"]
-                tilt_2 = gw_param_dict["tilt_2"]
-                phi_12 = gw_param_dict["phi_12"]
-                phi_jl = gw_param_dict["phi_jl"]
-            if "lambda_1" and "lambda_2" in gw_param_dict:
-                lambda_1 = gw_param_dict["lambda_1"]
-                lambda_2 = gw_param_dict["lambda_2"]
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, lambda_1, lambda_2, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(gw_param_dict)
+        else:
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
 
         npool = self.npool
         detectors = self.detector_list.copy()
@@ -1603,48 +1476,7 @@ class GWSNR:
         num_det = np.arange(len(detectors), dtype=int)
         # get the psds for the required detectors
         psd_list = self.psds_list.copy()
-
-        # reshape(-1) is so that either a float value is given or the input is an numpy array
-        # make sure all parameters are of same length
-        mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
         num = len(mass_1)
-        (
-            mass_1,
-            mass_2,
-            luminosity_distance,
-            theta_jn,
-            psi,
-            phase,
-            lambda_1, 
-            lambda_2,
-            geocent_time,
-            ra,
-            dec,
-            a_1,
-            a_2,
-            tilt_1,
-            tilt_2,
-            phi_12,
-            phi_jl,
-        ) = np.broadcast_arrays(
-            mass_1,
-            mass_2,
-            luminosity_distance,
-            theta_jn,
-            psi,
-            phase,
-            lambda_1,
-            lambda_2,
-            geocent_time,
-            ra,
-            dec,
-            a_1,
-            a_2,
-            tilt_1,
-            tilt_2,
-            phi_12,
-            phi_jl,
-        )
 
         #############################################
         # setting up parameters for multiprocessing #

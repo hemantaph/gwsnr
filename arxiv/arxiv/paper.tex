@@ -129,8 +129,8 @@
 \renewcommand{\footrulewidth}{0.25pt}
 
 \fancyfoot[L]{\parbox[t]{0.98\headwidth}{\footnotesize{\sffamily Hemantakumar Phurailatpam, Otto Akseli Hannuksela, (2024). \texttt{gwsnr}:
-A Python Package for Efficient SNR Calculation of
-GWs. \textit{PendingJournal of Open Source Software}, Pending(Pending), Pending. \url{https://doi.org/10.xxxxxx/draft}}}}
+A python package for efficient signal-to-noise calculation of
+gravitational-waves. \textit{PendingJournal of Open Source Software}, Pending(Pending), Pending. \url{https://doi.org/10.xxxxxx/draft}}}}
 
 
 \fancyfoot[R]{\sffamily \thepage}
@@ -236,7 +236,8 @@ GWs. \textit{PendingJournal of Open Source Software}, Pending(Pending), Pending.
 
 \usepackage{hyperref}
 \hypersetup{unicode=true,
-            pdftitle={gwsnr: A Python Package for Efficient SNR Calculation of GWs},
+            pdftitle={gwsnr: A python package for efficient signal-to-noise calculation of
+gravitational-waves},
             pdfborder={0 0 0},
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
@@ -283,8 +284,8 @@ GWs. \textit{PendingJournal of Open Source Software}, Pending(Pending), Pending.
 \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
 \fi
 
-\title{\texttt{gwsnr}: A Python Package for Efficient SNR Calculation of
-GWs}
+\title{\texttt{gwsnr}: A python package for efficient signal-to-noise calculation of
+gravitational-waves}
 
         \author[1]{Hemantakumar Phurailatpam}
           \author[1]{Otto Akseli HANNUKSELA}
@@ -345,7 +346,7 @@ Kong, Shatin, New Territories, Hong Kong}
 
 Gravitational waves (GWs), ripples in spacetime predicted by Einstein's
 theory of General Relativity, have revolutionized astrophysics since
-their first detection in 2015 (Abbott, B. P. et al. (2016a)). These
+their first detection in 2015 (Abbott, B.P. et al. (2016a)). These
 waves are emitted by cataclysmic events like the merging of binary black
 holes (BBHs), binary neutron stars (BNSs) and BH-NS pairs, providing a
 unique window into the cosmos. A critical aspect of GW analysis is the
@@ -355,7 +356,7 @@ Scientific Collaboration et al. (2015), Abbott et al. (2020), Buikema et
 al. (2020)), Virgo (F. Acernese et al. (2014), F. Acernese et al.
 (2019)) or KAGRA (Akutsu et al. (2020), Aso et al. (2013)). This ratio
 is pivotal in confirming the detection of GWs and extracting
-astrophysical information from them (Abbott, B. P. et al. (2016b)).
+astrophysical information from them (Abbott, B.P. et al. (2016b)).
 However, specific scenarios in GW research, particularly in simulations
 of detectable GW events (Abbott et al. (2016)) and in hierarchical
 Bayesian analysis (Thrane and Talbot (2019)) where selection effects are
@@ -494,8 +495,7 @@ large dataset from the \emph{\texttt{ler}} package, the ANN model uses
 dimensionality from 15 to 5 and enhancing accuracy. This approach offers
 a practical solution for assessing detectability under specified
 conditions. Other similar efforts with ANN models are detailed in
-Chapman-Bird et al. (2023), Gerosa et al. (2020), Callister et al.
-(2024) etc.
+Chapman-Bird et al. (2023), Gerosa et al. (2020) etc.
 
 In addition to providing trained ANN models for specific configurations,
 \emph{\texttt{gwsnr}} offers users the flexibility to develop and train
@@ -516,163 +516,156 @@ possible. Thanks are also due to the LIGO Laboratory for the
 computational resources, supported by National Science Foundation Grants
 No.~PHY-0757058 and No.~PHY-0823459.
 
-\section*{References}\label{references}
+\hypertarget{references}{%
+\section*{References}\label{references}}
 \addcontentsline{toc}{section}{References}
 
-\phantomsection\label{refs}
-\begin{CSLReferences}{1}{0}
-\bibitem[\citeproctext]{ref-tensorflow2015}
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-tensorflow2015}
 Abadi, Martín, Ashish Agarwal, Paul Barham, Eugene Brevdo, Zhifeng Chen,
 Craig Citro, Greg S. Corrado, et al. 2015. {``{TensorFlow}: Large-Scale
 Machine Learning on Heterogeneous Systems.''}
 \url{https://www.tensorflow.org/}.
 
-\bibitem[\citeproctext]{ref-Abbott:2016:rates}
+\leavevmode\hypertarget{ref-Abbott:2016:rates}
 Abbott, B. P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acernese, K.
 Ackley, C. Adams, et al. 2016. {``ASTROPHYSICAL IMPLICATIONS OF THE
 BINARY BLACK HOLE MERGER GW150914.''} \emph{The Astrophysical Journal
 Letters} 818 (2): L22.
 \url{https://doi.org/10.3847/2041-8205/818/2/l22}.
 
-\bibitem[\citeproctext]{ref-Abbott:2016}
-Abbott, B. P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acernese, K.
+\leavevmode\hypertarget{ref-Abbott:2016}
+Abbott, B.P., R. Abbott, T.D. Abbott, M.R. Abernathy, F. Acernese, K.
 Ackley, C. Adams, et al. 2016a. {``Observation of Gravitational Waves
 from a Binary Black Hole Merger.''} \emph{Physical Review Letters} 116
 (6). \url{https://doi.org/10.1103/physrevlett.116.061102}.
 
-\bibitem[\citeproctext]{ref-Abbott:2016:detection}
-Abbott, B. P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acernese, K.
+\leavevmode\hypertarget{ref-Abbott:2016:detection}
+Abbott, B.P., R. Abbott, T.D. Abbott, M.R. Abernathy, F. Acernese, K.
 Ackley, C. Adams, et al. 2016b. {``GW150914: First Results from the
 Search for Binary Black Hole Coalescence with Advanced LIGO.''}
 \emph{Physical Review D} 93 (12).
 \url{https://doi.org/10.1103/physrevd.93.122003}.
 
-\bibitem[\citeproctext]{ref-Abbott2020}
+\leavevmode\hypertarget{ref-Abbott2020}
 Abbott, B. P., R. Abbott, T. D. Abbott, S. Abraham, F. Acernese, K.
 Ackley, C. Adams, et al. 2020. {``Prospects for Observing and Localizing
 Gravitational-Wave Transients with Advanced LIGO, Advanced Virgo and
 KAGRA.''} \emph{Living Reviews in Relativity} 23 (1).
 \url{https://doi.org/10.1007/s41114-020-00026-9}.
 
-\bibitem[\citeproctext]{ref-virgo:2019}
+\leavevmode\hypertarget{ref-virgo:2019}
 Acernese, F., M. Agathos, L. Aiello, A. Allocca, A. Amato, S. Ansoldi,
 S. Antier, et al. 2019. {``Increasing the Astrophysical Reach of the
 Advanced Virgo Detector via the Application of Squeezed Vacuum States of
 Light.''} \emph{Phys. Rev. Lett.} 123 (December): 231108.
 \url{https://doi.org/10.1103/PhysRevLett.123.231108}.
 
-\bibitem[\citeproctext]{ref-VIRGO2015}
+\leavevmode\hypertarget{ref-VIRGO2015}
 Acernese, F, M Agathos, K Agatsuma, D Aisa, N Allemandou, A Allocca, J
 Amarni, et al. 2014. {``Advanced Virgo: A Second-Generation
 Interferometric Gravitational Wave Detector.''} \emph{Classical and
 Quantum Gravity} 32 (2): 024001.
 \url{https://doi.org/10.1088/0264-9381/32/2/024001}.
 
-\bibitem[\citeproctext]{ref-akutsu2020overviewkagradetectordesign}
+\leavevmode\hypertarget{ref-akutsu2020overviewkagradetectordesign}
 Akutsu, T., M. Ando, K. Arai, Y. Arai, S. Araki, A. Araya, N. Aritomi,
 et al. 2020. {``Overview of KAGRA: Detector Design and Construction
 History.''} \url{https://arxiv.org/abs/2005.05574}.
 
-\bibitem[\citeproctext]{ref-Allen:2012}
+\leavevmode\hypertarget{ref-Allen:2012}
 Allen, Bruce, Warren G. Anderson, Patrick R. Brady, Duncan A. Brown, and
 Jolien D. E. Creighton. 2012. {``FINDCHIRP: An Algorithm for Detection
 of Gravitational Waves from Inspiraling Compact Binaries.''}
 \emph{Physical Review D} 85 (12).
 \url{https://doi.org/10.1103/physrevd.85.122006}.
 
-\bibitem[\citeproctext]{ref-bilby}
+\leavevmode\hypertarget{ref-bilby}
 Ashton, Gregory, Sylvia Biscoveanu, Neil Cornish, Isaac Dal Canto,
 Prayush Kumar, Duncan Meacher, Hannah Middleton, Divyansh Mistry, Rory
 Smith, and Tom Stevenson. 2022. {``{bilby: a user-friendly Bayesian
 inference library}.''} \emph{GitHub Repository}. GitHub.
 \url{https://github.com/GregoryAshton/Bilby}.
 
-\bibitem[\citeproctext]{ref-PhysRevD:88:043007}
+\leavevmode\hypertarget{ref-PhysRevD:88:043007}
 Aso, Yoichi, Yuta Michimura, Kentaro Somiya, Masaki Ando, Osamu
 Miyakawa, Takanori Sekiguchi, Daisuke Tatsumi, and Hiroaki Yamamoto.
 2013. {``Interferometer Design of the KAGRA Gravitational Wave
 Detector.''} \emph{Phys. Rev. D} 88 (August): 043007.
 \url{https://doi.org/10.1103/PhysRevD.88.043007}.
 
-\bibitem[\citeproctext]{ref-PhysRevD.102.062003}
+\leavevmode\hypertarget{ref-PhysRevD.102.062003}
 Buikema, A., C. Cahillane, G. L. Mansell, C. D. Blair, R. Abbott, C.
 Adams, R. X. Adhikari, et al. 2020. {``Sensitivity and Performance of
 the Advanced LIGO Detectors in the Third Observing Run.''} \emph{Phys.
 Rev. D} 102 (September): 062003.
 \url{https://doi.org/10.1103/PhysRevD.102.062003}.
 
-\bibitem[\citeproctext]{ref-Callister2024}
-Callister, Thomas A. et al. 2024. {``Neural Network Emulator of the
-Advanced LIGO and Advanced Virgo Selection Function.''} \emph{Physical
-Review D} 110 (12). \url{https://doi.org/10.1103/physrevd.110.123041}.
-
-\bibitem[\citeproctext]{ref-ChapmanBird2023}
+\leavevmode\hypertarget{ref-ChapmanBird2023}
 Chapman-Bird, Christian E A et al. 2023. {``Rapid Determination of LISA
 Sensitivity to Extreme Mass Ratio Inspirals with Machine Learning.''}
 \emph{Monthly Notices of the Royal Astronomical Society} 522 (4):
 6043--54. \url{https://doi.org/10.1093/mnras/stad1397}.
 
-\bibitem[\citeproctext]{ref-Edwards:2023sak}
+\leavevmode\hypertarget{ref-Edwards:2023sak}
 Edwards, Thomas D. P., Kaze W. K. Wong, Kelvin K. H. Lam, Adam Coogan,
 Daniel Foreman-Mackey, Maximiliano Isi, and Aaron Zimmerman. 2024.
 {``{Differentiable and hardware-accelerated waveforms for gravitational
 wave data analysis}.''} \emph{Phys. Rev. D} 110 (6): 064028.
 \url{https://doi.org/10.1103/PhysRevD.110.064028}.
 
-\bibitem[\citeproctext]{ref-Gerosa:2020}
+\leavevmode\hypertarget{ref-Gerosa:2020}
 Gerosa, Davide et al. 2020. {``Gravitational-Wave Selection Effects
 Using Neural-Network Classifiers.''} \emph{Physical Review D} 102 (10).
 \url{https://doi.org/10.1103/physrevd.102.103020}.
 
-\bibitem[\citeproctext]{ref-numba}
+\leavevmode\hypertarget{ref-numba}
 Lam, Stan, Stéphane Pitrou, and Mark Seibert. 2022. {``Numba: A High
 Performance Python Compiler.''} \emph{Numba Documentation}. Anaconda,
 Inc. \url{https://numba.pydata.org/}.
 
-\bibitem[\citeproctext]{ref-lalsuite}
+\leavevmode\hypertarget{ref-lalsuite}
 LIGO Scientific Collaboration, Virgo Collaboration, and KAGRA
 Collaboration. 2018. {``{LVK} {A}lgorithm {L}ibrary - {LALS}uite.''}
 Free software (GPL). \url{https://doi.org/10.7935/GT1W-FZ16}.
 
-\bibitem[\citeproctext]{ref-ng2024}
+\leavevmode\hypertarget{ref-ng2024}
 Ng, Leo C. Y., Justin Janquart, Hemantakumar Phurailatpam, Harsh Narola,
 Jason S. C. Poon, Chris Van Den Broeck, and Otto A. Hannuksela. 2024.
 {``Uncovering Faint Lensed Gravitational-Wave Signals and Reprioritizing
 Their Follow-up Analysis Using Galaxy Lensing Forecasts with Detected
 Counterparts.''} \url{https://arxiv.org/abs/2403.16532}.
 
-\bibitem[\citeproctext]{ref-scikitlearn}
+\leavevmode\hypertarget{ref-scikitlearn}
 Pedregosa, Fabian, Gaël Varoquaux, Alexandre Gramfort, Vincent Michel,
 Bertrand Thirion, Olivier Grisel, Mathieu Blondel, et al. 2011.
 {``Scikit-Learn: Machine Learning in {P}ython.''} \emph{Journal of
 Machine Learning Research} 12: 2825--30.
 
-\bibitem[\citeproctext]{ref-ler}
+\leavevmode\hypertarget{ref-ler}
 Phurailatpam, Hemantakumar, Anupreeta More, Harsh Narola, Ng Chung Yin,
 Justin Janquart, Chris Van Den Broeck, Otto Akseli Hannuksela, Neha
 Singh, and David Keitel. 2024. {``Ler : LVK (LIGO-Virgo-KAGRA
 Collaboration) Event (Compact-Binary Mergers) Rate Calculator and
 Simulator.''} \url{https://arxiv.org/abs/2407.07526}.
 
-\bibitem[\citeproctext]{ref-Taylor:2018}
+\leavevmode\hypertarget{ref-Taylor:2018}
 Taylor, Stephen R., and Davide Gerosa. 2018. {``Mining
 Gravitational-Wave Catalogs to Understand Binary Stellar Evolution: A
 New Hierarchical Bayesian Framework.''} \emph{Physical Review D} 98 (8).
 \url{https://doi.org/10.1103/physrevd.98.083017}.
 
-\bibitem[\citeproctext]{ref-LIGO2015}
+\leavevmode\hypertarget{ref-LIGO2015}
 The LIGO Scientific Collaboration, J Aasi, B P Abbott, R Abbott, T
 Abbott, M R Abernathy, K Ackley, et al. 2015. {``Advanced LIGO.''}
 \emph{Classical and Quantum Gravity} 32 (7): 074001.
 \url{https://doi.org/10.1088/0264-9381/32/7/074001}.
 
-\bibitem[\citeproctext]{ref-Thrane:2019}
+\leavevmode\hypertarget{ref-Thrane:2019}
 Thrane, Eric, and Colm Talbot. 2019. {``An Introduction to Bayesian
 Inference in Gravitational-Wave Astronomy: Parameter Estimation, Model
 Selection, and Hierarchical Models.''} \emph{Publications of the
 Astronomical Society of Australia} 36.
 \url{https://doi.org/10.1017/pasa.2019.2}.
-
-\end{CSLReferences}
 
 \end{document}

@@ -8,7 +8,7 @@ import json
 # supress warning
 import absl.logging
 absl.logging.set_verbosity(absl.logging.ERROR)
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from tensorflow.keras.models import load_model
 from importlib import resources
 import pickle
@@ -45,7 +45,6 @@ def save_json(file_name, param):
             json.dump(param, write_file)
         except:
             json.dump(param, write_file, indent=4, cls=NumpyEncoder)
-
 
 def load_json(file_name):
     """Load a json file.
@@ -110,6 +109,149 @@ def load_ann_h5(filename):
     """
 
     return load_model(filename)
+
+def append_json(file_name, new_dictionary, old_dictionary=None, replace=False):
+    """
+    Append (values with corresponding keys) and update a json file with a dictionary. There are four options:
+
+    1. If old_dictionary is provided, the values of the new dictionary will be appended to the old dictionary and save in the 'file_name' json file.
+    2. If replace is True, replace the json file (with the 'file_name') content with the new_dictionary.
+    3. If the file does not exist, create a new one with the new_dictionary.
+    4. If none of the above, append the new dictionary to the content of the json file.
+
+    Parameters
+    ----------
+    file_name : `str`
+        json file name for storing the parameters. 
+    new_dictionary : `dict`
+        dictionary to be appended to the json file.
+    old_dictionary : `dict`, optional
+        If provided the values of the new dictionary will be appended to the old dictionary and save in the 'file_name' json file. 
+        Default is None.
+    replace : `bool`, optional
+        If True, replace the json file with the dictionary. Default is False.
+
+    """
+
+    # check if the file exists
+    # time
+    # start = datetime.datetime.now()
+    if old_dictionary:
+        data = old_dictionary
+    elif replace:
+        data = new_dictionary
+    elif not os.path.exists(file_name):
+        #print(f" {file_name} file does not exist. Creating a new one...")
+        replace = True
+        data = new_dictionary
+    else:
+        #print("getting data from file")
+        with open(file_name, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    # end = datetime.datetime.now()
+    # print(f"Time taken to load the json file: {end-start}")
+
+    # start = datetime.datetime.now()
+    if not replace:
+        data = add_dictionaries_together(data, new_dictionary)
+        # data_key = data.keys()
+        # for key, value in new_dictionary.items():
+        #     if key in data_key:
+        #         data[key] = np.concatenate((data[key], value)).tolist()
+    # end = datetime.datetime.now()
+    # print(f"Time taken to append the dictionary: {end-start}")
+
+    # save the dictionary
+    # start = datetime.datetime.now()
+    #print(data)
+    with open(file_name, "w", encoding="utf-8") as write_file:
+        json.dump(data, write_file, indent=4, cls=NumpyEncoder)
+    # end = datetime.datetime.now()
+    # print(f"Time taken to save the json file: {end-start}")
+
+    return data
+
+def add_dictionaries_together(dictionary1, dictionary2):
+    """
+    Adds two dictionaries with the same keys together.
+    
+    Parameters
+    ----------
+    dictionary1 : `dict`
+        dictionary to be added.
+    dictionary2 : `dict`
+        dictionary to be added.
+
+    Returns
+    ----------
+    dictionary : `dict`
+        dictionary with added values.
+    """
+    dictionary = {}
+    # Check if either dictionary empty, in which case only return the dictionary with values
+    if len(dictionary1) == 0:
+        return dictionary2
+    elif len(dictionary2) == 0:
+        return dictionary1
+    # Check if the keys are the same
+    if dictionary1.keys() != dictionary2.keys():
+        raise ValueError("The dictionaries have different keys.")
+    for key in dictionary1.keys():
+        value1 = dictionary1[key]
+        value2 = dictionary2[key]
+
+        # check if the value is empty
+        bool0 = len(value1) == 0 or len(value2) == 0
+        # check if the value is an ndarray or a list
+        bool1 = isinstance(value1, np.ndarray) and isinstance(value2, np.ndarray)
+        bool2 = isinstance(value1, list) and isinstance(value2, list)
+        bool3 = isinstance(value1, np.ndarray) and isinstance(value2, list)
+        bool4 = isinstance(value1, list) and isinstance(value2, np.ndarray)
+        bool4 = bool4 or bool3
+        bool5 = isinstance(value1, dict) and isinstance(value2, dict)
+
+        if bool0:
+            if len(value1) == 0 and len(value2) == 0:
+                dictionary[key] = np.array([])
+            elif len(value1) != 0 and len(value2) == 0:
+                dictionary[key] = np.array(value1)
+            elif len(value1) == 0 and len(value2) != 0:
+                dictionary[key] = np.array(value2)
+        elif bool1:
+            dictionary[key] = np.concatenate((value1, value2))
+        elif bool2:
+            dictionary[key] = value1 + value2
+        elif bool4:
+            dictionary[key] = np.concatenate((np.array(value1), np.array(value2)))
+        elif bool5:
+            dictionary[key] = add_dictionaries_together(
+                dictionary1[key], dictionary2[key]
+            )
+        else:
+            raise ValueError(
+                "The dictionary contains an item which is neither an ndarray nor a dictionary."
+            )
+    return dictionary
+
+def get_param_from_json(json_file):
+    """
+    Function to get the parameters from json file.
+
+    Parameters
+    ----------
+    json_file : `str`
+        json file name for storing the parameters.
+
+    Returns
+    ----------
+    param : `dict`
+    """
+    with open(json_file, "r", encoding="utf-8") as f:
+        param = json.load(f)
+
+    for key, value in param.items():
+        param[key] = np.array(value)
+    return param
 
 def load_ann_h5_from_module(package, directory, filename):
     """
@@ -214,7 +356,7 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
         # for Fp, Fc calculation
         ifos = bilby.gw.detector.InterferometerList(detector_list)
 
-    elif not psds and ifos:
+    elif ifos and not psds:
         ifos_ = []
         detector_list = []
         psds = dict()
@@ -239,6 +381,8 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
                 ifos_.append(ifo)
                 detector_list.append(ifo.name)
                 psds[ifo.name] = ifo.power_spectral_density.psd_file
+                if not psds[ifo.name]:
+                    psds[ifo.name] = ifo.power_spectral_density.asd_file
         ifos = ifos_
 
     elif psds and not ifos:
@@ -288,7 +432,7 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
     # generate bilby's psd objects
     psds_list = []
     detector_tensor_list = []
-    error_msg = "the psds format is not recognised. The parameter psds dict should contain chosen detector names as keys and corresponding psds txt file name (or name from pycbc psd)as their values"
+    error_msg = "the psds format is not recognised. The parameter psds dict should contain chosen detector names as keys and corresponding psds txt file name (or name from pycbc psd) as their values"
     # print(psds)
     # print(detector_list)
     for i, det in enumerate(detector_list):
@@ -311,44 +455,59 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
                 )
 
         elif isinstance(psds[det], float):
+            # get the psd from the open data
             duration = 16
-            sample_rate = 2048
+            sample_rate = 4096.0  # 2048Hz throws error
             psd_duration = duration * 32
             analysis_start = psds[det]
             psd_start_time = analysis_start - psd_duration
 
-            # set up empty interferometer
-            X1 = bilby.gw.detector.get_empty_interferometer(det)
+            # check directory
+            if not os.path.exists("./psd_data"):
+                os.makedirs("./psd_data")
 
-            # download the data
-            X1_psd_data = TimeSeries.fetch_open_data(
-                det, psd_start_time, psd_start_time + psd_duration, sample_rate=sample_rate, cache=True)
+            # check if the txt file exists in psd directory
+            path_ = f'./psd_data/{det}_{int(analysis_start+1)}_psd.txt'
+            it_exist = os.path.exists(path_)
 
-            # calculate the psd
-            psd_alpha = 2 * X1.strain_data.roll_off / duration
-            X1_psd = X1_psd_data.psd(fftlength=duration, overlap=0, window=("tukey", psd_alpha), method="median")
+            if not it_exist:
+                # set up empty interferometer
+                X1 = bilby.gw.detector.get_empty_interferometer(det)
 
-            # initialize the psd
-            psds_list.append(
-                bilby.gw.detector.PowerSpectralDensity(
-                    frequency_array=X1_psd.frequencies.value, psd_array=X1_psd.value
-                )
-            )
+                # download the data
+                print(f"Downloading data for {det} detector")
+                X1_psd_data = TimeSeries.fetch_open_data(
+                    det, psd_start_time, psd_start_time + psd_duration, sample_rate=sample_rate, cache=True)
+
+                # calculate the psd
+                psd_alpha = 2 * X1.strain_data.roll_off / duration
+                X1_psd = X1_psd_data.psd(fftlength=duration, overlap=0, window=("tukey", psd_alpha), method="median")
+
+                # save the psd
+                print(f"Saving psd data for {det} detector at {path_}")
+                X1_psd.write(path_)
+
+                # initialize the psd object
+                psd_obj = bilby.gw.detector.PowerSpectralDensity(
+                        frequency_array=X1_psd.frequencies.value, psd_array=X1_psd.value
+                    )
+            else:
+                print(f"Loading psd data for {det} detector from {path_}")
+                psd_obj = bilby.gw.detector.PowerSpectralDensity(psd_file=path_)
+
+            psds_list.append(psd_obj)
 
         elif isinstance(psds[det], str):
-            try:
-                psds_list.append(
-                    power_spectral_density_pycbc(psds[det]), f_min, sampling_frequency
-                )
-            except:
-                raise ValueError(error_msg)
+            print("Trying to get the psd from pycbc: ", psds[det])
+            psds_list.append(
+                power_spectral_density_pycbc(psds[det], f_min, sampling_frequency)
+            )
         else:
             raise ValueError(error_msg)
         
         detector_tensor_list.append(ifos[i].detector_tensor)
 
     return psds_list, detector_tensor_list, detector_list
-
 
 def power_spectral_density_pycbc(psd, f_min=20.0, sampling_frequency=2048.0):
     """
@@ -534,3 +693,75 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
     # print(f"In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {path_interpolator} \n")
 
     return (path_interpolator, it_exist)
+
+
+def get_gw_parameters(gw_param_dict):
+
+    if isinstance(gw_param_dict, dict):
+        pass
+    elif isinstance(gw_param_dict, str):
+        try:
+            gw_param_dict = get_param_from_json(gw_param_dict)
+        except:
+            raise ValueError("gw_param_dict should be either a dictionary or a json string")
+    else:
+        raise ValueError("gw_param_dict should be either a dictionary or a json string")
+
+    mass_1 = gw_param_dict.get("mass_1", np.array([10.0]))
+    mass_2 = gw_param_dict.get("mass_2", np.array([10.0]))
+    mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
+    luminosity_distance = gw_param_dict.get("luminosity_distance", np.array([100.0]))
+    theta_jn = gw_param_dict.get("theta_jn", np.array([0.0]))
+    psi = gw_param_dict.get("psi", np.array([0.0]))
+    phase = gw_param_dict.get("phase", np.array([0.0]))
+    geocent_time = gw_param_dict.get("geocent_time", np.array([1246527224.169434]))
+    ra = gw_param_dict.get("ra", np.array([0.0]))
+    dec = gw_param_dict.get("dec", np.array([0.0]))
+    size = len(mass_1)
+
+    # Extract spin parameters or initialize to zeros
+    a_1 = gw_param_dict.get("a_1", np.zeros(size))
+    a_2 = gw_param_dict.get("a_2", np.zeros(size))
+
+    # Extract precessing waveform parameters or initialize to zeros
+    tilt_1 = gw_param_dict.get("tilt_1", np.zeros(size))
+    tilt_2 = gw_param_dict.get("tilt_2", np.zeros(size))
+    phi_12 = gw_param_dict.get("phi_12", np.zeros(size))
+    phi_jl = gw_param_dict.get("phi_jl", np.zeros(size))
+
+    mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
+    (
+        mass_1,
+        mass_2,
+        luminosity_distance,
+        theta_jn,
+        psi,
+        phase,
+        geocent_time,
+        ra,
+        dec,
+        a_1,
+        a_2,
+        tilt_1,
+        tilt_2,
+        phi_12,
+        phi_jl,
+    ) = np.broadcast_arrays(
+        mass_1,
+        mass_2,
+        luminosity_distance,
+        theta_jn,
+        psi,
+        phase,
+        geocent_time,
+        ra,
+        dec,
+        a_1,
+        a_2,
+        tilt_1,
+        tilt_2,
+        phi_12,
+        phi_jl,
+    )
+
+    return mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl

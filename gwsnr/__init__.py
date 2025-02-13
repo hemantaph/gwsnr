@@ -13,6 +13,11 @@ __version__ = "0.3.2"
 import os
 __file__ = os.path.abspath(__file__)
 
+# import warnings
+# warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
+# import lal
+# lal.swig_redirect_standard_output_error(False)
+
 # import multiprocessing as mp
 
 # def set_multiprocessing_start_method():
@@ -38,6 +43,7 @@ from .multiprocessing_routine import *
 from .utils import *
 from .ripple_class import *
 from .jaxjit_functions import *
+from .ann_model_generator import *
 
 from . import ann
 
