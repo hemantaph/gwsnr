@@ -49,25 +49,34 @@ def noise_weighted_inner_prod(params):
         params[14] : float
             phi_jl
         params[15] : float
-            approximant
+            lambda_1
         params[16] : float
-            f_min
+            lambda_2
         params[17] : float
-            duration
+            eccentricity
         params[18] : float
+            approximant
+        params[19] : float
+            f_min
+        params[20] : float
+            duration
+        params[21] : float
             sampling_frequency
-        params[19] : int
+        params[22] : int
             index tracker
-        params[20] : list
+        params[23] : list
             list of psds for each detector
-        detector_list[21:] : list
+        params[24] : str
+            frequency_domain_source_model name
+        params[25:] : list
             list of detectors
+        
 
     Returns
     -------
     SNRs_list : list
         contains opt_snr for each detector and net_opt_snr
-    params[19] : int
+    params[22] : int
         index tracker
     """
 
@@ -89,18 +98,24 @@ def noise_weighted_inner_prod(params):
         "tilt_2": params[12],
         "phi_12": params[13],
         "phi_jl": params[14],
+        "lambda_1": params[15],
+        "lambda_2": params[16],
+        "eccentricity": params[17],
     }
 
+    # print('eccentricity', params[17])
+    # print('frequency_domain_source_model', params[24])
+
     waveform_arguments = dict(
-        waveform_approximant=params[15],
+        waveform_approximant=params[18],
         reference_frequency=20.0,
-        minimum_frequency=params[16],
+        minimum_frequency=params[19],
     )
 
     waveform_generator = bilby.gw.WaveformGenerator(
-        duration=params[17],
-        sampling_frequency=params[18],
-        frequency_domain_source_model=bilby.gw.source.lal_binary_black_hole,
+        duration=params[20],
+        sampling_frequency=params[21],
+        frequency_domain_source_model=getattr(bilby.gw.source, params[24]),
         waveform_arguments=waveform_arguments,
     )
     polas = waveform_generator.frequency_domain_strain(parameters=parameters)
@@ -110,8 +125,8 @@ def noise_weighted_inner_prod(params):
     # <h|h> = <h+,h+> + <hx,hx>, if h+ and hx are orthogonal
     hp_inner_hp_list = []
     hc_inner_hc_list = []
-    list_of_detectors = params[21:].tolist()
-    psds_objects = params[20]
+    list_of_detectors = params[25:].tolist()
+    psds_objects = params[23]
     for det in list_of_detectors:
 
         # need to compute the inner product for
@@ -142,7 +157,7 @@ def noise_weighted_inner_prod(params):
         hp_inner_hp_list.append(hp_inner_hp)
         hc_inner_hc_list.append(hc_inner_hc)
 
-    return (hp_inner_hp_list, hc_inner_hc_list, params[19])
+    return (hp_inner_hp_list, hc_inner_hc_list, params[22])
 
 
 def noise_weighted_inner_prod_ripple(params):
@@ -175,7 +190,7 @@ def noise_weighted_inner_prod_ripple(params):
         -------
         SNRs_list : list
             contains opt_snr for each detector and net_opt_snr
-        params[19] : int
+        params[22] : int
             index tracker
     """
 

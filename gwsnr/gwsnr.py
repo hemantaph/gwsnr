@@ -295,6 +295,7 @@ class GWSNR:
         ratio_resolution=50,
         sampling_frequency=2048.0,
         waveform_approximant="IMRPhenomD",
+        frequency_domain_source_model='lal_binary_black_hole',
         minimum_frequency=20.0,
         duration_max=None,
         duration_min=None,
@@ -342,6 +343,7 @@ class GWSNR:
         )
         self.sampling_frequency = sampling_frequency
         self.waveform_approximant = waveform_approximant
+        self.frequency_domain_source_model = frequency_domain_source_model
         self.f_min = minimum_frequency
         self.snr_type = snr_type
         self.interpolator_dir = interpolator_dir
@@ -650,6 +652,7 @@ class GWSNR:
         phi_jl=0.0,
         lambda_1=0.0,
         lambda_2=0.0,
+        eccentricity=0.0,
         gw_param_dict=False,
         output_jsonfile=False,
     ):
@@ -739,6 +742,9 @@ class GWSNR:
                 tilt_2=tilt_2,
                 phi_12=phi_12,
                 phi_jl=phi_jl,
+                lambda_1=lambda_1,
+                lambda_2=lambda_2,
+                eccentricity=eccentricity,
                 gw_param_dict=gw_param_dict,
                 output_jsonfile=output_jsonfile,
             )
@@ -856,9 +862,9 @@ class GWSNR:
         """
 
         if gw_param_dict is not False:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(gw_param_dict)
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, _, _, _ = get_gw_parameters(gw_param_dict)
         else:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, _, _, _ = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
 
         # setting up the parameters
         model = self.model_dict
@@ -1037,9 +1043,9 @@ class GWSNR:
 
         # getting the parameters from the dictionary
         if gw_param_dict is not False:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, _, _, _, _, _, _ = get_gw_parameters(gw_param_dict)
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, _, _, _, _, _, _, _, _, _ = get_gw_parameters(gw_param_dict)
         else:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, _, _, _, _, _, _ = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec))
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, _, _, _, _, _, _, _, _, _ = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec))
 
         # setting up the parameters
         detector_tensor = np.array(self.detector_tensor_list)
@@ -1186,6 +1192,9 @@ class GWSNR:
         tilt_2=0.0,
         phi_12=0.0,
         phi_jl=0.0,
+        lambda_1=0.0,
+        lambda_2=0.0,
+        eccentricity=0.0,
         gw_param_dict=False,
         output_jsonfile=False,
     ):
@@ -1257,9 +1266,9 @@ class GWSNR:
 
         # if gw_param_dict is given, then use that
         if gw_param_dict is not False:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(gw_param_dict)
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, lambda_1, lambda_2, eccentricity  = get_gw_parameters(gw_param_dict)
         else:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, lambda_1, lambda_2, eccentricity = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl, lambda_1=lambda_1, lambda_2=lambda_2, eccentricity=eccentricity))
 
         npool = self.npool
         sampling_frequency = self.sampling_frequency
@@ -1284,6 +1293,7 @@ class GWSNR:
         dectector_arr = np.array(detectors) * np.ones(
             (size1, len(detectors)), dtype=object
         )
+        frequency_domain_source_model = np.array([np.full(size1, self.frequency_domain_source_model)]).T
         psds_dict_list = np.array([np.full(size1, psd_dict, dtype=object)]).T
         # IMPORTANT: time duration calculation for each of the mass combination
         safety = 1.2
@@ -1312,6 +1322,9 @@ class GWSNR:
                 tilt_2[idx],
                 phi_12[idx],
                 phi_jl[idx],
+                lambda_1[idx],
+                lambda_2[idx],
+                eccentricity[idx],
                 np.full(size1, approximant),
                 np.full(size1, f_min),
                 duration,
@@ -1322,7 +1335,7 @@ class GWSNR:
         ).T
 
         input_arguments = np.concatenate(
-            (input_arguments, psds_dict_list, dectector_arr), axis=1
+            (input_arguments, psds_dict_list, frequency_domain_source_model, dectector_arr), axis=1
         )
 
         # np.shape(hp_inner_hp) = (len(num_det), size1)
@@ -1466,9 +1479,9 @@ class GWSNR:
 
         # if gw_param_dict is given, then use that
         if gw_param_dict is not False:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, lambda_1, lambda_2, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(gw_param_dict)
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, lambda_1, lambda_2, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, _, _, _ = get_gw_parameters(gw_param_dict)
         else:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, _, _, _ = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
 
         npool = self.npool
         detectors = self.detector_list.copy()

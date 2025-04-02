@@ -729,6 +729,13 @@ def get_gw_parameters(gw_param_dict):
     phi_12 = gw_param_dict.get("phi_12", np.zeros(size))
     phi_jl = gw_param_dict.get("phi_jl", np.zeros(size))
 
+    # Extract tidal parameters or initialize to zeros
+    lambda_1 = gw_param_dict.get("lambda_1", np.zeros(size))
+    lambda_2 = gw_param_dict.get("lambda_2", np.zeros(size))
+    
+    # Extract eccentricity or initialize to zeros
+    eccentricity = gw_param_dict.get("eccentricity", np.zeros(size))
+
     mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
     (
         mass_1,
@@ -746,6 +753,9 @@ def get_gw_parameters(gw_param_dict):
         tilt_2,
         phi_12,
         phi_jl,
+        lambda_1,
+        lambda_2,
+        eccentricity,
     ) = np.broadcast_arrays(
         mass_1,
         mass_2,
@@ -762,6 +772,9 @@ def get_gw_parameters(gw_param_dict):
         tilt_2,
         phi_12,
         phi_jl,
+        lambda_1,
+        lambda_2,
+        eccentricity,
     )
 
-    return mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl
+    return mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, lambda_1, lambda_2, eccentricity
