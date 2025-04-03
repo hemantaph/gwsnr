@@ -36,6 +36,7 @@ setup(name='gwsnr',
         "h5py>=3.11.0,<3.12.0",
         "numba>=0.57.1,<0.58.0",
         "numba>=0.57.1",
+        "ml-dtypes==0.3.1", # new
         "tensorflow>=2.17.0,<2.18.0",
         "scikit-learn==1.5.0",
         "numexpr>=2.8.4",

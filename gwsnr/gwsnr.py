@@ -591,7 +591,7 @@ class GWSNR:
             mass_1 = x / (1 + mass_ratio)
             mass_2 = x / (1 + mass_ratio) * mass_ratio
 
-            return findchirp_chirptime(mass_1, mass_2, minimum_frequency) * 1.2
+            return findchirp_chirptime(mass_1, mass_2, minimum_frequency) * 1.1
 
         # find where func is zero
         mtot_max_generated = fsolve(func, 150)[
@@ -1296,7 +1296,7 @@ class GWSNR:
         frequency_domain_source_model = np.array([np.full(size1, self.frequency_domain_source_model)]).T
         psds_dict_list = np.array([np.full(size1, psd_dict, dtype=object)]).T
         # IMPORTANT: time duration calculation for each of the mass combination
-        safety = 1.2
+        safety = 1.1
         approx_duration = safety * findchirp_chirptime(mass_1[idx], mass_2[idx], f_min)
         duration = np.ceil(approx_duration + 2.0)
         if self.duration_max:

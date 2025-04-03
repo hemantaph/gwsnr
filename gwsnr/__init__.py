@@ -18,23 +18,21 @@ __file__ = os.path.abspath(__file__)
 # import lal
 # lal.swig_redirect_standard_output_error(False)
 
-# import multiprocessing as mp
-
-# def set_multiprocessing_start_method():
-#     if os.name == 'posix':  # posix indicates the program is run on Unix/Linux/MacOS
-#       try:
-#          mp.set_start_method('fork', force=True)
-#       except RuntimeError:
-#          # The start method can only be set once and must be set before any process starts
-#          pass
-#     else:
-#       # For Windows and other operating systems, use 'spawn'
-#       try:
-#          mp.set_start_method('spawn', force=True)
-#       except RuntimeError:
-#          pass
-
-# set_multiprocessing_start_method()
+import multiprocessing as mp
+def set_multiprocessing_start_method():
+    if os.name == 'posix':  # posix indicates the program is run on Unix/Linux/MacOS
+      try:
+         mp.set_start_method('fork', force=True)
+      except RuntimeError:
+         # The start method can only be set once and must be set before any process starts
+         pass
+    else:
+      # For Windows and other operating systems, use 'spawn'
+      try:
+         mp.set_start_method('spawn', force=True)
+      except RuntimeError:
+         pass
+set_multiprocessing_start_method()
 
 from .gwsnr import *
 from .njit_functions import *
