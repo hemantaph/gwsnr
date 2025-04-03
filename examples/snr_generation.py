@@ -29,7 +29,7 @@ gwsnr = GWSNR(npool=int(4),
 # Setting up the BBH (Binary Black Hole) parameters
 # gerneral case, random parameters
 # chirp mass can go upto only 95 if f_min=20. to get non zero SNR
-nsamples = 1000
+nsamples = 10
 chirp_mass = np.linspace(5,80,nsamples)
 mass_ratio = np.random.uniform(0.2,1,size=nsamples)
 mass_1 = (chirp_mass*(1+mass_ratio)**(1/5))/mass_ratio**(3/5)
@@ -53,4 +53,6 @@ data = {'mass_1': mass_1, 'mass_2': mass_2, 'luminosity_distance': luminosity_di
 data.update(interp_snr)
 
 # save the dictionary in json format
-save_json('snr_data.json', data);
+file_name = './snr_data.json'
+print(f'saving results as json file at {file_name}')
+save_json(file_name, data);

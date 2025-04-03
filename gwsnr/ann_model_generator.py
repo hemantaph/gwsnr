@@ -49,7 +49,7 @@ class ANNModelGenerator():
     """
     
     def __init__(self,
-        directory="./ler_data",
+        directory="./gwsnr_data",
         npool=4,
         gwsnr_verbose=True,
         snr_th=8.0,
