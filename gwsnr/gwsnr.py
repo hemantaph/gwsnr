@@ -321,6 +321,20 @@ class GWSNR:
         self.snr_th_net = snr_th_net
         self.duration_max = duration_max
         self.duration_min = duration_min
+        self.snr_type = snr_type
+        # change multiprocessing start method from fork to spawn if snr_type is inner_product_jax
+        if self.snr_type == "inner_product_jax":
+            import multiprocessing as mp
+            import os
+
+            def set_multiprocessing_start_method():
+                start_method = 'spawn'  # Use 'spawn' for both POSIX and non-POSIX systems
+                try:
+                    mp.set_start_method(start_method, force=True)
+                except RuntimeError:
+                    # The start method can only be set once and must be set before any processes start
+                    pass
+            set_multiprocessing_start_method()
 
         # dealing with mtot_max
         # set max cut off according to minimum_frequency
@@ -345,7 +359,6 @@ class GWSNR:
         self.waveform_approximant = waveform_approximant
         self.frequency_domain_source_model = frequency_domain_source_model
         self.f_min = minimum_frequency
-        self.snr_type = snr_type
         self.interpolator_dir = interpolator_dir
 
         # dealing with psds
@@ -1397,8 +1410,6 @@ class GWSNR:
         theta_jn=0.0,
         psi=0.0,
         phase=0.0,
-        lambda_1=0.0,
-        lambda_2=0.0,
         geocent_time=1246527224.169434,
         ra=0.0,
         dec=0.0,
@@ -1479,7 +1490,7 @@ class GWSNR:
 
         # if gw_param_dict is given, then use that
         if gw_param_dict is not False:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, lambda_1, lambda_2, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, _, _, _ = get_gw_parameters(gw_param_dict)
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, _, _, _ = get_gw_parameters(gw_param_dict)
         else:
             mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, _, _, _ = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
 
@@ -1506,8 +1517,6 @@ class GWSNR:
             theta_jn=theta_jn[idx],
             psi=psi[idx],
             phase=phase[idx],
-            lambda_1=lambda_1[idx],
-            lambda_2=lambda_2[idx],
             geocent_time=geocent_time[idx],
             ra=ra[idx],
             dec=dec[idx],

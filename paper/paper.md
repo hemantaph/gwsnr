@@ -1,5 +1,5 @@
 ---
-title: '`gwsnr`: A Python Package for Efficient SNR Calculation of GWs'
+title: '`gwsnr`: A Python Package for Efficient SNR Calculation of Gravitational waves'
 tags:
   - Python
   - astrophysics
