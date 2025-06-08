@@ -359,8 +359,7 @@ def get_interpolated_snr(mass_1, mass_2, luminosity_distance, theta_jn, psi, geo
     for j in range(len_):
         # loop over the parameter points
         for i in range(size):
-            snr_partial_coeff = snr_partialscaled[j]
-            snr_partial_[j,i] = cubic_spline_interpolator2d(mtot[i], ratio[i], snr_partial_coeff, mtot_arr, ratio_arr)
+            snr_partial_[j,i] = cubic_spline_interpolator2d(mtot[i], ratio[i], snr_partialscaled[j], mtot_arr, ratio_arr)
             d_eff[j,i] =luminosity_distance[i] / np.sqrt(
                     Fp[j,i]**2 * ci_param[i] + Fc[j,i]**2 * ci_2[i]
                 )
