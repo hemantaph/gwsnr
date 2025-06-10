@@ -397,9 +397,9 @@ def cubic_spline_interpolator2d(xnew, ynew, coefficients, x, y):
     # find the index nearest to the ynew in y
     y_idx = np.searchsorted(y, ynew) - 1 if ynew > y[0] else 0
 
-    if (ynew>y[0]) and (ynew<y[1]):
-        if ynew > y[y_idx] + (y[y_idx+1] - y[y_idx]) / 2:
-            y_idx = y_idx + 1
+    if (ynew>y[0]) and (ynew<y[1]): # if ynew is between the first two points
+        if ynew > y[y_idx] + (y[y_idx+1] - y[y_idx]) / 2: # if ynew is closer to the second point
+            y_idx = y_idx + 1 # move to the second point
         result = cubic_spline_interpolator(xnew, coefficients[y_idx], x)
     elif y_idx == 0:  # lower end point
         result = cubic_spline_interpolator(xnew, coefficients[0], x)

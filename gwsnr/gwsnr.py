@@ -33,6 +33,9 @@ from .utils import (
     load_json_from_module,
     get_gw_parameters,
 )
+import jax
+import jax.numpy as jnp
+jax.config.update("jax_enable_x64", True)
 from .njit_functions import (
     get_interpolated_snr,
     findchirp_chirptime,
@@ -41,6 +44,7 @@ from .njit_functions import (
 )
 from .jaxjit_functions import (
     get_interpolated_snr_aligned_spins,
+    get_interpolated_snr_no_spins,
 )
 from .multiprocessing_routine import noise_weighted_inner_prod
 
@@ -491,20 +495,20 @@ class GWSNR:
         # len(detector_list) == 0, means all the detectors have interpolator stored
         if len(self.detector_list) > 0:
             print("Please be patient while the interpolator is generated")
-            if self.snr_type == 'interpolation_aligned_spins':
-                self.init_partialscaled_aligned_spins()
-            else:
-                self.init_partialscaled()
+            # if self.snr_type == 'interpolation_aligned_spins':
+            #     self.init_partialscaled_aligned_spins()
+            # else:
+            self.init_partialscaled()
         elif create_new_interpolator:
             # change back to original
             self.psds_list = psds_list
             self.detector_tensor_list = detector_tensor_list
             self.detector_list = detector_list
             print("Please be patient while the interpolator is generated")
-            if self.snr_type == 'interpolation_aligned_spins':
-                self.init_partialscaled_aligned_spins()
-            else:
-                self.init_partialscaled()
+            # if self.snr_type == 'interpolation_aligned_spins':
+            #     self.init_partialscaled_aligned_spins()
+            # else:
+            self.init_partialscaled()
 
         # get all partialscaledSNR from the stored interpolator
         self.snr_partialsacaled_list = [
@@ -744,7 +748,7 @@ class GWSNR:
         >>> snr.snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
         """
 
-        if self.snr_type == "interpolation" or self.snr_type == "interpolation_aligned_spins":
+        if (self.snr_type == "interpolation") or (self.snr_type == "interpolation_no_spins") or self.snr_type == "interpolation_aligned_spins":
             snr_dict = self.snr_with_interpolation(
                 mass_1,
                 mass_2,
@@ -1101,8 +1105,8 @@ class GWSNR:
         #     )
 
         # Get interpolated SNR
-        if self.snr_type == "interpolation":
-            snr, snr_effective, _, _ = get_interpolated_snr(
+        if self.snr_type == "interpolation" or self.snr_type == "interpolation_no_spins":
+            snr, snr_effective, _, _ = get_interpolated_snr_no_spins(
                 mass_1[idx2],
                 mass_2[idx2],
                 luminosity_distance[idx2],
@@ -1118,22 +1122,22 @@ class GWSNR:
             )
         elif self.snr_type == "interpolation_aligned_spins":
             snr, snr_effective, _, _ = get_interpolated_snr_aligned_spins(
-                mass_1[idx2],
-                mass_2[idx2],
-                luminosity_distance[idx2],
-                theta_jn[idx2],
-                psi[idx2],
-                geocent_time[idx2],
-                ra[idx2],
-                dec[idx2],
-                a_1[idx2],
-                a_2[idx2],
-                detector_tensor,
-                snr_partialscaled,
-                self.ratio_arr,
-                self.mtot_arr,
-                self.a_1_arr,
-                self.a_2_arr,
+                jnp.array(mass_1[idx2]),
+                jnp.array(mass_2[idx2]),
+                jnp.array(luminosity_distance[idx2]),
+                jnp.array(theta_jn[idx2]),
+                jnp.array(psi[idx2]),
+                jnp.array(geocent_time[idx2]),
+                jnp.array(ra[idx2]),
+                jnp.array(dec[idx2]),
+                jnp.array(a_1[idx2]),
+                jnp.array(a_2[idx2]),
+                jnp.array(detector_tensor),
+                jnp.array(snr_partialscaled),
+                jnp.array(self.ratio_arr),
+                jnp.array(self.mtot_arr),
+                jnp.array(self.a_1_arr),
+                jnp.array(self.a_2_arr),
             )
 
         # Create optimal_snr dictionary using dictionary comprehension
@@ -1152,7 +1156,7 @@ class GWSNR:
 
         return optimal_snr
     
-    def init_partialscaled_aligned_spins(self):
+    def init_partialscaled(self):
         """
         Function to generate partialscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.
         """
@@ -1165,28 +1169,32 @@ class GWSNR:
         num_det = np.arange(len(detectors), dtype=int)
         mtot_table = self.mtot_arr.copy()
         ratio_table = self.ratio_arr.copy()
-        a_1_table = self.a_1_arr.copy()
-        a_2_table = self.a_2_arr.copy()
         size1 = self.ratio_resolution
         size2 = self.mtot_resolution  
-        size3 = self.spin_resolution
-        size4 = self.spin_resolution
 
         # Assume these are 1D arrays with correct lengths
         ratio_table = np.asarray(ratio_table)
         mtot_table = np.asarray(mtot_table)
-        a_1_table = np.asarray(a_1_table)
-        a_2_table = np.asarray(a_2_table)
-
+        
         # Create broadcastable 4D grids
-        q, mtot, a1, a2 = np.meshgrid(
-            ratio_table, mtot_table, a_1_table, a_2_table, indexing='ij'
-        )
+        if self.snr_type == "interpolation_aligned_spins":
+            a_1_table = self.a_1_arr.copy()
+            a_2_table = self.a_2_arr.copy()
+            size3 = self.spin_resolution
+            size4 = self.spin_resolution
+            a_1_table = np.asarray(a_1_table)
+            a_2_table = np.asarray(a_2_table)
+
+            q, mtot, a_1, a_2 = np.meshgrid(
+                ratio_table, mtot_table, a_1_table, a_2_table, indexing='ij'
+            )
+        elif (self.snr_type == "interpolation") or (self.snr_type == "interpolation_no_spins"):
+            q, mtot = np.meshgrid(ratio_table, mtot_table, indexing='ij')
+            a_1 = np.zeros_like(mtot)
+            a_2 = a_1
 
         mass_1 = mtot / (1 + q)
         mass_2 = mass_1 * q
-        a_1 = a1
-        a_2 = a2
 
         # geocent_time cannot be array here
         # this geocent_time is only to get partialScaledSNR
@@ -1233,7 +1241,10 @@ class GWSNR:
         Mchirp_scaled = Mchirp ** (5.0 / 6.0)
         # filling in interpolation table for different detectors
         for j in num_det:
-            snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)) * dl_eff[j] / Mchirp_scaled), # shape (size1, size2, size3, size4)
+            if self.snr_type == "interpolation_aligned_spins":
+                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)) * dl_eff[j] / Mchirp_scaled), # shape (size1, size2, size3, size4)
+            elif (self.snr_type == "interpolation") or (self.snr_type == "interpolation_no_spins"):
+                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2)) * dl_eff[j] / Mchirp_scaled), # shape (size1, size2, size3, size4)
             # print('dl_eff=',dl_eff[j])
             # print('Mchirp_scaled=',Mchirp_scaled.shape)
             # print('optimal_snr_unscaled=',np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)).shape)
@@ -1241,88 +1252,88 @@ class GWSNR:
             save_pickle(self.path_interpolator[j], snr_partial_[0])
 
 
-    def init_partialscaled(self):
-        """
-        Function to generate partialscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.
-        """
+    # def init_partialscaled(self):
+    #     """
+    #     Function to generate partialscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.
+    #     """
 
-        if self.mtot_min < 1.0:
-            raise ValueError("Error: mass too low")
+    #     if self.mtot_min < 1.0:
+    #         raise ValueError("Error: mass too low")
 
-        detectors = self.detector_list.copy()
-        detector_tensor = self.detector_tensor_list.copy()
-        num_det = np.arange(len(detectors), dtype=int)
-        mtot_table = self.mtot_arr.copy()
-        ratio_table = self.ratio_arr.copy()
-        size1 = self.ratio_resolution
-        size2 = self.mtot_resolution 
+    #     detectors = self.detector_list.copy()
+    #     detector_tensor = self.detector_tensor_list.copy()
+    #     num_det = np.arange(len(detectors), dtype=int)
+    #     mtot_table = self.mtot_arr.copy()
+    #     ratio_table = self.ratio_arr.copy()
+    #     size1 = self.ratio_resolution
+    #     size2 = self.mtot_resolution 
 
-        mass_1 = np.zeros((size1, size2), dtype=float)
-        mass_2 = np.zeros((size1, size2), dtype=float) 
+    #     mass_1 = np.zeros((size1, size2), dtype=float)
+    #     mass_2 = np.zeros((size1, size2), dtype=float) 
 
-        # Ensure ratio_table and mtot_table are numpy arrays
-        ratio_table = np.asarray(ratio_table)
-        mtot_table = np.asarray(mtot_table)
+    #     # Ensure ratio_table and mtot_table are numpy arrays
+    #     ratio_table = np.asarray(ratio_table)
+    #     mtot_table = np.asarray(mtot_table)
 
-        # Use broadcasting to get (len(ratio_table), len(mtot_table)) shaped arrays
-        q_grid, mtot_grid = np.meshgrid(ratio_table, mtot_table, indexing='ij')
-        mass_1 = mtot_grid / (1 + q_grid)
-        mass_2 = mass_1 * q_grid
+    #     # Use broadcasting to get (len(ratio_table), len(mtot_table)) shaped arrays
+    #     q_grid, mtot_grid = np.meshgrid(ratio_table, mtot_table, indexing='ij')
+    #     mass_1 = mtot_grid / (1 + q_grid)
+    #     mass_2 = mass_1 * q_grid
 
-        # geocent_time cannot be array here
-        # this geocent_time is only to get partialScaledSNR
-        geocent_time_ = 1246527224.169434  # random time from O3
-        theta_jn_, ra_, dec_, psi_, phase_ = np.zeros(5)
-        luminosity_distance_ = 100.0
+    #     # geocent_time cannot be array here
+    #     # this geocent_time is only to get partialScaledSNR
+    #     geocent_time_ = 1246527224.169434  # random time from O3
+    #     theta_jn_, ra_, dec_, psi_, phase_ = np.zeros(5)
+    #     luminosity_distance_ = 100.0
 
-        # Vectorized computation for effective luminosity distance
-        Fp = np.array(
-            [
-                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "plus")
-                for tensor in detector_tensor
-            ]
-        )
-        Fc = np.array(
-            [
-                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "cross")
-                for tensor in detector_tensor
-            ]
-        )
-        dl_eff = luminosity_distance_ / np.sqrt(
-            Fp**2 * ((1 + np.cos(theta_jn_) ** 2) / 2) ** 2
-            + Fc**2 * np.cos(theta_jn_) ** 2
-        )
+    #     # Vectorized computation for effective luminosity distance
+    #     Fp = np.array(
+    #         [
+    #             antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "plus")
+    #             for tensor in detector_tensor
+    #         ]
+    #     )
+    #     Fc = np.array(
+    #         [
+    #             antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "cross")
+    #             for tensor in detector_tensor
+    #         ]
+    #     )
+    #     dl_eff = luminosity_distance_ / np.sqrt(
+    #         Fp**2 * ((1 + np.cos(theta_jn_) ** 2) / 2) ** 2
+    #         + Fc**2 * np.cos(theta_jn_) ** 2
+    #     )
 
-        print(f"Generating interpolator for {detectors} detectors")
-        # calling bilby_snr
-        optimal_snr_unscaled = self.compute_bilby_snr(
-            mass_1=mass_1.flatten(),
-            mass_2=mass_2.flatten(),
-            luminosity_distance=luminosity_distance_,
-            theta_jn=theta_jn_,
-            psi=psi_,
-            phase=phase_,
-            geocent_time=geocent_time_,
-            ra=ra_,
-            dec=dec_,
-        )
+    #     print(f"Generating interpolator for {detectors} detectors")
+    #     # calling bilby_snr
+    #     optimal_snr_unscaled = self.compute_bilby_snr(
+    #         mass_1=mass_1.flatten(),
+    #         mass_2=mass_2.flatten(),
+    #         luminosity_distance=luminosity_distance_,
+    #         theta_jn=theta_jn_,
+    #         psi=psi_,
+    #         phase=phase_,
+    #         geocent_time=geocent_time_,
+    #         ra=ra_,
+    #         dec=dec_,
+    #     )
         
-        # for partialscaledSNR
-        Mchirp = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
-        a2 = Mchirp ** (5.0 / 6.0)
-        # filling in interpolation table for different detectors
-        for j in num_det:
-            snr_ = np.reshape(optimal_snr_unscaled[detectors[j]], (size1, size2))
-            snr_partial_ = []
-            for k, q in enumerate(ratio_table):
-                snr_partial_.append(
-                    CubicSpline(
-                        mtot_table,
-                        (dl_eff[j] / a2[k]) * snr_[k],
-                    ).c
-                )
-            # save the interpolators for each detectors
-            save_pickle(self.path_interpolator[j], np.array(snr_partial_))
+    #     # for partialscaledSNR
+    #     Mchirp = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
+    #     a2 = Mchirp ** (5.0 / 6.0)
+    #     # filling in interpolation table for different detectors
+    #     for j in num_det:
+    #         snr_ = np.reshape(optimal_snr_unscaled[detectors[j]], (size1, size2))
+    #         snr_partial_ = []
+    #         for k, q in enumerate(ratio_table):
+    #             snr_partial_.append(
+    #                 CubicSpline(
+    #                     mtot_table,
+    #                     (dl_eff[j] / a2[k]) * snr_[k],
+    #                 ).c
+    #             )
+    #         # save the interpolators for each detectors
+    #         save_pickle(self.path_interpolator[j], np.array(snr_partial_))
 
     def compute_bilby_snr(
         self,

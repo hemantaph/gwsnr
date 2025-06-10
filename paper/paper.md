@@ -31,7 +31,7 @@ The *`gwsnr`* Python package addresses the need for efficient SNR computation in
 
 #### Modified FINDCHIRP Method: Partial Scaling Approach
 
-The *`gwsnr`* package introduces the Partial Scaling method for SNR calculations in spin-less binary systems. This method, rooted in the FINDCHIRP algorithm (@Allen:2012), focuses on non-spinning inspiral-merger-ringdown (IMR) waveforms, in lalsimulation library (@lalsuite), and particularly interpolates the Partial scaled SNR ($\rho_{1/2}$) based on mass parameters ($M_{tot},q$).
+The *`gwsnr`* package introduces the Partial Scaling method for SNR calculations in spin-less binary systems. This method, rooted in the FINDCHIRP algorithm (@Allen:2012), focuses on non-spinning inspiral-merger-ringdown (IMR) waveforms, in lalsimulation library (@lalsuite), and particularly interpolates the Partial scaled SNR ($\rho_{1/2}$) based on mass parameters ($M,q$).
 
 - **Interpolation Method**: Utilizes a 2D cubic spline technique (njit-ted) for the 'partialsnr' segment.
 
@@ -46,7 +46,7 @@ The *`gwsnr`* package introduces the Partial Scaling method for SNR calculations
 
   - For an spinless frequency-domain IMR waveform with optimal SNR equal to $\rho$: $\rho_{1/2} = \rho\,/\, F(D_l,\mathcal{M},\iota,\psi,\alpha, \delta)$
 
-  - $\rho_{1/2}$ is considered a function of $M_{tot}$ and $q$.
+  - $\rho_{1/2}$ is considered a function of $M$ and $q$.
 
 #### Noise-Weighted Inner Product Method with Multiprocessing
 
@@ -74,5 +74,80 @@ In addition to providing trained ANN models for specific configurations, *`gwsnr
 
 The author gratefully acknowledges the substantial contributions from all who supported this research. Special thanks go to my academic advisors for their invaluable guidance and unwavering support. The interactions with my research colleagues have greatly enriched this work. The Department of Physics at The Chinese University of Hong Kong is acknowledged for the Postgraduate Studentship that made this research possible. Thanks are also due to the LIGO Laboratory for the computational resources, supported by National Science Foundation Grants No. PHY-0757058 and No. PHY-0823459.
 
+## III. Interpolation with Partial Scaling method
+
+The `gwsnr` package introduces the Partial Scaling method for SNR calculations in spin-less and spin-aligned binary systems using interpolation assisted technique. 
+The idea for 'Partial Scaling method' is initially conceived for spin-less inspiral only waveforms, but it can be extended to IMR waveform (spinless and spin-aligned) systems as well.
+This method, rooted in the FINDCHIRP algorithm ([@Allen:2012](https://arxiv.org/pdf/gr-qc/0509116)), focuses on non-spinning and aligned-spins frequency domain waveforms, in `lalsimulation` library (@lalsuite), and particularly interpolates the Partial scaled SNR ($\rho_{1/2}$) based on mass parameters ($M,q$) and spin-magnitude ($a_1, a_2$) (if aligned-spins).
+
+Performance is optimized by though `JAX`'s Just-In-Time (`jit`) compilation, which accelerates both the antenna response functions calculation and the interpolation process. 
+
+### Mathematical Formulation
+
+Partial Scaling method, can be formulated, for spinless inspiral-only system with interpolation wrt to mass parameters, total-mass $M$ and mass-ratio $q$, as follows:
+For a simple **inspiral** waveform, following Eq.(2) of the Sec.([II](#ii-noise-weighted-inner-product-method)) and Eq.(D1) of [@Allen:2012](https://arxiv.org/pdf/gr-qc/0509116), the optimal SNR is given by,
+$$
+\begin{align}
+\rho &= \sqrt{4 \int_{f_{\rm min}}^{f_{\rm max}} \frac{|\tilde{h}(f)|^2}{S_n(f)}\, df}, \notag \\
+&= \left( \frac{1~\mathrm{Mpc}}{D_{\mathrm{eff}}} \right)
+\sqrt{4 \mathcal{A}_{1~\mathrm{Mpc}}^2 ({\cal M})
+\int_{f_{\rm min}}^{f_{\rm max}} \frac{f^{-7/3}}{S_n(f)}\, df }, \notag \\
+&= F(D_{\mathrm{eff}}, {\cal M}) \sqrt{ 4\int_{f_{\rm min}}^{f_{\rm lso}} \frac{f^{-7/3}}{S_n(f)}df }, \tag{B1}
+\end{align}
+$$
+where
+$$
+\begin{align}
+F(D_{\mathrm{eff}}, {\cal M}) &= \left(\frac{1~\mathrm{Mpc}}{D_{\mathrm{eff}}}\right) \mathcal{A}_{1~\mathrm{Mpc}} ({\cal M})\,, \tag{B2}\\
+\mathcal{A}_{\rm 1Mpc} &= \left(\frac{5}{24\pi}\right)^{1/2}
+\left(\frac{GM_\odot/c^2}{1~\mathrm{Mpc}}\right)
+\left(\frac{\pi GM_\odot}{c^3}\right)^{-1/6}
+\left(\frac{\mathcal{M}}{M_\odot}\right)^{5/6} \,,\tag{B3} \\
+D_\mathrm{eff} &= D \left[
+    F_+^2 \left(\frac{1+\cos^2\iota}{2}\right)^2 +
+    F_\times^2 \cos^2\iota
+\right]^{-1/2}\tag{B4} \\
+\end{align}
+$$
+
+$\mathcal{M}$ is the chirp mass, and in terms of ($M,q$) it reads $\mathcal{M} = M \left( \frac{q}{1+q^2} \right)^{3/5}$, where $M = m_1 + m_2$ is the total mass and $q = m_2/m_1$ is the mass ratio. 
+We take $f_{\rm min} = 20$ Hz and $f_{\rm max} = f_{\rm LSO}$, the last stable orbit frequency, which is determined by the total mass of the binary system as $f_{ISCO} = 1/(6^{3/2} \pi) (G\,M/c^3)^{-1/2}$.
+
+The idea is to separate out, from the inner product equation, the computationally expensive integral part (which is independedent of extrinsic parameter and detector configuration) and interpolate it with respect to ($M,q$). This part, which we term as 'Partial-SNR', reads:
+$$
+\begin{align}
+\rho_{1/2} &= \left(\frac{D_\mathrm{eff}}{1~\mathrm{Mpc}}\right) \mathcal{M}^{-5/6} \times \rho\,, \tag{B5}\\
+&= \left(\frac{5}{24\pi}\right)^{1/2}
+\left(\frac{GM_\odot/c^2}{1~\mathrm{Mpc}}\right)
+\left(\frac{\pi GM_\odot}{c^3}\right)^{-1/6}
+\left(\frac{1}{M_\odot}\right)^{5/6}
+\sqrt{4 \int_{20}^{f_{\rm LSO}} \frac{f^{-7/3}}{S_n(f)}\, df} \tag{B6}
+\end{align}
+$$
+
+For general (spin-aligned or spin-less) IMR waveform, we calculate $\rho$ using `bilby` (now $\rho_{\rm bilby}$), and follow the same idea as above and Eq.(B4) still holds, and now Partial-SNR reads:
+$$
+\begin{align}
+\rho_{1/2} &= \left(\frac{D_\mathrm{eff}}{1~\mathrm{Mpc}}\right) \mathcal{M}^{-5/6} \times \rho_{\rm bilby}\,, \tag{B7}
+\end{align}
+$$
+
+For spin-less IMR waveform, we make a 2D grid of $(M,q)$ and calculate $\rho_{1/2}$ for each point in the grid and store it in a pickle file. The number of elements in the each axis doesn't need to be same and can be set by the user. Also the elements in each axis are not equally space, $q$ axis is logarithmically spaced, while $M$ axis is inverse-logarithmically spaced, to minimize error with less number of points. But the value in each axis should be strictly increasing. To generate the $\rho_{1/2}$ for a newly provided set of parameters $(M_{\rm new},q_{\rm new})$, we load the pickle file, and then we use nested 1D cubic spline interpolation (see Sec.([IV]())), instead of bicubic spline interpolation, using the grid and the corresponding precomuted values of $\rho_{1/2}$
+
+For spin-aligned IMR waveform, we carry out similar interpolation but in in 4D space of $(M,q,a_1,a_2)$. The number of elements and spacing for $(M,q)$ axes are same as above, while $a_1$ and $a_2$ axes are uniformly spaced in a specified range $[-a_{\rm max}, a_{\rm min}]$. 
+
+## IV. Nested 1D Cubic Spline Interpolation
+
+Let's take the example of Partial-SNR interpolation for spin-less IMR waveform, where we have a 2D grid of $(M,q)$ and corresponding $\rho_{1/2}$ values. The interpolation is done in the following steps:
+
+- **Step 1**: Get the precomputed grid of $(M,q)$ and load the corresponding $\rho_{1/2}$ values from a pickle file.
+- **Step 2**: For a new set of parameters $(M_{\rm new},q_{\rm new})$, find the four nearest points in axes [$M_{i-1}, M_i, M_{i+1}, M_{i+2}$] and [$q_{j-1}, q_j, q_{j+1}, q_{j+2}$] and $M_i\leq M_{\rm new} \leq M_{i+1}$, such that $q_j \leq q_{\rm new} \leq q_{j+1}$. 
+- **Step 3**: For each fixed $q_j$, we perform a 1D cubic spline interpolation in the $M$ axis, using the four nearest points [$M_{i-1}, M_i, M_{i+1}, M_{i+2}$] and their corresponding $\rho_{1/2}$ values of $\right[(q_{j-1}, M_{\rm new}), (q_j, M_{\rm new}), (q_{j+1}, M_{\rm new}), (q_{j+2}, M_{\rm new})\left]$. This gives us a new interpolated value $\rho_{1/2}(M_{\rm new}, q_j)$.
+
+
+If the new point(s) are 
+
+
+<!-- **Interpolation Method**: Utilizes a 2D cubic spline technique (njit-ted) for the 'partialsnr' segment. -->
 
 # References
