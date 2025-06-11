@@ -1248,7 +1248,7 @@ class GWSNR:
             # print('dl_eff=',dl_eff[j])
             # print('Mchirp_scaled=',Mchirp_scaled.shape)
             # print('optimal_snr_unscaled=',np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)).shape)
-            print(f"\nSaving interpolator for {detectors[j]} detector with shape {snr_partial_[0].shape}")
+            print(f"\nSaving Partial-SNR for {detectors[j]} detector with shape {snr_partial_[0].shape}")
             save_pickle(self.path_interpolator[j], snr_partial_[0])
 
 
