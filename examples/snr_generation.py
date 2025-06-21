@@ -1,7 +1,7 @@
 """
 This script generates a set of BBH (Binary Black Hole) parameters and calculates the optimal SNR (Signal-to-Noise Ratio) for each set of parameters. The parameters are saved in a json file.
 """
-
+ENABLE_PJRT_COMPATIBILITY=1
 import numpy as np
 from gwsnr import GWSNR
 from gwsnr.utils import save_json
@@ -43,16 +43,32 @@ theta_jn = np.random.uniform(0,2*np.pi, size=nsamples)
 ra, dec, psi, phase = np.random.uniform(0,2*np.pi, size=nsamples), np.random.uniform(0,np.pi, size=nsamples), np.random.uniform(0,2*np.pi, size=nsamples), np.random.uniform(0,2*np.pi, size=nsamples)
 a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl = 0,0,0,0,0,0 # Zero spin
 
-# Calculate the optimal SNR (Signal-to-Noise Ratio) for each set of parameters
-# with interpolation
-interp_snr = gwsnr.snr(mass_1=mass_1, mass_2=mass_1, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, ra=ra, dec=dec)
-
-# save the SNR and BBH parameters
 # create a dictionary
 data = {'mass_1': mass_1, 'mass_2': mass_2, 'luminosity_distance': luminosity_distance, 'theta_jn': theta_jn, 'psi': psi, 'phase': phase, 'ra': ra, 'dec': dec}
-data.update(interp_snr)
+
+# Calculate the optimal SNR (Signal-to-Noise Ratio) for each set of parameters
+# with interpolation
+interp_snr = gwsnr.snr(**data)
+
+# save the SNR and BBH parameters
+interp_data = data.copy()
+interp_data.update(interp_snr)
 
 # save the dictionary in json format
-file_name = './snr_data.json'
-print(f'saving results as json file at {file_name}')
-save_json(file_name, data);
+file_name = './interpolated_snr_data.json'
+print(f'saving interpolated SNR results as json file at {file_name}')
+save_json(file_name, interp_data);
+
+# Calculate the optimal SNR (Signal-to-Noise Ratio) for each set of parameters
+# with inner product
+bilby_snr = gwsnr.compute_bilby_snr(**data)
+
+# save the SNR and BBH parameters
+bilby_data = data.copy()
+bilby_data.update(bilby_snr)
+
+# save the dictionary in json format
+file_name = './inner_product_snr_data.json'
+print(f'saving inner-product (bilby-like) SNR results as json file at {file_name}')
+save_json(file_name, bilby_data);
+

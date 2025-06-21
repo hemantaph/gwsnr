@@ -3,65 +3,18 @@ import jax.numpy as jnp
 from ripple import ms_to_Mc_eta
 from jax import vmap
 from jax import jit
-from .njit_functions import noise_weighted_inner_product
-from .jaxjit_functions import findchirp_chirptime_jax
-import bilby
+from ..jax import findchirp_chirptime_jax
+import multiprocessing as mp
 from multiprocessing import Pool
 from tqdm import tqdm
 
-from .multiprocessing_routine import noise_weighted_inner_prod_ripple
+from ..utils import noise_weighted_inner_prod_ripple
 
 class RippleInnerProduct:
     """
     Class to compute the noise weighted inner product for a given waveform and PSD
-
-    Parameters
-    ----------
-    waveform_name: `str`
-        The name of the waveform to use. Ripple supported waveforms are as follows, along with corresponding required arguments: 
-        IMRPhenomXAS (aligned spin): theta = ['Mchirp', 'eta', 'a_1', 'a_2', 'luminosity_distance', 'tc', 'phase', 'theta_jn']
-        IMRPhenomD (aligned spin): theta = ['Mchirp', 'eta', 'a_1', 'a_2', 'luminosity_distance', 'tc', 'phase', 'theta_jn']
-        IMRPhenomPv2 (Still finalizing sampling checks): not known
-        TaylorF2 with tidal effects : ['Mchirp', 'eta', 'a_1', 'a_2', 'lambda_1', 'lambda_2','luminosity_distance', 'tc', 'phase', 'theta_jn']
-            lambda_1: Dimensionless tidal deformability of the primary object [between 0 and 5000]
-            lambda_2: Dimensionless tidal deformability of the secondary object [between 0 and 5000]
-        IMRPhenomD_NRTidalv2, verified for the low spin regime (a_1, a_2 < 0.05), further testing is required for higher spins: ['Mchirp', 'eta', 'a_1', 'a_2', 'lambda_1', 'lambda_2','luminosity_distance', 'tc', 'phase', 'theta_jn']
-        Note: keep tc=0.0s
-    minimum_frequency: `float`
-        Default is 20.0 Hz
-    sampling_frequency: `float`
-        Default is 2048.0 Hz
-    reference_frequency: `float`
-        Default is minimum_frequency
-
-    Waveform argument descriptions:\n
-    +--------------------+--------------+--------------------------------------+
-    | Parameter          | Units        | Description                          |
-    +====================+==============+======================================+
-    | Mchirp             | Solar Mass   | Chirp mass                           |
-    +--------------------+--------------+--------------------------------------+
-    | eta                |              | Symmetric mass ratio                 |
-    +--------------------+--------------+--------------------------------------+
-    | a_1                |              | Spin of the primary                  |
-    +--------------------+--------------+--------------------------------------+
-    | a_2                |              | Spin of the secondary                |
-    +--------------------+--------------+--------------------------------------+
-    | lambda_1            |              | Dimensionless tidal deformability of|
-    |                    |              | the primary object                   |
-    +--------------------+--------------+--------------------------------------+
-    | lambda_2            |              | Dimensionless tidal deformability of|
-    |                    |              | the secondary object                 |
-    +--------------------+--------------+--------------------------------------+
-    | luminosity_distance| Mpc          | Luminosity distance                  |
-    +--------------------+--------------+--------------------------------------+
-    | tc                 | s            | Coalescence time                     |
-    +--------------------+--------------+--------------------------------------+
-    | phase              | rad          | Phase                                |
-    +--------------------+--------------+--------------------------------------+
-    | theta_jn           | rad          | Inclination angle                    |
-    +--------------------+--------------+--------------------------------------+
     """
-
+    
     def __init__(self, waveform_name, minimum_frequency=20.0, sampling_frequency=2048.0, reference_frequency=None):
 
         # instance initialization
@@ -151,7 +104,7 @@ class RippleInnerProduct:
         except AttributeError:
             raise ValueError(f"Waveform '{waveform_name}' not found in ripple.waveforms module.")
 
-    def noise_weighted_inner_product_jax(self, gw_param_dict, psd_list, detector_list, duration=None, duration_min=2, duration_max=128, verbose=False, npool=4, multiprocessing_verbose=True):
+    def noise_weighted_inner_product_jax(self, gw_param_dict, psd_list, detector_list, duration=None, duration_min=2, duration_max=128, npool=4, multiprocessing_verbose=True):
         """
         Compute the noise weighted inner product for a given waveform and PSD.
 
@@ -283,7 +236,7 @@ class RippleInnerProduct:
         #     hp_inner_hp[:, iter_i] = hp_inner_hp_i
         #     hc_inner_hc[:, iter_i] = hc_inner_hc_i
 
-
+        mp.set_start_method('fork', force=True)
         with Pool(processes=npool) as pool:
             # call the same function with different data in parallel
             # imap->retain order in the list, while map->doesn't
@@ -303,8 +256,10 @@ class RippleInnerProduct:
                     hp_inner_hp_i, hc_inner_hc_i, iter_i = result
                     hp_inner_hp[:, iter_i] = hp_inner_hp_i
                     hc_inner_hc[:, iter_i] = hc_inner_hc_i
+        mp.set_start_method('spawn', force=True)
 
         return hp_inner_hp, hc_inner_hc
+        
 
         # return input_arguments
 

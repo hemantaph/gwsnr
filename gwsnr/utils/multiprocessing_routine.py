@@ -6,7 +6,7 @@ Helper functions for multiprocessing in snr generation
 import numpy as np
 import bilby
 
-from .njit_functions import noise_weighted_inner_product
+from ..numba import noise_weighted_inner_product
 
 
 def noise_weighted_inner_prod(params):

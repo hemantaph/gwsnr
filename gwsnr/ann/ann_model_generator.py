@@ -6,11 +6,16 @@ This module contains the ANNModelGenerator class which is used to generate the A
 import numpy as np
 import os
 import pickle
-from .gwsnr import GWSNR
-from .utils import append_json, get_param_from_json, load_json, load_pickle, save_pickle, load_ann_h5
+from ..core import GWSNR
+from ..utils import append_json, get_param_from_json, load_json, load_ann_h5
 from scipy.optimize import curve_fit
+from ..numba import (
+    antenna_response_array,
+)
+import jax
+jax.config.update("jax_enable_x64", False)
+import jax.numpy as jnp
 
-from gwsnr import antenna_response_array, cubic_spline_interpolator2d
 import tensorflow as tf
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -53,6 +58,7 @@ class ANNModelGenerator():
         npool=4,
         gwsnr_verbose=True,
         snr_th=8.0,
+        snr_type="interpolation_aligned_spins_jax",
         waveform_approximant="IMRPhenomXPHM",
         **kwargs,  # ler and gwsnr arguments
     ):
@@ -66,15 +72,17 @@ class ANNModelGenerator():
             npool=npool,
             # gwsnr args
             mtot_min=2.0,
-            mtot_max=200,
+            mtot_max=439.6,
             ratio_min=0.1,
             ratio_max=1.0,
-            mtot_resolution=500,
+            spin_max=0.9,
+            mtot_resolution=200,
             ratio_resolution=50,
+            spin_resolution=20,
             sampling_frequency=2048.0,
             waveform_approximant=waveform_approximant,
             minimum_frequency=20.0,
-            snr_type="interpolation",
+            snr_type="interpolation_aligned_spins_jax",
             psds=None,
             ifos=None,
             interpolator_dir="./interpolator_pickle",
@@ -95,12 +103,14 @@ class ANNModelGenerator():
             mtot_max=self.gwsnr_args['mtot_max'],
             ratio_min=self.gwsnr_args['ratio_min'],
             ratio_max=self.gwsnr_args['ratio_max'],
+            spin_max=self.gwsnr_args['spin_max'],
             mtot_resolution=self.gwsnr_args['mtot_resolution'],
             ratio_resolution=self.gwsnr_args['ratio_resolution'],
+            spin_resolution=self.gwsnr_args['spin_resolution'],
             sampling_frequency=self.gwsnr_args['sampling_frequency'],
             waveform_approximant=self.gwsnr_args['waveform_approximant'],
             minimum_frequency=self.gwsnr_args['minimum_frequency'],
-            snr_type='interpolation',
+            snr_type=snr_type,
             psds=self.gwsnr_args['psds'],
             ifos=self.gwsnr_args['ifos'],
             interpolator_dir=self.gwsnr_args['interpolator_dir'],
@@ -158,55 +168,58 @@ class ANNModelGenerator():
         geocent_time = np.array(params['geocent_time'])
         ra = np.array(params['ra'])
         dec = np.array(params['dec'])
-        
-        detector_tensor = self.gwsnr.detector_tensor_list
-        snr_partial_coeff = np.array(self.gwsnr.snr_partialsacaled_list)[0]
-        ratio_arr = self.gwsnr.ratio_arr
-        mtot_arr = self.gwsnr.mtot_arr
-        
-        size = len(mass_1)
-        len_ = len(detector_tensor)
-        if len_ != 1:
-            raise ValueError("Only one detector is allowed")
-
-        mtot = mass_1 + mass_2
-        ratio = mass_2 / mass_1
-        # get array of antenna response
-        Fp, Fc = antenna_response_array(ra, dec, geocent_time, psi, detector_tensor)
-        Fp = np.array(Fp[0])
-        Fc = np.array(Fc[0])
-
-        Mc = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
-        eta = mass_1 * mass_2/(mass_1 + mass_2)**2.
-        A1 = Mc ** (5.0 / 6.0)
-        ci_2 = np.cos(theta_jn) ** 2
-        ci_param = ((1 + np.cos(theta_jn) ** 2) / 2) ** 2
-        
-        size = len(mass_1)
-        snr_partial_ = np.zeros(size)
-        d_eff = np.zeros(size)
-
-        # loop over the detectors
-        for i in range(size):
-            snr_partial_[i] = cubic_spline_interpolator2d(mtot[i], ratio[i], snr_partial_coeff, mtot_arr, ratio_arr)
-            d_eff[i] =luminosity_distance[i] / np.sqrt(
-                    Fp[i]**2 * ci_param[i] + Fc[i]**2 * ci_2[i]
-                )
-        #amp0
-        amp0 =  A1 / d_eff
-
-        # get spin parameters
         a_1 = np.array(params['a_1'])
         a_2 = np.array(params['a_2'])
         tilt_1 = np.array(params['tilt_1'])
         tilt_2 = np.array(params['tilt_2'])
 
+        # to get the components of the spin aligned with angular momentum
+        a_1 = a_1 * np.cos(tilt_1)
+        a_2 = a_2 * np.cos(tilt_2)
+        
+        detector_tensor = np.array(self.gwsnr.detector_tensor_list)
+        snr_partial_coeff = np.array(self.gwsnr.snr_partialsacaled_list)
+        ratio_arr = self.gwsnr.ratio_arr
+        mtot_arr = self.gwsnr.mtot_arr
+        a_1_arr  = self.gwsnr.a_1_arr
+        a_2_arr  = self.gwsnr.a_2_arr
+
+        len_ = len(detector_tensor)
+        if len_ != 1:
+            raise ValueError("Only one detector is allowed")
+
+        Mc = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
+        eta = mass_1 * mass_2/(mass_1 + mass_2)**2.
+        A1 = Mc ** (5.0 / 6.0)
+        
+        # calculate the snr_partial_ using natural cubic spline interpolation
+        _, _, snr_partial_, d_eff = self.gwsnr.get_interpolated_snr(
+            mass_1 = jnp.array(mass_1),
+            mass_2 = jnp.array(mass_2),
+            luminosity_distance = jnp.array(luminosity_distance),
+            theta_jn = jnp.array(theta_jn),
+            psi = jnp.array(psi),
+            geocent_time = jnp.array(geocent_time),
+            ra = jnp.array(ra),
+            dec = jnp.array(dec),
+            a_1 = np.array(a_1),
+            a_2 = np.array(a_2),
+            detector_tensor = jnp.array(detector_tensor),
+            snr_partialscaled = snr_partial_coeff,
+            ratio_arr = jnp.array(ratio_arr),
+            mtot_arr = jnp.array(mtot_arr),
+            a1_arr = np.array(a_1_arr),
+            a_2_arr = np.array(a_2_arr),
+        )
+
+        # print(f"snr_partial_ shape: {snr_partial_.shape}, d_eff shape: {d_eff.shape}")
+        # calculate the effective amplitude
+        amp0 =  A1 / np.array(d_eff)[0]
         # effective spin
         chi_eff = (mass_1 * a_1 * np.cos(tilt_1) + mass_2 * a_2 * np.cos(tilt_2)) / (mass_1 + mass_2)
 
-
         # input data
-        X1 = np.vstack([snr_partial_, amp0, eta, chi_eff, theta_jn]).T
+        X1 = np.vstack([np.array(snr_partial_)[0], amp0, eta, chi_eff, theta_jn]).T
 
         return X1
 
@@ -278,7 +291,6 @@ class ANNModelGenerator():
         error_adjustment_file_name='error_adjustment.json',
         ann_path_dict_file_name='ann_path_dict.json',
     ):
-        snr_threshold = self.gwsnr_args['snr_th']   # snr threshold
 
         # input and output data
         X, y = self.get_input_output_data(params=gw_param_dict, randomize=randomize)

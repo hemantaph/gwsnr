@@ -4,12 +4,10 @@ This module contains functions for calculating the SNR of a CBC signal. It has t
 """
 
 import os
-import pickle
-from multiprocessing import Pool
+import multiprocessing as mp
 import numpy as np
 from tqdm import tqdm
 from scipy.stats import norm
-from scipy.interpolate import CubicSpline
 from scipy.optimize import fsolve
 
 # warning suppression lal
@@ -18,9 +16,8 @@ warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
 import lal
 lal.swig_redirect_standard_output_error(False)
 
-from .ripple_class import RippleInnerProduct
-
-from .utils import (
+from ..ripple import RippleInnerProduct
+from ..utils import (
     dealing_with_psds,
     interpolator_check,
     load_json,
@@ -33,27 +30,22 @@ from .utils import (
     load_json_from_module,
     get_gw_parameters,
 )
-import jax
-import jax.numpy as jnp
-jax.config.update("jax_enable_x64", True)
-from .njit_functions import (
-    get_interpolated_snr,
+from ..utils import noise_weighted_inner_prod
+
+from ..numba import (
     findchirp_chirptime,
     antenna_response,
     antenna_response_array,
 )
-from .jaxjit_functions import (
-    get_interpolated_snr_aligned_spins,
-    get_interpolated_snr_no_spins,
-)
-from .multiprocessing_routine import noise_weighted_inner_prod
+import jax
+import jax.numpy as jnp
+jax.config.update("jax_enable_x64", False)
 
 # defining constants
 C = 299792458.0
 G = 6.67408e-11
 Pi = np.pi
 MTSUN_SI = 4.925491025543576e-06
-
 
 class GWSNR:
     """
@@ -320,6 +312,9 @@ class GWSNR:
         snr_th=8.0,
         snr_th_net=8.0,
         ann_path_dict=None,
+        snr_recalculation=False,
+        snr_recalculation_range=[6,8],
+        snr_recalculation_waveform_approximant="IMRPhenomXPHM",
     ):
 
         print("\nInitializing GWSNR class...\n")
@@ -332,19 +327,6 @@ class GWSNR:
         self.duration_min = duration_min
         self.snr_type = snr_type
         self.spin_max = spin_max
-        # change multiprocessing start method from fork to spawn if snr_type is inner_product_jax
-        if self.snr_type == "inner_product_jax":
-            import multiprocessing as mp
-            import os
-
-            def set_multiprocessing_start_method():
-                start_method = 'spawn'  # Use 'spawn' for both POSIX and non-POSIX systems
-                try:
-                    mp.set_start_method(start_method, force=True)
-                except RuntimeError:
-                    # The start method can only be set once and must be set before any processes start
-                    pass
-            set_multiprocessing_start_method()
 
         # dealing with mtot_max
         # set max cut off according to minimum_frequency
@@ -359,6 +341,11 @@ class GWSNR:
         self.ratio_max = ratio_max
         self.mtot_resolution = mtot_resolution
         self.ratio_resolution = ratio_resolution
+        self.snr_recalculation = snr_recalculation
+        if snr_recalculation:
+            self.snr_recalculation = snr_recalculation
+            self.snr_recalculation_range = snr_recalculation_range
+            self.snr_recalculation_waveform_approximant = snr_recalculation_waveform_approximant
         # buffer of 0.01 is added to the ratio
         self.ratio_arr = np.geomspace(ratio_min, ratio_max, ratio_resolution)
         # buffer of 0.1 is added to the mtot
@@ -371,6 +358,11 @@ class GWSNR:
         self.f_min = minimum_frequency
         self.interpolator_dir = interpolator_dir
         self.multiprocessing_verbose = multiprocessing_verbose
+
+        self.spin_resolution = spin_resolution
+        self.spin_max = spin_max
+        self.a_1_arr = np.linspace(-self.spin_max, self.spin_max, self.spin_resolution)
+        self.a_2_arr = np.linspace(-self.spin_max, self.spin_max, self.spin_resolution)
 
         # dealing with psds
         # if not given, bilby's default psds will be used
@@ -403,15 +395,25 @@ class GWSNR:
 
 
         # now generate interpolator, if not exists
-        if snr_type == "interpolation":
+        if snr_type == "interpolation" or snr_type == "interpolation_no_spins" or snr_type == "interpolation_no_spins_jax":
+            if snr_type == "interpolation_no_spins_jax":
+                from ..jax import get_interpolated_snr_no_spins_jax
+                self.get_interpolated_snr = get_interpolated_snr_no_spins_jax
+            else:
+                from ..numba import get_interpolated_snr_no_spins_numba
+                self.get_interpolated_snr = get_interpolated_snr_no_spins_numba
+
             # dealing with interpolator
             self.path_interpolator = self.interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
 
-        elif snr_type == "interpolation_aligned_spins":
-            self.spin_resolution = spin_resolution
-            self.spin_max = spin_max
-            self.a_1_arr = np.linspace(-self.spin_max, self.spin_max, self.spin_resolution)
-            self.a_2_arr = np.linspace(-self.spin_max, self.spin_max, self.spin_resolution)
+        elif snr_type == "interpolation_aligned_spins" or snr_type == "interpolation_aligned_spins_jax":
+
+            if snr_type == "interpolation_aligned_spins_jax":
+                from ..jax import get_interpolated_snr_aligned_spins_jax
+                self.get_interpolated_snr = get_interpolated_snr_aligned_spins_jax
+            else:
+                from ..numba import get_interpolated_snr_aligned_spins_numba
+                self.get_interpolated_snr = get_interpolated_snr_aligned_spins_numba
 
             self.param_dict_given['spin_max'] = self.spin_max
             self.param_dict_given['spin_resolution'] = self.spin_resolution
@@ -435,9 +437,18 @@ class GWSNR:
 
         # ANN method still needs the partialscaledSNR interpolator.
         elif snr_type == "ann":
+
+            from ..jax import get_interpolated_snr_aligned_spins_jax
+            self.get_interpolated_snr = get_interpolated_snr_aligned_spins_jax
+            # below is added to find the genereated interpolator path
+            self.param_dict_given['spin_max'] = self.spin_max
+            self.param_dict_given['spin_resolution'] = self.spin_resolution
+            
             self.model_dict, self.scaler_dict, self.error_adjustment, self.ann_catalogue = self.ann_initilization(ann_path_dict, detector_list, sampling_frequency, minimum_frequency, waveform_approximant, snr_th)
             # dealing with interpolator
+            self.snr_type = "interpolation_aligned_spins_jax"
             self.path_interpolator = self.interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
+            self.snr_type = "ann"
 
         else:
             raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'inner_product', 'inner_product_jax', 'ann'.")
@@ -526,10 +537,12 @@ class GWSNR:
         # check the content ann_path_dict.json in gwsnr/ann module directory
         # e.g. ann_path_dict = dict(L1=dict(model_path='path_to_model', scaler_path='path_to_scaler', sampling_frequency=2048.0, minimum_frequency=20.0, waveform_approximant='IMRPhenomXPHM', snr_th=8.0))
         # there will be existing ANN model and scaler for default parameters
-        ann_path_dict_default = load_json_from_module('gwsnr', 'ann', 'ann_path_dict.json')
+        ann_path_dict_default = load_json_from_module('gwsnr', 'ann.data', 'ann_path_dict.json')
         if ann_path_dict is None:
+            print("No ANN model and scaler path is given. Using default ANN model and scaler path from gwsnr/ann/ann_path_dict.json")
             ann_path_dict = ann_path_dict_default
         else:
+            print("ANN model and scaler path is given. Using the given path.")
             if isinstance(ann_path_dict, str):
                 ann_path_dict = load_json(ann_path_dict)
             elif isinstance(ann_path_dict, dict):
@@ -566,9 +579,9 @@ class GWSNR:
 
             # get ann model
             if not os.path.exists(ann_path_dict[detector]['model_path']):
-                # load the model from gwsnr/ann directory
-                model_dict[detector] = load_ann_h5_from_module('gwsnr', 'ann', ann_path_dict[detector]['model_path'])
-                print(f"ANN model for {detector} is loaded from gwsnr/ann directory.")
+                # load the model from gwsnr/ann/data directory
+                model_dict[detector] = load_ann_h5_from_module('gwsnr', 'ann.data', ann_path_dict[detector]['model_path'])
+                print(f"ANN model for {detector} is loaded from gwsnr/ann/data directory.")
             else:
                 # load the model from the given path
                 model_dict[detector] = load_ann_h5(ann_path_dict[detector]['model_path'])
@@ -576,9 +589,9 @@ class GWSNR:
 
             # get ann scaler
             if not os.path.exists(ann_path_dict[detector]['scaler_path']):
-                # load the scaler from gwsnr/ann directory
-                scaler_dict[detector] = load_pickle_from_module('gwsnr', 'ann', ann_path_dict[detector]['scaler_path'])
-                print(f"ANN scaler for {detector} is loaded from gwsnr/ann directory.")
+                # load the scaler from gwsnr/ann/data directory
+                scaler_dict[detector] = load_pickle_from_module('gwsnr', 'ann.data', ann_path_dict[detector]['scaler_path'])
+                print(f"ANN scaler for {detector} is loaded from gwsnr/ann/data directory.")
             else:
                 # load the scaler from the given path
                 scaler_dict[detector] = load_pickle(ann_path_dict[detector]['scaler_path'])
@@ -586,9 +599,9 @@ class GWSNR:
 
             # get error_adjustment
             if not os.path.exists(ann_path_dict[detector]['error_adjustment_path']):
-                # load the error_adjustment from gwsnr/ann directory
-                error_adjustment[detector] = load_json_from_module('gwsnr', 'ann', ann_path_dict[detector]['error_adjustment_path'])
-                print(f"ANN error_adjustment for {detector} is loaded from gwsnr/ann directory.")
+                # load the error_adjustment from gwsnr/ann/data directory
+                error_adjustment[detector] = load_json_from_module('gwsnr', 'ann.data', ann_path_dict[detector]['error_adjustment_path'])
+                print(f"ANN error_adjustment for {detector} is loaded from gwsnr/ann/data directory.")
             else:
                 # load the error_adjustment from the given path
                 error_adjustment[detector] = load_json(ann_path_dict[detector]['error_adjustment_path'])
@@ -748,43 +761,74 @@ class GWSNR:
         >>> snr.snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
         """
 
-        if (self.snr_type == "interpolation") or (self.snr_type == "interpolation_no_spins") or self.snr_type == "interpolation_aligned_spins":
+
+        if not gw_param_dict:
+            gw_param_dict = {
+                "mass_1": mass_1,
+                "mass_2": mass_2,
+                "luminosity_distance": luminosity_distance,
+                "theta_jn": theta_jn,
+                "psi": psi,
+                "phase": phase,
+                "geocent_time": geocent_time,
+                "ra": ra,
+                "dec": dec,
+                "a_1": a_1,
+                "a_2": a_2,
+                "tilt_1": tilt_1,
+                "tilt_2": tilt_2,
+                "phi_12": phi_12,
+                "phi_jl": phi_jl,
+                "lambda_1": lambda_1,
+                "lambda_2": lambda_2,
+                "eccentricity": eccentricity
+            }
+
+        interpolation_list = [
+            "interpolation",
+            "interpolation_no_spins",
+            "interpolation_aligned_spins",
+            "interpolation_no_spins_jax",
+            "interpolation_aligned_spins_jax",
+        ]
+
+        if self.snr_type in interpolation_list:
+
+            # if tilt_1, tilt_2 are given, 
+            # then a_1 = a_1 * np.cos(tilt_1)
+            # a_2 = a_2 * np.cos(tilt_2)
+            # first check if a_1 and a_2 are not less than 0.0
+            # if tilt_1 and tilt_2 is in gw_param_dict
+            tilt_1 = gw_param_dict.get("tilt_1", tilt_1)
+            tilt_2 = gw_param_dict.get("tilt_2", tilt_2)
+            a_1 = gw_param_dict.get("a_1", a_1)
+            a_2 = gw_param_dict.get("a_2", a_2)
+            a_1_old = a_1.copy()
+            a_2_old = a_2.copy()
+            # if tilt_1 and tilt_2 numpy.ndarray or list, convert them to numpy array
+            if isinstance(tilt_1, (list, np.ndarray)):
+                a_1 = np.array(a_1, ndmin=1)
+                a_2 = np.array(a_2, ndmin=1)
+                tilt_1 = np.array(tilt_1, ndmin=1)
+                tilt_2 = np.array(tilt_2, ndmin=1)
+                a_1 = a_1 * np.cos(tilt_1)
+                a_2 = a_2 * np.cos(tilt_2)
+                if gw_param_dict:
+                    gw_param_dict["a_1"] = a_1
+                    gw_param_dict["a_2"] = a_2
+
+            print("solving SNR with interpolation")
             snr_dict = self.snr_with_interpolation(
-                mass_1,
-                mass_2,
-                luminosity_distance=luminosity_distance,
-                theta_jn=theta_jn,
-                psi=psi,
-                phase=phase,
-                geocent_time=geocent_time,
-                ra=ra,
-                dec=dec,
                 gw_param_dict=gw_param_dict,
                 output_jsonfile=output_jsonfile,
             )
+            gw_param_dict['a_1'] = a_1_old
+            gw_param_dict['a_2'] = a_2_old
 
         elif self.snr_type == "inner_product":
             print("solving SNR with inner product")
 
             snr_dict = self.compute_bilby_snr(
-                mass_1,
-                mass_2,
-                luminosity_distance=luminosity_distance,
-                theta_jn=theta_jn,
-                psi=psi,
-                phase=phase,
-                geocent_time=geocent_time,
-                ra=ra,
-                dec=dec,
-                a_1=a_1,
-                a_2=a_2,
-                tilt_1=tilt_1,
-                tilt_2=tilt_2,
-                phi_12=phi_12,
-                phi_jl=phi_jl,
-                lambda_1=lambda_1,
-                lambda_2=lambda_2,
-                eccentricity=eccentricity,
                 gw_param_dict=gw_param_dict,
                 output_jsonfile=output_jsonfile,
             )
@@ -793,42 +837,12 @@ class GWSNR:
             print("solving SNR with inner product JAX")
 
             snr_dict = self.compute_ripple_snr(
-                mass_1,
-                mass_2,
-                luminosity_distance=luminosity_distance,
-                theta_jn=theta_jn,
-                psi=psi,
-                phase=phase,
-                geocent_time=geocent_time,
-                ra=ra,
-                dec=dec,
-                a_1=a_1,
-                a_2=a_2,
-                tilt_1=tilt_1,
-                tilt_2=tilt_2,
-                phi_12=phi_12,
-                phi_jl=phi_jl,
                 gw_param_dict=gw_param_dict,
                 output_jsonfile=output_jsonfile,
             )
 
         elif self.snr_type == "ann":
             snr_dict = self.snr_with_ann(
-                mass_1,
-                mass_2,
-                luminosity_distance=luminosity_distance,
-                theta_jn=theta_jn,
-                psi=psi,
-                phase=phase,
-                geocent_time=geocent_time,
-                ra=ra,
-                dec=dec,
-                a_1=a_1,
-                a_2=a_2,
-                tilt_1=tilt_1,
-                tilt_2=tilt_2,
-                phi_12=phi_12,
-                phi_jl=phi_jl,
                 gw_param_dict=gw_param_dict,
                 output_jsonfile=output_jsonfile,
             )
@@ -836,6 +850,39 @@ class GWSNR:
         else:
             raise ValueError("SNR function type not recognised")
         
+
+        if self.snr_recalculation:
+            waveform_approximant_old = self.waveform_approximant
+            self.waveform_approximant = self.snr_recalculation_waveform_approximant
+
+            optimal_snr_net = snr_dict["optimal_snr_net"]
+            min_, max_ = self.snr_recalculation_range
+            idx = np.logical_and(
+                optimal_snr_net >= min_,
+                optimal_snr_net <= max_,
+            )
+            if np.sum(idx) != 0:
+                print(
+                    f"Recalculating SNR for {np.sum(idx)} out of {len(optimal_snr_net)} samples in the SNR range of {min_} to {max_}"
+                )
+                # print(f'\n length of idx: {len(idx)}')
+                # print(f'\n length of tilt_2: {len(idx)}')
+                input_dict = {}
+                for key in gw_param_dict.keys():
+                    input_dict[key] = gw_param_dict[key][idx]
+
+                snr_dict_ = self.compute_bilby_snr(
+                    gw_param_dict=input_dict,
+                )
+
+                # iterate over detectors and update the snr_dict
+                for key in snr_dict.keys():
+                    if key in snr_dict_.keys():
+                        snr_dict[key][idx] = snr_dict_[key]
+
+            self.waveform_approximant = waveform_approximant_old
+        
+
         if self.pdet:
             pdet_dict = self.probability_of_detection(snr_dict=snr_dict, snr_th=8.0, snr_th_net=8.0, type=self.pdet)
 
@@ -845,8 +892,8 @@ class GWSNR:
 
     def snr_with_ann(
         self,
-        mass_1,
-        mass_2,
+        mass_1=30.,
+        mass_2=29.,
         luminosity_distance=100.0,
         theta_jn=0.0,
         psi=0.0,
@@ -948,7 +995,8 @@ class GWSNR:
         for i, det in enumerate(detectors):
             x = scaler[det].transform(ann_input[i])
             optimal_snr_ = model[det].predict(x, verbose=0).flatten()
-            optimal_snr[det][idx_tracker] = optimal_snr_ - (self.error_adjustment[det]['slope']*optimal_snr_ + self.error_adjustment[det]['intercept'])
+            # adjusting the optimal SNR with error adjustment
+            optimal_snr[det][idx_tracker] = optimal_snr_ + (self.error_adjustment[det]['slope']*optimal_snr_ + self.error_adjustment[det]['intercept'])
             optimal_snr["optimal_snr_net"] += optimal_snr[det] ** 2
         optimal_snr["optimal_snr_net"] = np.sqrt(optimal_snr["optimal_snr_net"])
 
@@ -988,34 +1036,39 @@ class GWSNR:
         eta = mass_1 * mass_2 / (mass_1 + mass_2) ** 2.0
         A1 = Mc ** (5.0 / 6.0)
 
-        _, _, snr_partial, d_eff = get_interpolated_snr(
-            mass_1,
-            mass_2,
-            params["luminosity_distance"][idx],
-            params["theta_jn"][idx],
-            params["psi"][idx],
-            params["geocent_time"][idx],
-            params["ra"][idx],
-            params["dec"][idx],
-            np.array(self.detector_tensor_list),
-            np.array(self.snr_partialsacaled_list),
-            np.array(self.ratio_arr),
-            np.array(self.mtot_arr),
-        )
-
-        # amp0
-        amp0 = A1 / d_eff
-
-        # inclination angle
-        theta_jn = np.array(params["theta_jn"][idx])
-
-        # get spin parameters
         a_1 = np.array(params["a_1"][idx])
         a_2 = np.array(params["a_2"][idx])
         tilt_1 = np.array(params["tilt_1"][idx])
         tilt_2 = np.array(params["tilt_2"][idx])
-        # phi_12 = np.array(params["phi_12"][idx])
-        # phi_jl = np.array(params["phi_jl"][idx])
+        # to get the components of the spin aligned with angular momentum
+        a_1 = a_1 * np.cos(tilt_1)
+        a_2 = a_2 * np.cos(tilt_2)
+
+        _, _, snr_partial, d_eff = self.get_interpolated_snr(
+            jnp.array(mass_1),
+            jnp.array(mass_2),
+            jnp.array(params["luminosity_distance"][idx]),
+            jnp.array(params["theta_jn"][idx]),
+            jnp.array(params["psi"][idx]),
+            jnp.array(params["geocent_time"][idx]),
+            jnp.array(params["ra"][idx]),
+            jnp.array(params["dec"][idx]),
+            jnp.array(params["a_1"][idx]),
+            jnp.array(params["a_2"][idx]),
+            jnp.array(self.detector_tensor_list),
+            jnp.array(self.snr_partialsacaled_list),
+            jnp.array(self.ratio_arr),
+            jnp.array(self.mtot_arr),
+            jnp.array(self.a_1_arr),
+            jnp.array(self.a_2_arr),
+        )
+
+        # amp0
+        amp0 = A1 / np.array(d_eff)
+        # inclination angle
+        theta_jn = np.array(params["theta_jn"][idx])
+
+        snr_partial = np.array(snr_partial)
 
         # effective spin
         chi_eff = (mass_1 * a_1 * np.cos(tilt_1) + mass_2 * a_2 * np.cos(tilt_2)) / (mass_1 + mass_2)
@@ -1031,8 +1084,8 @@ class GWSNR:
 
     def snr_with_interpolation(
         self,
-        mass_1,
-        mass_2,
+        mass_1=30.,
+        mass_2=29.,
         luminosity_distance=100.0,
         theta_jn=0.0,
         psi=0.0,
@@ -1104,9 +1157,13 @@ class GWSNR:
         #         "mass_1 and mass_2 must be within the range of mtot_min and mtot_max"
         #     )
 
+        # Set multiprocessing start method to 'spawn' for multri-threading compatibility
+        mp.set_start_method('spawn', force=True)
+
         # Get interpolated SNR
-        if self.snr_type == "interpolation" or self.snr_type == "interpolation_no_spins":
-            snr, snr_effective, _, _ = get_interpolated_snr_no_spins(
+        if self.snr_type == "interpolation" or self.snr_type == "interpolation_no_spins" or self.snr_type == "interpolation_aligned_spins":
+            
+            snr, snr_effective, _, _ = self.get_interpolated_snr(
                 mass_1[idx2],
                 mass_2[idx2],
                 luminosity_distance[idx2],
@@ -1115,13 +1172,18 @@ class GWSNR:
                 geocent_time[idx2],
                 ra[idx2],
                 dec[idx2],
+                a_1[idx2],
+                a_2[idx2],
                 detector_tensor,
                 snr_partialscaled,
                 self.ratio_arr,
                 self.mtot_arr,
+                self.a_1_arr,
+                self.a_2_arr,
             )
-        elif self.snr_type == "interpolation_aligned_spins":
-            snr, snr_effective, _, _ = get_interpolated_snr_aligned_spins(
+        elif self.snr_type == "interpolation_no_spins_jax" or self.snr_type == "interpolation_aligned_spins_jax":
+
+            snr, snr_effective, _, _ = self.get_interpolated_snr(
                 jnp.array(mass_1[idx2]),
                 jnp.array(mass_2[idx2]),
                 jnp.array(luminosity_distance[idx2]),
@@ -1175,9 +1237,12 @@ class GWSNR:
         # Assume these are 1D arrays with correct lengths
         ratio_table = np.asarray(ratio_table)
         mtot_table = np.asarray(mtot_table)
+
+        list_1 = ["interpolation_aligned_spins", "interpolation_aligned_spins_numba", "interpolation_aligned_spins_jax"]
+        list_2 = ["interpolation", "interpolation_no_spins", "interpolation_no_spins_numba", "interpolation_no_spins_jax"]
         
         # Create broadcastable 4D grids
-        if self.snr_type == "interpolation_aligned_spins":
+        if self.snr_type in list_1:
             a_1_table = self.a_1_arr.copy()
             a_2_table = self.a_2_arr.copy()
             size3 = self.spin_resolution
@@ -1188,7 +1253,7 @@ class GWSNR:
             q, mtot, a_1, a_2 = np.meshgrid(
                 ratio_table, mtot_table, a_1_table, a_2_table, indexing='ij'
             )
-        elif (self.snr_type == "interpolation") or (self.snr_type == "interpolation_no_spins"):
+        elif self.snr_type  in list_2:
             q, mtot = np.meshgrid(ratio_table, mtot_table, indexing='ij')
             a_1 = np.zeros_like(mtot)
             a_2 = a_1
@@ -1240,100 +1305,21 @@ class GWSNR:
         Mchirp = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5)) # shape (size1, size2, size3, size4)
         Mchirp_scaled = Mchirp ** (5.0 / 6.0)
         # filling in interpolation table for different detectors
+        list_1 = ["interpolation_aligned_spins", "interpolation_aligned_spins_numba", "interpolation_aligned_spins_jax"]
+        list_2 = ["interpolation", "interpolation_no_spins", "interpolation_no_spins_numba", "interpolation_no_spins_jax"]
+
         for j in num_det:
-            if self.snr_type == "interpolation_aligned_spins":
+            if self.snr_type in list_1:
                 snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)) * dl_eff[j] / Mchirp_scaled), # shape (size1, size2, size3, size4)
-            elif (self.snr_type == "interpolation") or (self.snr_type == "interpolation_no_spins"):
+            elif self.snr_type in list_2:
                 snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2)) * dl_eff[j] / Mchirp_scaled), # shape (size1, size2, size3, size4)
+            else:
+                raise ValueError(f"snr_type {self.snr_type} is not supported for interpolation.")
             # print('dl_eff=',dl_eff[j])
             # print('Mchirp_scaled=',Mchirp_scaled.shape)
             # print('optimal_snr_unscaled=',np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)).shape)
             print(f"\nSaving Partial-SNR for {detectors[j]} detector with shape {snr_partial_[0].shape}")
             save_pickle(self.path_interpolator[j], snr_partial_[0])
-
-
-    # def init_partialscaled(self):
-    #     """
-    #     Function to generate partialscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.
-    #     """
-
-    #     if self.mtot_min < 1.0:
-    #         raise ValueError("Error: mass too low")
-
-    #     detectors = self.detector_list.copy()
-    #     detector_tensor = self.detector_tensor_list.copy()
-    #     num_det = np.arange(len(detectors), dtype=int)
-    #     mtot_table = self.mtot_arr.copy()
-    #     ratio_table = self.ratio_arr.copy()
-    #     size1 = self.ratio_resolution
-    #     size2 = self.mtot_resolution 
-
-    #     mass_1 = np.zeros((size1, size2), dtype=float)
-    #     mass_2 = np.zeros((size1, size2), dtype=float) 
-
-    #     # Ensure ratio_table and mtot_table are numpy arrays
-    #     ratio_table = np.asarray(ratio_table)
-    #     mtot_table = np.asarray(mtot_table)
-
-    #     # Use broadcasting to get (len(ratio_table), len(mtot_table)) shaped arrays
-    #     q_grid, mtot_grid = np.meshgrid(ratio_table, mtot_table, indexing='ij')
-    #     mass_1 = mtot_grid / (1 + q_grid)
-    #     mass_2 = mass_1 * q_grid
-
-    #     # geocent_time cannot be array here
-    #     # this geocent_time is only to get partialScaledSNR
-    #     geocent_time_ = 1246527224.169434  # random time from O3
-    #     theta_jn_, ra_, dec_, psi_, phase_ = np.zeros(5)
-    #     luminosity_distance_ = 100.0
-
-    #     # Vectorized computation for effective luminosity distance
-    #     Fp = np.array(
-    #         [
-    #             antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "plus")
-    #             for tensor in detector_tensor
-    #         ]
-    #     )
-    #     Fc = np.array(
-    #         [
-    #             antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "cross")
-    #             for tensor in detector_tensor
-    #         ]
-    #     )
-    #     dl_eff = luminosity_distance_ / np.sqrt(
-    #         Fp**2 * ((1 + np.cos(theta_jn_) ** 2) / 2) ** 2
-    #         + Fc**2 * np.cos(theta_jn_) ** 2
-    #     )
-
-    #     print(f"Generating interpolator for {detectors} detectors")
-    #     # calling bilby_snr
-    #     optimal_snr_unscaled = self.compute_bilby_snr(
-    #         mass_1=mass_1.flatten(),
-    #         mass_2=mass_2.flatten(),
-    #         luminosity_distance=luminosity_distance_,
-    #         theta_jn=theta_jn_,
-    #         psi=psi_,
-    #         phase=phase_,
-    #         geocent_time=geocent_time_,
-    #         ra=ra_,
-    #         dec=dec_,
-    #     )
-        
-    #     # for partialscaledSNR
-    #     Mchirp = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
-    #     a2 = Mchirp ** (5.0 / 6.0)
-    #     # filling in interpolation table for different detectors
-    #     for j in num_det:
-    #         snr_ = np.reshape(optimal_snr_unscaled[detectors[j]], (size1, size2))
-    #         snr_partial_ = []
-    #         for k, q in enumerate(ratio_table):
-    #             snr_partial_.append(
-    #                 CubicSpline(
-    #                     mtot_table,
-    #                     (dl_eff[j] / a2[k]) * snr_[k],
-    #                 ).c
-    #             )
-    #         # save the interpolators for each detectors
-    #         save_pickle(self.path_interpolator[j], np.array(snr_partial_))
 
     def compute_bilby_snr(
         self,
@@ -1464,7 +1450,6 @@ class GWSNR:
         if self.duration_min:
             duration[duration < self.duration_min] = self.duration_min
 
-
         input_arguments = np.array(
             [
                 mass_1[idx],
@@ -1501,7 +1486,11 @@ class GWSNR:
         # np.shape(hp_inner_hp) = (len(num_det), size1)
         hp_inner_hp = np.zeros((len(num_det), size1), dtype=np.complex128)
         hc_inner_hc = np.zeros((len(num_det), size1), dtype=np.complex128)
-        with Pool(processes=npool) as pool:
+
+        # to access multi-cores instead of multithreading
+        mp.set_start_method('fork', force=True)
+
+        with mp.Pool(processes=npool) as pool:
             # call the same function with different data in parallel
             # imap->retain order in the list, while map->doesn't
             if self.multiprocessing_verbose:
@@ -1520,6 +1509,9 @@ class GWSNR:
                     hp_inner_hp_i, hc_inner_hc_i, iter_i = result
                     hp_inner_hp[:, iter_i] = hp_inner_hp_i
                     hc_inner_hc[:, iter_i] = hc_inner_hc_i
+        
+        # close forked processes
+        mp.set_start_method('spawn', force=True)
 
         # get polarization tensor
         # np.shape(Fp) = (size1, len(num_det))
@@ -1740,6 +1732,12 @@ class GWSNR:
         else:
             snr_th = self.snr_th
 
+        # check if snr_th is an array or a single value
+        if isinstance(snr_th, (list, np.ndarray)):
+            snr_th = np.array(snr_th)
+        else:
+            snr_th = np.full(len(self.detector_list), snr_th)
+
         if snr_th_net:
             snr_th_net = snr_th_net
         else:
@@ -1747,14 +1745,14 @@ class GWSNR:
 
         detectors = np.array(self.detector_list)
         pdet_dict = {}
-        for det in detectors:
+        for i, det in enumerate(detectors):
             if type == "matched_filter":
-                pdet_dict[det] = np.array(1 - norm.cdf(snr_th - snr_dict[det]), dtype=int)
+                pdet_dict[det] = np.array(1 - norm.cdf(snr_th[i] - snr_dict[det]))
             else:
-                pdet_dict[det] = np.array(snr_th < snr_dict[det], dtype=int)
+                pdet_dict[det] = np.array(snr_th[i] < snr_dict[det], dtype=int)
 
         if type == "matched_filter":
-            pdet_dict["pdet_net"] = np.array(1 - norm.cdf(snr_th_net - snr_dict["optimal_snr_net"]), dtype=int)
+            pdet_dict["pdet_net"] = np.array(1 - norm.cdf(snr_th_net - snr_dict["optimal_snr_net"]))
         else:
             pdet_dict["pdet_net"] = np.array(snr_th_net < snr_dict["optimal_snr_net"], dtype=int)
 
