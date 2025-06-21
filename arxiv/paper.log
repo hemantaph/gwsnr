@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Homebrew) (preloaded format=pdflatex 2024.10.29)  22 JUN 2025 06:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/Homebrew) (preloaded format=pdflatex 2024.10.29)  22 JUN 2025 06:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1339,6 +1339,12 @@ Type  H <return>  for immediate help.
                                                   
 l.348 their first detection in 2015 (Abbott, B. 
                                                   P. et al. (2016a), B.  P.
+? ^^[[A
+Type <return> to proceed, S to scroll future error messages,
+R to run without stopping, Q to run quietly,
+I to insert something, E to edit your file,
+1 or ... or 9 to ignore the next 1 to 9 tokens of input,
+H for help, X to quit.
 ? 
 
 ! LaTeX Error: Unicode character   (U+2009)
@@ -1399,12 +1405,12 @@ Package fancyhdr Warning: \headheight is too small (62.59596pt):
 
 [2]
 ! Undefined control sequence.
-l.549 \bibitem[\citeproctext
+l.551 \bibitem[\citeproctext
                             ]{ref-tensorflow:2015}
 ? 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 555.
+Package pdftex.def Info: logo.png  used on input line 556.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
@@ -1422,18 +1428,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.555 ...tem[\citeproctext]{ref-Abbott:2016:rates}
+l.557 ...tem[\citeproctext]{ref-Abbott:2016:rates}
                                                   
 ? 
 
-Underfull \hbox (badness 10000) detected at line 555
+Underfull \hbox (badness 10000) detected at line 557
 [][]
  []
 
 ! Undefined control sequence.
 <write> ... {ref-Abbott:2016:rates}{\citeproctext 
                                                   }
-l.555 ...tem[\citeproctext]{ref-Abbott:2016:rates}
+l.557 ...tem[\citeproctext]{ref-Abbott:2016:rates}
                                                   
 ? 
 
@@ -1443,18 +1449,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.562 \bibitem[\citeproctext]{ref-Abbott:2016}
+l.564 \bibitem[\citeproctext]{ref-Abbott:2016}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 562
+Underfull \hbox (badness 10000) detected at line 564
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Abbott:2016}{\citeproctext 
                                                   }
-l.562 \bibitem[\citeproctext]{ref-Abbott:2016}
+l.564 \bibitem[\citeproctext]{ref-Abbott:2016}
                                               
 ? 
 
@@ -1465,7 +1471,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.563 Abbott, B. 
+l.565 Abbott, B. 
                    P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acer...
 
 ? 
@@ -1477,7 +1483,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.563 Abbott, B. P., R. Abbott, T. 
+l.565 Abbott, B. P., R. Abbott, T. 
                                        D. Abbott, M. R. Abernathy, F. Acer...
 
 ? 
@@ -1489,7 +1495,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.563 ...B. P., R. Abbott, T. D. Abbott, M. 
+l.565 ...B. P., R. Abbott, T. D. Abbott, M. 
                                                   R. Abernathy, F. Acernese, K.
 
 ? 
@@ -1500,18 +1506,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.568 ...\citeproctext]{ref-Abbott:2016:detection}
+l.570 ...\citeproctext]{ref-Abbott:2016:detection}
                                                   
 ? 
 
-Underfull \hbox (badness 10000) detected at line 568
+Underfull \hbox (badness 10000) detected at line 570
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...f-Abbott:2016:detection}{\citeproctext 
                                                   }
-l.568 ...\citeproctext]{ref-Abbott:2016:detection}
+l.570 ...\citeproctext]{ref-Abbott:2016:detection}
                                                   
 ? 
 
@@ -1522,7 +1528,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.569 Abbott, B. 
+l.571 Abbott, B. 
                    P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acer...
 
 ? 
@@ -1534,7 +1540,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.569 Abbott, B. P., R. Abbott, T. 
+l.571 Abbott, B. P., R. Abbott, T. 
                                        D. Abbott, M. R. Abernathy, F. Acer...
 
 ? 
@@ -1546,7 +1552,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.569 ...B. P., R. Abbott, T. D. Abbott, M. 
+l.571 ...B. P., R. Abbott, T. D. Abbott, M. 
                                                   R. Abernathy, F. Acernese, K.
 
 ? 
@@ -1557,18 +1563,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.575 \bibitem[\citeproctext]{ref-Abbott:2016:pe}
+l.577 \bibitem[\citeproctext]{ref-Abbott:2016:pe}
                                                  
 ? 
 
-Underfull \hbox (badness 10000) detected at line 575
+Underfull \hbox (badness 10000) detected at line 577
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ite {ref-Abbott:2016:pe}{\citeproctext 
                                                   }
-l.575 \bibitem[\citeproctext]{ref-Abbott:2016:pe}
+l.577 \bibitem[\citeproctext]{ref-Abbott:2016:pe}
                                                  
 ? 
 
@@ -1579,7 +1585,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.576 Abbott, B. 
+l.578 Abbott, B. 
                    P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acer...
 
 ? 
@@ -1591,7 +1597,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.576 Abbott, B. P., R. Abbott, T. 
+l.578 Abbott, B. P., R. Abbott, T. 
                                        D. Abbott, M. R. Abernathy, F. Acer...
 
 ? 
@@ -1603,7 +1609,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.576 ...B. P., R. Abbott, T. D. Abbott, M. 
+l.578 ...B. P., R. Abbott, T. D. Abbott, M. 
                                                   R. Abernathy, F. Acernese, K.
 
 ? 
@@ -1614,18 +1620,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.581 \bibitem[\citeproctext]{ref-Abbott:2020}
+l.583 \bibitem[\citeproctext]{ref-Abbott:2020}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 581
+Underfull \hbox (badness 10000) detected at line 583
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Abbott:2020}{\citeproctext 
                                                   }
-l.581 \bibitem[\citeproctext]{ref-Abbott:2020}
+l.583 \bibitem[\citeproctext]{ref-Abbott:2020}
                                               
 ? 
 
@@ -1635,18 +1641,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.588 \bibitem[\citeproctext]{ref-Abbott:2021}
+l.590 \bibitem[\citeproctext]{ref-Abbott:2021}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 588
+Underfull \hbox (badness 10000) detected at line 590
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Abbott:2021}{\citeproctext 
                                                   }
-l.588 \bibitem[\citeproctext]{ref-Abbott:2021}
+l.590 \bibitem[\citeproctext]{ref-Abbott:2021}
                                               
 ? 
 
@@ -1656,18 +1662,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.595 \bibitem[\citeproctext]{ref-VIRGO:2019}
+l.597 \bibitem[\citeproctext]{ref-VIRGO:2019}
                                              
 ? 
 
-Underfull \hbox (badness 10000) detected at line 595
+Underfull \hbox (badness 10000) detected at line 597
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...bibcite {ref-VIRGO:2019}{\citeproctext 
                                                   }
-l.595 \bibitem[\citeproctext]{ref-VIRGO:2019}
+l.597 \bibitem[\citeproctext]{ref-VIRGO:2019}
                                              
 ? 
 
@@ -1677,18 +1683,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.602 \bibitem[\citeproctext]{ref-VIRGO:2015}
+l.604 \bibitem[\citeproctext]{ref-VIRGO:2015}
                                              
 ? 
 
-Underfull \hbox (badness 10000) detected at line 602
+Underfull \hbox (badness 10000) detected at line 604
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...bibcite {ref-VIRGO:2015}{\citeproctext 
                                                   }
-l.602 \bibitem[\citeproctext]{ref-VIRGO:2015}
+l.604 \bibitem[\citeproctext]{ref-VIRGO:2015}
                                              
 ? 
 
@@ -1698,18 +1704,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.609 \bibitem[\citeproctext]{ref-Akutsu:2020}
+l.611 \bibitem[\citeproctext]{ref-Akutsu:2020}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 609
+Underfull \hbox (badness 10000) detected at line 611
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Akutsu:2020}{\citeproctext 
                                                   }
-l.609 \bibitem[\citeproctext]{ref-Akutsu:2020}
+l.611 \bibitem[\citeproctext]{ref-Akutsu:2020}
                                               
 ? 
 
@@ -1719,18 +1725,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.614 \bibitem[\citeproctext]{ref-Allen:2012}
+l.616 \bibitem[\citeproctext]{ref-Allen:2012}
                                              
 ? 
 
-Underfull \hbox (badness 10000) detected at line 614
+Underfull \hbox (badness 10000) detected at line 616
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...bibcite {ref-Allen:2012}{\citeproctext 
                                                   }
-l.614 \bibitem[\citeproctext]{ref-Allen:2012}
+l.616 \bibitem[\citeproctext]{ref-Allen:2012}
                                              
 ? 
 
@@ -1740,18 +1746,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.621 \bibitem[\citeproctext]{ref-Ashton:2022}
+l.623 \bibitem[\citeproctext]{ref-Ashton:2022}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 621
+Underfull \hbox (badness 10000) detected at line 623
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Ashton:2022}{\citeproctext 
                                                   }
-l.621 \bibitem[\citeproctext]{ref-Ashton:2022}
+l.623 \bibitem[\citeproctext]{ref-Ashton:2022}
                                               
 ? 
 
@@ -1761,18 +1767,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.628 \bibitem[\citeproctext]{ref-Ashton:2019}
+l.630 \bibitem[\citeproctext]{ref-Ashton:2019}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 628
+Underfull \hbox (badness 10000) detected at line 630
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Ashton:2019}{\citeproctext 
                                                   }
-l.628 \bibitem[\citeproctext]{ref-Ashton:2019}
+l.630 \bibitem[\citeproctext]{ref-Ashton:2019}
                                               
 ? 
 
@@ -1782,23 +1788,23 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.635 \bibitem[\citeproctext]{ref-Aso:2013}
+l.637 \bibitem[\citeproctext]{ref-Aso:2013}
                                            
 ? 
 
-Underfull \hbox (badness 10000) detected at line 635
+Underfull \hbox (badness 10000) detected at line 637
 [][]
  []
 
 ! Undefined control sequence.
 <write> ... \bibcite {ref-Aso:2013}{\citeproctext 
                                                   }
-l.635 \bibitem[\citeproctext]{ref-Aso:2013}
+l.637 \bibitem[\citeproctext]{ref-Aso:2013}
                                            
 ? 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 642.
+Package pdftex.def Info: logo.png  used on input line 643.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
@@ -1816,18 +1822,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.642 \bibitem[\citeproctext]{ref-Buikema:2020}
+l.644 \bibitem[\citeproctext]{ref-Buikema:2020}
                                                
 ? 
 
-Underfull \hbox (badness 10000) detected at line 642
+Underfull \hbox (badness 10000) detected at line 644
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...bcite {ref-Buikema:2020}{\citeproctext 
                                                   }
-l.642 \bibitem[\citeproctext]{ref-Buikema:2020}
+l.644 \bibitem[\citeproctext]{ref-Buikema:2020}
                                                
 ? 
 
@@ -1837,18 +1843,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.649 \bibitem[\citeproctext]{ref-Callister:2024}
+l.651 \bibitem[\citeproctext]{ref-Callister:2024}
                                                  
 ? 
 
-Underfull \hbox (badness 10000) detected at line 649
+Underfull \hbox (badness 10000) detected at line 651
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ite {ref-Callister:2024}{\citeproctext 
                                                   }
-l.649 \bibitem[\citeproctext]{ref-Callister:2024}
+l.651 \bibitem[\citeproctext]{ref-Callister:2024}
                                                  
 ? 
 
@@ -1858,18 +1864,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.654 ...item[\citeproctext]{ref-ChapmanBird:2023}
+l.656 ...item[\citeproctext]{ref-ChapmanBird:2023}
                                                   
 ? 
 
-Underfull \hbox (badness 10000) detected at line 654
+Underfull \hbox (badness 10000) detected at line 656
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...e {ref-ChapmanBird:2023}{\citeproctext 
                                                   }
-l.654 ...item[\citeproctext]{ref-ChapmanBird:2023}
+l.656 ...item[\citeproctext]{ref-ChapmanBird:2023}
                                                   
 ? 
 
@@ -1879,18 +1885,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.660 ...item[\citeproctext]{ref-ligolensing:2023}
+l.662 ...item[\citeproctext]{ref-ligolensing:2023}
                                                   
 ? 
 
-Underfull \hbox (badness 10000) detected at line 660
+Underfull \hbox (badness 10000) detected at line 662
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...e {ref-ligolensing:2023}{\citeproctext 
                                                   }
-l.660 ...item[\citeproctext]{ref-ligolensing:2023}
+l.662 ...item[\citeproctext]{ref-ligolensing:2023}
                                                   
 ? 
 
@@ -1900,18 +1906,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.667 \bibitem[\citeproctext]{ref-Edwards:2023}
+l.669 \bibitem[\citeproctext]{ref-Edwards:2023}
                                                
 ? 
 
-Underfull \hbox (badness 10000) detected at line 667
+Underfull \hbox (badness 10000) detected at line 669
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...bcite {ref-Edwards:2023}{\citeproctext 
                                                   }
-l.667 \bibitem[\citeproctext]{ref-Edwards:2023}
+l.669 \bibitem[\citeproctext]{ref-Edwards:2023}
                                                
 ? 
 
@@ -1921,18 +1927,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.674 \bibitem[\citeproctext]{ref-Gerosa:2020}
+l.676 \bibitem[\citeproctext]{ref-Gerosa:2020}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 674
+Underfull \hbox (badness 10000) detected at line 676
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Gerosa:2020}{\citeproctext 
                                                   }
-l.674 \bibitem[\citeproctext]{ref-Gerosa:2020}
+l.676 \bibitem[\citeproctext]{ref-Gerosa:2020}
                                               
 ? 
 
@@ -1942,18 +1948,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.679 \bibitem[\citeproctext]{ref-jax:2018}
+l.681 \bibitem[\citeproctext]{ref-jax:2018}
                                            
 ? 
 
-Underfull \hbox (badness 10000) detected at line 679
+Underfull \hbox (badness 10000) detected at line 681
 [][]
  []
 
 ! Undefined control sequence.
 <write> ... \bibcite {ref-jax:2018}{\citeproctext 
                                                   }
-l.679 \bibitem[\citeproctext]{ref-jax:2018}
+l.681 \bibitem[\citeproctext]{ref-jax:2018}
                                            
 ? 
 
@@ -1963,18 +1969,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.684 \bibitem[\citeproctext]{ref-Janquart:2023}
+l.686 \bibitem[\citeproctext]{ref-Janquart:2023}
                                                 
 ? 
 
-Underfull \hbox (badness 10000) detected at line 684
+Underfull \hbox (badness 10000) detected at line 686
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...cite {ref-Janquart:2023}{\citeproctext 
                                                   }
-l.684 \bibitem[\citeproctext]{ref-Janquart:2023}
+l.686 \bibitem[\citeproctext]{ref-Janquart:2023}
                                                 
 ? 
 
@@ -1984,18 +1990,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.691 \bibitem[\citeproctext]{ref-numba:2022}
+l.693 \bibitem[\citeproctext]{ref-numba:2022}
                                              
 ? 
 
-Underfull \hbox (badness 10000) detected at line 691
+Underfull \hbox (badness 10000) detected at line 693
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...bibcite {ref-numba:2022}{\citeproctext 
                                                   }
-l.691 \bibitem[\citeproctext]{ref-numba:2022}
+l.693 \bibitem[\citeproctext]{ref-numba:2022}
                                              
 ? 
 
@@ -2005,18 +2011,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.696 \bibitem[\citeproctext]{ref-lalsuite:2018}
+l.698 \bibitem[\citeproctext]{ref-lalsuite:2018}
                                                 
 ? 
 
-Underfull \hbox (badness 10000) detected at line 696
+Underfull \hbox (badness 10000) detected at line 698
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...cite {ref-lalsuite:2018}{\citeproctext 
                                                   }
-l.696 \bibitem[\citeproctext]{ref-lalsuite:2018}
+l.698 \bibitem[\citeproctext]{ref-lalsuite:2018}
                                                 
 ? 
 
@@ -2026,18 +2032,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.701 \bibitem[\citeproctext]{ref-More:2025}
+l.703 \bibitem[\citeproctext]{ref-More:2025}
                                             
 ? 
 
-Underfull \hbox (badness 10000) detected at line 701
+Underfull \hbox (badness 10000) detected at line 703
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...\bibcite {ref-More:2025}{\citeproctext 
                                                   }
-l.701 \bibitem[\citeproctext]{ref-More:2025}
+l.703 \bibitem[\citeproctext]{ref-More:2025}
                                             
 ? 
 
@@ -2047,18 +2053,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.706 \bibitem[\citeproctext]{ref-Leo:2024}
+l.708 \bibitem[\citeproctext]{ref-Leo:2024}
                                            
 ? 
 
-Underfull \hbox (badness 10000) detected at line 706
+Underfull \hbox (badness 10000) detected at line 708
 [][]
  []
 
 ! Undefined control sequence.
 <write> ... \bibcite {ref-Leo:2024}{\citeproctext 
                                                   }
-l.706 \bibitem[\citeproctext]{ref-Leo:2024}
+l.708 \bibitem[\citeproctext]{ref-Leo:2024}
                                            
 ? 
 
@@ -2068,18 +2074,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.713 \bibitem[\citeproctext]{ref-numpy:2022}
+l.715 \bibitem[\citeproctext]{ref-numpy:2022}
                                              
 ? 
 
-Underfull \hbox (badness 10000) detected at line 713
+Underfull \hbox (badness 10000) detected at line 715
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...bibcite {ref-numpy:2022}{\citeproctext 
                                                   }
-l.713 \bibitem[\citeproctext]{ref-numpy:2022}
+l.715 \bibitem[\citeproctext]{ref-numpy:2022}
                                              
 ? 
 
@@ -2089,18 +2095,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.718 ...item[\citeproctext]{ref-scikitlearn:2011}
+l.720 ...item[\citeproctext]{ref-scikitlearn:2011}
                                                   
 ? 
 
-Underfull \hbox (badness 10000) detected at line 718
+Underfull \hbox (badness 10000) detected at line 720
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...e {ref-scikitlearn:2011}{\citeproctext 
                                                   }
-l.718 ...item[\citeproctext]{ref-scikitlearn:2011}
+l.720 ...item[\citeproctext]{ref-scikitlearn:2011}
                                                   
 ? 
 
@@ -2110,18 +2116,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.724 ...m[\citeproctext]{ref-gwsnr:documentation}
+l.726 ...m[\citeproctext]{ref-gwsnr:documentation}
                                                   
 ? 
 
-Underfull \hbox (badness 10000) detected at line 724
+Underfull \hbox (badness 10000) detected at line 726
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ref-gwsnr:documentation}{\citeproctext 
                                                   }
-l.724 ...m[\citeproctext]{ref-gwsnr:documentation}
+l.726 ...m[\citeproctext]{ref-gwsnr:documentation}
                                                   
 ? 
 
@@ -2131,23 +2137,23 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.729 \bibitem[\citeproctext]{ref-ler:2024}
+l.731 \bibitem[\citeproctext]{ref-ler:2024}
                                            
 ? 
 
-Underfull \hbox (badness 10000) detected at line 729
+Underfull \hbox (badness 10000) detected at line 731
 [][]
  []
 
 ! Undefined control sequence.
 <write> ... \bibcite {ref-ler:2024}{\citeproctext 
                                                   }
-l.729 \bibitem[\citeproctext]{ref-ler:2024}
+l.731 \bibitem[\citeproctext]{ref-ler:2024}
                                            
 ? 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 735.
+Package pdftex.def Info: logo.png  used on input line 737.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
@@ -2165,18 +2171,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.736 \bibitem[\citeproctext]{ref-Taylor:2018}
+l.738 \bibitem[\citeproctext]{ref-Taylor:2018}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 736
+Underfull \hbox (badness 10000) detected at line 738
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Taylor:2018}{\citeproctext 
                                                   }
-l.736 \bibitem[\citeproctext]{ref-Taylor:2018}
+l.738 \bibitem[\citeproctext]{ref-Taylor:2018}
                                               
 ? 
 
@@ -2186,18 +2192,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.742 \bibitem[\citeproctext]{ref-LIGO:2015}
+l.744 \bibitem[\citeproctext]{ref-LIGO:2015}
                                             
 ? 
 
-Underfull \hbox (badness 10000) detected at line 742
+Underfull \hbox (badness 10000) detected at line 744
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...\bibcite {ref-LIGO:2015}{\citeproctext 
                                                   }
-l.742 \bibitem[\citeproctext]{ref-LIGO:2015}
+l.744 \bibitem[\citeproctext]{ref-LIGO:2015}
                                             
 ? 
 
@@ -2207,18 +2213,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.748 \bibitem[\citeproctext]{ref-Thrane:2019}
+l.750 \bibitem[\citeproctext]{ref-Thrane:2019}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 748
+Underfull \hbox (badness 10000) detected at line 750
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Thrane:2019}{\citeproctext 
                                                   }
-l.748 \bibitem[\citeproctext]{ref-Thrane:2019}
+l.750 \bibitem[\citeproctext]{ref-Thrane:2019}
                                               
 ? 
 
@@ -2228,18 +2234,18 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.755 \bibitem[\citeproctext]{ref-Wempe:2022}
+l.757 \bibitem[\citeproctext]{ref-Wempe:2022}
                                              
 ? 
 
-Underfull \hbox (badness 10000) detected at line 755
+Underfull \hbox (badness 10000) detected at line 757
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...bibcite {ref-Wempe:2022}{\citeproctext 
                                                   }
-l.755 \bibitem[\citeproctext]{ref-Wempe:2022}
+l.757 \bibitem[\citeproctext]{ref-Wempe:2022}
                                              
 ? 
 
@@ -2249,23 +2255,23 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.762 \bibitem[\citeproctext]{ref-Wierda:2021}
+l.764 \bibitem[\citeproctext]{ref-Wierda:2021}
                                               
 ? 
 
-Underfull \hbox (badness 10000) detected at line 762
+Underfull \hbox (badness 10000) detected at line 764
 [][]
  []
 
 ! Undefined control sequence.
 <write> ...ibcite {ref-Wierda:2021}{\citeproctext 
                                                   }
-l.762 \bibitem[\citeproctext]{ref-Wierda:2021}
+l.764 \bibitem[\citeproctext]{ref-Wierda:2021}
                                               
 ? 
 File: logo.png Graphic file (type png)
 <use logo.png>
-Package pdftex.def Info: logo.png  used on input line 771.
+Package pdftex.def Info: logo.png  used on input line 773.
 (pdftex.def)             Requested size: 156.4962pt x 59.95006pt.
 
 Package fancyhdr Warning: \headheight is too small (62.59596pt): 
@@ -2284,17 +2290,23 @@ L3 programming layer <2024-02-20>
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
-Package rerunfilecheck Info: File `paper.out' has not changed.
-(rerunfilecheck)             Checksum: 1A9C103D0E2ED4ECF0FF815FD5A16C06;1800.
+
+Package rerunfilecheck Warning: File `paper.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `paper.out':
+(rerunfilecheck)             Before: 1A9C103D0E2ED4ECF0FF815FD5A16C06;1800
+(rerunfilecheck)             After:  D9DBD39C6C2B93528591A6BDDEEB28D7;1894.
 Package logreq Info: Writing requests to 'paper.run.xml'.
 \openout1 = `paper.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 34629 strings out of 474116
- 671388 string characters out of 5732612
+ 34631 strings out of 474116
+ 671411 string characters out of 5732612
  1952187 words of memory out of 5000000
- 56296 multiletter control sequences out of 15000+600000
+ 56297 multiletter control sequences out of 15000+600000
  586055 words of font info for 174 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,15n,87p,1194b,858s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -2326,10 +2338,10 @@ ew/Cellar/texlive/20240312_3/share/texmf-dist/fonts/type1/public/cm-super/sftt0
 800.pfb></opt/homebrew/Cellar/texlive/20240312_3/share/texmf-dist/fonts/type1/p
 ublic/cm-super/sftt1000.pfb></opt/homebrew/Cellar/texlive/20240312_3/share/texm
 f-dist/fonts/type1/public/cm-super/sftt1728.pfb>
-Output written on paper.pdf (6 pages, 443721 bytes).
+Output written on paper.pdf (6 pages, 444161 bytes).
 PDF statistics:
- 249 PDF objects out of 1000 (max. 8388607)
- 192 compressed objects within 2 object streams
- 16 named destinations out of 1000 (max. 500000)
+ 250 PDF objects out of 1000 (max. 8388607)
+ 193 compressed objects within 2 object streams
+ 17 named destinations out of 1000 (max. 500000)
  47186 words of extra memory for PDF output out of 51595 (max. 10000000)
 

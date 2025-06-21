@@ -63,7 +63,7 @@ $$
 \rho = \rho_{1/2} \times \left(\frac{\mathcal{M}}{M_\odot}\right)^{5/6} \times \left(\frac{1~\mathrm{Mpc}}{D_\mathrm{eff}}\right)
 $$
 
-This procedure transforms a computationally intensive integration into a simple, JIT-compiled table lookup and multiplication, enabling massive performance gains for large-scale population studies.
+This procedure transforms a computationally intensive integration into a simple, JIT-compiled interpolation and multiplication, enabling massive performance gains for large-scale population studies.
 
 ### ANN-based Pdet Estimation
 
