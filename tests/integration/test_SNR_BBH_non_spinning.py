@@ -13,8 +13,6 @@ def test_gwsnr_snr_generation(tmp_path):
     # Initialize the GWSNR object
     gwsnr = GWSNR(
         npool=4,
-        mtot_resolution=100,
-        ratio_resolution=20,
         waveform_approximant="IMRPhenomD",
         minimum_frequency=20.0,
         snr_type="interpolation",

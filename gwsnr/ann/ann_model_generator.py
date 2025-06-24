@@ -13,7 +13,7 @@ from ..numba import (
     antenna_response_array,
 )
 import jax
-jax.config.update("jax_enable_x64", False)
+jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp
 
 import tensorflow as tf

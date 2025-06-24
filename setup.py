@@ -32,7 +32,7 @@ setup(
     url='https://github.com/hemantaph/gwsnr',
     packages=find_packages(),
     package_data={
-        'gwsnr': ['ann/data/*.json', 'ann/data/*.pkl', 'ann/data/*.h5'],
+        'gwsnr': ['ann/data/*.json', 'ann/data/*.pkl', 'ann/data/*.h5', 'core/interpolator_pickle/'],
     },
     install_requires=requirements,
 )

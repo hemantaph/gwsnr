@@ -1,86 +1,33 @@
-# Sphinx documentation 
-docs/_build/
-
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*
-
-# ignore json
-# *.json
-# .json
-# **.json
-# **/*.json
-# **/**/*.json
-# **/**/**/*.json
-# **/**/**/**/*.json
-# **/**/**/**/**/*.json
-examples/*.json
-examples/**/*.json
-examples/**/**/*.json
-examples/**/**/**/*.json
-examples/**/**/**/**/*.json
-devdir/*.json
-devdir/**/*.json
-devdir/**/**/*.json
-devdir/**/**/**/*.json
-devdir/**/**/**/**/*.json
-docs/*.json
-docs/**/*.json
-docs/**/**/*.json
-docs/**/**/**/*.json
-docs/**/**/**/**/*.json
-
-# ignore pickle
-# *.pickle
-# .pickle
-# **.pickle
-# **/*.pickle
-# **/**/*.pickle
-# **/**/**/*.pickle
-# **/**/**/**/*.pickle
-# **/**/**/**/**/*.pickle
-examples/*.pickle
-examples/**/*.pickle
-examples/**/**/*.pickle
-examples/**/**/**/*.pickle
-examples/**/**/**/**/*.pickle
-devdir/*.pickle
-devdir/**/*.pickle
-devdir/**/**/*..pickle
-devdir/**/**/**/*.pickle
-devdir/**/**/**/**/*.pickle
-docs/*.pickle
-docs/**/*.pickle
-docs/**/**/*.pickle
-docs/**/**/**/*.pickle
-docs/**/**/**/**/*.pickle
-examples/*.pkl
-examples/**/*.pkl
-examples/**/**/*.pkl
-examples/**/**/**/*.pkl
-examples/**/**/**/**/*.pkl
-devdir/*.pkl
-devdir/**/*.pkl
-devdir/**/**/*.pkl
-devdir/**/**/**/*.pkl
-devdir/**/**/**/**/*.pkl
-docs/*.pkl
-docs/**/*.pkl
-docs/**/**/*.pkl
-docs/**/**/**/*.pkl
-docs/**/**/**/**/*.pkl
-
-.DS_Store
-
-examples/interpolator_pickle/
-examples/interpolator_pickle/*
-
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sphinx
+docs/_build/
+
+# JSON files (specific directories)
+examples/**/*.json
+devdir/**/*.json
+docs/**/*.json
+
+# Pickle files (specific directories)
+examples/**/*.pickle
+examples/**/*.pkl
+devdir/**/*.pickle
+devdir/**/*.pkl
+docs/**/*.pickle
+docs/**/*.pkl
+
+# Interpolator pickle directory
+examples/interpolator_pickle/
+
+# macOS
+.DS_Store
 
 # Distribution / packaging
 .Python
@@ -101,4 +48,3 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-

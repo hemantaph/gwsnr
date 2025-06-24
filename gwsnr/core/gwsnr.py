@@ -1,9 +1,61 @@
 # -*- coding: utf-8 -*-
 """
-This module contains functions for calculating the SNR of a CBC signal. It has two methods: interpolation (bicubic) and inner product (multiprocessing and jax.jit+jax.vmap). Interpolation method is much faster than inner product method. Interpolation method is tested for IMRPhenomD and TaylorF2 waveform approximants for the spinless scenario.
+gwsnr: A Python package for efficient signal-to-noise ratio (SNR) calculation of gravitational-wave signals from compact binary coalescences (CBCs).
+
+Overview
+--------
+This module provides a flexible and computationally efficient framework to calculate the optimal signal-to-noise ratio (SNR) of gravitational-wave signals for a variety of waveform models and detector configurations. The package supports multiple backend methods for SNR estimation:
+
+1. **Interpolation Method (Partial-Scaled SNR)**:
+   - Implements fast bicubic (and optionally JAX/Numba-accelerated) interpolation of precomputed "partial-scaled" SNRs.
+   - Particularly efficient for aligned-spin or non-spinning systems.
+   - Precomputes a grid of intrinsic parameters (e.g., total mass, mass ratio, aligned spin components) decoupled from extrinsic parameters.
+   - Tested for waveform approximants such as `IMRPhenomD`, `TaylorF2`, and `IMRPhenomXPHM`.
+
+2. **Noise-Weighted Inner Product Method**:
+   - Calculates SNR using the standard inner-product integral between waveform and noise PSD, following the matched-filtering formalism.
+   - Supports multiprocessing and is compatible with waveform generation from `lalsimulation` and `ripple`.
+   - Useful for arbitrary frequency-domain waveform models including precession and higher harmonics.
+
+3. **JAX-based Inner Product**:
+   - Accelerated computation using the `ripple` waveform generator and JAX's `jit` and `vmap` functions for parallelized batched evaluation.
+
+4. **Artificial Neural Network (ANN) Estimation**:
+   - Enables rapid estimation of the probability of detection (`Pdet`) for spin-precessing systems using trained ANN models.
+   - Reduces input dimensionality by leveraging partial-scaled SNR as a summary statistic.
+   - Configurable and extensible with user-supplied ANN models and scalers.
+
+5. **Hybrid SNR Recalculation**:
+   - Combines fast interpolation-based evaluation with inner-product-based recalculation for systems near the SNR detection threshold.
+
+Key Features
+------------
+- Supports customizable detector configurations, PSDs, and waveform models.
+- Compatible with Bilby interferometer and PSD interfaces.
+- Optimized for large-scale population synthesis and selection effect modeling.
+- Integrated with tools like `ler` for gravitational-wave lensing and rate studies.
+- Built-in functionality to handle partial-scaled interpolator generation, caching, and ANN model loading.
+
+Usage Example
+-------------
+>>> from gwsnr import GWSNR
+>>> snr = GWSNR(snr_type='interpolation', waveform_approximant='IMRPhenomD')
+>>> result = snr.snr(mass_1=30, mass_2=30, luminosity_distance=100, theta_jn=0.0, ra=0.0, dec=0.0)
+
+References
+----------
+- Phurailatpam & Hannuksela (2025), *gwsnr: A Python package for efficient signal-to-noise calculation of gravitational-waves*, JOSS (in review)
+- Allen et al. (2012), *FINDCHIRP: An algorithm for detection of gravitational waves from inspiraling compact binaries*, Phys. Rev. D.
+- Edwards et al. (2024), *Differentiable and hardware-accelerated waveforms for gravitational wave data analysis*, Phys. Rev. D.
+- Ashton et al. (2019, 2022), *Bilby: A user-friendly Bayesian inference library for gravitational-wave astronomy*
+- NumPy, SciPy, Numba, JAX, TensorFlow, Scikit-learn
 """
 
+
+import shutil
 import os
+from importlib.resources import path
+import pathlib
 import multiprocessing as mp
 import numpy as np
 from tqdm import tqdm
@@ -34,12 +86,13 @@ from ..utils import noise_weighted_inner_prod
 
 from ..numba import (
     findchirp_chirptime,
-    antenna_response,
+    antenna_response_plus,
+    antenna_response_cross,
     antenna_response_array,
 )
 import jax
 import jax.numpy as jnp
-jax.config.update("jax_enable_x64", False)
+jax.config.update("jax_enable_x64", True)
 
 # defining constants
 C = 299792458.0
@@ -49,7 +102,7 @@ MTSUN_SI = 4.925491025543576e-06
 
 class GWSNR:
     """
-    Class to calculate SNR of a CBC signal with either interpolation or inner product method. Interpolation method is much faster than inner product method. Interpolation method is tested for IMRPhenomD and TaylorF2 waveform approximants for the spinless scenario.
+    Class to calculate SNR of a CBC signal with either interpolation or inner product method. Interpolation method is much faster than inner product method. Interpolation method is tested for IMRPhenomD, TaylorF2, and IMRPhenomXPHM waveform approximants for both spinless and aligned-spin scenarios.
 
     Parameters
     ----------
@@ -57,26 +110,37 @@ class GWSNR:
         Number of processors to use for parallel processing.
         Default is 4.
     mtot_min : `float`
-        Minimum total mass of the binary in solar mass (use interpolation purpose). Default is 2.0.
+        Minimum total mass of the binary in solar mass (use interpolation purpose). Default is 2*4.98-2 (4.98 Mo is the minimum component mass of BBH systems in GWTC-3).
     mtot_max : `float`
-        Maximum total mass of the binary in solar mass (use interpolation purpose). Default is 184. This is set so that the waveform is within the frequency range of the detector (with fmin=20.).
+        Maximum total mass of the binary in solar mass (use interpolation purpose). Default is 2*112.5+2 (112.5 Mo is the maximum component mass of BBH systems in GWTC-3).
+        This is automatically adjusted based on minimum_frequency if mtot_cut=True.
     ratio_min : `float`
         Minimum mass ratio of the binary (use interpolation purpose). Default is 0.1.
     ratio_max : `float`
         Maximum mass ratio of the binary (use interpolation purpose). Default is 1.0.
+    spin_max : `float`
+        Maximum spin magnitude for aligned-spin interpolation methods. Default is 0.9.
     mtot_resolution : `int`
-        Number of points in the total mass array (use interpolation purpose). Default is 100.
+        Number of points in the total mass array (use interpolation purpose). Default is 200.
     ratio_resolution : `int`
-        Number of points in the mass ratio array (use interpolation purpose). Default is 100.
+        Number of points in the mass ratio array (use interpolation purpose). Default is 50.
+    spin_resolution : `int`
+        Number of points in the spin arrays for aligned-spin interpolation methods. Default is 20.
     sampling_frequency : `float`
         Sampling frequency of the detector. Default is 2048.0.
     waveform_approximant : `str`
         Waveform approximant to use. Default is 'IMRPhenomD'.
+    frequency_domain_source_model : `str`
+        Source model for frequency domain waveform generation. Default is 'lal_binary_black_hole'.
     minimum_frequency : `float`
         Minimum frequency of the waveform. Default is 20.0.
+    duration_max : `float` or `None`
+        Maximum duration for waveform generation. Default is None. Automatically set to 64.0 for IMRPhenomXPHM on Intel processors.
+    duration_min : `float` or `None`
+        Minimum duration for waveform generation. Default is None.
     snr_type : `str`
         Type of SNR calculation. Default is 'interpolation'.
-        options: 'interpolation', 'inner_product', 'inner_product_jax', 'pdet', 'ann'
+        options: 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'inner_product', 'inner_product_jax', 'ann'
     psds : `dict`
         Dictionary of psds for different detectors. Default is None. If None, bilby's default psds will be used. Other options:\n
         Example 1: when values are psd name from pycbc analytical psds, psds={'L1':'aLIGOaLIGODesignSensitivityT1800044','H1':'aLIGOaLIGODesignSensitivityT1800044','V1':'AdvVirgo'}. To check available psd name run \n
@@ -114,6 +178,20 @@ class GWSNR:
         If True, it will show progress bar while computing SNR (inner product) with :meth:`~snr_with_interpolation`. Default is True. If False, it will not show progress bar but will be faster.
     mtot_cut : `bool`
         If True, it will set the maximum total mass of the binary according to the minimum frequency of the waveform. Default is True.
+    pdet : `bool` or `str`
+        If True or 'bool', calculate probability of detection using boolean method. If 'matched_filter', use matched filter probability. Default is False.
+    snr_th : `float`
+        SNR threshold for individual detector for pdet calculation. Default is 8.0.
+    snr_th_net : `float`
+        SNR threshold for network SNR for pdet calculation. Default is 8.0.
+    ann_path_dict : `dict` or `str` or `None`
+        Dictionary or path to json file containing ANN model and scaler paths for different detectors. Default is None (uses built-in models).
+    snr_recalculation : `bool`
+        If True, enables hybrid SNR recalculation for systems near detection threshold. Default is False.
+    snr_recalculation_range : `list`
+        SNR range [min, max] for triggering recalculation. Default is [6,8].
+    snr_recalculation_waveform_approximant : `str`
+        Waveform approximant to use for SNR recalculation. Default is 'IMRPhenomXPHM'.
 
     Examples
     ----------
@@ -137,19 +215,33 @@ class GWSNR:
     +-------------------------------------+----------------------------------+
     |:attr:`~ratio_max`                   | `float`                          |
     +-------------------------------------+----------------------------------+
+    |:attr:`~spin_max`                    | `float`                          |
+    +-------------------------------------+----------------------------------+
     |:attr:`~mtot_resolution`             | `int`                            |
     +-------------------------------------+----------------------------------+
     |:attr:`~ratio_resolution`            | `int`                            |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~spin_resolution`             | `int`                            |
     +-------------------------------------+----------------------------------+
     |:attr:`~ratio_arr`                   | `numpy.ndarray`                  |
     +-------------------------------------+----------------------------------+
     |:attr:`~mtot_arr`                    | `numpy.ndarray`                  |
     +-------------------------------------+----------------------------------+
+    |:attr:`~a_1_arr`                     | `numpy.ndarray`                  |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~a_2_arr`                     | `numpy.ndarray`                  |
+    +-------------------------------------+----------------------------------+
     |:attr:`~sampling_frequency`          | `float`                          |
     +-------------------------------------+----------------------------------+
     |:attr:`~waveform_approximant`        | `str`                            |
     +-------------------------------------+----------------------------------+
+    |:attr:`~frequency_domain_source_model`| `str`                           |
+    +-------------------------------------+----------------------------------+
     |:attr:`~f_min`                       | `float`                          |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~duration_max`                | `float`                          |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~duration_min`                | `float`                          |
     +-------------------------------------+----------------------------------+
     |:attr:`~snr_type`                    | `str`                            |
     +-------------------------------------+----------------------------------+
@@ -165,7 +257,31 @@ class GWSNR:
     +-------------------------------------+----------------------------------+
     |:attr:`~path_interpolator`           | `list` of `str`                  |
     +-------------------------------------+----------------------------------+
+    |:attr:`~snr_partialsacaled_list`     | `list` of `numpy.ndarray`        |
+    +-------------------------------------+----------------------------------+
     |:attr:`~multiprocessing_verbose`     | `bool`                           |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~param_dict_given`            | `dict`                           |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~pdet`                        | `bool` or `str`                  |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~snr_th`                      | `float`                          |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~snr_th_net`                  | `float`                          |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~model_dict`                  | `dict` (ANN models)              |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~scaler_dict`                 | `dict` (ANN scalers)             |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~error_adjustment`            | `dict` (ANN error correction)    |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~ann_catalogue`               | `dict` (ANN configuration)       |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~snr_recalculation`           | `bool`                           |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~snr_recalculation_range`     | `list`                           |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~snr_recalculation_waveform_approximant`| `str`               |
     +-------------------------------------+----------------------------------+
 
     Instance Methods
@@ -174,35 +290,51 @@ class GWSNR:
     +-------------------------------------+----------------------------------+
     | Methods                             | Description                      |
     +=====================================+==================================+
-    |:meth:`~snr`                         | Calls                            |
-    |                                     | :meth:`~snr_with_interpolation`  |
-    |                                     | or :meth:`~compute_bilby_snr`    |
-    |                                     | depending on the value of        |
-    |                                     | :attr:`~snr_type` attribute.     |
+    |:meth:`~snr`                         | Main method that calls           |
+    |                                     | appropriate SNR calculation      |
+    |                                     | based on :attr:`~snr_type`.      |
     +-------------------------------------+----------------------------------+
     |:meth:`~snr_with_interpolation`      | Calculates SNR using             |
     |                                     | interpolation method.            |
     +-------------------------------------+----------------------------------+
+    |:meth:`~snr_with_ann`                | Calculates SNR using             |
+    |                                     | artificial neural network.       |
+    +-------------------------------------+----------------------------------+
     |:meth:`~compute_bilby_snr`           | Calculates SNR using             |
-    |                                     | inner product method.            |
-    |                                     | (python multiprocessing)         |
+    |                                     | inner product method             |
+    |                                     | (python multiprocessing).        |
     +-------------------------------------+----------------------------------+
     |:meth:`~compute_ripple_snr`          | Calculates SNR using             |
-    |                                     | inner product method.            |
-    |                                     | (jax.jit+jax.vmap)               |
+    |                                     | inner product method             |
+    |                                     | (jax.jit+jax.vmap).              |
     +-------------------------------------+----------------------------------+
-    |:meth:`~bns_horizon`                 | Calculates BNS horizon           |
+    |:meth:`~detector_horizon`            | Calculates detector horizon      |
     |                                     | distance.                        |
+    +-------------------------------------+----------------------------------+
+    |:meth:`~probability_of_detection`    | Calculates probability of        |
+    |                                     | detection.                       |
     +-------------------------------------+----------------------------------+
     |:meth:`~print_all_params`            | Prints all the parameters of     |
     |                                     | the class instance.              |
     +-------------------------------------+----------------------------------+
-    |:meth:`~init_partialscaled`             | Generates partialscaled SNR   |
+    |:meth:`~init_partialscaled`          | Generates partialscaled SNR      |
     |                                     | interpolation coefficients.      |
+    +-------------------------------------+----------------------------------+
+    |:meth:`~interpolator_setup`          | Sets up interpolator files       |
+    |                                     | and handles caching.             |
+    +-------------------------------------+----------------------------------+
+    |:meth:`~ann_initilization`           | Initializes ANN models and       |
+    |                                     | scalers for detection.           |
+    +-------------------------------------+----------------------------------+
+    |:meth:`~output_ann`                  | Prepares input features for      |
+    |                                     | ANN prediction.                  |
+    +-------------------------------------+----------------------------------+
+    |:meth:`~calculate_mtot_max`          | Calculates maximum total mass    |
+    |                                     | based on minimum frequency.      |
     +-------------------------------------+----------------------------------+
     """
 
-    # Attributes
+    # Class attributes with documentation
     npool = None
     """``int`` \n
     Number of processors to use for parallel processing."""
@@ -223,6 +355,10 @@ class GWSNR:
     """``float`` \n
     Maximum mass ratio of the binary (use interpolation purpose)."""
 
+    spin_max = None
+    """``float`` \n
+    Maximum spin magnitude for aligned-spin interpolation methods."""
+
     mtot_resolution = None
     """``int`` \n
     Number of points in the total mass array (use interpolation purpose)."""
@@ -231,13 +367,25 @@ class GWSNR:
     """``int`` \n
     Number of points in the mass ratio array (use interpolation purpose)."""
 
+    spin_resolution = None
+    """``int`` \n
+    Number of points in the spin arrays for aligned-spin interpolation methods."""
+
     ratio_arr = None
     """``numpy.ndarray`` \n
     Array of mass ratio."""
 
-    snr_partialsacaled = None
+    mtot_arr = None
     """``numpy.ndarray`` \n
-    Array of partial scaled SNR interpolation coefficients."""
+    Array of total mass."""
+
+    a_1_arr = None
+    """``numpy.ndarray`` \n
+    Array of primary spin values for aligned-spin interpolation."""
+
+    a_2_arr = None
+    """``numpy.ndarray`` \n
+    Array of secondary spin values for aligned-spin interpolation."""
 
     sampling_frequency = None
     """``float`` \n
@@ -247,67 +395,131 @@ class GWSNR:
     """``str`` \n
     Waveform approximant to use."""
 
+    frequency_domain_source_model = None
+    """``str`` \n
+    Source model for frequency domain waveform generation."""
+
     f_min = None
     """``float`` \n
     Minimum frequency of the waveform."""
 
+    duration_max = None
+    """``float`` or ``None`` \n
+    Maximum duration for waveform generation."""
+
+    duration_min = None
+    """``float`` or ``None`` \n
+    Minimum duration for waveform generation."""
+
     snr_type = None
     """``str`` \n
-    Type of SNR calculation."""
+    Type of SNR calculation. Options: 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'inner_product', 'inner_product_jax', 'ann'."""
 
-    psds = None
-    """``dict`` \n
-    Dictionary of psds for different detectors."""
+    psds_list = None
+    """``list`` of bilby's PowerSpectralDensity ``object`` \n
+    List of power spectral density objects for different detectors."""
+
+    detector_tensor_list = None
+    """``list`` of detector tensor ``numpy.ndarray`` \n
+    List of detector tensor arrays for antenna response calculations."""
+
+    detector_list = None
+    """``list`` of ``str`` \n
+    List of detector names."""
 
     interpolator_dir = None
     """``str`` \n
     Path to store the interpolator pickle file."""
 
-    detector_list = None
-    """``list`` \n
-    List of detectors."""
+    path_interpolator = None
+    """``list`` of ``str`` \n
+    List of paths to interpolator pickle files for each detector."""
 
-    stored_snrs = None
+    snr_partialsacaled_list = None
+    """``list`` of ``numpy.ndarray`` \n
+    List of partial-scaled SNR interpolation coefficients for each detector."""
+
+    multiprocessing_verbose = None
+    """``bool`` \n
+    If True, show progress bar during SNR computation with multiprocessing."""
+
+    param_dict_given = None
     """``dict`` \n
-    Dictionary of stored SNRs."""
+    Dictionary containing interpolator parameters for identification and caching."""
 
     pdet = None
-    """``bool`` \n
-    If True, it will calculate the probability of detection. Default is False. Can also be 'matched_filter' or 'bool'. The value 'True' and 'bool' will give the same result."""
+    """``bool`` or ``str`` \n
+    If True or 'bool', calculate probability of detection using boolean method. If 'matched_filter', use matched filter probability. Default is False."""
 
     snr_th = None
     """``float`` \n
-    SNR threshold for individual detector. Use for pdet calculation. Default is 8.0."""
+    SNR threshold for individual detector for pdet calculation. Default is 8.0."""
 
     snr_th_net = None
     """``float`` \n
-    SNR threshold for network SNR. Use for pdet calculation. Default is 8.0."""
+    SNR threshold for network SNR for pdet calculation. Default is 8.0."""
+
+    model_dict = None
+    """``dict`` \n
+    Dictionary of ANN models for different detectors (used when snr_type='ann')."""
+
+    scaler_dict = None
+    """``dict`` \n
+    Dictionary of ANN feature scalers for different detectors (used when snr_type='ann')."""
+
+    error_adjustment = None
+    """``dict`` \n
+    Dictionary of ANN error correction parameters for different detectors (used when snr_type='ann')."""
+
+    ann_catalogue = None
+    """``dict`` \n
+    Dictionary containing ANN configuration and model paths (used when snr_type='ann')."""
+
+    snr_recalculation = None
+    """``bool`` \n
+    If True, enables hybrid SNR recalculation for systems near detection threshold."""
+
+    snr_recalculation_range = None
+    """``list`` \n
+    SNR range [min, max] for triggering recalculation."""
+
+    snr_recalculation_waveform_approximant = None
+    """``str`` \n
+    Waveform approximant to use for SNR recalculation."""
+
+    get_interpolated_snr = None
+    """``function`` \n
+    Function for interpolated SNR calculation (set based on snr_type)."""
+
+    noise_weighted_inner_product_jax = None
+    """``function`` \n
+    JAX-accelerated noise-weighted inner product function (used when snr_type='inner_product_jax')."""
 
     def __init__(
         self,
         npool=int(4),
-        mtot_min=2.0,
-        mtot_max=439.6,
+        mtot_min=2*4.98, # 4.98 Mo is the minimum component mass of BBH systems in GWTC-3
+        mtot_max=2*112.5, # 112.5 Mo is the maximum component mass of BBH systems in GWTC-3
         ratio_min=0.1,
         ratio_max=1.0,
         spin_max=0.9,
         mtot_resolution=200,
-        ratio_resolution=50,
-        spin_resolution=20,
+        ratio_resolution=20,
+        spin_resolution=10,
         sampling_frequency=2048.0,
         waveform_approximant="IMRPhenomD",
         frequency_domain_source_model='lal_binary_black_hole',
         minimum_frequency=20.0,
         duration_max=None,
         duration_min=None,
-        snr_type="interpolation",
+        snr_type="interpolation_no_spins_jax",
         psds=None,
         ifos=None,
         interpolator_dir="./interpolator_pickle",
         create_new_interpolator=False,
         gwsnr_verbose=True,
         multiprocessing_verbose=True,
-        mtot_cut=True,
+        mtot_cut=False,
         pdet=False,
         snr_th=8.0,
         snr_th_net=8.0,
@@ -328,6 +540,22 @@ class GWSNR:
         self.snr_type = snr_type
         self.spin_max = spin_max
 
+        # # getting interpolator data from the package
+        # # first check if the interpolator directory './interpolator_pickle' exists
+        # if not pathlib.Path('./interpolator_pickle').exists():
+        #     # Get the path to the resource
+        #     with path('gwsnr.core', 'interpolator_pickle') as resource_path:
+        #         print(f"Copying interpolator data from the library resource {resource_path} to the current working directory.")
+        #         resource_path = pathlib.Path(resource_path)  # Ensure it's a Path object
+
+        #         # Define destination path (same name in current working directory)
+        #         dest_path = pathlib.Path.cwd() / resource_path.name
+
+        #         # Copy entire directory tree
+        #         if dest_path.exists():
+        #             shutil.rmtree(dest_path)
+        #         shutil.copytree(resource_path, dest_path)
+
         # dealing with mtot_max
         # set max cut off according to minimum_frequency
         mtot_max = (
@@ -346,12 +574,12 @@ class GWSNR:
             self.snr_recalculation = snr_recalculation
             self.snr_recalculation_range = snr_recalculation_range
             self.snr_recalculation_waveform_approximant = snr_recalculation_waveform_approximant
-        # buffer of 0.01 is added to the ratio
+
         self.ratio_arr = np.geomspace(ratio_min, ratio_max, ratio_resolution)
+        self.mtot_arr = np.sort(mtot_min + mtot_max - np.geomspace(mtot_min, mtot_max, mtot_resolution))
         # buffer of 0.1 is added to the mtot
-        self.mtot_arr = np.sort(
-            mtot_min + mtot_max - np.geomspace(mtot_min, mtot_max, mtot_resolution)
-        )
+        # self.mtot_arr = np.concatenate((np.array([mtot_min-0.1]), np.sort(mtot_min + mtot_max - np.geomspace(mtot_min, mtot_max, mtot_resolution-2)), np.array([mtot_max+0.1])))
+
         self.sampling_frequency = sampling_frequency
         self.waveform_approximant = waveform_approximant
         self.frequency_domain_source_model = frequency_domain_source_model
@@ -451,7 +679,7 @@ class GWSNR:
             self.snr_type = "ann"
 
         else:
-            raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'inner_product', 'inner_product_jax', 'ann'.")
+            raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'inner_product', 'inner_product_jax', 'ann'.")
 
         # change back to original
         self.psds_list = psds_list
@@ -468,26 +696,39 @@ class GWSNR:
     # dealing with interpolator
     def interpolator_setup(self, interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list):
         """
-        Function to generate the partialscaled SNR interpolator and return its pickle file paths.
+        Function to set up interpolator files and handle caching for partialscaled SNR interpolation coefficients.
+
+        This method checks for existing interpolator files, determines which detectors need new interpolators,
+        and manages the generation and loading of partialscaled SNR interpolation data. It handles both
+        the creation of new interpolators and the loading of existing ones from cache.
 
         Parameters
         ----------
         interpolator_dir : `str`
-            Path to store the interpolator pickle file.
+            Path to directory for storing interpolator pickle files. Default is './interpolator_pickle'.
         create_new_interpolator : `bool`
-            If set True, new interpolator will be generated or replace the existing one.
-        psds_list : `list`
-            List of psds for different detectors.
-        detector_tensor_list : `list`
-            List of detector tensor.
-        detector_list : `list`
-            List of detectors.
-
+            If True, forces generation of new interpolators or replaces existing ones. If False,
+            uses existing interpolators when available. Default is False.
+        psds_list : `list` of bilby's PowerSpectralDensity objects
+            List of power spectral density objects for different detectors used for interpolator generation.
+        detector_tensor_list : `list` of `numpy.ndarray`
+            List of detector tensor arrays for antenna response calculations during interpolator generation.
+        detector_list : `list` of `str`
+            List of detector names (e.g., ['L1', 'H1', 'V1']) for which interpolators are needed.
 
         Returns
-        ----------
-        path_interpolator_all : `list`
-            List of partialscaled SNR interpolator pickle file paths.
+        -------
+        path_interpolator_all : `list` of `str`
+            List of file paths to partialscaled SNR interpolator pickle files for all detectors.
+            These files contain the precomputed interpolation coefficients used for fast SNR calculation.
+
+        Notes
+        -----
+        - The method uses :func:`~gwsnr.utils.interpolator_check` to determine which detectors need new interpolators
+        - For missing interpolators, calls :meth:`~init_partialscaled` to generate them
+        - Updates class attributes including :attr:`~psds_list`, :attr:`~detector_tensor_list`, :attr:`~detector_list`, and :attr:`~path_interpolator`
+        - Loads all interpolator data into :attr:`~snr_partialsacaled_list` for runtime use
+        - Supports both no-spin and aligned-spin interpolation methods based on :attr:`~snr_type`
         """
 
         # Note: it will only select detectors that does not have interpolator stored yet
@@ -530,8 +771,55 @@ class GWSNR:
 
     def ann_initilization(self, ann_path_dict, detector_list, sampling_frequency, minimum_frequency, waveform_approximant, snr_th):
         """
-        Function to initialize ANN model and scaler for the given detector list. It also generates the partialscaledSNR interpolator for the required waveform approximant.
+        Function to initialize ANN models and scalers for detection probability estimation using artificial neural networks.
 
+        This method loads and validates ANN models, feature scalers, and error correction parameters for each detector
+        in the detector list. It handles both built-in models from the gwsnr package and user-provided models,
+        ensuring compatibility with the current GWSNR configuration parameters.
+
+        Parameters
+        ----------
+        ann_path_dict : `dict` or `str` or `None`
+            Dictionary or path to JSON file containing ANN model and scaler paths for different detectors.
+            If None, uses default models from gwsnr/ann/data/ann_path_dict.json.
+            If dict, should have structure: {detector_name: {'model_path': str, 'scaler_path': str, 
+            'error_adjustment_path': str, 'sampling_frequency': float, 'minimum_frequency': float, 
+            'waveform_approximant': str, 'snr_th': float}}.
+        detector_list : `list` of `str`
+            List of detector names (e.g., ['L1', 'H1', 'V1']) for which ANN models are needed.
+        sampling_frequency : `float`
+            Sampling frequency of the detector data. Must match ANN training parameters.
+        minimum_frequency : `float`
+            Minimum frequency of the waveform. Must match ANN training parameters.
+        waveform_approximant : `str`
+            Waveform approximant to use. Must match ANN training parameters.
+        snr_th : `float`
+            SNR threshold for individual detector detection. Must match ANN training parameters.
+
+        Returns
+        -------
+        model_dict : `dict`
+            Dictionary of loaded ANN models for each detector {detector_name: tensorflow.keras.Model}.
+        scaler_dict : `dict`
+            Dictionary of loaded feature scalers for each detector {detector_name: sklearn.preprocessing.Scaler}.
+        error_adjustment : `dict`
+            Dictionary of error correction parameters for each detector {detector_name: {'slope': float, 'intercept': float}}.
+        ann_catalogue : `dict`
+            Dictionary containing complete ANN configuration and model paths for all detectors.
+
+        Raises
+        ------
+        ValueError
+            If ANN model or scaler is not available for a detector in detector_list.
+            If model parameters don't match the current GWSNR configuration.
+            If required keys ('model_path', 'scaler_path') are missing from ann_path_dict.
+
+        Notes
+        -----
+        - Models are loaded from gwsnr/ann/data directory if paths don't exist as files
+        - Parameter validation ensures ANN models are compatible with current settings
+        - Error adjustment parameters provide post-prediction correction for improved accuracy
+        - ANN models use partial-scaled SNR as input feature along with other parameters
         """
 
         # check the content ann_path_dict.json in gwsnr/ann module directory
@@ -611,12 +899,28 @@ class GWSNR:
 
     def _print_no_interpolator(self, **kwargs):
         """
-        Helper function to print error message when no interpolator is found.
+        Function to print error message when no interpolator is found for interpolation-based SNR calculation.
+
+        This is a placeholder method that is assigned to :meth:`~snr_with_interpolation` when :attr:`~snr_type` 
+        is set to 'inner_product' or 'inner_product_jax', indicating that interpolation functionality 
+        is not available for these SNR calculation methods.
 
         Parameters
         ----------
-        kwargs : `dict`
-            Dictionary of parameters.
+        **kwargs : `dict`
+            Arbitrary keyword arguments passed to the method (ignored).
+
+        Raises
+        ------
+        ValueError
+            Always raises an error indicating that no interpolator is available and suggesting 
+            to use snr_type="interpolation" to generate interpolators.
+
+        Notes
+        -----
+        - This method is automatically assigned during class initialization when using inner product methods
+        - Serves as a safety mechanism to prevent calls to interpolation methods when unavailable
+        - Users should initialize GWSNR with appropriate interpolation snr_type to access interpolation functionality
         """
 
         raise ValueError(
@@ -625,19 +929,38 @@ class GWSNR:
 
     def calculate_mtot_max(self, mtot_max, minimum_frequency):
         """
-        Function to calculate maximum total mass of the binary in solar mass (use in interpolation purpose) according to the minimum frequency of the waveform.
+        Function to calculate the maximum total mass cutoff based on minimum frequency to ensure positive chirp time.
+
+        This method determines the maximum allowable total mass for binary systems by finding where 
+        the chirp time becomes zero at the given minimum frequency. The chirp time represents the 
+        duration a gravitational wave signal spends in the detector's frequency band. A safety factor 
+        of 1.1 is applied to ensure the chirp time remains positive for waveform generation.
+
+        The calculation uses the :func:`~gwsnr.numba.findchirp_chirptime` function to compute chirp 
+        times and employs numerical root finding to determine where the chirp time approaches zero.
 
         Parameters
         ----------
         mtot_max : `float`
-            Maximum total mass of the binary in solar mass (use interpolation purpose).
+            User-specified maximum total mass of the binary in solar masses. If this exceeds 
+            the frequency-based limit, it will be reduced to the calculated maximum.
         minimum_frequency : `float`
-            Minimum frequency of the waveform.
+            Minimum frequency of the waveform in Hz. Lower frequencies allow higher total masses 
+            before the chirp time becomes negative.
 
         Returns
-        ----------
+        -------
         mtot_max : `float`
-            Maximum total mass of the binary in solar mass (use interpolation purpose).
+            Adjusted maximum total mass of the binary in solar masses, ensuring positive chirp 
+            time at the given minimum frequency. Will be the smaller of the input mtot_max and 
+            the frequency-based limit.
+
+        Notes
+        -----
+        - Uses equal mass ratio (q=1.0) for the chirp time calculation as a conservative estimate
+        - The safety factor of 1.1 provides a buffer to prevent numerical issues during waveform generation
+        - This limit is particularly important for low-frequency detectors and TaylorF2 approximants
+        - The method uses :func:`scipy.optimize.fsolve` to find the root of the chirp time function
         """
 
         def func(x, mass_ratio=1.0):
@@ -657,12 +980,37 @@ class GWSNR:
 
     def print_all_params(self, verbose=True):
         """
-        Function to print all the parameters of the class instance
+        Function to print all the parameters and configuration of the GWSNR class instance.
+
+        This method displays comprehensive information about the current GWSNR configuration including
+        computational parameters, waveform settings, detector configuration, interpolation grid parameters,
+        and file paths. It provides a complete overview of the initialized GWSNR instance for verification
+        and debugging purposes.
 
         Parameters
         ----------
         verbose : `bool`
-            If True, print all the parameters of the class instance. Default is True.
+            If True, print all the parameters of the class instance to stdout. If False,
+            suppress output. Default is True.
+
+        Notes
+        -----
+        The printed information includes:
+        
+        - **Computational settings**: Number of processors (:attr:`~npool`), SNR calculation type (:attr:`~snr_type`)
+        - **Waveform configuration**: Approximant (:attr:`~waveform_approximant`), sampling frequency (:attr:`~sampling_frequency`), minimum frequency (:attr:`~f_min`)
+        - **Mass parameter ranges**: Total mass bounds (:attr:`~mtot_min`, :attr:`~mtot_max`) with frequency-based cutoff information
+        - **Detector setup**: List of detectors (:attr:`~detector_list`) and their PSDs (:attr:`~psds_list`)
+        - **Interpolation parameters**: Mass ratio bounds (:attr:`~ratio_min`, :attr:`~ratio_max`), grid resolutions (:attr:`~mtot_resolution`, :attr:`~ratio_resolution`)
+        - **File paths**: Interpolator directory (:attr:`~interpolator_dir`) when using interpolation methods
+
+        This method is automatically called during class initialization when :attr:`~gwsnr_verbose` is True.
+
+        Examples
+        --------
+        >>> from gwsnr import GWSNR
+        >>> snr = GWSNR(gwsnr_verbose=False)  # Initialize without printing
+        >>> snr.print_all_params()  # Manually print parameters
         """
 
         if verbose:
@@ -710,55 +1058,99 @@ class GWSNR:
         output_jsonfile=False,
     ):
         """
-        Function for calling SNR calculation function depending on the value of snr_type attribute. If snr_type is 'interpolation', it calls snr_with_interpolation function. If snr_type is 'inner_product', it calls compute_bilby_snr function.
+        Main function to calculate SNR of gravitational-wave signals from compact binary coalescences.
+
+        This method serves as the primary interface for SNR calculation, automatically routing to the 
+        appropriate computation method based on the :attr:`~snr_type` setting. It supports multiple 
+        backend methods including interpolation-based fast calculation, inner product methods, JAX-accelerated 
+        computation, and artificial neural network estimation.
+
+        The method handles parameter validation, coordinate transformations (e.g., tilt angles to aligned spins), 
+        and optionally computes probability of detection. For systems near detection threshold, it can perform 
+        hybrid SNR recalculation using more accurate waveform models.
 
         Parameters
         ----------
         mass_1 : `numpy.ndarray` or `float`
-            Primary mass of the binary in solar mass. Default is 10.0.
+            Primary mass of the binary in solar masses. Default is np.array([10.0]).
         mass_2 : `numpy.ndarray` or `float`
-            Secondary mass of the binary in solar mass. Default is 10.0.
+            Secondary mass of the binary in solar masses. Default is np.array([10.0]).
         luminosity_distance : `numpy.ndarray` or `float`
             Luminosity distance of the binary in Mpc. Default is 100.0.
         theta_jn : `numpy.ndarray` or `float`
-            Inclination angle of the binary in radian. Default is 0.0.
+            Inclination angle between total angular momentum and line of sight in radians. Default is 0.0.
         psi : `numpy.ndarray` or `float`
-            Polarization angle of the binary in radian. Default is 0.0.
+            Gravitational wave polarization angle in radians. Default is 0.0.
         phase : `numpy.ndarray` or `float`
-            Phase of the binary in radian. Default is 0.0.
+            Gravitational wave phase at coalescence in radians. Default is 0.0.
         geocent_time : `numpy.ndarray` or `float`
-            Geocentric time of the binary in gps. Default is 1246527224.169434.
+            GPS time of coalescence at geocenter in seconds. Default is 1246527224.169434.
         ra : `numpy.ndarray` or `float`
-            Right ascension of the binary in radian. Default is 0.0.
+            Right ascension of the source in radians. Default is 0.0.
         dec : `numpy.ndarray` or `float`
-            Declination of the binary in radian. Default is 0.0.
+            Declination of the source in radians. Default is 0.0.
         a_1 : `numpy.ndarray` or `float`
-            Primary spin of the binary. Default is 0.0.
+            Dimensionless spin magnitude of the primary object. Default is 0.0.
         a_2 : `numpy.ndarray` or `float`
-            Secondary spin of the binary. Default is 0.0.
+            Dimensionless spin magnitude of the secondary object. Default is 0.0.
         tilt_1 : `numpy.ndarray` or `float`
-            Tilt of the primary spin of the binary. Default is 0.0.
+            Tilt angle of primary spin relative to orbital angular momentum in radians. Default is 0.0.
         tilt_2 : `numpy.ndarray` or `float`
-            Tilt of the secondary spin of the binary. Default is 0.0.
+            Tilt angle of secondary spin relative to orbital angular momentum in radians. Default is 0.0.
         phi_12 : `numpy.ndarray` or `float`
-            Relative angle between the primary and secondary spin of the binary. Default is 0.0.
+            Azimuthal angle between the two spins in radians. Default is 0.0.
         phi_jl : `numpy.ndarray` or `float`
-            Angle between the total angular momentum and the orbital angular momentum of the binary. Default is 0.0.
-        gw_param_dict : `dict`
-            This allows to pass all the parameters as a dictionary (dict.keys()=param_names, dict.values()=param values). Default is False.
+            Azimuthal angle between total and orbital angular momentum in radians. Default is 0.0.
+        lambda_1 : `numpy.ndarray` or `float`
+            Dimensionless tidal deformability of primary object. Default is 0.0.
+        lambda_2 : `numpy.ndarray` or `float`
+            Dimensionless tidal deformability of secondary object. Default is 0.0.
+        eccentricity : `numpy.ndarray` or `float`
+            Orbital eccentricity at reference frequency. Default is 0.0.
+        gw_param_dict : `dict` or `bool`
+            Dictionary containing all gravitational wave parameters as key-value pairs. 
+            If provided, takes precedence over individual parameter arguments. Default is False.
         output_jsonfile : `str` or `bool`
-            If str, the SNR dictionary will be saved as a json file with the given name. Default is False.
+            If string, saves the SNR results to a JSON file with the given filename. 
+            If True, saves to 'snr.json'. If False, no file output. Default is False.
 
         Returns
         -------
         snr_dict : `dict`
-            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).
+            Dictionary containing SNR values for each detector and network SNR.
+            Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'optimal_snr_net'.
+            Values are numpy arrays of SNR values corresponding to input parameters.
+        pdet_dict : `dict`
+            Dictionary containing probability of detection values (only if :attr:`~pdet` is True).
+            Keys include detector names and 'pdet_net'. Values are numpy arrays of probabilities.
+
+        Raises
+        ------
+        ValueError
+            If :attr:`~snr_type` is not recognized or if parameters are outside valid ranges.
+
+        Notes
+        -----
+        - For interpolation methods, aligned spin components are computed as a_i * cos(tilt_i)
+        - Total mass must be within [mtot_min, mtot_max] range for interpolation methods
+        - Hybrid SNR recalculation is triggered when :attr:`~snr_recalculation` is True and 
+          network SNR falls within :attr:`~snr_recalculation_range`
+        - When :attr:`~pdet` is True, returns detection probabilities instead of SNR values
 
         Examples
-        ----------
+        --------
         >>> from gwsnr import GWSNR
-        >>> snr = GWSNR(snrs_type='interpolation')
-        >>> snr.snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+        >>> # Basic interpolation-based SNR calculation
+        >>> snr = GWSNR(snr_type='interpolation')
+        >>> result = snr.snr(mass_1=30.0, mass_2=30.0, luminosity_distance=100.0)
+        
+        >>> # Using parameter dictionary
+        >>> params = {'mass_1': [20, 30], 'mass_2': [20, 30], 'luminosity_distance': [100, 200]}
+        >>> result = snr.snr(gw_param_dict=params)
+        
+        >>> # With probability of detection
+        >>> snr_pdet = GWSNR(snr_type='interpolation', pdet=True)
+        >>> pdet_result = snr_pdet.snr(mass_1=30.0, mass_2=30.0, luminosity_distance=100.0)
         """
 
 
@@ -803,8 +1195,8 @@ class GWSNR:
             tilt_2 = gw_param_dict.get("tilt_2", tilt_2)
             a_1 = gw_param_dict.get("a_1", a_1)
             a_2 = gw_param_dict.get("a_2", a_2)
-            a_1_old = a_1.copy()
-            a_2_old = a_2.copy()
+            a_1_old = a_1
+            a_2_old = a_2
             # if tilt_1 and tilt_2 numpy.ndarray or list, convert them to numpy array
             if isinstance(tilt_1, (list, np.ndarray)):
                 a_1 = np.array(a_1, ndmin=1)
@@ -911,41 +1303,91 @@ class GWSNR:
         output_jsonfile=False,
     ):
         """
-        Function to calculate SNR using bicubic interpolation method.
+        Function to calculate SNR using artificial neural network (ANN) estimation method.
+
+        This method uses trained neural networks to rapidly estimate the probability of detection (Pdet) 
+        for spin-precessing gravitational wave signals. The ANN models leverage partial-scaled SNR as a 
+        summary statistic along with other intrinsic parameters to provide fast detection probability 
+        estimates, particularly useful for population synthesis studies.
+
+        The method first calculates partial-scaled SNR using interpolation, then uses this as input 
+        to pre-trained ANN models for each detector. Error correction is applied to improve accuracy
+        of the ANN predictions.
 
         Parameters
         ----------
         mass_1 : `numpy.ndarray` or `float`
-            Primary mass of the binary in solar mass. Default is 10.0.
+            Primary mass of the binary in solar masses. Default is 30.0.
         mass_2 : `numpy.ndarray` or `float`
-            Secondary mass of the binary in solar mass. Default is 10.0.
+            Secondary mass of the binary in solar masses. Default is 29.0.
         luminosity_distance : `numpy.ndarray` or `float`
             Luminosity distance of the binary in Mpc. Default is 100.0.
         theta_jn : `numpy.ndarray` or `float`
-            Inclination angle of the binary in radian. Default is 0.0.
+            Inclination angle between total angular momentum and line of sight in radians. Default is 0.0.
         psi : `numpy.ndarray` or `float`
-            Polarization angle of the binary in radian. Default is 0.0.
+            Gravitational wave polarization angle in radians. Default is 0.0.
         phase : `numpy.ndarray` or `float`
-            Phase of the binary in radian. Default is 0.0.
+            Gravitational wave phase at coalescence in radians. Default is 0.0.
         geocent_time : `numpy.ndarray` or `float`
-            Geocentric time of the binary in gps. Default is 1246527224.169434.
+            GPS time of coalescence at geocenter in seconds. Default is 1246527224.169434.
         ra : `numpy.ndarray` or `float`
-            Right ascension of the binary in radian. Default is 0.0.
+            Right ascension of the source in radians. Default is 0.0.
         dec : `numpy.ndarray` or `float`
-            Declination of the binary in radian. Default is 0.0.
+            Declination of the source in radians. Default is 0.0.
+        a_1 : `numpy.ndarray` or `float`
+            Dimensionless spin magnitude of the primary object. Default is 0.0.
+        a_2 : `numpy.ndarray` or `float`
+            Dimensionless spin magnitude of the secondary object. Default is 0.0.
+        tilt_1 : `numpy.ndarray` or `float`
+            Tilt angle of primary spin relative to orbital angular momentum in radians. Default is 0.0.
+        tilt_2 : `numpy.ndarray` or `float`
+            Tilt angle of secondary spin relative to orbital angular momentum in radians. Default is 0.0.
+        phi_12 : `numpy.ndarray` or `float`
+            Azimuthal angle between the two spins in radians. Default is 0.0.
+        phi_jl : `numpy.ndarray` or `float`
+            Azimuthal angle between total and orbital angular momentum in radians. Default is 0.0.
+        gw_param_dict : `dict` or `bool`
+            Dictionary containing all gravitational wave parameters as key-value pairs. 
+            If provided, takes precedence over individual parameter arguments. Default is False.
         output_jsonfile : `str` or `bool`
-            If str, the SNR dictionary will be saved as a json file with the given name. Default is False.
+            If string, saves the SNR results to a JSON file with the given filename. 
+            If True, saves to 'snr.json'. If False, no file output. Default is False.
 
         Returns
         -------
-        snr_dict : `dict`
-            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).
+        optimal_snr : `dict`
+            Dictionary containing ANN-estimated SNR values for each detector and network SNR.
+            Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'optimal_snr_net'.
+            Values are numpy arrays of SNR estimates corresponding to input parameters.
+
+        Raises
+        ------
+        ValueError
+            If total mass (mass_1 + mass_2) is outside the range [mtot_min, mtot_max].
+
+        Notes
+        -----
+        - ANN models must be pre-trained and loaded during class initialization
+        - Uses aligned spin components calculated as a_i * cos(tilt_i) for feature input
+        - Feature inputs include: partial-scaled SNR, amplitude factor, symmetric mass ratio, 
+          effective spin, and inclination angle
+        - Error adjustment parameters provide post-prediction correction for improved accuracy
+        - Compatible with waveform approximants that have corresponding trained ANN models
+        - Requires :attr:`~snr_type` to be set to 'ann' during GWSNR initialization
 
         Examples
-        ----------
+        --------
         >>> from gwsnr import GWSNR
+        >>> # Initialize with ANN method
         >>> snr = GWSNR(snr_type='ann', waveform_approximant='IMRPhenomXPHM')
-        >>> snr.snr_with_ann(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0)
+        >>> # Calculate SNR using ANN
+        >>> result = snr.snr_with_ann(mass_1=30.0, mass_2=25.0, luminosity_distance=200.0, 
+        ...                          a_1=0.5, a_2=0.3, tilt_1=0.2, tilt_2=0.1)
+        
+        >>> # Using parameter dictionary
+        >>> params = {'mass_1': [20, 30], 'mass_2': [20, 25], 'luminosity_distance': [100, 200],
+        ...           'a_1': [0.2, 0.5], 'tilt_1': [0.1, 0.3]}
+        >>> result = snr.snr_with_ann(gw_param_dict=params)
         """
 
         if gw_param_dict is not False:
@@ -1011,23 +1453,48 @@ class GWSNR:
 
     def output_ann(self, idx, params):
         """
-        Function to output the input data for ANN.
+        Function to prepare input features for ANN prediction from gravitational wave parameters.
+
+        This method transforms gravitational wave parameters into feature vectors suitable for 
+        artificial neural network prediction of detection probabilities. It calculates partial-scaled 
+        SNR using interpolation and combines it with other intrinsic parameters to create the input 
+        features expected by the pre-trained ANN models.
+
+        The feature vector for each detector includes:
+        - Partial-scaled SNR (dimensionless, distance-independent)
+        - Amplitude factor (A1 = Mc^(5/6) / d_eff)
+        - Symmetric mass ratio (eta)
+        - Effective spin (chi_eff)
+        - Inclination angle (theta_jn)
 
         Parameters
         ----------
-        idx : `numpy.ndarray`
-            Index array.
+        idx : `numpy.ndarray` of `bool`
+            Boolean index array indicating which parameter entries are within valid mass ranges 
+            for interpolation (mtot_min <= mtot <= mtot_max).
         params : `dict`
-            Dictionary of input parameters.
+            Dictionary containing gravitational wave parameters with keys:
+            - 'mass_1', 'mass_2': Primary and secondary masses in solar masses
+            - 'luminosity_distance': Distance in Mpc
+            - 'theta_jn': Inclination angle in radians
+            - 'a_1', 'a_2': Spin magnitudes (dimensionless)
+            - 'tilt_1', 'tilt_2': Spin tilt angles in radians
+            - 'psi', 'geocent_time', 'ra', 'dec': Extrinsic parameters
 
         Returns
         -------
-        X_L1 : `numpy.ndarray`
-            Feature scaled input data for L1 detector.
-        X_H1 : `numpy.ndarray`
-            Feature scaled input data for H1 detector.
-        X_V1 : `numpy.ndarray`
-            Feature scaled input data for V1 detector.
+        ann_input : `list` of `numpy.ndarray`
+            List of feature arrays for each detector in :attr:`~detector_list`.
+            Each array has shape (N, 5) where N is the number of valid parameter sets,
+            and columns correspond to [partial_scaled_snr, amplitude_factor, eta, chi_eff, theta_jn].
+
+        Notes
+        -----
+        - Uses :meth:`~get_interpolated_snr` to calculate partial-scaled SNR via interpolation
+        - Aligned spin components are computed as a_i * cos(tilt_i) for chi_eff calculation
+        - Chirp mass Mc = (m1*m2)^(3/5) / (m1+m2)^(1/5) is used for amplitude scaling
+        - Effective spin chi_eff = (m1*a1z + m2*a2z) / (m1+m2) where aiz are aligned components
+        - Feature scaling is applied later using pre-loaded scalers in :meth:`~snr_with_ann`
         """
 
         mass_1 = np.array(params["mass_1"][idx])
@@ -1099,41 +1566,81 @@ class GWSNR:
         gw_param_dict=False,
     ):
         """
-        Function to calculate SNR using bicubic interpolation method.
+        Function to calculate SNR using bicubic interpolation of precomputed partial-scaled SNR coefficients.
+
+        This method provides fast SNR calculation by interpolating precomputed partial-scaled SNR values
+        across a grid of intrinsic parameters (total mass, mass ratio, and optionally aligned spins).
+        The interpolation is performed using either Numba-accelerated or JAX-accelerated functions
+        depending on the :attr:`~snr_type` setting. This approach is particularly efficient for
+        large-scale population studies and parameter estimation.
+
+        The method handles parameter validation, ensures masses are within interpolation bounds,
+        and computes antenna response patterns for each detector. For systems outside the mass
+        range, SNR values are set to zero.
 
         Parameters
         ----------
         mass_1 : `numpy.ndarray` or `float`
-            Primary mass of the binary in solar mass. Default is 10.0.
+            Primary mass of the binary in solar masses. Default is 30.0.
         mass_2 : `numpy.ndarray` or `float`
-            Secondary mass of the binary in solar mass. Default is 10.0.
+            Secondary mass of the binary in solar masses. Default is 29.0.
         luminosity_distance : `numpy.ndarray` or `float`
             Luminosity distance of the binary in Mpc. Default is 100.0.
         theta_jn : `numpy.ndarray` or `float`
-            Inclination angle of the binary in radian. Default is 0.0.
+            Inclination angle between total angular momentum and line of sight in radians. Default is 0.0.
         psi : `numpy.ndarray` or `float`
-            Polarization angle of the binary in radian. Default is 0.0.
+            Gravitational wave polarization angle in radians. Default is 0.0.
         phase : `numpy.ndarray` or `float`
-            Phase of the binary in radian. Default is 0.0.
+            Gravitational wave phase at coalescence in radians. Default is 0.0.
         geocent_time : `numpy.ndarray` or `float`
-            Geocentric time of the binary in gps. Default is 1246527224.169434.
+            GPS time of coalescence at geocenter in seconds. Default is 1246527224.169434.
         ra : `numpy.ndarray` or `float`
-            Right ascension of the binary in radian. Default is 0.0.
+            Right ascension of the source in radians. Default is 0.0.
         dec : `numpy.ndarray` or `float`
-            Declination of the binary in radian. Default is 0.0.
+            Declination of the source in radians. Default is 0.0.
+        a_1 : `numpy.ndarray` or `float`
+            Dimensionless aligned spin component of the primary object (only used for aligned-spin interpolation types). Default is 0.0.
+        a_2 : `numpy.ndarray` or `float`
+            Dimensionless aligned spin component of the secondary object (only used for aligned-spin interpolation types). Default is 0.0.
+        gw_param_dict : `dict` or `bool`
+            Dictionary containing all gravitational wave parameters as key-value pairs. 
+            If provided, takes precedence over individual parameter arguments. Default is False.
         output_jsonfile : `str` or `bool`
-            If str, the SNR dictionary will be saved as a json file with the given name. Default is False.
+            If string, saves the SNR results to a JSON file with the given filename. 
+            If True, saves to 'snr.json'. If False, no file output. Default is False.
 
         Returns
         -------
-        snr_dict : `dict`
-            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).
+        optimal_snr : `dict`
+            Dictionary containing SNR values for each detector and network SNR.
+            Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'optimal_snr_net'.
+            Values are numpy arrays of SNR values corresponding to input parameters.
+            Systems with total mass outside [mtot_min, mtot_max] have SNR set to zero.
+
+        Notes
+        -----
+        - Requires precomputed interpolation coefficients stored in :attr:`~snr_partialsacaled_list`
+        - Total mass (mass_1 + mass_2) must be within [mtot_min, mtot_max] for non-zero SNR
+        - For aligned-spin methods, uses aligned spin components computed as a_i * cos(tilt_i)
+        - Interpolation grid parameters are set during class initialization
+        - Supports both Numba and JAX backends for accelerated computation
+        - Compatible with waveform approximants: IMRPhenomD, TaylorF2, IMRPhenomXPHM
 
         Examples
-        ----------
+        --------
         >>> from gwsnr import GWSNR
-        >>> snr = GWSNR(snr_type='interpolation')
-        >>> snr.snr_with_interpolation(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+        >>> # No-spin interpolation
+        >>> snr = GWSNR(snr_type='interpolation_no_spins')
+        >>> result = snr.snr_with_interpolation(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
+        
+        >>> # Aligned-spin interpolation
+        >>> snr_spin = GWSNR(snr_type='interpolation_aligned_spins')
+        >>> result = snr_spin.snr_with_interpolation(mass_1=30.0, mass_2=25.0, 
+        ...                                         luminosity_distance=100.0, a_1=0.5, a_2=0.3)
+        
+        >>> # Using parameter dictionary
+        >>> params = {'mass_1': [20, 30], 'mass_2': [20, 25], 'luminosity_distance': [100, 200]}
+        >>> result = snr.snr_with_interpolation(gw_param_dict=params)
         """
 
         # getting the parameters from the dictionary
@@ -1164,22 +1671,22 @@ class GWSNR:
         if self.snr_type == "interpolation" or self.snr_type == "interpolation_no_spins" or self.snr_type == "interpolation_aligned_spins":
             
             snr, snr_effective, _, _ = self.get_interpolated_snr(
-                mass_1[idx2],
-                mass_2[idx2],
-                luminosity_distance[idx2],
-                theta_jn[idx2],
-                psi[idx2],
-                geocent_time[idx2],
-                ra[idx2],
-                dec[idx2],
-                a_1[idx2],
-                a_2[idx2],
-                detector_tensor,
-                snr_partialscaled,
-                self.ratio_arr,
-                self.mtot_arr,
-                self.a_1_arr,
-                self.a_2_arr,
+                np.array(mass_1[idx2], dtype=np.float64),
+                np.array(mass_2[idx2], dtype=np.float64),
+                np.array(luminosity_distance[idx2], dtype=np.float64),
+                np.array(theta_jn[idx2], dtype=np.float64),
+                np.array(psi[idx2], dtype=np.float64),
+                np.array(geocent_time[idx2], dtype=np.float64),
+                np.array(ra[idx2], dtype=np.float64),
+                np.array(dec[idx2], dtype=np.float64),
+                np.array(a_1[idx2], dtype=np.float64),
+                np.array(a_2[idx2], dtype=np.float64),
+                np.array(detector_tensor, dtype=np.float64),
+                np.array(snr_partialscaled, dtype=np.float64),
+                np.array(self.ratio_arr, dtype=np.float64),
+                np.array(self.mtot_arr, dtype=np.float64),
+                np.array(self.a_1_arr, dtype=np.float64),
+                np.array(self.a_2_arr, dtype=np.float64),
             )
         elif self.snr_type == "interpolation_no_spins_jax" or self.snr_type == "interpolation_aligned_spins_jax":
 
@@ -1220,7 +1727,56 @@ class GWSNR:
     
     def init_partialscaled(self):
         """
-        Function to generate partialscaled SNR interpolation coefficients. It will save the interpolator in the pickle file path indicated by the path_interpolator attribute.
+        Function to generate partialscaled SNR interpolation coefficients for fast bicubic interpolation.
+
+        This method computes and saves precomputed partial-scaled SNR values across a grid of intrinsic 
+        parameters (total mass, mass ratio, and optionally aligned spins) for each detector in the network. 
+        The partial-scaled SNR is distance-independent and decoupled from extrinsic parameters, enabling 
+        fast interpolation during runtime SNR calculations.
+
+        The method creates a parameter grid based on the interpolation type:
+        - For no-spin methods: 2D grid over (mass_ratio, total_mass)
+        - For aligned-spin methods: 4D grid over (mass_ratio, total_mass, a_1, a_2)
+
+        For each grid point, it computes the optimal SNR using :meth:`~compute_bilby_snr` with fixed 
+        extrinsic parameters, then scales by effective luminosity distance and chirp mass to create 
+        the partial-scaled SNR coefficients. These coefficients are saved as pickle files for later 
+        use during interpolation-based SNR calculations.
+
+        Parameters
+        ----------
+        None
+            Uses class attributes for grid parameters and detector configuration.
+
+        Returns
+        -------
+        None
+            Saves interpolation coefficients to pickle files specified in :attr:`~path_interpolator`.
+
+        Raises
+        ------
+        ValueError
+            If :attr:`~mtot_min` is less than 1.0 solar mass.
+            If :attr:`~snr_type` is not supported for interpolation.
+
+        Notes
+        -----
+        - Uses fixed extrinsic parameters: luminosity_distance=100 Mpc, theta_jn=0, ra=0, dec=0, psi=0, phase=0
+        - Calls :meth:`~compute_bilby_snr` to generate unscaled SNR values across the parameter grid
+        - Partial-scaled SNR = (optimal_SNR * d_eff) / Mc^(5/6) where Mc is chirp mass
+        - Grid dimensions depend on resolution parameters: :attr:`~ratio_resolution`, :attr:`~mtot_resolution`, :attr:`~spin_resolution`
+        - For aligned-spin methods, grid covers spin range [-spin_max, +spin_max] for both objects
+        - Interpolation coefficients enable fast runtime SNR calculation via bicubic interpolation
+        - Compatible with snr_types: 'interpolation', 'interpolation_no_spins', 'interpolation_aligned_spins', and their JAX variants
+
+        Examples
+        --------
+        This method is called automatically during GWSNR initialization when interpolation 
+        coefficients don't exist or when :attr:`~create_new_interpolator` is True.
+
+        >>> from gwsnr import GWSNR
+        >>> # Will automatically call init_partialscaled() if needed
+        >>> snr = GWSNR(snr_type='interpolation_no_spins', create_new_interpolator=True)
         """
 
         if self.mtot_min < 1.0:
@@ -1270,13 +1826,13 @@ class GWSNR:
         # Vectorized computation for effective luminosity distance
         Fp = np.array(
             [
-                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "plus")
+                antenna_response_plus(ra_, dec_, geocent_time_, psi_, tensor)
                 for tensor in detector_tensor
             ]
         )
         Fc = np.array(
             [
-                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "cross")
+                antenna_response_cross(ra_, dec_, geocent_time_, psi_, tensor,)
                 for tensor in detector_tensor
             ]
         )
@@ -1310,9 +1866,9 @@ class GWSNR:
 
         for j in num_det:
             if self.snr_type in list_1:
-                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)) * dl_eff[j] / Mchirp_scaled), # shape (size1, size2, size3, size4)
+                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)) * dl_eff[j] / Mchirp_scaled, dtype=np.float16), # shape (size1, size2, size3, size4)
             elif self.snr_type in list_2:
-                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2)) * dl_eff[j] / Mchirp_scaled), # shape (size1, size2, size3, size4)
+                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2)) * dl_eff[j] / Mchirp_scaled, dtype=np.float16), # shape (size1, size2, size3, size4)
             else:
                 raise ValueError(f"snr_type {self.snr_type} is not supported for interpolation.")
             # print('dl_eff=',dl_eff[j])
@@ -1345,69 +1901,96 @@ class GWSNR:
         output_jsonfile=False,
     ):
         """
-        SNR calculated using inner product method. This is similar to the SNR calculation method used in bilby.
+        Function to calculate SNR using noise-weighted inner product method with LAL waveform generation.
+
+        This method computes the optimal signal-to-noise ratio using the standard matched filtering 
+        formalism with noise-weighted inner products between gravitational wave signals and detector 
+        noise power spectral densities. It supports multiprocessing for efficient computation and 
+        is compatible with various waveform approximants from LALSimulation.
+
+        The method generates frequency-domain waveforms using LAL, computes the inner products 
+        with detector PSDs, and calculates antenna response patterns for each detector in the 
+        network. It automatically handles duration estimation based on chirp time and supports 
+        systems with arbitrary spin configurations including precession.
 
         Parameters
         ----------
-        mass_1 : float
-            The mass of the heavier object in the binary in solar masses.
-        mass_2 : float
-            The mass of the lighter object in the binary in solar masses.
-        luminosity_distance : float
-            The luminosity distance to the binary in megaparsecs.
-        theta_jn : float, optional
-            The angle between the total angular momentum and the line of sight.
-            Default is 0.
-        psi : float, optional
-            The gravitational wave polarisation angle.
-            Default is 0.
-        phase : float, optional
-            The gravitational wave phase at coalescence.
-            Default is 0.
-        geocent_time : float, optional
-            The GPS time of coalescence.
-            Default is 1249852157.0.
-        ra : float, optional
-            The right ascension of the source.
-            Default is 0.
-        dec : float, optional
-            The declination of the source.
-            Default is 0.
-        a_1 : float, optional
-            The spin magnitude of the heavier object in the binary.
-            Default is 0.
-        tilt_1 : float, optional
-            The tilt angle of the heavier object in the binary.
-            Default is 0.
-        phi_12 : float, optional
-            The azimuthal angle between the two spins.
-            Default is 0.
-        a_2 : float, optional
-            The spin magnitude of the lighter object in the binary.
-            Default is 0.
-        tilt_2 : float, optional
-            The tilt angle of the lighter object in the binary.
-            Default is 0.
-        phi_jl : float, optional
-            The azimuthal angle between the total angular momentum and the orbital angular momentum.
-            Default is 0.
-        verbose : bool, optional
-            If true, print the SNR.
-            Default is True.
-        jsonFile : bool, optional
-            If true, save the SNR parameters and values in a json file.
-            Default is False.
+        mass_1 : `numpy.ndarray` or `float`
+            Primary mass of the binary in solar masses. Default is 10.
+        mass_2 : `numpy.ndarray` or `float`
+            Secondary mass of the binary in solar masses. Default is 10.
+        luminosity_distance : `numpy.ndarray` or `float`
+            Luminosity distance of the binary in Mpc. Default is 100.0.
+        theta_jn : `numpy.ndarray` or `float`
+            Inclination angle between total angular momentum and line of sight in radians. Default is 0.0.
+        psi : `numpy.ndarray` or `float`
+            Gravitational wave polarization angle in radians. Default is 0.0.
+        phase : `numpy.ndarray` or `float`
+            Gravitational wave phase at coalescence in radians. Default is 0.0.
+        geocent_time : `numpy.ndarray` or `float`
+            GPS time of coalescence at geocenter in seconds. Default is 1246527224.169434.
+        ra : `numpy.ndarray` or `float`
+            Right ascension of the source in radians. Default is 0.0.
+        dec : `numpy.ndarray` or `float`
+            Declination of the source in radians. Default is 0.0.
+        a_1 : `numpy.ndarray` or `float`
+            Dimensionless spin magnitude of the primary object. Default is 0.0.
+        a_2 : `numpy.ndarray` or `float`
+            Dimensionless spin magnitude of the secondary object. Default is 0.0.
+        tilt_1 : `numpy.ndarray` or `float`
+            Tilt angle of primary spin relative to orbital angular momentum in radians. Default is 0.0.
+        tilt_2 : `numpy.ndarray` or `float`
+            Tilt angle of secondary spin relative to orbital angular momentum in radians. Default is 0.0.
+        phi_12 : `numpy.ndarray` or `float`
+            Azimuthal angle between the two spins in radians. Default is 0.0.
+        phi_jl : `numpy.ndarray` or `float`
+            Azimuthal angle between total and orbital angular momentum in radians. Default is 0.0.
+        lambda_1 : `numpy.ndarray` or `float`
+            Dimensionless tidal deformability of primary object. Default is 0.0.
+        lambda_2 : `numpy.ndarray` or `float`
+            Dimensionless tidal deformability of secondary object. Default is 0.0.
+        eccentricity : `numpy.ndarray` or `float`
+            Orbital eccentricity at reference frequency. Default is 0.0.
+        gw_param_dict : `dict` or `bool`
+            Dictionary containing all gravitational wave parameters as key-value pairs. 
+            If provided, takes precedence over individual parameter arguments. Default is False.
+        output_jsonfile : `str` or `bool`
+            If string, saves the SNR results to a JSON file with the given filename. 
+            If True, saves to 'snr.json'. If False, no file output. Default is False.
 
         Returns
-        ----------
-        snr_dict : `dict`
-            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).
+        -------
+        optimal_snr : `dict`
+            Dictionary containing SNR values for each detector and network SNR.
+            Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'optimal_snr_net'.
+            Values are numpy arrays of SNR values corresponding to input parameters.
+            Systems with total mass outside [mtot_min, mtot_max] have SNR set to zero.
+
+        Notes
+        -----
+        - Uses LALSimulation for frequency-domain waveform generation
+        - Automatically estimates waveform duration based on chirp time with safety factor
+        - Duration is bounded by :attr:`~duration_min` and :attr:`~duration_max` if specified
+        - Supports multiprocessing with :attr:`~npool` processors for parallel computation
+        - Compatible with all LAL waveform approximants including precessing and higher-order modes
+        - Uses :func:`~gwsnr.utils.noise_weighted_inner_prod` for inner product calculation
+        - Antenna response patterns computed using :func:`~gwsnr.numba.antenna_response_array`
 
         Examples
-        ----------
+        --------
         >>> from gwsnr import GWSNR
-        >>> snr = GWSNR(snrs_type='inner_product')
-        >>> snr.compute_bilby_snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+        >>> # Initialize with inner product method
+        >>> snr = GWSNR(snr_type='inner_product')
+        >>> # Calculate SNR for aligned systems
+        >>> result = snr.compute_bilby_snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
+        
+        >>> # Calculate SNR for precessing systems
+        >>> result = snr.compute_bilby_snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0,
+        ...                               a_1=0.5, a_2=0.3, tilt_1=0.2, tilt_2=0.1)
+        
+        >>> # Using parameter dictionary
+        >>> params = {'mass_1': [20, 30], 'mass_2': [20, 25], 'luminosity_distance': [100, 200]}
+        >>> result = snr.compute_bilby_snr(gw_param_dict=params)
         """
 
         # if gw_param_dict is given, then use that
@@ -1562,69 +2145,92 @@ class GWSNR:
         output_jsonfile=False,
     ):
         """
-        SNR calculated using inner product method with ripple generated waveform.
+        Function to calculate SNR using JAX-accelerated noise-weighted inner product method with Ripple waveform generation.
+
+        This method computes the optimal signal-to-noise ratio using JAX-accelerated inner products between 
+        gravitational wave signals generated with the Ripple waveform generator and detector noise power 
+        spectral densities. It leverages JAX's just-in-time (JIT) compilation and vectorized map (vmap) 
+        functions for highly efficient parallelized computation, making it suitable for large-scale 
+        parameter estimation and population studies.
+
+        The method uses the RippleInnerProduct class for waveform generation and inner product calculation,
+        automatically handling duration estimation and supporting arbitrary spin configurations. It provides
+        significant computational speedup compared to traditional LAL-based methods while maintaining
+        numerical accuracy.
 
         Parameters
         ----------
-        mass_1 : float
-            The mass of the heavier object in the binary in solar masses.
-        mass_2 : float
-            The mass of the lighter object in the binary in solar masses.
-        luminosity_distance : float
-            The luminosity distance to the binary in megaparsecs.
-        theta_jn : float, optional
-            The angle between the total angular momentum and the line of sight.
-            Default is 0.
-        psi : float, optional
-            The gravitational wave polarisation angle.
-            Default is 0.
-        phase : float, optional
-            The gravitational wave phase at coalescence.
-            Default is 0.
-        geocent_time : float, optional
-            The GPS time of coalescence.
-            Default is 1249852157.0.
-        ra : float, optional
-            The right ascension of the source.
-            Default is 0.
-        dec : float, optional
-            The declination of the source.
-            Default is 0.
-        a_1 : float, optional
-            The spin magnitude of the heavier object in the binary.
-            Default is 0.
-        tilt_1 : float, optional
-            The tilt angle of the heavier object in the binary.
-            Default is 0.
-        phi_12 : float, optional
-            The azimuthal angle between the two spins.
-            Default is 0.
-        a_2 : float, optional
-            The spin magnitude of the lighter object in the binary.
-            Default is 0.
-        tilt_2 : float, optional
-            The tilt angle of the lighter object in the binary.
-            Default is 0.
-        phi_jl : float, optional
-            The azimuthal angle between the total angular momentum and the orbital angular momentum.
-            Default is 0.
-        verbose : bool, optional
-            If true, print the SNR.
-            Default is True.
-        jsonFile : bool, optional
-            If true, save the SNR parameters and values in a json file.
-            Default is False.
+        mass_1 : `numpy.ndarray` or `float`
+            Primary mass of the binary in solar masses. Default is 10.
+        mass_2 : `numpy.ndarray` or `float`
+            Secondary mass of the binary in solar masses. Default is 10.
+        luminosity_distance : `numpy.ndarray` or `float`
+            Luminosity distance of the binary in Mpc. Default is 100.0.
+        theta_jn : `numpy.ndarray` or `float`
+            Inclination angle between total angular momentum and line of sight in radians. Default is 0.0.
+        psi : `numpy.ndarray` or `float`
+            Gravitational wave polarization angle in radians. Default is 0.0.
+        phase : `numpy.ndarray` or `float`
+            Gravitational wave phase at coalescence in radians. Default is 0.0.
+        geocent_time : `numpy.ndarray` or `float`
+            GPS time of coalescence at geocenter in seconds. Default is 1246527224.169434.
+        ra : `numpy.ndarray` or `float`
+            Right ascension of the source in radians. Default is 0.0.
+        dec : `numpy.ndarray` or `float`
+            Declination of the source in radians. Default is 0.0.
+        a_1 : `numpy.ndarray` or `float`
+            Dimensionless spin magnitude of the primary object. Default is 0.0.
+        a_2 : `numpy.ndarray` or `float`
+            Dimensionless spin magnitude of the secondary object. Default is 0.0.
+        tilt_1 : `numpy.ndarray` or `float`
+            Tilt angle of primary spin relative to orbital angular momentum in radians. Default is 0.0.
+        tilt_2 : `numpy.ndarray` or `float`
+            Tilt angle of secondary spin relative to orbital angular momentum in radians. Default is 0.0.
+        phi_12 : `numpy.ndarray` or `float`
+            Azimuthal angle between the two spins in radians. Default is 0.0.
+        phi_jl : `numpy.ndarray` or `float`
+            Azimuthal angle between total and orbital angular momentum in radians. Default is 0.0.
+        gw_param_dict : `dict` or `bool`
+            Dictionary containing all gravitational wave parameters as key-value pairs. 
+            If provided, takes precedence over individual parameter arguments. Default is False.
+        output_jsonfile : `str` or `bool`
+            If string, saves the SNR results to a JSON file with the given filename. 
+            If True, saves to 'snr.json'. If False, no file output. Default is False.
 
         Returns
-        ----------
-        snr_dict : `dict`
-            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).
+        -------
+        optimal_snr : `dict`
+            Dictionary containing SNR values for each detector and network SNR.
+            Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'optimal_snr_net'.
+            Values are numpy arrays of SNR values corresponding to input parameters.
+            Systems with total mass outside [mtot_min, mtot_max] have SNR set to zero.
+
+        Notes
+        -----
+        - Uses Ripple waveform generator with JAX backend for GPU acceleration
+        - Automatically estimates waveform duration bounded by :attr:`~duration_min` and :attr:`~duration_max`
+        - Compatible with waveform approximants supported by Ripple (e.g., IMRPhenomD, IMRPhenomXPHM)
+        - Leverages JAX's jit and vmap for vectorized batch processing
+        - Supports multiprocessing with :attr:`~npool` processors when applicable
+        - Uses :meth:`~RippleInnerProduct.noise_weighted_inner_product_jax` for inner product calculation
+        - Antenna response patterns computed using :func:`~gwsnr.numba.antenna_response_array`
+        - Requires :attr:`~snr_type` to be set to 'inner_product_jax' during GWSNR initialization
 
         Examples
-        ----------
+        --------
         >>> from gwsnr import GWSNR
-        >>> snr = GWSNR(snrs_type='inner_product')
-        >>> snr.compute_bilby_snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+        >>> # Initialize with JAX inner product method
+        >>> snr = GWSNR(snr_type='inner_product_jax', waveform_approximant='IMRPhenomD')
+        >>> # Calculate SNR for aligned systems
+        >>> result = snr.compute_ripple_snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
+        
+        >>> # Calculate SNR for precessing systems
+        >>> result = snr.compute_ripple_snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0,
+        ...                                a_1=0.5, a_2=0.3, tilt_1=0.2, tilt_2=0.1)
+        
+        >>> # Using parameter dictionary
+        >>> params = {'mass_1': [20, 30], 'mass_2': [20, 25], 'luminosity_distance': [100, 200]}
+        >>> result = snr.compute_ripple_snr(gw_param_dict=params)
         """
 
         # if gw_param_dict is given, then use that
@@ -1708,23 +2314,57 @@ class GWSNR:
 
     def probability_of_detection(self, snr_dict, snr_th=None, snr_th_net=None, type="matched_filter"):
         """
-        Probaility of detection of GW for the given sensitivity of the detectors
+        Function to calculate probability of detection for gravitational wave signals using SNR threshold criteria.
+
+        This method computes the probability of detection (Pdet) for gravitational wave signals based on 
+        signal-to-noise ratio thresholds for individual detectors and the detector network. It supports 
+        both matched filter probability calculation using Gaussian noise assumptions and simple boolean 
+        threshold detection. The method is compatible with single or multiple SNR threshold values for 
+        different detectors in the network.
 
         Parameters
         ----------
         snr_dict : `dict`
-            Dictionary of SNR for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=snr_arrays).
-        rho_th : `float`
-            Threshold SNR for detection. Default is 8.0.
-        rho_net_th : `float`
-            Threshold net SNR for detection. Default is 8.0.
+            Dictionary containing SNR values for each detector and network SNR.
+            Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'optimal_snr_net'.
+            Values are numpy arrays of SNR values corresponding to input parameters.
+        snr_th : `float` or `numpy.ndarray` or `None`
+            SNR threshold for individual detector detection. If None, uses :attr:`~snr_th`.
+            If array, must have length equal to number of detectors. Default is None.
+        snr_th_net : `float` or `None`
+            SNR threshold for network detection. If None, uses :attr:`~snr_th_net`. Default is None.
         type : `str`
-            Type of SNR calculation. Default is 'matched_filter'. Other option is 'bool'.
+            Type of probability calculation method. Default is 'matched_filter'.
+            Options: 'matched_filter' (Gaussian noise probability), 'bool' (boolean threshold).
 
         Returns
-        ----------
+        -------
         pdet_dict : `dict`
-            Dictionary of probability of detection for each detector and net SNR (dict.keys()=detector_names and optimal_snr_net, dict.values()=pdet_arrays).
+            Dictionary containing probability of detection for each detector and network.
+            Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'pdet_net'.
+            Values are numpy arrays of detection probabilities [0,1] for 'matched_filter' 
+            or boolean arrays {0,1} for 'bool' type.
+
+        Notes
+        -----
+        - For 'matched_filter' type: Uses Gaussian noise assumption with Pdet = 1 - Φ(ρ_th - ρ)
+          where Φ is the cumulative distribution function of the standard normal distribution
+        - For 'bool' type: Returns 1 if SNR > threshold, 0 otherwise
+        - Individual detector thresholds can be different by providing array of thresholds
+        - Network detection uses quadrature sum of individual detector SNRs
+        - Compatible with all SNR calculation methods (interpolation, inner product, ANN)
+
+        Examples
+        --------
+        >>> from gwsnr import GWSNR
+        >>> snr = GWSNR(snr_type='interpolation', pdet=True)
+        >>> # Calculate SNR first
+        >>> snr_result = snr.snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
+        >>> # Calculate detection probability manually
+        >>> pdet_result = snr.probability_of_detection(snr_result, snr_th=8.0, type='matched_filter')
+        
+        >>> # Using different thresholds for different detectors
+        >>> pdet_result = snr.probability_of_detection(snr_result, snr_th=[8.0, 8.0, 7.0], type='bool')
         """
 
         if snr_th:
@@ -1760,21 +2400,56 @@ class GWSNR:
 
     def detector_horizon(self, mass_1=1.4, mass_2=1.4, snr_th=None, snr_th_net=None):
         """
-        Function for finding detector horizon distance for BNS (m1=m2=1.4)
+        Function to calculate detector horizon distance for compact binary coalescences.
+
+        This method computes the horizon distance for each detector in the network, defined as the 
+        luminosity distance at which a compact binary coalescence would produce a signal-to-noise 
+        ratio equal to the detection threshold. The horizon distance represents the maximum range 
+        at which a source can be detected with optimal orientation and sky location.
+
+        The calculation uses a reference binary system (typically BNS with masses m1=m2=1.4 M☉) 
+        at optimal orientation (face-on, overhead) and scales the SNR to find the distance where 
+        the SNR equals the detection threshold. The method accounts for detector antenna response 
+        patterns and uses the same waveform generation as other SNR calculation methods.
 
         Parameters
         ----------
         mass_1 : `numpy.ndarray` or `float`
-            Primary mass of the binary in solar mass. Default is 1.4.
+            Primary mass of the binary in solar masses. Default is 1.4.
         mass_2 : `numpy.ndarray` or `float`
-            Secondary mass of the binary in solar mass. Default is 1.4.
-        snr_th : `float`
-            SNR threshold for detection. Default is 8.0.
+            Secondary mass of the binary in solar masses. Default is 1.4.
+        snr_th : `float` or `None`
+            SNR threshold for individual detector detection. If None, uses :attr:`~snr_th`. Default is None.
+        snr_th_net : `float` or `None`
+            SNR threshold for network detection. If None, uses :attr:`~snr_th_net`. Default is None.
 
         Returns
-        ----------
+        -------
         horizon : `dict`
-            Dictionary of horizon distance for each detector in Mpc (dict.keys()=detector_names, dict.values()=horizon_distance).
+            Dictionary containing horizon distances for each detector and network.
+            Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'net'.
+            Values are horizon distances in Mpc for the given binary system and SNR thresholds.
+
+        Notes
+        -----
+        - Uses optimal orientation: theta_jn=0 (face-on), ra=dec=psi=phase=0 (overhead)
+        - Reference luminosity distance is 100 Mpc for SNR calculation scaling
+        - Horizon distance = (d_eff/SNR_th) × SNR_100Mpc where d_eff is effective distance
+        - Network horizon uses quadrature sum of effective distances from all detectors
+        - Compatible with all waveform approximants supported by the inner product method
+        - Uses :meth:`~compute_bilby_snr` for reference SNR calculation at 100 Mpc
+
+        Examples
+        --------
+        >>> from gwsnr import GWSNR
+        >>> snr = GWSNR(snr_type='inner_product')
+        >>> # Calculate BNS horizon for default 1.4+1.4 solar mass system
+        >>> horizon = snr.detector_horizon()
+        >>> print(f"LIGO-Hanford horizon: {horizon['H1']:.1f} Mpc")
+        
+        >>> # Calculate horizon for different mass system
+        >>> horizon_bbh = snr.detector_horizon(mass_1=30.0, mass_2=30.0, snr_th=8.0)
+        >>> print(f"Network horizon: {horizon_bbh['net']:.1f} Mpc")
         """
 
         if snr_th:
@@ -1808,13 +2483,13 @@ class GWSNR:
         # Vectorized computation for effective luminosity distance
         Fp = np.array(
             [
-                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "plus")
+                antenna_response_plus(ra_, dec_, geocent_time_, psi_, tensor)
                 for tensor in detector_tensor
             ]
         )
         Fc = np.array(
             [
-                antenna_response(ra_, dec_, geocent_time_, psi_, tensor, "cross")
+                antenna_response_cross(ra_, dec_, geocent_time_, psi_, tensor)
                 for tensor in detector_tensor
             ]
         )

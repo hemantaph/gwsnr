@@ -1,10 +1,21 @@
 # -*- coding: utf-8 -*-
 """
+Numba-compiled helper functions for gravitational wave signal-to-noise ratio calculations.
+
+This module provides optimized numerical functions for gravitational wave data analysis,
+including chirp time calculations, antenna response computations, polarization tensors,
+coordinate transformations, and noise-weighted inner products. All functions are compiled
+with Numba's @njit decorator for high-performance computation, with parallel processing
+support using prange for multi-threaded execution where applicable.
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Helper functions for gwsnr. All functions are njit compiled.
 """
 
 import numpy as np
-from numba import njit
+from numba import njit, prange
 
 Gamma = 0.5772156649015329
 Pi = np.pi
@@ -181,7 +192,7 @@ def ra_dec_to_theta_phi(ra, dec, gmst):
     return theta, phi
 
 @njit
-def get_polarization_tensor(ra, dec, time, psi, mode='plus'):
+def get_polarization_tensor_plus(ra, dec, time, psi):
     """
     Function to calculate the polarization tensor
 
@@ -195,8 +206,6 @@ def get_polarization_tensor(ra, dec, time, psi, mode='plus'):
         GPS time of the source.
     psi : `float`
         Polarization angle of the source.
-    mode : `str`
-        Mode of the polarization. Default is 'plus'.
 
     Returns
     -------
@@ -210,13 +219,40 @@ def get_polarization_tensor(ra, dec, time, psi, mode='plus'):
     m = -u * np.sin(psi) - v * np.cos(psi)
     n = -u * np.cos(psi) + v * np.sin(psi)
 
-    if mode == 'plus':
-        return einsum1(m, m) - einsum1(n, n)
-    elif mode == 'cross':
-        return einsum1(m, n) + einsum1(n, m)
+    return einsum1(m, m) - einsum1(n, n)
+    
+@njit
+def get_polarization_tensor_cross(ra, dec, time, psi):
+    """
+    Function to calculate the polarization tensor
+
+    Parameters
+    ----------
+    ra : `float`
+        Right ascension of the source in radians.
+    dec : float
+        Declination of the source in radians.
+    time : `float`
+        GPS time of the source.
+    psi : `float`
+        Polarization angle of the source.
+
+    Returns
+    -------
+    polarization_tensor: `numpy.ndarray`
+        Polarization tensor of the detector.
+    """
+    gmst = np.fmod(gps_to_gmst(time), 2 * np.pi)
+    theta, phi = ra_dec_to_theta_phi(ra, dec, gmst)
+    u = np.array([np.cos(phi) * np.cos(theta), np.cos(theta) * np.sin(phi), -np.sin(theta)])
+    v = np.array([-np.sin(phi), np.cos(phi), 0])
+    m = -u * np.sin(psi) - v * np.cos(psi)
+    n = -u * np.cos(psi) + v * np.sin(psi)
+
+    return einsum1(m, n) + einsum1(n, m)
 
 @njit
-def antenna_response(ra, dec, time, psi, detector_tensor, mode='plus'):
+def antenna_response_plus(ra, dec, time, psi, detector_tensor):
     """
     Function to calculate the antenna response
 
@@ -241,10 +277,39 @@ def antenna_response(ra, dec, time, psi, detector_tensor, mode='plus'):
         Antenna response of the detector.
     """
 
-    polarization_tensor = get_polarization_tensor(ra, dec, time, psi, mode=mode)
+    polarization_tensor = get_polarization_tensor_plus(ra, dec, time, psi)
     return einsum2(detector_tensor, polarization_tensor)
 
 @njit
+def antenna_response_cross(ra, dec, time, psi, detector_tensor):
+    """
+    Function to calculate the antenna response
+
+    Parameters
+    ----------
+    ra : `float`
+        Right ascension of the source in radians.
+    dec : float
+        Declination of the source in radians.
+    time : `float`
+        GPS time of the source.
+    psi : `float`
+        Polarization angle of the source.
+    detector_tensor : array-like
+        Detector tensor for the detector (3x3 matrix)
+    mode : `str`
+        Mode of the polarization. Default is 'plus'.
+
+    Returns
+    -------
+    antenna_response: `float`
+        Antenna response of the detector.
+    """
+
+    polarization_tensor = get_polarization_tensor_cross(ra, dec, time, psi)
+    return einsum2(detector_tensor, polarization_tensor)
+
+@njit(parallel=True)
 def antenna_response_array(ra, dec, time, psi, detector_tensor):
     """
     Function to calculate the antenna response in array form.
@@ -273,10 +338,11 @@ def antenna_response_array(ra, dec, time, psi, detector_tensor):
     Fp = np.zeros((len_det, len_param))
     Fc = np.zeros((len_det, len_param))
 
-    for j in range(len_det):
-        for i in range(len_param):
-            Fp[j,i] = antenna_response(ra[i], dec[i], time[i], psi[i], detector_tensor[j], mode="plus")
-            Fc[j,i] = antenna_response(ra[i], dec[i], time[i], psi[i], detector_tensor[j], mode="cross")
+    for i in prange(len_param):
+        for j in range(len_det):
+        
+            Fp[j,i] = antenna_response_plus(ra[i], dec[i], time[i], psi[i], detector_tensor[j])
+            Fc[j,i] = antenna_response_cross(ra[i], dec[i], time[i], psi[i], detector_tensor[j])
 
     return Fp, Fc
 

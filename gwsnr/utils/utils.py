@@ -662,6 +662,7 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
 
     len_ = len(param_dict_stored)
     # del param_dict_given["psds"]
+    param_dict_given["psds"] = str(param_dict_given["psds"])
     param_dict_given["detector_tensor"] = str(param_dict_given["detector_tensor"])
     # print("\n\n", param_dict_given)
     # print("\n\n",param_dict_stored)
