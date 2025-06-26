@@ -707,9 +707,25 @@ def get_gw_parameters(gw_param_dict):
             raise ValueError("gw_param_dict should be either a dictionary or a json string")
     else:
         raise ValueError("gw_param_dict should be either a dictionary or a json string")
+    
+    # add error handling for all parameters
+    for key, value in gw_param_dict.items():
+        if isinstance(value, (list, np.ndarray)):
+            if len(value) == 0 or np.any(np.isnan(value)) or np.any(np.isinf(value)):
+                raise ValueError(f"Parameter '{key}' contains invalid values: {value}")
+        elif value is None or np.isnan(value) or np.isinf(value):
+            raise ValueError(f"Parameter '{key}' contains invalid value: {value}")
 
-    mass_1 = gw_param_dict.get("mass_1", np.array([10.0]))
-    mass_2 = gw_param_dict.get("mass_2", np.array([10.0]))
+        if key in ["mass_1", "mass_2", "luminosity_distance", "geocent_time"]:
+            if np.any(value < 0):
+                raise ValueError(f"Parameter '{key}' contains negative values: {value}")
+            
+        if key in ["a_1", "a_2", "eccentricity"]:
+            if np.any(value > 1):
+                raise ValueError(f"Parameter '{key}' contains invalid values: {value}")
+
+    mass_1 = gw_param_dict.get("mass_1")
+    mass_2 = gw_param_dict.get("mass_2")
     mass_1, mass_2 = np.array([mass_1]).reshape(-1), np.array([mass_2]).reshape(-1)
     luminosity_distance = gw_param_dict.get("luminosity_distance", np.array([100.0]))
     theta_jn = gw_param_dict.get("theta_jn", np.array([0.0]))

@@ -60,7 +60,6 @@ import multiprocessing as mp
 import numpy as np
 from tqdm import tqdm
 from scipy.stats import norm
-from scipy.optimize import fsolve
 
 # warning suppression lal
 import warnings
@@ -68,7 +67,6 @@ warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
 import lal
 lal.swig_redirect_standard_output_error(False)
 
-from ..ripple import RippleInnerProduct
 from ..utils import (
     dealing_with_psds,
     interpolator_check,
@@ -90,9 +88,6 @@ from ..numba import (
     antenna_response_cross,
     antenna_response_array,
 )
-import jax
-import jax.numpy as jnp
-jax.config.update("jax_enable_x64", True)
 
 # defining constants
 C = 299792458.0
@@ -147,7 +142,7 @@ class GWSNR:
         >>> import pycbc.psd
         >>> pycbc.psd.get_lalsim_psd_list()
         Example 2: when values are psd txt file available in bilby,
-        psds={'L1':'aLIGO_O4_high_asd.txt','H1':'aLIGO_O4_high_asd.txt', 'V1':'AdV_asd.txt', 'K1':'KAGRA_design_asd.txt'}.
+        psds={'L1':'aLIGO_O4_high_asd.txt','H1':'aLIGO_O4_high_asd.txt', 'V1':'AdV_asd.txt'}.
         For other psd files, check https://github.com/lscsoft/bilby/tree/master/bilby/gw/detector/noise_curves \n
         Example 3: when values are custom psd txt file. psds={'L1':'custom_psd.txt','H1':'custom_psd.txt'}. Custom created txt file has two columns. 1st column: frequency array, 2nd column: strain.
     ifos : `list` or `None`
@@ -177,7 +172,7 @@ class GWSNR:
     multiprocessing_verbose : `bool`
         If True, it will show progress bar while computing SNR (inner product) with :meth:`~snr_with_interpolation`. Default is True. If False, it will not show progress bar but will be faster.
     mtot_cut : `bool`
-        If True, it will set the maximum total mass of the binary according to the minimum frequency of the waveform. Default is True.
+        If True, it will set the maximum total mass of the binary according to the minimum frequency of the waveform. This is done searching for the maximum total mass corresponding to zero chirp time, i.e. the sytem merge below the minimum frequency. This is done to avoid unnecessary computation of SNR for systems that will not be detected. Default is False.
     pdet : `bool` or `str`
         If True or 'bool', calculate probability of detection using boolean method. If 'matched_filter', use matched filter probability. Default is False.
     snr_th : `float`
@@ -499,10 +494,10 @@ class GWSNR:
         self,
         npool=int(4),
         mtot_min=2*4.98, # 4.98 Mo is the minimum component mass of BBH systems in GWTC-3
-        mtot_max=2*112.5, # 112.5 Mo is the maximum component mass of BBH systems in GWTC-3
+        mtot_max=2*112.5+10.0, # 112.5 Mo is the maximum component mass of BBH systems in GWTC-3. 10.0 Mo is added to avoid edge effects.
         ratio_min=0.1,
         ratio_max=1.0,
-        spin_max=0.9,
+        spin_max=0.99,
         mtot_resolution=200,
         ratio_resolution=20,
         spin_resolution=10,
@@ -512,7 +507,7 @@ class GWSNR:
         minimum_frequency=20.0,
         duration_max=None,
         duration_min=None,
-        snr_type="interpolation_no_spins_jax",
+        snr_type="interpolation_no_spins",
         psds=None,
         ifos=None,
         interpolator_dir="./interpolator_pickle",
@@ -525,7 +520,7 @@ class GWSNR:
         snr_th_net=8.0,
         ann_path_dict=None,
         snr_recalculation=False,
-        snr_recalculation_range=[6,8],
+        snr_recalculation_range=[4,12],
         snr_recalculation_waveform_approximant="IMRPhenomXPHM",
     ):
 
@@ -563,6 +558,7 @@ class GWSNR:
             if not mtot_cut
             else self.calculate_mtot_max(mtot_max, minimum_frequency)
         )
+        self.mtot_cut = mtot_cut
         self.mtot_max = mtot_max
         self.mtot_min = mtot_min
         self.ratio_min = ratio_min
@@ -654,6 +650,8 @@ class GWSNR:
         
         # need to initialize RippleInnerProduct class
         elif snr_type == "inner_product_jax":
+            from ..ripple import RippleInnerProduct
+
             ripple_class = RippleInnerProduct(
                 waveform_name=waveform_approximant, 
                 minimum_frequency=minimum_frequency, 
@@ -666,15 +664,15 @@ class GWSNR:
         # ANN method still needs the partialscaledSNR interpolator.
         elif snr_type == "ann":
 
-            from ..jax import get_interpolated_snr_aligned_spins_jax
-            self.get_interpolated_snr = get_interpolated_snr_aligned_spins_jax
+            from ..numba import get_interpolated_snr_aligned_spins_numba
+            self.get_interpolated_snr = get_interpolated_snr_aligned_spins_numba
             # below is added to find the genereated interpolator path
             self.param_dict_given['spin_max'] = self.spin_max
             self.param_dict_given['spin_resolution'] = self.spin_resolution
             
             self.model_dict, self.scaler_dict, self.error_adjustment, self.ann_catalogue = self.ann_initilization(ann_path_dict, detector_list, sampling_frequency, minimum_frequency, waveform_approximant, snr_th)
             # dealing with interpolator
-            self.snr_type = "interpolation_aligned_spins_jax"
+            self.snr_type = "interpolation_aligned_spins"
             self.path_interpolator = self.interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
             self.snr_type = "ann"
 
@@ -763,9 +761,9 @@ class GWSNR:
             self.init_partialscaled()
 
         # get all partialscaledSNR from the stored interpolator
-        self.snr_partialsacaled_list = [
+        self.snr_partialsacaled_list = np.array([
             load_pickle(path) for path in path_interpolator_all
-        ]
+        ], dtype=np.float64)
 
         return path_interpolator_all
 
@@ -825,23 +823,35 @@ class GWSNR:
         # check the content ann_path_dict.json in gwsnr/ann module directory
         # e.g. ann_path_dict = dict(L1=dict(model_path='path_to_model', scaler_path='path_to_scaler', sampling_frequency=2048.0, minimum_frequency=20.0, waveform_approximant='IMRPhenomXPHM', snr_th=8.0))
         # there will be existing ANN model and scaler for default parameters
-        ann_path_dict_default = load_json_from_module('gwsnr', 'ann.data', 'ann_path_dict.json')
+
+        # getting ann data from the package
+        # first check if the ann_data directory './ann_data' exists
+        if not pathlib.Path('./ann_data').exists():
+            # Get the path to the resource
+            with path('gwsnr.ann', 'ann_data') as resource_path:
+                print(f"Copying ANN data from the library resource {resource_path} to the current working directory.")
+                resource_path = pathlib.Path(resource_path)  # Ensure it's a Path object
+
+                # Define destination path (same name in current working directory)
+                dest_path = pathlib.Path.cwd() / resource_path.name
+
+                # Copy entire directory tree
+                if dest_path.exists():
+                    shutil.rmtree(dest_path)
+                shutil.copytree(resource_path, dest_path)
+ 
         if ann_path_dict is None:
-            print("No ANN model and scaler path is given. Using default ANN model and scaler path from gwsnr/ann/ann_path_dict.json")
-            ann_path_dict = ann_path_dict_default
+            print("ANN model and scaler path is not given. Using the default path.")
+            ann_path_dict = './ann_data/ann_path_dict.json'
         else:
             print("ANN model and scaler path is given. Using the given path.")
-            if isinstance(ann_path_dict, str):
-                ann_path_dict = load_json(ann_path_dict)
-            elif isinstance(ann_path_dict, dict):
-                pass
-            else:
-                raise ValueError("ann_path_dict should be a dictionary or a path to the json file.")
-            # if 'L1' key already exist in the dict, you can still give new dict value for 'L1' when initializing GWSNR.
-            # if no new dict value is given for 'L1', it will take the default value from ann_path_dict_default.
-            ann_path_dict_default.update(ann_path_dict)
-            ann_path_dict = ann_path_dict_default
-        del ann_path_dict_default
+
+        if isinstance(ann_path_dict, str):
+            ann_path_dict = load_json(ann_path_dict)
+        elif isinstance(ann_path_dict, dict):
+            pass
+        else:
+            raise ValueError("ann_path_dict should be a dictionary or a path to the json file.")
 
         model_dict = {}
         scaler_dict = {}
@@ -967,9 +977,11 @@ class GWSNR:
             mass_1 = x / (1 + mass_ratio)
             mass_2 = x / (1 + mass_ratio) * mass_ratio
 
-            return findchirp_chirptime(mass_1, mass_2, minimum_frequency) * 1.1
+            return findchirp_chirptime(mass_1, mass_2, minimum_frequency)
 
         # find where func is zero
+        from scipy.optimize import fsolve
+        
         mtot_max_generated = fsolve(func, 150)[
             0
         ]  # to make sure that chirptime is not negative, TaylorF2 might need this
@@ -1152,7 +1164,6 @@ class GWSNR:
         >>> snr_pdet = GWSNR(snr_type='interpolation', pdet=True)
         >>> pdet_result = snr_pdet.snr(mass_1=30.0, mass_2=30.0, luminosity_distance=100.0)
         """
-
 
         if not gw_param_dict:
             gw_param_dict = {
@@ -1438,7 +1449,7 @@ class GWSNR:
             x = scaler[det].transform(ann_input[i])
             optimal_snr_ = model[det].predict(x, verbose=0).flatten()
             # adjusting the optimal SNR with error adjustment
-            optimal_snr[det][idx_tracker] = optimal_snr_ + (self.error_adjustment[det]['slope']*optimal_snr_ + self.error_adjustment[det]['intercept'])
+            optimal_snr[det][idx_tracker] = optimal_snr_ - (self.error_adjustment[det]['slope']*optimal_snr_ + self.error_adjustment[det]['intercept'])
             optimal_snr["optimal_snr_net"] += optimal_snr[det] ** 2
         optimal_snr["optimal_snr_net"] = np.sqrt(optimal_snr["optimal_snr_net"])
 
@@ -1497,49 +1508,53 @@ class GWSNR:
         - Feature scaling is applied later using pre-loaded scalers in :meth:`~snr_with_ann`
         """
 
-        mass_1 = np.array(params["mass_1"][idx])
-        mass_2 = np.array(params["mass_2"][idx])
-        Mc = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
-        eta = mass_1 * mass_2 / (mass_1 + mass_2) ** 2.0
-        A1 = Mc ** (5.0 / 6.0)
+        mass_1 = np.array(params['mass_1'][idx])
+        mass_2 = np.array(params['mass_2'][idx])
+        luminosity_distance = np.array(params['luminosity_distance'][idx])
+        theta_jn = np.array(params['theta_jn'][idx])
+        psi = np.array(params['psi'][idx])
+        geocent_time = np.array(params['geocent_time'][idx])
+        ra = np.array(params['ra'][idx])
+        dec = np.array(params['dec'][idx])
+        a_1 = np.array(params['a_1'][idx])
+        a_2 = np.array(params['a_2'][idx])
+        tilt_1 = np.array(params['tilt_1'][idx])
+        tilt_2 = np.array(params['tilt_2'][idx])
+        # effective spin
+        chi_eff = (mass_1 * a_1 * np.cos(tilt_1) + mass_2 * a_2 * np.cos(tilt_2)) / (mass_1 + mass_2)
 
-        a_1 = np.array(params["a_1"][idx])
-        a_2 = np.array(params["a_2"][idx])
-        tilt_1 = np.array(params["tilt_1"][idx])
-        tilt_2 = np.array(params["tilt_2"][idx])
         # to get the components of the spin aligned with angular momentum
         a_1 = a_1 * np.cos(tilt_1)
         a_2 = a_2 * np.cos(tilt_2)
 
         _, _, snr_partial, d_eff = self.get_interpolated_snr(
-            jnp.array(mass_1),
-            jnp.array(mass_2),
-            jnp.array(params["luminosity_distance"][idx]),
-            jnp.array(params["theta_jn"][idx]),
-            jnp.array(params["psi"][idx]),
-            jnp.array(params["geocent_time"][idx]),
-            jnp.array(params["ra"][idx]),
-            jnp.array(params["dec"][idx]),
-            jnp.array(params["a_1"][idx]),
-            jnp.array(params["a_2"][idx]),
-            jnp.array(self.detector_tensor_list),
-            jnp.array(self.snr_partialsacaled_list),
-            jnp.array(self.ratio_arr),
-            jnp.array(self.mtot_arr),
-            jnp.array(self.a_1_arr),
-            jnp.array(self.a_2_arr),
+            np.array(mass_1),
+            np.array(mass_2),
+            np.array(luminosity_distance),
+            np.array(theta_jn),
+            np.array(psi),
+            np.array(geocent_time),
+            np.array(ra),
+            np.array(dec),
+            np.array(a_1),
+            np.array(a_2),
+            np.array(self.detector_tensor_list),
+            np.array(self.snr_partialsacaled_list),
+            np.array(self.ratio_arr),
+            np.array(self.mtot_arr),
+            np.array(self.a_1_arr),
+            np.array(self.a_2_arr),
         )
 
-        # amp0
+        # calculate the effective amplitude
+        Mc = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
+        eta = mass_1 * mass_2/(mass_1 + mass_2)**2.
+        A1 = Mc ** (5.0 / 6.0)
         amp0 = A1 / np.array(d_eff)
         # inclination angle
         theta_jn = np.array(params["theta_jn"][idx])
 
         snr_partial = np.array(snr_partial)
-
-        # effective spin
-        chi_eff = (mass_1 * a_1 * np.cos(tilt_1) + mass_2 * a_2 * np.cos(tilt_2)) / (mass_1 + mass_2)
-
         # for the detectors
         ann_input = []
         for i in range(len(self.detector_list)):
@@ -1656,13 +1671,9 @@ class GWSNR:
 
         size = len(mass_1)
         mtot = mass_1 + mass_2
+        # Check if mtot is within the range of mtot_min and mtot_max
         idx2 = np.logical_and(mtot >= self.mtot_min, mtot <= self.mtot_max)
         idx_tracker = np.nonzero(idx2)[0]
-        # size_ = len(idx_tracker)
-        # if size_ == 0:
-        #     raise ValueError(
-        #         "mass_1 and mass_2 must be within the range of mtot_min and mtot_max"
-        #     )
 
         # Set multiprocessing start method to 'spawn' for multri-threading compatibility
         mp.set_start_method('spawn', force=True)
@@ -1689,6 +1700,9 @@ class GWSNR:
                 np.array(self.a_2_arr, dtype=np.float64),
             )
         elif self.snr_type == "interpolation_no_spins_jax" or self.snr_type == "interpolation_aligned_spins_jax":
+            import jax
+            import jax.numpy as jnp
+            jax.config.update("jax_enable_x64", True)
 
             snr, snr_effective, _, _ = self.get_interpolated_snr(
                 jnp.array(mass_1[idx2]),
@@ -1866,9 +1880,9 @@ class GWSNR:
 
         for j in num_det:
             if self.snr_type in list_1:
-                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)) * dl_eff[j] / Mchirp_scaled, dtype=np.float16), # shape (size1, size2, size3, size4)
+                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)) * dl_eff[j] / Mchirp_scaled, dtype=np.float32), # shape (size1, size2, size3, size4)
             elif self.snr_type in list_2:
-                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2)) * dl_eff[j] / Mchirp_scaled, dtype=np.float16), # shape (size1, size2, size3, size4)
+                snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2)) * dl_eff[j] / Mchirp_scaled, dtype=np.float32), # shape (size1, size2, size3, size4)
             else:
                 raise ValueError(f"snr_type {self.snr_type} is not supported for interpolation.")
             # print('dl_eff=',dl_eff[j])

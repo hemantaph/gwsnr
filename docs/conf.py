@@ -21,14 +21,21 @@ import sys
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath("../gwsnr")) 
 
+# Import version dynamically
+def get_version():
+    version_file = os.path.join(os.path.dirname(__file__), "..", "gwsnr", "_version.py")
+    version_dict = {}
+    with open(version_file) as f:
+        exec(f.read(), version_dict)
+    return version_dict['__version__']
+
 project = 'gwsnr'
 copyright = '2023, Phurailatpam Hemantakumar'
 author = 'Phurailatpam Hemantakumar'
-release = '0.3.2'
+release = get_version()
 
 
 # -- General configuration ---------------------------------------------------
-
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.

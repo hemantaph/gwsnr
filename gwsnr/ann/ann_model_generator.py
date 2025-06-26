@@ -9,9 +9,6 @@ import pickle
 from ..core import GWSNR
 from ..utils import append_json, get_param_from_json, load_json, load_ann_h5
 from scipy.optimize import curve_fit
-from ..numba import (
-    antenna_response_array,
-)
 import jax
 jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp
@@ -58,12 +55,15 @@ class ANNModelGenerator():
         npool=4,
         gwsnr_verbose=True,
         snr_th=8.0,
-        snr_type="interpolation_aligned_spins_jax",
+        snr_type="interpolation_aligned_spins",
         waveform_approximant="IMRPhenomXPHM",
         **kwargs,  # ler and gwsnr arguments
     ):
 
         self.directory = directory
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
+
         self.ann_model = self.ann_model_4layers
         self.ann = None
         self.scaler = None
@@ -71,25 +71,25 @@ class ANNModelGenerator():
         self.gwsnr_args = dict(
             npool=npool,
             # gwsnr args
-            mtot_min=2.0,
-            mtot_max=439.6,
+            mtot_min=2*4.98, # 4.98 Mo is the minimum component mass of BBH systems in GWTC-3
+            mtot_max=2*112.5+10.0, # 112.5 Mo is the maximum component mass of BBH systems in GWTC-3. 10.0 Mo is added to avoid edge effects.
             ratio_min=0.1,
             ratio_max=1.0,
-            spin_max=0.9,
+            spin_max=0.99,
             mtot_resolution=200,
-            ratio_resolution=50,
-            spin_resolution=20,
+            ratio_resolution=20,
+            spin_resolution=10,
             sampling_frequency=2048.0,
             waveform_approximant=waveform_approximant,
             minimum_frequency=20.0,
-            snr_type="interpolation_aligned_spins_jax",
+            snr_type="interpolation_aligned_spins",
             psds=None,
             ifos=None,
             interpolator_dir="./interpolator_pickle",
             create_new_interpolator=False,
             gwsnr_verbose=gwsnr_verbose,
             multiprocessing_verbose=True,
-            mtot_cut=True,
+            mtot_cut=False,
             snr_th=snr_th,
         )
         self.gwsnr_args.update(kwargs)
@@ -172,51 +172,43 @@ class ANNModelGenerator():
         a_2 = np.array(params['a_2'])
         tilt_1 = np.array(params['tilt_1'])
         tilt_2 = np.array(params['tilt_2'])
+        # effective spin
+        chi_eff = (mass_1 * a_1 * np.cos(tilt_1) + mass_2 * a_2 * np.cos(tilt_2)) / (mass_1 + mass_2)
 
         # to get the components of the spin aligned with angular momentum
         a_1 = a_1 * np.cos(tilt_1)
         a_2 = a_2 * np.cos(tilt_2)
         
         detector_tensor = np.array(self.gwsnr.detector_tensor_list)
-        snr_partial_coeff = np.array(self.gwsnr.snr_partialsacaled_list)
-        ratio_arr = self.gwsnr.ratio_arr
-        mtot_arr = self.gwsnr.mtot_arr
-        a_1_arr  = self.gwsnr.a_1_arr
-        a_2_arr  = self.gwsnr.a_2_arr
-
         len_ = len(detector_tensor)
         if len_ != 1:
             raise ValueError("Only one detector is allowed")
-
-        Mc = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
-        eta = mass_1 * mass_2/(mass_1 + mass_2)**2.
-        A1 = Mc ** (5.0 / 6.0)
         
         # calculate the snr_partial_ using natural cubic spline interpolation
         _, _, snr_partial_, d_eff = self.gwsnr.get_interpolated_snr(
-            mass_1 = jnp.array(mass_1),
-            mass_2 = jnp.array(mass_2),
-            luminosity_distance = jnp.array(luminosity_distance),
-            theta_jn = jnp.array(theta_jn),
-            psi = jnp.array(psi),
-            geocent_time = jnp.array(geocent_time),
-            ra = jnp.array(ra),
-            dec = jnp.array(dec),
+            mass_1 = np.array(mass_1),
+            mass_2 = np.array(mass_2),
+            luminosity_distance = np.array(luminosity_distance),
+            theta_jn = np.array(theta_jn),
+            psi = np.array(psi),
+            geocent_time = np.array(geocent_time),
+            ra = np.array(ra),
+            dec = np.array(dec),
             a_1 = np.array(a_1),
             a_2 = np.array(a_2),
-            detector_tensor = jnp.array(detector_tensor),
-            snr_partialscaled = snr_partial_coeff,
-            ratio_arr = jnp.array(ratio_arr),
-            mtot_arr = jnp.array(mtot_arr),
-            a1_arr = np.array(a_1_arr),
-            a_2_arr = np.array(a_2_arr),
+            detector_tensor = detector_tensor,
+            snr_partialscaled = np.array(self.gwsnr.snr_partialsacaled_list),
+            ratio_arr = np.array(self.gwsnr.ratio_arr),
+            mtot_arr = np.array(self.gwsnr.mtot_arr),
+            a1_arr = np.array(self.gwsnr.a_1_arr),
+            a_2_arr = np.array(self.gwsnr.a_2_arr),
         )
 
-        # print(f"snr_partial_ shape: {snr_partial_.shape}, d_eff shape: {d_eff.shape}")
         # calculate the effective amplitude
-        amp0 =  A1 / np.array(d_eff)[0]
-        # effective spin
-        chi_eff = (mass_1 * a_1 * np.cos(tilt_1) + mass_2 * a_2 * np.cos(tilt_2)) / (mass_1 + mass_2)
+        Mc = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5))
+        eta = mass_1 * mass_2/(mass_1 + mass_2)**2.
+        # A1 = Mc ** (5.0 / 6.0)
+        amp0 =  Mc ** (5.0 / 6.0) / np.array(d_eff)[0]
 
         # input data
         X1 = np.vstack([np.array(snr_partial_)[0], amp0, eta, chi_eff, theta_jn]).T
@@ -252,7 +244,7 @@ class ANNModelGenerator():
 
         # get the parameters
         if isinstance(gw_param_dict, str):
-            path_ = f"{self.directory}/{gw_param_dict}"
+            path_ = f"{gw_param_dict}"
             gw_param_dict = get_param_from_json(path_)
         elif isinstance(gw_param_dict, dict):
             pass
@@ -383,7 +375,7 @@ class ANNModelGenerator():
             raise ValueError("Error adjustment file does not exist")
             
         ann_path_dict_ = {
-            "L1": {
+            self.gwsnr.detector_list[0]: {
                 "model_path": f'{self.directory}/{ann_file_name}',
                 "scaler_path": f'{self.directory}/{scaler_file_name}',
                 "error_adjustment_path": f'{self.directory}/{error_adjustment_file_name}',

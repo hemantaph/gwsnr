@@ -1,5 +1,7 @@
 import numpy as np
+import jax
 import jax.numpy as jnp
+jax.config.update("jax_enable_x64", True)
 from ripple import ms_to_Mc_eta
 from jax import vmap
 from jax import jit
@@ -204,7 +206,7 @@ class RippleInnerProduct:
         # compute the waveform h+ and hx
         # NOTE: result will be in complex64 instead of complex128. This will be change later
         # vmap+jax.jit faster than just using jax.jit
-
+        mp.set_start_method('spawn', force=True)
         hp, hc = self.vmap_waveform(fs, theta_ripple, f_ref)
         hp, hc = np.array(hp, dtype=np.complex128), np.array(hc, dtype=np.complex128)
         fs = np.array(fs, dtype=np.float64)

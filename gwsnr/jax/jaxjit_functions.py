@@ -400,10 +400,6 @@ def antenna_response_array(ra, dec, time, psi, detector_tensor):
     tensors and polarization tensors derived from source sky location and
     polarization angle. Optimized for GPU acceleration and gradient-based optimization.
     """
-    # detector_tensor shape: (n_det, 3, 3)
-    # ra, dec, time, psi shape: (n_param,)
-    n_det = detector_tensor.shape[0]
-    n_param = ra.shape[0]
 
     # VMAP over detector and parameter axes
     # Outputs shape (n_det, n_param)

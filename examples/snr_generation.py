@@ -6,24 +6,30 @@ import numpy as np
 from gwsnr import GWSNR
 from gwsnr.utils import save_json
 
-gwsnr = GWSNR(npool=int(4),
-        mtot_min=2.0,
-        mtot_max=439.6,
+gwsnr = GWSNR(
+        npool=int(4),
+        mtot_min=2*4.98, # 4.98 Mo is the minimum component mass of BBH systems in GWTC-3
+        mtot_max=2*112.5+10.0, # 112.5 Mo is the maximum component mass of BBH systems in GWTC-3. 10.0 Mo is added to avoid edge effects.
         ratio_min=0.1,
         ratio_max=1.0,
-        mtot_resolution=500,
-        ratio_resolution=50,
+        spin_max=0.99,
+        mtot_resolution=200,
+        ratio_resolution=20,
+        spin_resolution=10,
         sampling_frequency=2048.0,
         waveform_approximant="IMRPhenomD",
+        frequency_domain_source_model='lal_binary_black_hole',
         minimum_frequency=20.0,
-        snr_type="interpolation",
+        duration_max=None,
+        duration_min=None,
+        snr_type="interpolation_no_spins",
         psds=None,
         ifos=None,
         interpolator_dir="./interpolator_pickle",
         create_new_interpolator=False,
         gwsnr_verbose=True,
         multiprocessing_verbose=True,
-        mtot_cut=True,
+        mtot_cut=False,
     )
 
 # Setting up the BBH (Binary Black Hole) parameters

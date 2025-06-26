@@ -1,3 +1,46 @@
 [build-system]
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "gwsnr"
+dynamic = ["version", "dependencies"]
+description = "A Python package for calculating gravitational wave signal-to-noise ratios"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Hemantakumar Phurailatpam", email = "hemantaphurailatpam@gmail.com"},
+]
+maintainers = [
+    {name = "Hemantakumar Phurailatpam", email = "hemantaphurailatpam@gmail.com"},
+]
+keywords = ["gravitational-waves", "signal-processing", "physics", "astronomy"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+
+[project.urls]
+Homepage = "https://github.com/hemantaph/gwsnr"
+Documentation = "https://gwsnr.readthedocs.io"
+Repository = "https://github.com/hemantaph/gwsnr"
+"Bug Tracker" = "https://github.com/hemantaph/gwsnr/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "gwsnr._version.__version__"}
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["gwsnr*"]
+
+[tool.setuptools.package-data]
+gwsnr = ["ann/ann_data/*", "core/interpolator_pickle/*"]
