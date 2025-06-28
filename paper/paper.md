@@ -32,7 +32,7 @@ This combination of advanced techniques and user-friendly design makes gwsnr a v
 
 # Mathematical Formulation
 
-The `gwsnr` package provides two efficient methods for computing the optimal SNR in GW data analysis: the Noise-Weighted Inner Product Method with Multiprocessing and the Partial Scaling Interpolation Method. In addition, there are two approaches for estimating $P_{\rm det}$ for precessing systems: ANN-based $P_{\rm det}$ Estimation and the Partial Scaling Interpolation Method with SNR recalculation. Extensive details of these methods can be found in the package documentation (@gwsnr:documentation).
+The `gwsnr` package provides two efficient methods for computing the optimal SNR in GW data analysis: the Noise-Weighted Inner Product Method with Multiprocessing and the Partial Scaling Interpolation Method. In addition, there are two approaches for estimating $P_{\rm det}$ for precessing systems: ANN-based $P_{\rm det}$ Estimation and the Hybrid SNR Recalculation. Extensive details of these methods can be found in the package documentation (@gwsnr:documentation).
 
 ### Noise-Weighted Inner Product Method with Multiprocessing
 
@@ -74,7 +74,7 @@ The `gwsnr` package now incorporates an artificial neural network (ANN) model, d
 
 In addition to providing trained ANN models for specific configurations, `gwsnr` offers users the flexibility to develop and train custom models tailored to their unique requirements. This adaptability allows for optimization based on variations in detector sensitivity, gravitational-wave properties, and other research-specific factors, ensuring maximum model effectiveness across different scenarios.
 
-### Partial Scaling Interpolation Method with SNR Recalculation for Pdet Estimation
+### Hybrid SNR Recalculation for Pdet Estimation
 
 While the Partial Scaling method is highly efficient for aligned-spin systems, its utility can be further enhanced by recalculating the SNR for precessing systems within a predefined small range of generated SNRs. This is done by first obtaining optimal SNRs with the Partial Scaling method, selecting the SNRs near $\rho_{\rm th}$, and then recalculating the SNRs for these systems using the Noise-Weighted Inner Product Method. This approach allows us to leverage the speed of the Partial Scaling method while ensuring accurate SNR values for systems close to the detection threshold. The recalculated SNRs can then be used to estimate $P_{\rm det}$, providing a balance between computational efficiency and accuracy.
 

@@ -1,3 +1,7 @@
+import multiprocessing as mp
+# mp.set_start_method('fork', force=True)
+
+from multiprocessing import Pool
 import numpy as np
 import jax
 import jax.numpy as jnp
@@ -6,8 +10,7 @@ from ripple import ms_to_Mc_eta
 from jax import vmap
 from jax import jit
 from ..jax import findchirp_chirptime_jax
-import multiprocessing as mp
-from multiprocessing import Pool
+
 from tqdm import tqdm
 
 from ..utils import noise_weighted_inner_prod_ripple
@@ -206,7 +209,7 @@ class RippleInnerProduct:
         # compute the waveform h+ and hx
         # NOTE: result will be in complex64 instead of complex128. This will be change later
         # vmap+jax.jit faster than just using jax.jit
-        mp.set_start_method('spawn', force=True)
+        # mp.set_start_method('spawn', force=True)
         hp, hc = self.vmap_waveform(fs, theta_ripple, f_ref)
         hp, hc = np.array(hp, dtype=np.complex128), np.array(hc, dtype=np.complex128)
         fs = np.array(fs, dtype=np.float64)
@@ -238,7 +241,8 @@ class RippleInnerProduct:
         #     hp_inner_hp[:, iter_i] = hp_inner_hp_i
         #     hc_inner_hc[:, iter_i] = hc_inner_hc_i
 
-        mp.set_start_method('fork', force=True)
+        # mp.set_start_method('fork', force=True)
+
         with Pool(processes=npool) as pool:
             # call the same function with different data in parallel
             # imap->retain order in the list, while map->doesn't
@@ -258,7 +262,7 @@ class RippleInnerProduct:
                     hp_inner_hp_i, hc_inner_hc_i, iter_i = result
                     hp_inner_hp[:, iter_i] = hp_inner_hp_i
                     hc_inner_hc[:, iter_i] = hc_inner_hc_i
-        mp.set_start_method('spawn', force=True)
+        # mp.set_start_method('spawn', force=True)
 
         return hp_inner_hp, hc_inner_hc
         

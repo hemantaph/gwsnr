@@ -5,6 +5,7 @@ Helper functions for gwsnr
 
 import os
 import json
+
 # supress warning
 import absl.logging
 absl.logging.set_verbosity(absl.logging.ERROR)
@@ -15,6 +16,7 @@ import pickle
 import numpy as np
 import bilby
 from gwpy.timeseries import TimeSeries
+
 
 class NumpyEncoder(json.JSONEncoder):
     """
@@ -654,16 +656,25 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
     # check if param_dict_list.pickle exists
     if not os.path.exists(det_path + "/param_dict_list.pickle"):
         dict_list = []
-        with open(det_path + "/param_dict_list.pickle", "wb") as handle:
-            pickle.dump(dict_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        save_pickle(det_path + "/param_dict_list.pickle", dict_list)
 
     # for checking existing interpolator pickle in the det_path/param_dict_list.pickle file
-    param_dict_stored = pickle.load(open(det_path + "/param_dict_list.pickle", "rb"))
+    param_dict_stored = load_pickle(det_path + "/param_dict_list.pickle")
 
     len_ = len(param_dict_stored)
     # del param_dict_given["psds"]
-    param_dict_given["psds"] = str(param_dict_given["psds"])
+    param_dict_given["psds"] = str(param_dict_given["psds"].psd_array)
     param_dict_given["detector_tensor"] = str(param_dict_given["detector_tensor"])
+
+    # # expilcitly check if the param_dict_given is not available in the param_dict_stored
+    # for param_dict in param_dict_stored:
+    #     for key in param_dict_given.keys():
+    #         if param_dict_given[key] != param_dict[key]:
+    #             print(f"param_dict_given {key} = {param_dict_given[key]} is not equal to param_dict_stored {key} = {param_dict[key]}")
+    #         else:
+    #             print(f"param_dict_given {key} = {param_dict_given[key]} is equal to param_dict_stored {key} = {param_dict[key]}")
+
+
     # print("\n\n", param_dict_given)
     # print("\n\n",param_dict_stored)
     if param_dict_given in param_dict_stored:
@@ -688,8 +699,7 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
 
         # store the pickle dict
         param_dict_stored.append(param_dict_given)
-        with open(det_path + "/param_dict_list.pickle", "wb") as handle:
-            pickle.dump(param_dict_stored, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        save_pickle(det_path + "/param_dict_list.pickle", param_dict_stored)
 
     # print(f"In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {path_interpolator} \n")
 

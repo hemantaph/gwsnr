@@ -1,54 +1,99 @@
 # -*- coding: utf-8 -*-
 """
-gwsnr: A Python package for efficient signal-to-noise ratio (SNR) calculation of gravitational-wave signals from compact binary coalescences (CBCs).
+Gravitational-wave signal-to-noise ratio calculation.
 
-Overview
+This module provides efficient calculation of signal-to-noise ratio (SNR) 
+for gravitational-wave signals from compact binary coalescences (CBCs).
+
+The module implements multiple computational backends optimized for different
+use cases: interpolation-based methods for fast evaluation, noise-weighted
+inner products for high accuracy, JAX-accelerated computation for vectorized
+operations, and artificial neural networks for rapid probability estimation.
+
+Methods
+-------
+The package supports five main computational approaches:
+
+Interpolation Method (Partial-Scaled SNR)
+    Fast bicubic interpolation of precomputed partial-scaled SNRs. Efficient
+    for aligned-spin or non-spinning systems. Uses grids of intrinsic 
+    parameters decoupled from extrinsic parameters. Supports waveform
+    approximants: IMRPhenomD, TaylorF2, IMRPhenomXPHM.
+
+Noise-Weighted Inner Product Method  
+    Standard matched-filtering SNR calculation using inner-product integral
+    between waveform and noise PSD. Supports multiprocessing and waveform
+    generation from lalsimulation and ripple. Compatible with arbitrary
+    frequency-domain models including precession and higher harmonics.
+
+JAX-based Inner Product
+    Hardware-accelerated computation using ripple waveform generator with
+    JAX jit compilation and vmap vectorization for batched evaluation.
+
+Artificial Neural Network (ANN) Estimation
+    Rapid probability of detection estimation for spin-precessing systems
+    using trained neural network models. Uses partial-scaled SNR as summary
+    statistic to reduce dimensionality. Supports user-supplied models.
+
+Hybrid SNR Recalculation
+    Combines fast interpolation with accurate inner-product recalculation
+    for systems near detection threshold.
+
+Features
 --------
-This module provides a flexible and computationally efficient framework to calculate the optimal signal-to-noise ratio (SNR) of gravitational-wave signals for a variety of waveform models and detector configurations. The package supports multiple backend methods for SNR estimation:
+- Customizable detector configurations and power spectral densities
+- Bilby interferometer and PSD interface compatibility  
+- Large-scale population synthesis optimization
+- Integration with gravitational-wave lensing tools
+- Automated interpolator generation and caching
+- Extensible neural network model framework
 
-1. **Interpolation Method (Partial-Scaled SNR)**:
-   - Implements fast bicubic (and optionally JAX/Numba-accelerated) interpolation of precomputed "partial-scaled" SNRs.
-   - Particularly efficient for aligned-spin or non-spinning systems.
-   - Precomputes a grid of intrinsic parameters (e.g., total mass, mass ratio, aligned spin components) decoupled from extrinsic parameters.
-   - Tested for waveform approximants such as `IMRPhenomD`, `TaylorF2`, and `IMRPhenomXPHM`.
+Examples
+--------
+Basic SNR calculation using interpolation:
 
-2. **Noise-Weighted Inner Product Method**:
-   - Calculates SNR using the standard inner-product integral between waveform and noise PSD, following the matched-filtering formalism.
-   - Supports multiprocessing and is compatible with waveform generation from `lalsimulation` and `ripple`.
-   - Useful for arbitrary frequency-domain waveform models including precession and higher harmonics.
-
-3. **JAX-based Inner Product**:
-   - Accelerated computation using the `ripple` waveform generator and JAX's `jit` and `vmap` functions for parallelized batched evaluation.
-
-4. **Artificial Neural Network (ANN) Estimation**:
-   - Enables rapid estimation of the probability of detection (`Pdet`) for spin-precessing systems using trained ANN models.
-   - Reduces input dimensionality by leveraging partial-scaled SNR as a summary statistic.
-   - Configurable and extensible with user-supplied ANN models and scalers.
-
-5. **Hybrid SNR Recalculation**:
-   - Combines fast interpolation-based evaluation with inner-product-based recalculation for systems near the SNR detection threshold.
-
-Key Features
-------------
-- Supports customizable detector configurations, PSDs, and waveform models.
-- Compatible with Bilby interferometer and PSD interfaces.
-- Optimized for large-scale population synthesis and selection effect modeling.
-- Integrated with tools like `ler` for gravitational-wave lensing and rate studies.
-- Built-in functionality to handle partial-scaled interpolator generation, caching, and ANN model loading.
-
-Usage Example
--------------
 >>> from gwsnr import GWSNR
->>> snr = GWSNR(snr_type='interpolation', waveform_approximant='IMRPhenomD')
->>> result = snr.snr(mass_1=30, mass_2=30, luminosity_distance=100, theta_jn=0.0, ra=0.0, dec=0.0)
+>>> snr_calc = GWSNR(snr_type='interpolation', 
+...                  waveform_approximant='IMRPhenomD')
+>>> result = snr_calc.snr(mass_1=30, mass_2=30, 
+...                       luminosity_distance=100, 
+...                       theta_jn=0.0, ra=0.0, dec=0.0)
+
+Custom detector configuration:
+
+>>> import bilby
+>>> ifo = bilby.gw.detector.interferometer.Interferometer(
+...     name='LIO',
+...     power_spectral_density=bilby.gw.detector.PowerSpectralDensity(
+...         asd_file='custom_psd.txt'),
+...     minimum_frequency=10.0,
+...     maximum_frequency=2048.0,
+...     length=4,
+...     latitude=19.613, longitude=77.031, elevation=450.0,
+...     xarm_azimuth=117.6, yarm_azimuth=207.6)
+>>> snr_calc = GWSNR(psds={'LIO': 'custom_psd.txt'}, ifos=[ifo])
+
+Notes
+-----
+The interpolation methods are particularly efficient for population studies
+involving thousands to millions of systems. For individual high-precision
+calculations, the inner product methods provide the most accurate results.
+
+Neural network estimation is experimental and currently optimized for
+specific detector configurations and parameter ranges.
 
 References
 ----------
-- Phurailatpam & Hannuksela (2025), *gwsnr: A Python package for efficient signal-to-noise calculation of gravitational-waves*, JOSS (in review)
-- Allen et al. (2012), *FINDCHIRP: An algorithm for detection of gravitational waves from inspiraling compact binaries*, Phys. Rev. D.
-- Edwards et al. (2024), *Differentiable and hardware-accelerated waveforms for gravitational wave data analysis*, Phys. Rev. D.
-- Ashton et al. (2019, 2022), *Bilby: A user-friendly Bayesian inference library for gravitational-wave astronomy*
-- NumPy, SciPy, Numba, JAX, TensorFlow, Scikit-learn
+.. [1] Phurailatpam & Hannuksela (2025), "gwsnr: A Python package for 
+       efficient signal-to-noise calculation of gravitational-waves", 
+       JOSS Publications.
+.. [2] Allen et al. (2012), "FINDCHIRP: An algorithm for detection of 
+       gravitational waves from inspiraling compact binaries", 
+       Phys. Rev. D 85, 122006.
+.. [3] Edwards et al. (2024), "Differentiable and hardware-accelerated 
+       waveforms for gravitational wave data analysis", Phys. Rev. D.
+.. [4] Ashton et al. (2019), "Bilby: A user-friendly Bayesian inference 
+       library for gravitational-wave astronomy", Astrophys. J. Suppl. 241, 27.
 """
 
 
@@ -56,7 +101,9 @@ import shutil
 import os
 from importlib.resources import path
 import pathlib
+
 import multiprocessing as mp
+
 import numpy as np
 from tqdm import tqdm
 from scipy.stats import norm
@@ -79,8 +126,8 @@ from ..utils import (
     load_pickle_from_module,
     load_json_from_module,
     get_gw_parameters,
-)
-from ..utils import noise_weighted_inner_prod
+)  # from gwsnr/utils/utils.py
+from ..utils import noise_weighted_inner_prod  # from gwsnr/utils/multiprocessing_routine.py
 
 from ..numba import (
     findchirp_chirptime,
@@ -145,6 +192,7 @@ class GWSNR:
         psds={'L1':'aLIGO_O4_high_asd.txt','H1':'aLIGO_O4_high_asd.txt', 'V1':'AdV_asd.txt'}.
         For other psd files, check https://github.com/lscsoft/bilby/tree/master/bilby/gw/detector/noise_curves \n
         Example 3: when values are custom psd txt file. psds={'L1':'custom_psd.txt','H1':'custom_psd.txt'}. Custom created txt file has two columns. 1st column: frequency array, 2nd column: strain.
+        Example 4: when you want psds to be created from a stretch of data for a given trigger time. psds={'L1':1246527224.169434} \n
     ifos : `list` or `None`
         List of interferometer objects or detector names. Default is None. If None, bilby's default interferometer objects will be used. For example for LIGO India detector, it can be defined as follows, \n
         >>> import bilby
@@ -523,6 +571,32 @@ class GWSNR:
         snr_recalculation_range=[4,12],
         snr_recalculation_waveform_approximant="IMRPhenomXPHM",
     ):
+        """
+        Initialize the GWSNR class for gravitational wave signal-to-noise ratio calculation.
+
+        This method sets up the GWSNR instance with specified parameters for SNR computation,
+        including detector configurations, waveform settings, and computational method selection.
+        It automatically handles interpolator setup, detector PSD loading, and ANN model 
+        initialization based on the chosen SNR calculation method.
+
+        The initialization process includes:
+        - Setting up detector configurations and power spectral densities
+        - Configuring interpolation grids for fast SNR calculation (if applicable)
+        - Loading or generating interpolation coefficients for partial-scaled SNR
+        - Initializing ANN models and scalers for detection probability estimation
+        - Validating parameter ranges and compatibility checks
+
+        All parameters are documented in the class docstring above. This initialization
+        method automatically calls appropriate setup routines based on the selected
+        snr_type and prints configuration information if gwsnr_verbose is True.
+
+        Raises
+        ------
+        ValueError
+            If snr_type is not recognized or parameter combinations are invalid.
+        FileNotFoundError
+            If required interpolator files or ANN models cannot be found and cannot be generated.
+        """
 
         print("\nInitializing GWSNR class...\n")
         # setting instance attributes
@@ -535,21 +609,21 @@ class GWSNR:
         self.snr_type = snr_type
         self.spin_max = spin_max
 
-        # # getting interpolator data from the package
-        # # first check if the interpolator directory './interpolator_pickle' exists
-        # if not pathlib.Path('./interpolator_pickle').exists():
-        #     # Get the path to the resource
-        #     with path('gwsnr.core', 'interpolator_pickle') as resource_path:
-        #         print(f"Copying interpolator data from the library resource {resource_path} to the current working directory.")
-        #         resource_path = pathlib.Path(resource_path)  # Ensure it's a Path object
+        # getting interpolator data from the package
+        # first check if the interpolator directory './interpolator_pickle' exists
+        if not pathlib.Path('./interpolator_pickle').exists():
+            # Get the path to the resource
+            with path('gwsnr.core', 'interpolator_pickle') as resource_path:
+                print(f"Copying interpolator data from the library resource {resource_path} to the current working directory.")
+                resource_path = pathlib.Path(resource_path)  # Ensure it's a Path object
 
-        #         # Define destination path (same name in current working directory)
-        #         dest_path = pathlib.Path.cwd() / resource_path.name
+                # Define destination path (same name in current working directory)
+                dest_path = pathlib.Path.cwd() / interpolator_dir
 
-        #         # Copy entire directory tree
-        #         if dest_path.exists():
-        #             shutil.rmtree(dest_path)
-        #         shutil.copytree(resource_path, dest_path)
+                # Copy entire directory tree
+                if dest_path.exists():
+                    shutil.rmtree(dest_path)
+                shutil.copytree(resource_path, dest_path)
 
         # dealing with mtot_max
         # set max cut off according to minimum_frequency
@@ -615,7 +689,7 @@ class GWSNR:
         if waveform_approximant=="IMRPhenomXPHM" and duration_max is None:
             print("Intel processor has trouble allocating memory when the data is huge. So, by default for IMRPhenomXPHM, duration_max = 64.0. Otherwise, set to some max value like duration_max = 600.0 (10 mins)")
             self.duration_max = 64.0
-            self.durarion_min = 4.0
+            self.duration_min = 4.0
 
 
         # now generate interpolator, if not exists
@@ -1676,7 +1750,7 @@ class GWSNR:
         idx_tracker = np.nonzero(idx2)[0]
 
         # Set multiprocessing start method to 'spawn' for multri-threading compatibility
-        mp.set_start_method('spawn', force=True)
+        # mp.set_start_method('spawn', force=True)
 
         # Get interpolated SNR
         if self.snr_type == "interpolation" or self.snr_type == "interpolation_no_spins" or self.snr_type == "interpolation_aligned_spins":
@@ -2085,7 +2159,15 @@ class GWSNR:
         hc_inner_hc = np.zeros((len(num_det), size1), dtype=np.complex128)
 
         # to access multi-cores instead of multithreading
-        mp.set_start_method('fork', force=True)
+        if mp.current_process().name != 'MainProcess':
+            print(
+                "\n\n[ERROR] This multiprocessing code must be run under 'if __name__ == \"__main__\":'.\n"
+                "Please wrap your script entry point in this guard.\n"
+                "See: https://docs.python.org/3/library/multiprocessing.html#multiprocessing-programming\n"
+            )
+            raise RuntimeError(
+                "\nMultiprocessing code must be run under 'if __name__ == \"__main__\":'.\n\n"
+            )
 
         with mp.Pool(processes=npool) as pool:
             # call the same function with different data in parallel
@@ -2108,8 +2190,6 @@ class GWSNR:
                     hc_inner_hc[:, iter_i] = hc_inner_hc_i
         
         # close forked processes
-        mp.set_start_method('spawn', force=True)
-
         # get polarization tensor
         # np.shape(Fp) = (size1, len(num_det))
         Fp, Fc = antenna_response_array(
@@ -2524,3 +2604,21 @@ class GWSNR:
         #print('optimal_snr_unscaled', optimal_snr_unscaled["optimal_snr_net"])
 
         return horizon
+    
+
+# def set_multiprocessing_start_method():
+#     import sys
+    
+#     if mp.current_process().name == "MainProcess":
+#         if not hasattr(sys, 'ps1'):
+#             # Not running in main script or interactive mode (Jupyter/IPython)
+        
+#             # Option 1: Print warning (less disruptive)
+#             print("\n[ERROR] This multiprocessing code must be run under 'if __name__ == \"__main__\":'.\n"
+#                 "Please wrap your script entry point in this guard.\n"
+#                 "See: https://docs.python.org/3/library/multiprocessing.html#multiprocessing-programming\n")
+#             # Option 2: Raise Exception (fail fast, preferred for libraries)
+#             raise RuntimeError(
+#                 "\n\nMultiprocessing code must be run under 'if __name__ == \"__main__\":'.\n"
+#                 "Please wrap your script entry point in this guard.\n"
+#                 "See: https://docs.python.org/3/library/multiprocessing.html#multiprocessing-programming\n\n")
