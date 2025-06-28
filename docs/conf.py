@@ -36,6 +36,7 @@ release = get_version()
 
 
 # -- General configuration ---------------------------------------------------
+
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -52,7 +53,23 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
     "autoapi.extension",
+    "sphinxcontrib.mermaid",
+    "myst_parser",
 ]
+
+# MathJax configuration for proper math rendering
+mathjax3_config = {
+    "tex": {
+        "inlineMath": [["$", "$"], ["\\(", "\\)"]],
+        "displayMath": [["$$", "$$"], ["\\[", "\\]"]],
+        "processEscapes": True,
+        "processEnvironments": True,
+    },
+    "options": {
+        "ignoreHtmlClass": "tex2jax_ignore",
+        "processHtmlClass": "tex2jax_process",
+    },
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -66,6 +83,30 @@ pygments_style = 'sphinx'
 
 # Don't mess with double-dash used in CLI options
 smartquotes_action = "qe"
+
+# -- MyST Parser Configuration -----------------------------------------------
+myst_fence_as_directive = ["mermaid"]
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
+
+# Configure math rendering for MyST
+myst_dmath_double_inline = True
+myst_dmath_allow_labels = True
+myst_dmath_allow_space = True
+myst_dmath_allow_digits = True
+myst_update_mathjax = False
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -107,22 +148,15 @@ autoapi_keep_files = True
 napoleon_include_special_with_doc = True
 
 def skip_member(app, what, name, obj, skip, options):
-    if what == "gwsnr.C":
+    if what == "gwsnr.gwsnr.C":
         skip = True
         
-    if "gwsnr" in name:
+    if "gwsnr.gwsnr" in name:
         if obj.name in [
             "C",
         ]:
             skip = True
     return skip
-
-def setup(sphinx):
-    sphinx.connect("autoapi-skip-member", skip_member)
-    roles.register_local_role('orange', orange_role)
-    roles.register_local_role('orange_first', orange_first_letter)
-    roles.register_local_role('red', red_role)
-    roles.register_local_role('red_first', red_first_letter)
 
 from docutils import nodes
 from docutils.parsers.rst import roles
@@ -130,9 +164,6 @@ from docutils.parsers.rst import roles
 def orange_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
     node = nodes.inline(rawtext, text, classes=["orange"])
     return [node], []
-
-# def setup(app):
-#     roles.register_local_role('orange', orange_role)
 
 def orange_first_letter(role, rawtext, text, lineno, inliner, options={}, content=[]):
     # Create two nodes: one for the first letter with a class and one for the rest
@@ -151,8 +182,21 @@ def red_first_letter(role, rawtext, text, lineno, inliner, options={}, content=[
     rest = nodes.inline(rawtext, text[1:], classes=[])
     return [first_letter, rest], []
 
-# def setup(app):
-#     roles.register_local_role('orange', orange_role)
-#     roles.register_local_role('orange_first', orange_first_letter)
-#     roles.register_local_role('red', red_role)
-#     roles.register_local_role('red_first', red_first_letter)
+def setup(app):
+    # Register autoapi skip member callback
+    app.connect("autoapi-skip-member", skip_member)
+    # Register custom roles
+    roles.register_local_role('orange', orange_role)
+    roles.register_local_role('orange_first', orange_first_letter)
+    roles.register_local_role('red', red_role)
+    roles.register_local_role('red_first', red_first_letter)
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
+
+# Configure Mermaid
+mermaid_cmd = 'mmdc'
+mermaid_params = ['--theme', 'forest', '--width', '800', '--backgroundColor', 'transparent']

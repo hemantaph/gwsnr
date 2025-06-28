@@ -45,22 +45,31 @@ Glossary
    :caption: Contents:
 
    Installation
+   Codeoverview
    Summary
-
+   innerproduct
+   interpolation
+   ann
+   hybrid
+   
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: API:
 
-   autoapi/gwsnr/gwsnr/index.rst
-   autoapi/gwsnr/njit_functions/index.rst
-   autoapi/gwsnr/multiprocessing_routine/index.rst
+   autoapi/gwsnr/core/index.rst
+   autoapi/gwsnr/ann/index.rst
+   autoapi/gwsnr/numba/index.rst
+   autoapi/gwsnr/jax/index.rst
+   autoapi/gwsnr/ripple/index.rst
    autoapi/gwsnr/utils/index.rst
    
 .. toctree::
    :maxdepth: 2
    :caption: Examples:
 
-   snr_generation
+   examples/snr_generation
+   examples/model_generation
+
 
 Indices and tables
 ==================

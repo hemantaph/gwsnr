@@ -1,30 +1,25 @@
-:orphan:
+:py:mod:`gwsnr.utils.utils`
+===========================
 
-:py:mod:`gwsnr.utils`
-=====================
+.. py:module:: gwsnr.utils.utils
 
-.. py:module:: gwsnr.utils
+.. autoapi-nested-parse::
 
+   Helper functions for gwsnr
 
-Submodules
-----------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 1
-
-   multiprocessing_routine/index.rst
-   utils/index.rst
+   ..
+       !! processed by numpydoc !!
 
 
-Package Contents
-----------------
+Module Contents
+---------------
 
 Classes
 ~~~~~~~
 
 .. autoapisummary::
 
-   gwsnr.utils.NumpyEncoder
+   gwsnr.utils.utils.NumpyEncoder
 
 
 
@@ -33,24 +28,21 @@ Functions
 
 .. autoapisummary::
 
-   gwsnr.utils.save_json
-   gwsnr.utils.load_json
-   gwsnr.utils.save_pickle
-   gwsnr.utils.load_pickle
-   gwsnr.utils.load_ann_h5
-   gwsnr.utils.append_json
-   gwsnr.utils.add_dictionaries_together
-   gwsnr.utils.get_param_from_json
-   gwsnr.utils.load_ann_h5_from_module
-   gwsnr.utils.load_json_from_module
-   gwsnr.utils.load_pickle_from_module
-   gwsnr.utils.dealing_with_psds
-   gwsnr.utils.power_spectral_density_pycbc
-   gwsnr.utils.interpolator_check
-   gwsnr.utils.interpolator_pickle_path
-   gwsnr.utils.get_gw_parameters
-   gwsnr.utils.noise_weighted_inner_prod
-   gwsnr.utils.noise_weighted_inner_prod_ripple
+   gwsnr.utils.utils.save_json
+   gwsnr.utils.utils.load_json
+   gwsnr.utils.utils.save_pickle
+   gwsnr.utils.utils.load_pickle
+   gwsnr.utils.utils.load_ann_h5
+   gwsnr.utils.utils.append_json
+   gwsnr.utils.utils.add_dictionaries_together
+   gwsnr.utils.utils.get_param_from_json
+   gwsnr.utils.utils.load_ann_h5_from_module
+   gwsnr.utils.utils.load_json_from_module
+   gwsnr.utils.utils.load_pickle_from_module
+   gwsnr.utils.utils.dealing_with_psds
+   gwsnr.utils.utils.power_spectral_density_pycbc
+   gwsnr.utils.utils.interpolator_check
+   gwsnr.utils.utils.interpolator_pickle_path
 
 
 
@@ -642,147 +634,6 @@ Functions
        it_exist: bool
            True if the interpolator exists
            False if the interpolator does not exists
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-
-.. py:function:: noise_weighted_inner_prod(params)
-
-   
-   Probaility of detection of GW for the given sensitivity of the detectors
-
-
-   :Parameters:
-
-       **params** : list
-           list of parameters for the inner product calculation
-           List contains:
-
-           params[0] : float
-               mass_1
-           params[1] : float
-               mass_2
-           params[2] : float
-               luminosity_distance
-           params[3] : float
-               theta_jn
-           params[4] : float
-               psi
-           params[5] : float
-               phase
-           params[6] : float
-               ra
-           params[7] : float
-               dec
-           params[8] : float
-               geocent_time
-           params[9] : float
-               a_1
-           params[10] : float
-               a_2
-           params[11] : float
-               tilt_1
-           params[12] : float
-               tilt_2
-           params[13] : float
-               phi_12
-           params[14] : float
-               phi_jl
-           params[15] : float
-               lambda_1
-           params[16] : float
-               lambda_2
-           params[17] : float
-               eccentricity
-           params[18] : float
-               approximant
-           params[19] : float
-               f_min
-           params[20] : float
-               duration
-           params[21] : float
-               sampling_frequency
-           params[22] : int
-               index tracker
-           params[23] : list
-               list of psds for each detector
-           params[24] : str
-               frequency_domain_source_model name
-           params[25:] : list
-               list of detectors
-
-   :Returns:
-
-       **SNRs_list** : list
-           contains opt_snr for each detector and net_opt_snr
-
-       **params[22]** : int
-           index tracker
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: noise_weighted_inner_prod_ripple(params)
-
-   
-   Probaility of detection of GW for the given sensitivity of the detectors
-
-
-   :Parameters:
-
-       **params** : list
-           list of parameters for the inner product calculation
-           List contains:
-
-           params[0] : `numpy.ndarray`
-               plus polarization
-           params[1] : `numpy.ndarray`
-               cross polarization
-           params[2] : `numpy.ndarray`
-               frequency array
-           params[3] : `float`
-               cutt-off size of given arrays
-           params[4] : `float`
-               minimum frequency
-           params[5] : `float`
-               duration
-           params[6] : `int`
-               index
-           params[7] : `list`
-               psd objects of given detectors
-
-   :Returns:
-
-       **SNRs_list** : list
-           contains opt_snr for each detector and net_opt_snr
-
-       **params[22]** : int
-           index tracker
 
 
 

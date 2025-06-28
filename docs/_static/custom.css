@@ -1,0 +1,6 @@
+.scrollable-image {
+  overflow-x: auto; /* Enable horizontal scrolling */
+  border: 1px solid #e1e1e1; /* Optional: adds a nice border */
+  padding: 10px; /* Optional: adds some space around the image */
+  background-color: #fcfcfc; /* Optional: slight background color */
+}

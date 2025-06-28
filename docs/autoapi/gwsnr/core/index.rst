@@ -1,30 +1,18 @@
-:py:mod:`gwsnr`
-===============
+:orphan:
 
-.. py:module:: gwsnr
+:py:mod:`gwsnr.core`
+====================
 
-.. autoapi-nested-parse::
-
-   
-   GWSNR: Gravitational Wave Signal-to-Noise Ratio
+.. py:module:: gwsnr.core
 
 
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
+   gwsnr/index.rst
 
 
 Package Contents
@@ -35,7 +23,7 @@ Classes
 
 .. autoapisummary::
 
-   gwsnr.GWSNR
+   gwsnr.core.GWSNR
 
 
 
