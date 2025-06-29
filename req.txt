@@ -8,5 +8,5 @@ sphinx-tabs
 sphinx-jupyterbook-latex
 myst-parser
 linkify-it-py
-pydata-sphinx-theme
+sphinxcontrib.mermaid
 # npm install -g @mermaid-js/mermaid-cli

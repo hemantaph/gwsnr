@@ -21,6 +21,7 @@ dependencies:
     - sphinx-autoapi==3.0.0
     - linkify-it-py
     - sphinx-jupyterbook-latex
+    - sphinxcontrib.mermaid
     - gwsnr>=0.3.4
 
 # to build the documentation, run:
