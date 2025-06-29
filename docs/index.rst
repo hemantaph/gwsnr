@@ -1,7 +1,7 @@
 Welcome to gwsnr's documentation!
 ===============================
 
-.. image:: ../gwsnrlogo.png
+.. image:: _static/logo.svg
    :align: center
    :width: 40%
    :alt: gwsnr logo
@@ -12,15 +12,15 @@ gwsnr
 
 ``gwsnr``: :red_first:`Gravitational` :red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Computation Package
 
-The ``gwsnr`` package is designed to facilitate efficient and accurate SNR computations in gravitational wave research. It implements advanced techniques for enhancing calculation speed and precision, making it a valuable tool for researchers in this field. Description available in `README.md <https://github.com/hemantaph/gwsnr>`_ section.
+The ``gwsnr`` package is designed to facilitate efficient and accurate SNR computations in gravitational wave research. It implements advanced techniques for enhancing calculation speed and precision, making it a valuable tool for researchers in this field. Description available in :doc:`Summary` section.
 
 | The code is available at `github.gwsnr <https://github.com/hemantaph/gwsnr>`_.
 | For reaching out to the developer, please raise issue in `github.gwsnr.issue <https://github.com/hemantaph/gwsnr/issues>`_.
 
 ``gwsnr`` to integrate with `ler <https://ler.readthedocs.io/en/latest/>`_ package for simulating detectable gravitational wave signals.
 
-| ``gwsnr`` main developer: `Hemanta Ph. <https://hemantaph.notion.site/Hemanta-Ph-b4c52e857d424c0db2a68f4e63d6097f>`_
-| ``gwsnr`` developer and analyst: Otto Akseli Hannuksela.
+| ``gwsnr`` main developer: `Hemanta Ph. <https://www.hemantaph.com>`_
+| ``gwsnr`` developer and analyst: `Hemanta Ph. <https://www.hemantaph.com>`_, `Otto Akseli Hannuksela <https://www.oahannuksela.com/>`_.
 
 Glossary
 ==================
