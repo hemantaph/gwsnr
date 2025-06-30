@@ -1,10 +1,13 @@
 # Summary
 
+![GW Match Filtering Animation](_static/match_filtering.gif)
+
+
 <p align="center">
-    <img src="_static/snr.png" alt="Your Logo" width="50%" style="margin: 0; padding: 0;">
+    <img src="_static/match_filtering.gif" alt="Your Logo" width="50%" style="margin: 0; padding: 0;">
 </p>
 <p align="center">
-    <em>Detection of a gravitational wave signal in noisy data. Top (cartoon): Signal-to-noise ratio (SNR) as a function of GPS time, with the SNR threshold (orange dashed line) indicating the minimum required for confident detection. The sharp peak crossing the threshold marks a detectable GW event. Bottom (cartoon): Strain versus GPS time, showing the gravitational wave signal (blue) embedded in background noise (grey).</em>
+    <em>Detection of a gravitational wave signal in noisy data. Top: Signal-to-noise ratio (SNR, blue) as a function of GPS time, with the SNR threshold (orange dashed line) indicating the minimum required for confident detection. The sharp peak crossing the threshold marks a detectable GW event. Bottom: Strain versus GPS time, showing the gravitational wave signal (pink) embedded in background noise (black).</em>
 </p>
 
 Gravitational waves (GWs)—ripples in spacetime predicted by Einstein’s theory of General Relativity—have revolutionized astrophysics since their first direct detection in 2015 [1,2]. These signals, emitted by the mergers of compact objects such as binary black holes (BBHs), binary neutron stars (BNSs), and black hole–neutron star pairs, provide unique insights into the universe. A central quantity in GW data analysis is the **signal-to-noise ratio** (SNR), which quantifies the strength of a GW signal relative to the noise in detectors like LIGO[3], Virgo[4], and KAGRA[5]. Reliable SNR estimation is essential for confirming GW detections and performing astrophysical inference [6]. However, modern GW research—especially in population simulations [7] and hierarchical Bayesian inference with selection effects [8]—requires the computation of SNRs for vast numbers of systems, making traditional methods based on noise-weighted inner products prohibitively slow [9,10].
