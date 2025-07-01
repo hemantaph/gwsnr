@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.pypirc
 
 # Jupyter
 .ipynb_checkpoints/
@@ -47,4 +48,5 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
+MANIFEST.pypirc
+.pypirc

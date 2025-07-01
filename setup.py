@@ -37,8 +37,21 @@ setup(
     author_email='hemantaphurailatpam@gmail.com',
     url='https://github.com/hemantaph/gwsnr',
     packages=find_packages(),
+    include_package_data=True,
     package_data={
         'gwsnr': ['ann/ann_data/*', 'core/interpolator_pickle/*'],
+        'gwsnr.ann': ['ann_data/*'],
+        'gwsnr.core': ['interpolator_pickle/*'],
     },
+    python_requires='>=3.10',
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+    ],
     install_requires=requirements,
 )

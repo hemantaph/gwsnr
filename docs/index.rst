@@ -6,9 +6,9 @@ Welcome to gwsnr's documentation!
    :width: 40%
    :alt: gwsnr logo
 
-==================
+
 gwsnr
-==================
+-----------------
 
 ``gwsnr``: :red_first:`Gravitational` :red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Computation Package
 
@@ -37,7 +37,7 @@ For citation, please use the following BibTeX entry:
    }
 
 Quick Start Guide
-==================
+-----------------
 
 Detailed Installation guide and usage examples are available in :doc:`Installation` and :doc:`Examples` sections respectively. Here is a quick start guide to use ``gwsnr`` package.
 
@@ -47,7 +47,7 @@ Installation (bash command)
 
    pip install gwsnr
 
-SNR Computation with `gwsnr` (Python code)
+SNR computation with `gwsnr` (Python code)
 
 .. code-block:: python
 
@@ -58,36 +58,35 @@ SNR Computation with `gwsnr` (Python code)
 
 
 Glossary
-==================
+-----------------
 
 .. glossary::
+
  
    Gravitational waves
 
       .. image:: _static/gw.gif
-         :align: left
+         :align: center
          :width: 480px
          :alt: gif
 
       *Animation showing the propagation of gravitational waves from inspiraling binary black holes.* 
-      `Source <https://community.wolfram.com/groups/-/m/t/790989>`_ : Jeffrey Bryant, Wolfram|Alpha, LLC.
+      `Source <https://community.wolfram.com/groups/-/m/t/790989>`_ : Jeffrey Bryant, Wolfram | Alpha, LLC.
 
-      |
       Ripples in the fabric of space-time caused by some of the most violent and energetic processes in the Universe, such as merger of compact binaries (e.g., black holes and neutron stars) and supernovae explosions. Albert Einstein predicted the existence of gravitational waves in 1916 in his general theory of relativity, but it took a century to detect them directly. The first detection was made in 2015 by the LIGO and Virgo collaborations, which won the 2017 Nobel Prize in Physics. Gravitational waves are invisible, yet incredibly fast; they travel at the speed of light, squeezing and stretching anything in their path.
+
 
    Detection of gravitational waves
 
       .. image:: _static/matched_filtering.gif
-         :align: left
-         :width: 480px
+         :align: center
+         :width: 600px
          :alt: gif
 
-      *Animation showing the matched filtering technique used in gravitational wave detection. The is a peak in the SNR time series when the template matches the signal in the data.*
-      `Source <https://www.youtube.com/watch?v=bBBDR5jf9oU>`_ : Alex Nitz.
+      *Animation showing the matched filtering technique used in gravitational wave detection. Top: Signal-to-noise ratio (SNR, blue) as a function of GPS time, with the SNR threshold (orange dashed line) indicating the minimum required for confident detection. The sharp peak crossing the threshold marks a detectable GW event. Bottom: Strain versus GPS time, showing the gravitational wave signal (pink) embedded in background noise (black).*
+      `Source <https://www.youtube.com/watch?v=bBBDR5jf9oU>`_ : Alex Nitz | youtube.
 
-      Gravitational waves are detected using laser interferometers, which measure the changes in the distances of arm lengths caused by the passing waves. Four major detectors are currently operational: LIGO Livingston (in the US), LIGO Hanford (in the US), Virgo (in Italy), and KAGRA (in Japan). The amplitude of these waves is extremely small, typically on the order of 10^-21, and advanced techniques are required to detect and  extract the signals from the noise background. Match filtering is a common technique used to identify the presence of gravitational wave signals in the data by correlating the data with theoretical templates of expected signals.
-
-      
+      Gravitational waves are detected using laser interferometers, which measure the changes in the distances of arm lengths caused by the passing waves. Four major detectors are currently operational: LIGO Livingston (in the US), LIGO Hanford (in the US), Virgo (in Italy), and KAGRA (in Japan). The amplitude of these waves is extremely small, typically on the order of 10^-21 m, and advanced techniques are required to detect and  extract the signals from the noise background. Match filtering is a common technique used to identify the presence of gravitational wave signals in the data by correlating the data with theoretical templates of expected signals.
 
 
    Signal-to-noise ratio (SNR)

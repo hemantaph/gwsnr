@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber paper"] 1750543245.37342 "paper.bcf" "paper.bbl" "paper" 1750545003.47572 0
-  "paper.bcf" 1750545003.28937 108069 3288707a673968f323d9d50ddda5dcea "pdflatex"
+["biber paper"] 1750543245.37342 "paper.bcf" "paper.bbl" "paper" 1751279626.69204 0
+  "paper.bcf" 1751279626.51099 108069 3288707a673968f323d9d50ddda5dcea "pdflatex"
   (generated)
   "paper.bbl"
   "paper.blg"
   (rewritten before read)
-["pdflatex"] 1750545002.25284 "/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex" "paper.pdf" "paper" 1750545003.47597 2
-  "/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex" 1750544453.11559 33110 8eccf53668cde667a75d7651edd8b51d ""
+["pdflatex"] 1751279625.46194 "/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex" "paper.pdf" "paper" 1751279626.69229 2
+  "/Users/phurailatpamhemantakumar/phd/mypackages/gwsnr/arxiv/paper.tex" 1751279623.88696 33403 06ecd78dd07092cbcd1ec4c51aa3f7fe ""
   "/opt/homebrew/Cellar/texlive/20240312_3/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1710106625 2971 def0b6c1f0b107b3b936def894055589 ""
   "/opt/homebrew/Cellar/texlive/20240312_3/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1710106625 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/opt/homebrew/Cellar/texlive/20240312_3/share/texmf-dist/fonts/map/fontname/texfonts.map" 1710106625 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -241,10 +241,10 @@
   "/opt/homebrew/Cellar/texlive/20240312_3/share/texmf-dist/web2c/texmf.cnf" 1710106625 41652 e14926ab86fde7902cad99d9eeaa5ca5 ""
   "/opt/homebrew/Cellar/texlive/20240312_3/share/texmf-var/web2c/pdftex/pdflatex.fmt" 1710106625 8221880 586024644079ee3bb0c221d6d52d1611 ""
   "logo.png" 1730742397.70006 98285 362704720fe7d823a3fcebfbb7af335e ""
-  "paper.aux" 1750545003.28773 3076 4d14dc3e9ac1591ad9270d812ee6e892 "pdflatex"
+  "paper.aux" 1751279626.50937 3250 3aa61b12e6ecef9013da5b361049140b "pdflatex"
   "paper.bbl" 1750543260.49037 466 ee04f40f768daeed26442158e95aba61 "biber paper"
-  "paper.out" 1750545003.2885 1800 1a9c103d0e2ed4ecf0ff815fd5a16c06 "pdflatex"
-  "paper.tex" 1750544453.11559 33110 8eccf53668cde667a75d7651edd8b51d ""
+  "paper.out" 1751279626.51014 1894 d9dbd39c6c2b93528591a6bddeeb28d7 "pdflatex"
+  "paper.tex" 1751279623.88696 33403 06ecd78dd07092cbcd1ec4c51aa3f7fe ""
   (generated)
   "paper.aux"
   "paper.bcf"
