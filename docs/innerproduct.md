@@ -17,7 +17,7 @@ $$
 
 Here, $S_n(f)$ denotes the one-sided power spectral density (PSD) of the detector noise, and $[f_{\min}, f_{\max}]$ is the analysis frequency band.
 
-### Optimal SNR Calculation
+### Optimal SNR 
 
 GW waveform can be expressed as a combination of plus and cross polarizations, $\tilde{h}(f) = \tilde{h}_+(f) + i\, \tilde{h}_\times(f)$. Using this, we can write optimal SNR as:
 
@@ -37,7 +37,22 @@ $$
 
 The antenna pattern functions $F_+$ and $F_\times$ depend on the detector's orientation and the source's sky location ($\alpha$, $\delta$), inclination ($\iota$), polarization angle ($\psi$), and geocent time ($t_c$). The waveform polarizations $\tilde{h}_{+,\times}$ themselves depend on both intrinsic parameters (component masses $m_1$, $m_2$, and spins) and extrinsic parameters (luminosity distance $D_L$, inclination angle $\iota$, coalescence phase $\phi_c$, and $t_c$).
 
-This method provides a flexible and robust framework for computing optimal SNRs using arbitrary frequency-domain waveform models and detector configurations. The bottleneck in this method is waveform generation, which is mitigated to some extent by parallelizing it across multiple CPU cores. The remaining computations are efficiently handled through `numba.njit` (with multithreaded `prange` loops) compilation and acceleration, making this approach more efficient than traditional Bilby SNR generation.
+
+### Network Optimal SNR
+
+The network optimal SNR combines the individual detector optimal SNRs to provide a single measure of detectability across the entire detector network. For a network of $n$ detectors, the network SNR is calculated as:
+
+$$
+\begin{align}
+\rho_{\rm opt, net} = \sqrt{\sum_{i=1}^{n} \rho_{{\rm opt,} i}^2} \tag{4}
+\end{align}
+$$
+
+where $\rho_i$ is the optimal SNR in the $i$-th detector. This quadrature sum assumes that the noise in different detectors is uncorrelated, which is a reasonable approximation for geographically separated gravitational-wave detectors.
+
+---
+
+Noise-Weighted Inner Product Method provides a flexible and robust framework for computing optimal SNRs using arbitrary frequency-domain waveform models and detector configurations. The bottleneck in this method is waveform generation, which is mitigated to some extent by parallelizing it across multiple CPU cores. The remaining computations are efficiently handled through `numba.njit` (with multithreaded `prange` loops) compilation and acceleration, making this approach more efficient than traditional Bilby SNR generation.
 
 ## Example Usage
 

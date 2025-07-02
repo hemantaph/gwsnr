@@ -36,7 +36,7 @@ $$
 
 $\mathcal{M}$ is the chirp mass, and in terms of ($M,q$) it reads $\mathcal{M} = M \left( \frac{q}{1+q^2} \right)^{3/5}$, where $M = m_1 + m_2$ is the total mass and $q = m_2/m_1$ is the mass ratio. 
 $D_l$ is the luminosity distance, $\iota$ is the inclination angle, and $F_+$ and $F_\times$ are the antenna patterns of the detector.
-The integral runs from a minimum frequency $f_{\min}$ (typically $20$ Hz) up to the frequency of the last stable orbit, which is determined by the total mass of the binary system as $f_{\rm LSO} = 1/(6^{3/2} \pi) (G\,M/c^3)^{-\frac{1}{2}}$.
+The integral runs from a minimum frequency $f_{\min}$ (typically $20$ Hz) up to the frequency of the last stable orbit, which is determined by the total mass of the binary system as $f_{\rm lso} = 1/(6^{3/2} \pi) (G\,M/c^3)^{-\frac{1}{2}}$.
 
 A key insight is to isolate the computationally intensive integral, which is independent of extrinsic parameters such as distance, inclination angle, and sky location. This term is defined as the partial-SNR, $\rho_{\frac{1}{2}}$ and it reads
 
@@ -55,7 +55,7 @@ For more general IMR waveforms the same principle applies. The full SNR, $\rho_{
 
 $$
 \begin{align}
-\rho_{\frac{1}{2}} &= \left(\frac{D_\mathrm{eff}}{1~\mathrm{Mpc}}\right) \mathcal{M}^{-5/6} \times \rho_{\rm bilby}\,, \tag{6}
+\rho_{\frac{1}{2}} &= \left(\frac{D_\mathrm{eff}}{1~\mathrm{Mpc}}\right) \mathcal{M}^{-5/6} \times \rho_{\rm full}\,, \tag{6}
 \end{align}
 $$
 
@@ -204,7 +204,7 @@ interp_snr_aligned_spins = gwsnr_aligned_spins.snr(gw_param_dict=param_dict) # o
 
 ## Accuracy and Performance
 
-The accuracy of the Partial Scaling interpolation method is generally very high, with deviations typically less than 0.5% (and absolute errors on the order of 0.01) compared to the noise-weighted inner product method. This level of precision is sufficient for most gravitational wave data analysis applications, particularly when considering the inherent uncertainties in astrophysical parameters.
+The accuracy of the Partial Scaling interpolation method is generally very high, with deviations typically less than 0.5% (and absolute errors on the order of $10^{-2}$) compared to the noise-weighted inner product method. This level of precision is sufficient for most gravitational wave data analysis applications, particularly when considering the inherent uncertainties in astrophysical parameters.
 
 <p align="center">
     <img src="_static/snr_comparison_interpolation.png" alt="Partial SNR Parameter Dependencies" width="100%"/>

@@ -8,12 +8,27 @@ Installation
 
 .. tabs::
         
-     .. code-tab:: console pip
+   .. code-tab:: console pip
 
         pip install gwsnr
 
+   .. code-tab:: console pip with GPU support
+
+      pip install gwsnr
+      pip install -U "jax[cuda12]"
+
 
 This will also install the dependencies needed by the lastest ``gwsnr`` version.  
+
+.. ``gwsnr`` includes `JAXs <https://jax.readthedocs.io/en/latest/>`_ functionalities. For faster SNR interpolation computation using Nvidia GPU, install ``JAX`` with GPU support.
+
+.. .. tabs::
+
+..    .. code-tab:: console pip with GPU support
+
+..       pip install gwsnr
+..       pip install -U "jax[cuda12]"
+      
 
 .. _development:
 gwsnr for development

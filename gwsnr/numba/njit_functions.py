@@ -347,6 +347,85 @@ def antenna_response_array(ra, dec, time, psi, detector_tensor):
     return Fp, Fc
 
 @njit
+def effective_distance(
+    luminosity_distance, theta_jn, ra, dec, geocent_time, psi, detector_tensor
+):
+    """
+    Function to calculate the effective distance of the source.
+
+    Parameters
+    ----------
+    luminosity_distance : `float`
+        Luminosity distance of the source in Mpc.
+    theta_jn : `float`
+        Angle between the line of sight and the orbital angular momentum vector.
+    ra : `float`
+        Right ascension of the source in radians.
+    dec : `float`
+        Declination of the source in radians.
+    time : `float`
+        GPS time of the source.
+    psi : `float`
+        Polarization angle of the source.
+    detector_tensor : array-like
+        Detector tensor for the detector (3x3 matrix).
+
+    Returns
+    -------
+    effective_distance: `float`
+        Effective distance of the source in Mpc.
+    """
+
+    Fp, Fc = antenna_response_plus(ra, dec, geocent_time, psi, detector_tensor), antenna_response_cross(ra, dec, geocent_time, psi, detector_tensor)
+
+    return luminosity_distance / np.sqrt(
+            Fp**2 * ((1 + np.cos(theta_jn) ** 2) / 2) ** 2
+            + Fc**2 * np.cos(theta_jn) ** 2
+        )
+
+@njit(parallel=True)
+def effective_distance_array(
+    luminosity_distance, theta_jn, ra, dec, geocent_time, psi, detector_tensor
+):
+    """
+    Function to calculate the effective distance of the source in array form.
+
+    Parameters
+    ----------
+    luminosity_distance : `numpy.ndarray`
+        Luminosity distance of the source in Mpc.
+    theta_jn : `numpy.ndarray`
+        Angle between the line of sight and the orbital angular momentum vector.
+    ra : `numpy.ndarray`
+        Right ascension of the source in radians.
+    dec : `numpy.ndarray`
+        Declination of the source in radians.
+    time : `numpy.ndarray`
+        GPS time of the source.
+    psi : `numpy.ndarray`
+        Polarization angle of the source.
+    detector_tensor : array-like
+        Detector tensor for the multiple detectors (nx3x3 matrix), where n is the number of detectors.
+
+    Returns
+    -------
+    effective_distance: `numpy.ndarray`
+        Effective distance of the source in Mpc. Shape is (n, len(ra)).
+    """
+
+    len_det = len(detector_tensor)
+    len_param = len(ra) 
+    eff_dist = np.zeros((len_det, len_param))
+
+    for i in prange(len_param):
+        for j in range(len_det):
+            eff_dist[j,i] = effective_distance(
+                luminosity_distance[i], theta_jn[i], ra[i], dec[i], geocent_time[i], psi[i], detector_tensor[j]
+            )
+
+    return eff_dist
+
+@njit
 def noise_weighted_inner_product(
     signal1, signal2, psd, duration,
 ):

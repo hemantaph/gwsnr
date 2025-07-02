@@ -10,6 +10,8 @@ from .njit_functions import (
     antenna_response_cross,
     antenna_response_array,
     noise_weighted_inner_product,
+    effective_distance,
+    effective_distance_array,
 )
 
 from .njit_interpolators import (
@@ -36,6 +38,8 @@ __all__ = [
     'antenna_response_cross',
     'antenna_response_array',
     'noise_weighted_inner_product',
+    'effective_distance',
+    'effective_distance_array',
     # njit_interpolators
     'find_index_1d_numba',
     'cubic_function_4pts_numba',

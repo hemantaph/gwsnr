@@ -102,6 +102,8 @@ Glossary
    Summary
    innerproduct
    interpolation
+   probabilityofdetection
+   horizondistance
    ann
    hybrid
    

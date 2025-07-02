@@ -8,11 +8,13 @@ The `gwsnr` package provides tools to calculate the probability of detecting a g
 The most straightforward approach treats detection as a binary outcome based on the [optimal SNR](innerproduct.md#optimal-snr-calculation), $\rho_{\rm opt}$. If the signal’s intrinsic strength is greater than the threshold, it is considered detected. This relationship is modeled as a step function:
 
 $$
+\begin{align}
 P_{\rm det}(\theta) =
 \begin{cases}
 1 & \text{if } \rho_{\rm opt}(\theta) > \rho_{\rm th} \\
 0 & \text{otherwise}
-\end{cases}\tag{1}
+\end{cases}\, \tag{1}
+\end{align}
 $$
 
 Here, $\theta$ represents the set of parameters defining the GW source. This method is computationally simple and provides a clear “yes” or “no” answer for detectability based on the ideal SNR.
@@ -26,14 +28,14 @@ A more realistic model acknowledges that detector noise causes the measured matc
 Following the convention in GW astronomy (e.g., [Thrane & Talbot 2019](https://arxiv.org/abs/1809.02293)), the probability density of measuring a specific $\rho_{\rm mf}$ for a signal with parameters $\theta$ is:
 
 $$
-p(\rho_{\rm mf} \mid \theta) = \frac{1}{\sqrt{2\pi}} \exp\left[ -\frac{1}{2}(\rho_{\rm mf} - \rho_{\rm opt}(\theta))^2 \right]\tag{2}
+p(\rho_{\rm mf} \mid \theta) = \frac{1}{\sqrt{2\pi}} \exp\left[ -\frac{1}{2}(\rho_{\rm mf} - \rho_{\rm opt}(\theta))^2 \right]\, \tag{2}
 $$
 
 The probability of detection, $P_{\rm det}$, is the probability that the measured SNR will exceed the threshold $\rho_{\rm th}$. This is given by the integral:
 
 $$
 P_{\rm det}(\theta) = \int_{\rho_{\rm th}}^{\infty} p(\rho_{\rm mf} \mid \theta) \, d\rho_{\rm mf}
-= \int_{\rho_{\rm th}}^{\infty} \frac{1}{\sqrt{2\pi}} \exp\left[ -\frac{1}{2}(x - \rho_{\rm opt}(\theta))^2 \right] dx \tag{3}
+= \int_{\rho_{\rm th}}^{\infty} \frac{1}{\sqrt{2\pi}} \exp\left[ -\frac{1}{2}(x - \rho_{\rm opt}(\theta))^2 \right] dx\, \tag{3}
 $$
 
 In `gwsnr`, this integral is efficiently calculated using the cumulative distribution function (CDF) of the standard normal distribution.

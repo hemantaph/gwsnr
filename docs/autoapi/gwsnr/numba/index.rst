@@ -35,6 +35,8 @@ Functions
    gwsnr.numba.antenna_response_cross
    gwsnr.numba.antenna_response_array
    gwsnr.numba.noise_weighted_inner_product
+   gwsnr.numba.effective_distance
+   gwsnr.numba.effective_distance_array
    gwsnr.numba.find_index_1d_numba
    gwsnr.numba.cubic_function_4pts_numba
    gwsnr.numba.cubic_spline_4d_numba
@@ -457,6 +459,104 @@ Functions
        **duration: `float`**
            Duration of the data.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: effective_distance(luminosity_distance, theta_jn, ra, dec, geocent_time, psi, detector_tensor)
+
+   
+   Function to calculate the effective distance of the source.
+
+
+   :Parameters:
+
+       **luminosity_distance** : `float`
+           Luminosity distance of the source in Mpc.
+
+       **theta_jn** : `float`
+           Angle between the line of sight and the orbital angular momentum vector.
+
+       **ra** : `float`
+           Right ascension of the source in radians.
+
+       **dec** : `float`
+           Declination of the source in radians.
+
+       **time** : `float`
+           GPS time of the source.
+
+       **psi** : `float`
+           Polarization angle of the source.
+
+       **detector_tensor** : array-like
+           Detector tensor for the detector (3x3 matrix).
+
+   :Returns:
+
+       effective_distance: `float`
+           Effective distance of the source in Mpc.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: effective_distance_array(luminosity_distance, theta_jn, ra, dec, geocent_time, psi, detector_tensor)
+
+   
+   Function to calculate the effective distance of the source in array form.
+
+
+   :Parameters:
+
+       **luminosity_distance** : `numpy.ndarray`
+           Luminosity distance of the source in Mpc.
+
+       **theta_jn** : `numpy.ndarray`
+           Angle between the line of sight and the orbital angular momentum vector.
+
+       **ra** : `numpy.ndarray`
+           Right ascension of the source in radians.
+
+       **dec** : `numpy.ndarray`
+           Declination of the source in radians.
+
+       **time** : `numpy.ndarray`
+           GPS time of the source.
+
+       **psi** : `numpy.ndarray`
+           Polarization angle of the source.
+
+       **detector_tensor** : array-like
+           Detector tensor for the multiple detectors (nx3x3 matrix), where n is the number of detectors.
+
+   :Returns:
+
+       effective_distance: `numpy.ndarray`
+           Effective distance of the source in Mpc. Shape is (n, len(ra)).
 
 
 

@@ -297,7 +297,7 @@ Classes
    |                                     | inner product method             |
    |                                     | (jax.jit+jax.vmap).              |
    +-------------------------------------+----------------------------------+
-   |:meth:`~detector_horizon`            | Calculates detector horizon      |
+   |:meth:`~horizon_distance`            | Calculates detector horizon      |
    |                                     | distance.                        |
    +-------------------------------------+----------------------------------+
    |:meth:`~probability_of_detection`    | Calculates probability of        |
@@ -1328,7 +1328,7 @@ Classes
 
       .. rubric:: Notes
 
-      - The method uses :func:`~gwsnr.utils.interpolator_check` to determine which detectors need new interpolators
+      - The method uses :func:`~self.utils.interpolator_check` to determine which detectors need new interpolators
       - For missing interpolators, calls :meth:`~init_partialscaled` to generate them
       - Updates class attributes including :attr:`~psds_list`, :attr:`~detector_tensor_list`, :attr:`~detector_list`, and :attr:`~path_interpolator`
       - Loads all interpolator data into :attr:`~snr_partialsacaled_list` for runtime use
@@ -1425,7 +1425,7 @@ Classes
       duration a gravitational wave signal spends in the detector's frequency band. A safety factor
       of 1.1 is applied to ensure the chirp time remains positive for waveform generation.
 
-      The calculation uses the :func:`~gwsnr.numba.findchirp_chirptime` function to compute chirp
+      The calculation uses the :func:`~self.numba.findchirp_chirptime` function to compute chirp
       times and employs numerical root finding to determine where the chirp time approaches zero.
 
       :Parameters:
@@ -2093,8 +2093,8 @@ Classes
       - Duration is bounded by :attr:`~duration_min` and :attr:`~duration_max` if specified
       - Supports multiprocessing with :attr:`~npool` processors for parallel computation
       - Compatible with all LAL waveform approximants including precessing and higher-order modes
-      - Uses :func:`~gwsnr.utils.noise_weighted_inner_prod` for inner product calculation
-      - Antenna response patterns computed using :func:`~gwsnr.numba.antenna_response_array`
+      - Uses :func:`~self.utils.noise_weighted_inner_prod` for inner product calculation
+      - Antenna response patterns computed using :func:`~self.numba.antenna_response_array`
 
 
       .. rubric:: Examples
@@ -2212,7 +2212,7 @@ Classes
       - Leverages JAX's jit and vmap for vectorized batch processing
       - Supports multiprocessing with :attr:`~npool` processors when applicable
       - Uses :meth:`~RippleInnerProduct.noise_weighted_inner_product_jax` for inner product calculation
-      - Antenna response patterns computed using :func:`~gwsnr.numba.antenna_response_array`
+      - Antenna response patterns computed using :func:`~self.numba.antenna_response_array`
       - Requires :attr:`~snr_type` to be set to 'inner_product_jax' during GWSNR initialization
 
 
@@ -2308,7 +2308,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: detector_horizon(mass_1=1.4, mass_2=1.4, snr_th=None, snr_th_net=None)
+   .. py:method:: horizon_distance_analytical(mass_1=1.4, mass_2=1.4, snr_th=None, snr_th_net=None)
 
       
       Function to calculate detector horizon distance for compact binary coalescences.
@@ -2366,12 +2366,115 @@ Classes
       >>> from gwsnr import GWSNR
       >>> snr = GWSNR(snr_type='inner_product')
       >>> # Calculate BNS horizon for default 1.4+1.4 solar mass system
-      >>> horizon = snr.detector_horizon()
+      >>> horizon = snr.horizon_distance()
       >>> print(f"LIGO-Hanford horizon: {horizon['H1']:.1f} Mpc")
 
       >>> # Calculate horizon for different mass system
-      >>> horizon_bbh = snr.detector_horizon(mass_1=30.0, mass_2=30.0, snr_th=8.0)
+      >>> horizon_bbh = snr.horizon_distance(mass_1=30.0, mass_2=30.0, snr_th=8.0)
       >>> print(f"Network horizon: {horizon_bbh['net']:.1f} Mpc")
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: horizon_distance_numerical(mass_1=1.4, mass_2=1.4, snr_th=None, snr_th_net=None, minimize_function_dict=None, root_scalar_dict=None)
+
+      
+      Function to calculate detector horizon distance for compact binary coalescences with optimal sky location.
+
+      This method computes the horizon distance for each detector in the network, defined as the
+      luminosity distance at which a compact binary coalescence would produce a signal-to-noise
+      ratio equal to the detection threshold. The horizon distance represents the maximum range
+      at which a source can be detected by optimizing over sky location and using optimal
+      orientation parameters.
+
+      The calculation performs two-step optimization: first finds the optimal sky location (ra, dec)
+      that maximizes SNR for each detector, then uses root finding to determine the luminosity
+      distance where SNR equals the detection threshold. For individual detectors, optimization
+      minimizes effective distance, while for network SNR, it maximizes the combined network response.
+
+      :Parameters:
+
+          **mass_1** : `numpy.ndarray` or `float`
+              Primary mass of the binary in solar masses. Default is 1.4.
+
+          **mass_2** : `numpy.ndarray` or `float`
+              Secondary mass of the binary in solar masses. Default is 1.4.
+
+          **geocent_time** : `numpy.ndarray` or `float`
+              GPS time of coalescence at geocenter in seconds. Default is 1246527224.169434.
+              The value of `geocent_time` is used to compute the sky location and SNR.
+
+          **snr_th** : `float` or `None`
+              SNR threshold for individual detector detection. If None, uses :attr:`~snr_th`. Default is None.
+
+          **snr_th_net** : `float` or `None`
+              SNR threshold for network detection. If None, uses :attr:`~snr_th_net`. Default is None.
+
+          **minimize_function_dict** : `dict` or `None`
+              Dictionary containing optimization parameters for sky location minimization.
+              Default structure: {'x0': [0.0, 0.0], 'method': 'SLSQP', 'bounds': [(0, 2*np.pi), (-np.pi/2, np.pi/2)]}.
+              If None, uses default values.
+              Refer to :meth:`~scipy.optimize.minimize` for details on parameters; link: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html
+
+          **root_scalar_dict** : `dict` or `None`
+              Dictionary containing parameters for root finding to determine horizon distance.
+              Default structure: {'bracket': [10, 20000], 'method': 'bisect', 'xtol': 1e-5}.
+              If None, uses default values.
+              Refer to :meth:`~scipy.optimize.root_scalar` for details on parameters; link: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root_scalar.html
+
+      :Returns:
+
+          **horizon** : `dict`
+              Dictionary containing horizon distances for each detector and network.
+              Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'optimal_snr_net'.
+              Values are horizon distances in Mpc for the given binary system and SNR thresholds.
+
+          **sky_location** : `dict`
+              Dictionary containing optimal sky coordinates (for the given geocent_time) for maximum SNR. This is wrt the geocentric time.
+              Keys include detector names (e.g., 'L1', 'H1', 'V1') and 'optimal_snr_net'.
+              Values are tuples (ra, dec) in radians where maximum SNR is achieved.
+
+          **geocent_time** : `float`
+              The geocentric time used for the horizon distance calculation, default is 1246527224.169434.
+
+
+
+
+
+
+
+
+      .. rubric:: Notes
+
+      - Uses optimal orientation: theta_jn=0 (face-on), psi=0 (optimal polarization)
+      - Sky location optimization covers: ra ∈ [0, 2π], dec ∈ [-π/2, π/2]
+      - Uses fixed geocentric time 1246527224.169434 (O3 observing run reference)
+      - For individual detectors: minimizes effective distance to find optimal sky location
+      - For network SNR: minimizes inverse of optimal network SNR across all detectors
+      - Root finding uses bisection method with luminosity distance bracket [10, 20000] Mpc
+      - Temporarily disables :attr:`~multiprocessing_verbose` for cleaner output during optimization
+      - Compatible with all waveform approximants supported by the chosen :attr:`~snr_type`
+      - Uses :func:`~scipy.optimize.minimize` for sky location optimization
+      - Uses :func:`~scipy.optimize.root_scalar` for horizon distance calculation
+
+
+      .. rubric:: Examples
+
+      >>> from gwsnr import GWSNR
+      >>> snr = GWSNR(snr_type='inner_product')
+      >>> # Calculate BNS horizon for default 1.4+1.4 solar mass system
+      >>> horizon, sky_loc = snr.horizon_distance()
+      >>> print(f"LIGO-Hanford horizon: {horizon['H1']:.1f} Mpc at (RA, Dec) = {sky_loc['H1']}")
+
+      >>> # Calculate horizon with custom optimization parameters
+      >>> custom_minimize = {'x0': [np.pi, 0.0], 'method': 'L-BFGS-B'}
+      >>> custom_root = {'bracket': [50, 10000], 'method': 'brentq'}
+      >>> horizon_bbh, sky_loc = snr.horizon_distance(mass_1=30.0, mass_2=30.0,
+      ...                                            minimize_function_dict=custom_minimize,
+      ...                                            root_scalar_dict=custom_root)
+      >>> print(f"Network horizon: {horizon_bbh['optimal_snr_net']:.1f} Mpc")
 
 
 
