@@ -57,41 +57,45 @@ SNR computation with `gwsnr` (Python code)
    print(f"SNR value: {snrs}")
 
 
+.. _glossary:
+
 Glossary
------------------
+========
 
 .. glossary::
 
- 
    Gravitational waves
+      Ripples in the fabric of spacetime, first predicted by Albert Einstein in his theory of General Relativity in 1916. They are created by some of the most violent and energetic events in the universe, such as the collision of black holes, the merging of neutron stars, or supernova explosions. These waves travel outward from their source at the speed of light, carrying information about their origins and the nature of gravity itself.
 
-      .. image:: _static/gw.gif
+      For a century, gravitational waves remained a theoretical prediction. It wasn't until 2015 that the LIGO and Virgo collaborations made the first direct detection, an achievement that earned the 2017 Nobel Prize in Physics and opened an entirely new way of observing the cosmos.
+
+      .. figure:: _static/gw.gif
          :align: center
          :width: 480px
-         :alt: gif
+         :alt: Animation of Gravitational Waves
 
-      *Animation showing the propagation of gravitational waves from inspiraling binary black holes.* 
-      `Source <https://community.wolfram.com/groups/-/m/t/790989>`_ : Jeffrey Bryant, Wolfram | Alpha, LLC.
-
-      Ripples in the fabric of space-time caused by some of the most violent and energetic processes in the Universe, such as merger of compact binaries (e.g., black holes and neutron stars) and supernovae explosions. Albert Einstein predicted the existence of gravitational waves in 1916 in his general theory of relativity, but it took a century to detect them directly. The first detection was made in 2015 by the LIGO and Virgo collaborations, which won the 2017 Nobel Prize in Physics. Gravitational waves are invisible, yet incredibly fast; they travel at the speed of light, squeezing and stretching anything in their path.
-
+         Animation showing the propagation of gravitational waves from inspiraling binary black holes. As the waves travel, they stretch and squeeze spacetime in their path.
+         *Source: Jeffrey Bryant, Wolfram | Alpha, LLC.*
 
    Detection of gravitational waves
+      The effect of a passing gravitational wave is incredibly subtle. To detect these faint signals, scientists use enormous L-shaped instruments called laser interferometers. The most prominent detectors are the two LIGO observatories in the United States, the Virgo detector in Italy, and the KAGRA detector in Japan. These instruments use lasers to measure minute changes in the lengths of their kilometers-long arms—changes on the order of 1/10,000th the width of a proton.
 
-      .. image:: _static/matched_filtering.gif
+      Because the signals are so weak, they are often buried in the detector's background noise. To find them, scientists use a technique called **matched filtering**. This involves comparing the noisy detector data against a large bank of theoretical waveform templates. When a segment of the data closely matches a template, the signal "rings up," indicating a potential detection.
+
+      .. figure:: _static/matched_filtering.gif
          :align: center
          :width: 600px
-         :alt: gif
+         :alt: Animation of Matched Filtering
 
-      *Animation showing the matched filtering technique used in gravitational wave detection. Top: Signal-to-noise ratio (SNR, blue) as a function of GPS time, with the SNR threshold (orange dashed line) indicating the minimum required for confident detection. The sharp peak crossing the threshold marks a detectable GW event. Bottom: Strain versus GPS time, showing the gravitational wave signal (pink) embedded in background noise (black).*
-      `Source <https://www.youtube.com/watch?v=bBBDR5jf9oU>`_ : Alex Nitz | youtube.
-
-      Gravitational waves are detected using laser interferometers, which measure the changes in the distances of arm lengths caused by the passing waves. Four major detectors are currently operational: LIGO Livingston (in the US), LIGO Hanford (in the US), Virgo (in Italy), and KAGRA (in Japan). The amplitude of these waves is extremely small, typically on the order of 10^-21 m, and advanced techniques are required to detect and  extract the signals from the noise background. Match filtering is a common technique used to identify the presence of gravitational wave signals in the data by correlating the data with theoretical templates of expected signals.
-
+         Animation of the matched filtering technique. The bottom panel shows a theoretical gravitational-wave signal (pink) hidden within noisy detector data (black). The top panel shows the Signal-to-Noise Ratio (SNR) calculated from this data. A confident detection is claimed when the SNR forms a sharp peak that crosses a pre-defined threshold (orange dashed line).
+         *Source: Alex Nitz | YouTube.*
 
    Signal-to-noise ratio (SNR)
+      The central metric used to assess the strength and significance of a potential gravitational-wave signal. It quantifies how much stronger the signal is compared to the average level of the background noise.
 
-      The signal-to-noise ratio (SNR) is a key metric in assessing the strength of the detected gravitational wave signal against the noise. Higher SNR values indicate a stronger signal, making it easier to distinguish from the noise and hence more reliable detection. 
+      A higher SNR indicates a more confident detection, making it easier to distinguish a real astrophysical event from random noise fluctuations. A detection is typically confirmed only when the SNR peak surpasses a certain threshold value. The ``gwsnr`` package is designed to compute this critical quantity efficiently and accurately for a wide range of astrophysical scenarios.
+
+
 
 .. toctree::
    :maxdepth: 2
