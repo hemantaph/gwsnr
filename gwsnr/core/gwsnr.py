@@ -613,7 +613,7 @@ class GWSNR:
         # first check if the interpolator directory './interpolator_pickle' exists
         if not pathlib.Path('./interpolator_pickle').exists():
             # Get the path to the resource
-            with path('self.core', 'interpolator_pickle') as resource_path:
+            with path('gwsnr.core', 'interpolator_pickle') as resource_path:
                 print(f"Copying interpolator data from the library resource {resource_path} to the current working directory.")
                 resource_path = pathlib.Path(resource_path)  # Ensure it's a Path object
 
@@ -2704,7 +2704,7 @@ class GWSNR:
 
         if root_scalar_dict is None:
             root_scalar_dict = dict(
-                bracket=[10, 1000000], 
+                bracket=[10, 100000], 
                 method='bisect', 
                 xtol=1e-5
             )

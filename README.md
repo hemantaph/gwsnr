@@ -11,7 +11,7 @@
 pip install gwsnr
 ```
 
-## How to use? (Simple Example)
+## Example Usage
 
 ```python
 from gwsnr import GWSNR
@@ -35,6 +35,8 @@ The **`gwsnr`** Python package addresses this computational bottleneck, offering
 - **ANN-Based $P_{\rm det}$ Estimation**: Employs a trained Artificial Neural Network (ANN) to provide fast probability of detection ($P_{\rm det}$) estimates via SNR calculations for precessing BBH systems. This feature is especially valuable when rapid detection assessments are needed without requiring precise SNR values.
 
 - **Hybrid SNR Recalculation**: A balanced approach that combines the speed of the partial scaling method (or ANN-based estimation) with the precision of the noise-weighted inner product, ensuring high accuracy for systems near the detection threshold.
+
+- **Horizon Distance Calculation**: Implements both analytical and numerical methods to compute the horizon distance for gravitational wave sources, allowing users to assess detector sensitivity and detection capabilities across various configurations.
 
 - **Integration and Flexibility**: Offers a user-friendly interface to combine various detector noise models, waveform models, detector configurations, and signal parameters.
 

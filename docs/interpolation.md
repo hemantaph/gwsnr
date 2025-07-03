@@ -36,17 +36,16 @@ $$
 
 $\mathcal{M}$ is the chirp mass, and in terms of ($M,q$) it reads $\mathcal{M} = M \left( \frac{q}{1+q^2} \right)^{3/5}$, where $M = m_1 + m_2$ is the total mass and $q = m_2/m_1$ is the mass ratio. 
 $D_l$ is the luminosity distance, $\iota$ is the inclination angle, and $F_+$ and $F_\times$ are the antenna patterns of the detector.
-The integral runs from a minimum frequency $f_{\min}$ (typically $20$ Hz) up to the frequency of the last stable orbit, which is determined by the total mass of the binary system as $f_{\rm lso} = 1/(6^{3/2} \pi) (G\,M/c^3)^{-\frac{1}{2}}$.
+The integral runs from a minimum frequency $f_{\min}$ (typically $20$ Hz) up to the frequency of the last stable orbit, which is determined by the total mass of the binary system as $f_{\rm lso} = 1/(6^{3/2} \pi) (G\,M/c^3)^{-\frac{1}{2}}$. 
 
 A key insight is to isolate the computationally intensive integral, which is independent of extrinsic parameters such as distance, inclination angle, and sky location. This term is defined as the partial-SNR, $\rho_{\frac{1}{2}}$ and it reads
 
 $$
 \begin{align}
-\rho_{\frac{1}{2}} &= \left(\frac{D_\mathrm{eff}}{1~\mathrm{Mpc}}\right) \mathcal{M}^{-5/6} \times \rho\,, \tag{4}\\
-&= \left(\frac{5}{24\pi}\right)^{\frac{1}{2}}
-\left(\frac{GM_\odot/c^2}{1~\mathrm{Mpc}}\right)
-\left(\frac{\pi GM_\odot}{c^3}\right)^{-1/6}
-\left(\frac{1}{M_\odot}\right)^{5/6}
+\rho_{\frac{1}{2}} &= \left(\frac{D_\mathrm{eff}}{1~\mathrm{Mpc}}\right) \left(\frac{\mathcal{M}}{M_\odot}\right)^{-5/6} \times \rho\,, \tag{4}\\
+&= \left(\frac{5}{24\pi}\right)^{-\frac{1}{2}}
+\left(\frac{GM_\odot/c^2}{1~\mathrm{Mpc}}\right)^{-1}
+\left(\frac{\pi GM_\odot}{c^3}\right)^{1/6}
 \sqrt{4 \int_{20}^{f_{\rm LSO}} \frac{f^{-7/3}}{S_n(f)}\, df} \tag{5}
 \end{align}
 $$
@@ -55,9 +54,24 @@ For more general IMR waveforms the same principle applies. The full SNR, $\rho_{
 
 $$
 \begin{align}
-\rho_{\frac{1}{2}} &= \left(\frac{D_\mathrm{eff}}{1~\mathrm{Mpc}}\right) \mathcal{M}^{-5/6} \times \rho_{\rm full}\,, \tag{6}
+\rho_{\frac{1}{2}} &= \frac{D_\mathrm{eff}}{\mathcal{M}^{5/6}} \times \rho_{\rm full}\,, \tag{6}
 \end{align}
 $$
+
+Here I assume $D_\mathrm{eff}$ and $\mathcal{M}$ are in the units of Mpc and $M_\odot$, respectively, so that $\rho_{\frac{1}{2}}$ is dimensionless. Through numerical analysis (see the section on [Why interpolation is possible?](#why-interpolation-is-possible)), the partial-SNR $\rho_{\frac{1}{2}}$ turns out to be a smooth function of the intrinsic parameters of the binary system, such as total mass $M$ and mass ratio $q$ for non-spinning systems, and additional spin magnitudes $a_1$ and $a_2$ for spin-aligned systems. This allows us to pre-compute $\rho_{\frac{1}{2}}$ for a grid of binary parameters, which can then be efficiently interpolated for new parameter sets.
+
+## Why interpolation is possible?
+
+Interpolation is feasible for frequency-domain IMR waveforms restricted to the dominant (2,2)-mode because the partial-SNR exhibits smooth and continuous dependence on the binary's intrinsic parameters. As demonstrated in the figure below, the partial-SNR varies smoothly with total mass $M$, mass ratio $q$, and spin magnitudes $a_1$ and $a_2$. This continuous behavior enables accurate interpolation across the parameter space defined by the pre-computed grid. Importantly, for this class of waveforms, the partial-SNR depends only on intrinsic parameters and remains independent of extrinsic parameters such as luminosity distance, inclination angle, and sky location.
+
+<figure align="center">
+  <img src="_static/gwsnr_partial_snr_examples.png" alt="Partial SNR Parameter Dependencies" width="500"/>
+  <figcaption align="left">
+    <b>Figure.</b> Partial SNR ρ<sub>1/2</sub> as a function of intrinsic parameters for aligned-spin IMRPhenomD waveforms. The four panels demonstrate the smooth variation of ρ<sub>1/2</sub> with respect to total mass M, mass ratio q, and spin magnitudes a<sub>1</sub> and a<sub>2</sub>, with other parameters held constant. The continuous and monotonic behavior enables accurate interpolation across the parameter space.
+  </figcaption>
+</figure>
+
+Spin-precessing systems, with higher harmonics, the relationship is not as smooth, and interpolation may not yield accurate results. In such cases, the noise-weighted inner product method is recommended.
 
 ## Interpolation Procedure
 
@@ -70,7 +84,7 @@ Once the interpolated value of $\rho_{\frac{1}{2}}$ is obtained, the final optim
 
 $$
 \begin{align}
-\rho = \rho_{\frac{1}{2}} \times \left( \frac{D_{\text{eff}}}{1~\mathrm{Mpc}} \right) \left( \frac{{\cal M}}{M_\odot} \right)^{5/6}.\tag{7}
+\rho = \rho_{\frac{1}{2}} \times \frac{\mathcal{M}^{5/6}}{D_\mathrm{eff}} \, .\tag{7}
 \end{align}
 $$
 
@@ -92,26 +106,15 @@ $$
 
 A subsequent cubic spline interpolation is then carried out along the $q$ axis, using these values, to determine the final interpolated result $\rho_{\frac{1}{2}}(M_{\rm new}, q_{\rm new})$.
 
-<p align="center">
-    <img src="_static/grid2D.jpg" alt="2D Grid Interpolation" width="400"/>
-</p>
+
+<figure align="center">
+  <img src="_static/grid2D.jpg" alt="Partial SNR Parameter Dependencies" width="400"/>
+</figure>
+
 
 For the spin-aligned IMR waveform, the methodology is conceptually identical but operates in a four-dimensional grid spanning $(M, q, a_1, a_2)$. The interpolation follows a hierarchical scheme, beginning with the $a_1$ and $a_2$ axes, followed by $M$, and finally $q$, recursively applying the one-dimensional cubic spline interpolation at each stage until the final value, $\rho_{\frac{1}{2}}(M_{\rm new}, q_{\rm new}, a_{1, \rm new}, a_{2, \rm new})$, is obtained.
 
 In the presence of edge cases—particularly when the target parameter lies near or beyond the boundaries of the precomputed grid—the methodology employs a robust fallback: the nearest available value of $\rho_{\frac{1}{2}}$ is utilized. Specifically, if $M_{\rm new} < M_1$ (or $M_0$), where $M_0$ and $M_1$ represent the first and second points along the $M$ axis, the scheme resorts to simple linear interpolation (or extrapolation) based on these initial grid points. This approach ensures both the stability and consistency of the interpolation procedure, even at or outside the defined limits of the parameter space.
-
-## Why interpolation is possible?
-
-Interpolation is feasible for frequency-domain IMR waveforms restricted to the dominant (2,2)-mode because the partial-SNR exhibits smooth and continuous dependence on the binary's intrinsic parameters. As demonstrated in the figure below, the partial-SNR varies smoothly with total mass $M$, mass ratio $q$, and spin magnitudes $a_1$ and $a_2$. This continuous behavior enables accurate interpolation across the parameter space defined by the pre-computed grid. Importantly, for this class of waveforms, the partial-SNR depends only on intrinsic parameters and remains independent of extrinsic parameters such as luminosity distance, inclination angle, and sky location.
-
-<p align="center">
-    <img src="_static/gwsnr_partial_snr_examples.png" alt="Partial SNR Parameter Dependencies" width="500"/>
-</p>
-<p align="center">
-    <em>Figure: Partial SNR ρ<sub>1/2</sub> as a function of intrinsic parameters for aligned-spin IMRPhenomD waveforms. The four panels demonstrate the smooth variation of ρ<sub>1/2</sub> with respect to total mass M, mass ratio q, and spin magnitudes a<sub>1</sub> and a<sub>2</sub>, with other parameters held constant. The continuous and monotonic behavior enables accurate interpolation across the parameter space.</em>
-</p>
-
-Spin-precessing systems, with higher harmonics, the relationship is not as smooth, and interpolation may not yield accurate results. In such cases, the noise-weighted inner product method is recommended.
 
 ## Catmull-Rom Spline Interpolation
 
@@ -200,15 +203,27 @@ param_dict = dict(
 )
 
 interp_snr_aligned_spins = gwsnr_aligned_spins.snr(gw_param_dict=param_dict) # or gwsnr_aligned_spins.snr(**param_dict)
+
+print(interp_snr_aligned_spins)
+```
+
+**Expected Output:**
+```
+{'L1': array([ 0.32863562, 12.80466615,  4.64289071, ...,  9.40759371,
+       18.66322763,  3.73022863]), 'H1': array([ 0.90286756, 15.01545159,  5.19427481, ..., 11.65219727,
+       23.79538297,  5.33905121]), 'V1': array([ 1.85612149, 12.78743709,  2.20533615, ...,  9.99559578,
+       17.89409329,  1.94768776]), 'optimal_snr_net': array([ 2.09006176, 23.51471473,  7.30755995, ..., 18.00523412,
+       35.13879467,  6.79805569])}
 ```
 
 ## Accuracy and Performance
 
 The accuracy of the Partial Scaling interpolation method is generally very high, with deviations typically less than 0.5% (and absolute errors on the order of $10^{-2}$) compared to the noise-weighted inner product method. This level of precision is sufficient for most gravitational wave data analysis applications, particularly when considering the inherent uncertainties in astrophysical parameters.
 
-<p align="center">
-    <img src="_static/snr_comparison_interpolation.png" alt="Partial SNR Parameter Dependencies" width="100%"/>
-</p>
-<p align="center">
-    <em>Figure: Comparison of the predicted SNR using the Partial Scaling method (interpolation) against the true SNR from the Bilby library for aligned-spin IMRPhenomD waveforms. The close agreement demonstrates the effectiveness of the interpolation approach.</em>
-</p>
+
+<figure  align="center">
+  <img src="_static/snr_comparison_interpolation.png" alt="Partial SNR Parameter Dependencies" width="100%"/>
+  <figcaption align="left">
+    <b>Figure.</b> Comparison of the predicted SNR using the Partial Scaling method (interpolation) against the true SNR from the Bilby library for aligned-spin IMRPhenomD waveforms. The close agreement demonstrates the effectiveness of the interpolation approach.
+  </figcaption>
+</figure>

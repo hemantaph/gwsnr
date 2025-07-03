@@ -25,14 +25,15 @@ Gravitational waves (GWs), ripples in spacetime predicted by Einstein's theory o
 
 # Statement of Need
 
-The *`gwsnr`* Python package addresses the need for efficient SNR computation in GW research. It provides a flexible and user-friendly interface, allowing users to combine various detector noise models, waveform models, detector configurations, and signal parameters. *`gwsnr`* enhances SNR calculations through several key features. Firstly, it utilizes an innovative interpolation method, employing a partial-scaling approach for accurately interpolating the SNR of GWs from spin-less and spin-aligned binary systems. Secondly, the package features a noise-weighted inner product method, similar to that in the *`bilby`* package (@Ashton:2019, @Ashton:2022), but enhanced with multiprocessing capabilities. This parallel processing is crucial for handling large datasets and computationally intensive analyses that doesn't sacrifice in accuracy. Thirdly, a trained Artificial Neural Network (ANN) model is incorporated for rapid 'probability of detection' (Pdet) estimation for BBH systems with spin precession. 
-<!-- Lastly, *`gwsnr`* leverages *`numpy`* (@numpy:2022) vectorization, and *`numba`*'s (@numba:2022) and *`JAX`*'s (@jax:2018) Just-In-Time compiler (`numba.njit` and `jax.jit`), which optimizes performance by compiling Python code into machine code at runtime, drastically reducing execution times, and finally parallelizing the computation using `prange` (for `numba.njit`) and `jax.vmap` (for `jax.jit`).  -->
+The *`gwsnr`* Python package addresses the need for efficient SNR computation in GW research. It provides a flexible and user-friendly interface that allows users to combine various detector noise models, waveform models, detector configurations, and signal parameters. *`gwsnr`* enhances GW analysis through several key features, including an innovative partial-scaling interpolation method for non-precessing binaries, a multiprocessing-enhanced inner product method for arbitrary waveforms, and a trained Artificial Neural Network (ANN) for rapid probability of detection ($P_{\rm det}$) estimation. Furthermore, the package provides tools to compute the horizon distance ($D_{\rm hor}$), a key metric for detector sensitivity, using both analytical and numerical methods.
+<!-- It provides a flexible and user-friendly interface, allowing users to combine various detector noise models, waveform models, detector configurations, and signal parameters. *`gwsnr`* enhances SNR calculations through several key features. Firstly, it utilizes an innovative interpolation method, employing a partial-scaling approach for accurately interpolating the SNR of GWs from spin-less and spin-aligned binary systems. Secondly, the package features a noise-weighted inner product method, similar to that in the *`bilby`* package (@Ashton:2019, @Ashton:2022), but enhanced with multiprocessing capabilities. This parallel processing is crucial for handling large datasets and computationally intensive analyses that doesn't sacrifice in accuracy. Thirdly, a trained Artificial Neural Network (ANN) model is incorporated for rapid 'probability of detection' (Pdet) estimation for BBH systems with spin precession.  -->
+
 At its core, *`gwsnr`* achieves its high performance by leveraging *`NumPy`* vectorization (@numpy:2022) and Just-In-Time (JIT) compilation through both *`numba`* (@numba:2022) and *`JAX`* (@jax:2018). These JIT compilers translate Python code to optimized machine code at runtime, while built-in parallelization strategies like `numba.prange` and `jax.vmap` ensure efficient use of computational resources.
 This combination of advanced techniques and user-friendly design makes gwsnr a valuable tool for GW data analysis, particularly in simulating detectable compact binary mergers, determining rates of both lensed and unlensed GW events (as demonstrated by its use in the *`ler`* package; @ler:2024, @Leo:2024, @More:2025, @Janquart:2023, @Abbott:2021, @ligolensing:2023, @Wierda:2021, @Wempe:2022), and will help in the analysis of selection effects within hierarchical Bayesian frameworks (@Thrane:2019).
 
 # Mathematical Formulation
 
-The `gwsnr` package provides two efficient methods for computing the optimal SNR in GW data analysis: the Noise-Weighted Inner Product Method with Multiprocessing and the Partial Scaling Interpolation Method. In addition, there are two approaches for estimating $P_{\rm det}$ for precessing systems: ANN-based $P_{\rm det}$ Estimation and the Hybrid SNR Recalculation. Extensive details of these methods can be found in the package documentation (@gwsnr:documentation).
+The `gwsnr` package provides two efficient methods for computing the optimal SNR in GW data analysis: the Noise-Weighted Inner Product Method with Multiprocessing and the Partial Scaling Interpolation Method. In addition, there are two approaches for estimating $P_{\rm det}$ for precessing systems: ANN-based $P_{\rm det}$ Estimation and the Hybrid SNR Recalculation. Furthermore, it provides tools for calculating the $D_{\rm hor}$ efficiently through analytic and numerical methods. Extensive details of these methods can be found in the package documentation (@gwsnr:documentation).
 
 ### Noise-Weighted Inner Product Method with Multiprocessing
 
@@ -50,33 +51,49 @@ $$
 \rho = \sqrt{ F_+^2 \left< \tilde{h}_+ | \tilde{h}_+ \right> + F_{\times}^2 \left< \tilde{h}_{\times} | \tilde{h}_{\times} \right> }
 $$
 
-While this approach is versatile, it can be computationally intensive, with waveform generation representing the primary bottleneck. The `gwsnr` package addresses this challenge by parallelizing waveform generation across multiple CPU cores and accelerating the antenna pattern and inner product calculations using `numba.njit` compilation. Additionally, `gwsnr` provides optional support for JAX-based waveform generation and acceleration via the `ripple` waveform library [@Edwards:2023], utilizing `jax.jit` for just-in-time compilation and `jax.vmap` for efficient batched operations.
+While this approach is versatile, it can be computationally intensive, with waveform generation representing the primary bottleneck. While the core computation is similar to that in packages like *`bilby`* (@Ashton:2019; @Ashton:2022), *`gwsnr`* overcomes this challenge by parallelizing waveform generation across multiple CPU cores and accelerating the antenna pattern and inner product calculations using `numba.njit` compilation. Additionally, `gwsnr` provides optional support for JAX-based waveform generation and acceleration via the `ripple` waveform library [@Edwards:2023], utilizing `jax.jit` for just-in-time compilation and `jax.vmap` for efficient batched operations.
 
 ### Partial Scaling Interpolation Method
 
 For non-spinning or aligned-spin binary systems restricted to the dominant harmonic mode, `gwsnr` implements a highly efficient interpolation-based technique called the Partial Scaling method. This approach, adapted from the FINDCHIRP algorithm (@Allen:2012), decouples the computationally expensive parts of the SNR calculation from the extrinsic source parameters. It achieves this by defining a "partial-scaled SNR" $\rho_{1/2}$, which isolates the dependence on the intrinsic parameters (masses and spins). For a given full IMR waveform SNR, $\rho_{\text{full}}$, the partial SNR is defined as:
 
 $$
-\rho_{1/2} = \left(\frac{D_\mathrm{eff}}{1~\mathrm{Mpc}}\right) \left(\frac{\mathcal{M}}{M_\odot}\right)^{-5/6} \times \rho_{\text{full}}
+\rho_{1/2} = \frac{D_\mathrm{eff}}{\mathcal{M}^{5/6}} \times \rho_{\text{full}}\, .
 $$
 
 Here, $\mathcal{M}$ is the chirp mass and $D_{\text{eff}}$ is the effective distance, which encapsulates the luminosity distance, sky location, and detector orientation wrt the binary. Since $\rho_{1/2}$ depends only on the intrinsic properties of the binary, its value can be pre-computed on a grid and stored. For non-spinning systems, this is a two-dimensional grid of total mass ($M$) and mass ratio ($q$), while for aligned-spin systems, it is a four-dimensional grid that also includes the two spin magnitudes. To find the SNR for a new binary, `gwsnr` performs a rapid cubic spline interpolation on the pre-computed grid to find the corresponding $\rho_{1/2}$ value. The final SNR is then recovered almost instantaneously by applying the scaling transformation:
 
 $$
-\rho = \rho_{1/2} \times \left(\frac{\mathcal{M}}{M_\odot}\right)^{5/6} \times \left(\frac{1~\mathrm{Mpc}}{D_\mathrm{eff}}\right)
+\rho = \rho_{1/2} \times \frac{\mathcal{M}^{5/6}}{D_\mathrm{eff}}\,.
 $$
 
 This procedure transforms a computationally intensive integration into a simple, JIT-compiled interpolation and multiplication, enabling massive performance gains for large-scale population studies.
 
 ### ANN-based Pdet Estimation
 
-The `gwsnr` package now incorporates an artificial neural network (ANN) model, developed using TensorFlow (@tensorflow:2015) and scikit-learn (@scikitlearn:2011), to rapidly estimate $P_{\rm det}$ in binary black hole (BBH) systems using the IMRPhenomXPHM waveform approximant. This complex IMR waveform model accounts for spin-precessing systems with subdominant harmonics. The ANN model is especially useful when precise signal-to-noise ratio (SNR) calculations are not critical, providing a quick and effective means of estimating $P_{\rm det}$. This value indicates detectability under Gaussian noise by determining if the SNR exceeds a certain threshold (e.g., $\rho_{\rm th}=8$). Trained on a large dataset from the `ler` package, the ANN model uses 'partial scaled SNR' values as a primary input, reducing input dimensionality from 15 to 5 and enhancing accuracy. This approach offers a practical solution for assessing detectability under specified conditions. Other similar efforts with ANN models are detailed in (@ChapmanBird:2023, @Gerosa:2020, @Callister:2024).
+The `gwsnr` package now incorporates an artificial neural network (ANN) model, developed using TensorFlow (@tensorflow:2015) and scikit-learn (@scikitlearn:2011), to rapidly estimate $P_{\rm det}$ in binary black hole (BBH) systems using the IMRPhenomXPHM waveform approximant. This complex IMR waveform model accounts for spin-precessing systems with subdominant harmonics. The ANN model is especially useful when precise signal-to-noise ratio (SNR) calculations are not critical, providing a quick and effective means of estimating $P_{\rm det}$. This value indicates detectability under Gaussian noise by determining if the SNR exceeds a certain threshold (e.g., $\rho_{\rm th}=8$). Trained on a large dataset from the `ler` package, the ANN model uses 'partial scaled SNR' values as a primary input, reducing input dimensionality from 15 to 5 and enhancing efficiency. This approach offers a practical solution for assessing detectability under specified conditions. Other similar efforts with ANN models are detailed in (@ChapmanBird:2023, @Gerosa:2020, @Callister:2024).
 
 In addition to providing trained ANN models for specific configurations, `gwsnr` offers users the flexibility to develop and train custom models tailored to their unique requirements. This adaptability allows for optimization based on variations in detector sensitivity, gravitational-wave properties, and other research-specific factors, ensuring maximum model effectiveness across different scenarios.
 
 ### Hybrid SNR Recalculation for Pdet Estimation
 
 While the Partial Scaling method is highly efficient for aligned-spin systems, its utility can be further enhanced by recalculating the SNR for precessing systems within a predefined small range of generated SNRs. This is done by first obtaining optimal SNRs with the Partial Scaling method, selecting the SNRs near $\rho_{\rm th}$, and then recalculating the SNRs for these systems using the Noise-Weighted Inner Product Method. This approach allows us to leverage the speed of the Partial Scaling method while ensuring accurate SNR values for systems close to the detection threshold. The recalculated SNRs can then be used to estimate $P_{\rm det}$, providing a balance between computational efficiency and accuracy.
+
+## Horizon Distance Calculation
+
+$D_{\rm hor}$ is a key metric for assessing detector sensitivity, defined as the maximum distance at which an optimally oriented source can be detected with a given $\rho_{\rm th}$. *`gwsnr`* computes this using two approaches. The **analytical method** scales a known $D_{\rm eff}$, using a related $\rho_{\rm opt}$ and the chosen $\rho_{\rm th}$ as follows:
+
+$$
+D_{\rm hor} = \frac{\rho_{\rm opt}}{\rho_{\rm th}} D_{\rm eff}
+$$
+
+The **numerical method** offers a more direct approach. Using functions from `scipy.optimize` (@scipy:2020), such as `minimize` and `root_scalar`, *`gwsnr`* first optimizes for the sky location that maximizes the SNR,  and then using a root-finding algorithm to solve for the distance $d_L$ where
+
+$$
+\rho(d_L) - \rho_{\rm th} = 0
+$$
+
+Both methods are applicable to single detectors, while the numerical approach can also be extended to compute the horizon distance for detector networks.
 
 # Acknowledgements
 

@@ -1,0 +1,179 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam defaultFontSize 10
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+skinparam direction top to bottom
+
+title GWSNR Package Code Overview - Architecture & Workflow
+
+' Main GWSNR Class
+package "gwsnr.core" {
+    class GWSNR #E1F5FE {
+        + __init__(snr_type, waveform_approximant, ...)
+        + snr() : Main SNR calculation dispatcher
+        --
+        + snr_with_interpolation()
+        + snr_with_ann()
+        + compute_bilby_snr()
+        + compute_ripple_snr()
+        --
+        + init_partialscaled()
+        + interpolator_setup()
+        + ann_initialization()
+        --
+        + probability_of_detection()
+        + horizon_distance_analytical()
+        + horizon_distance_numerical()
+        --
+        - snr_type : str
+        - detector_list : list
+        - psds_list : list
+        - get_interpolated_snr : function
+        - noise_weighted_inner_product_jax : function
+    }
+}
+
+' SNR Calculation Methods
+package "SNR Methods" {
+    together {
+        class "Interpolation Method" as interp #F3E5F5
+        class "Inner Product Method" as inner #F3E5F5
+    }
+    together {
+        class "JAX Inner Product" as jax_inner #F3E5F5
+        class "ANN Method" as ann #F3E5F5
+    }
+    class "Hybrid Recalculation" as hybrid #F3E5F5
+}
+
+' Horizon Distance Calculations
+package "Horizon Distance" {
+    together {
+        class "Analytical Horizon" as horizon_analytical #E8F5F5
+        class "Numerical Horizon" as horizon_numerical #E8F5F5
+    }
+}
+
+' Backend Acceleration
+package "Acceleration Backends" {
+    together {
+        class "Numba JIT" as numba #FFF3E0
+        class "JAX Backend" as jax #FFF3E0
+    }
+    class "Ripple Integration" as ripple #FFF3E0
+}
+
+' Utilities and Support
+package "Utils & Support" {
+    together {
+        class "Utilities" as util_funcs #E8F5E8
+        class "Multiprocessing" as mp #E8F5E8
+    }
+    class "ANN Models" as ann_models #E8F5E8
+}
+
+' Data Storage
+package "Data & Interpolators" {
+    together {
+        class "Interpolator Cache" as cache #FFEBEE
+        class "ANN Data" as ann_data #FFEBEE
+    }
+    class "Detector Config" as detector_config #FFEBEE
+}
+
+' Additional Features
+package "Additional Features" {
+    class "Supporting Methods" as features #F0F0F0
+}
+
+' Workflow Connections - Vertical Flow
+GWSNR ||--down--> interp : "snr() dispatches to"
+GWSNR ||--down--> inner
+GWSNR ||--down--> jax_inner
+GWSNR ||--down--> ann
+GWSNR ||--down--> hybrid
+
+' Horizon distance connections
+GWSNR ||--down--> horizon_analytical : "horizon_distance_analytical()"
+GWSNR ||--down--> horizon_numerical : "horizon_distance_numerical()"
+horizon_analytical --down--> interp : "Uses SNR calculation"
+horizon_numerical --down--> interp : "Uses SNR + optimization"
+
+' Backend connections
+interp --down--> numba : "No-spin & Aligned-spin"
+interp --down--> jax : "JAX variants"
+inner --down--> mp : "Parallel computation"
+jax_inner --down--> ripple : "JAX acceleration"
+ann --down--> ann_models : "Model inference"
+
+' Utility connections
+numba --down--> util_funcs : "Helper functions"
+jax --down--> util_funcs : "Parameter handling"
+mp --down--> util_funcs : "Data processing"
+
+' Data connections
+GWSNR --down--> cache : "Loads interpolators"
+GWSNR --down--> ann_data : "Loads ANN models"
+GWSNR --down--> detector_config : "Detector setup"
+
+' Additional features
+GWSNR --down--> features : "Supporting methods"
+
+note right of features
+Supporting Methods:
+• Probability of Detection
+• Horizon Distance Calculation
+• Parameter Validation
+• JSON Output
+• Custom PSDs
+• Multi-detector Networks
+• Sky Location Optimization
+end note
+
+note left of GWSNR
+Main Workflow:
+1. Initialize with snr_type
+2. Setup detectors & PSDs
+3. Load/generate interpolators
+4. Call snr() method
+5. Dispatch to appropriate backend
+6. Return SNR dictionary
+end note
+
+note right of interp
+SNR Types:
+• interpolation_no_spins
+• interpolation_aligned_spins
+• interpolation_*_jax
+• inner_product
+• inner_product_jax
+• ann
+end note
+
+note left of horizon_analytical
+Analytical Horizon:
+• Uses optimal orientation (face-on)
+• Fixed sky location (overhead)
+• Scales SNR from reference distance
+• Fast calculation method
+end note
+
+note right of horizon_numerical
+Numerical Horizon:
+• Optimizes over sky location
+• Uses scipy.optimize.minimize
+• Root finding with scipy.root_scalar
+• More accurate but slower
+• Supports custom optimization params
+end note
+
+note left of hybrid
+Hybrid Strategy:
+Fast interpolation +
+selective recalculation
+for threshold events
+end note
+
+@enduml

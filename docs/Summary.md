@@ -1,11 +1,12 @@
 # Summary
 
-<p align="center">
-    <img src="_static/snr.png" alt="Your Logo" width="100%" style="margin: 0; padding: 0;">
-</p>
-<p align="center">
-    <em>Fig. Detection of a gravitational wave signal in noisy data. Top (cartoon): Signal-to-noise ratio (SNR) as a function of GPS time, with the SNR threshold (orange dashed line) indicating the minimum required for confident detection. The sharp peak crossing the threshold marks a detectable GW event. Bottom (cartoon): Strain versus GPS time, showing the gravitational wave signal (blue) embedded in background noise (grey).</em>
-</p>
+<figure align="center">
+  <img src="_static/snr.png" alt="snr" width="100%" style="margin: 0; padding: 0;"/>
+  <figcaption align="left">
+    <b>Figure.</b> Detection of a gravitational wave signal in noisy data. Top (cartoon): Signal-to-noise ratio (SNR) as a function of GPS time, with the SNR threshold (orange dashed line) indicating the minimum required for confident detection. The sharp peak crossing the threshold marks a detectable GW event. Bottom (cartoon): Strain versus GPS time, showing the gravitational wave signal (blue) embedded in background noise (grey).
+  </figcaption>
+</figure>
+
 
 Gravitational waves (GWs)—ripples in spacetime predicted by Einstein’s theory of General Relativity—have revolutionized astrophysics since their first direct detection in 2015. These signals, emitted by the mergers of compact objects such as binary black holes (BBHs), binary neutron stars (BNSs), and black hole–neutron star pairs, provide unique insights into the universe. A central quantity in GW data analysis is the **signal-to-noise ratio** (SNR), which quantifies the strength of a GW signal relative to the noise in detectors like LIGO, Virgo, and KAGRA. Reliable SNR estimation is essential for confirming GW detections and performing astrophysical inference. However, modern GW research—especially in population simulations and hierarchical Bayesian inference with selection effects—requires the computation of SNRs for vast numbers of systems, making traditional methods based on noise-weighted inner products prohibitively slow.
 
@@ -20,6 +21,8 @@ The **`gwsnr`** Python package addresses this computational bottleneck, offering
 - **ANN-Based $P_{\rm det}$ Estimation**: Employs a trained Artificial Neural Network (ANN) to provide fast probability of detection ($P_{\rm det}$) estimates via SNR calculations for precessing BBH systems. This feature is especially valuable when rapid detection assessments are needed without requiring precise SNR values.
 
 - **Hybrid SNR Recalculation**: A balanced approach that combines the speed of the partial scaling method (or ANN-based estimation) with the precision of the noise-weighted inner product, ensuring high accuracy for systems near the detection threshold.
+
+- **Horizon Distance Calculation**: Implements both analytical and numerical methods to compute the horizon distance for gravitational wave sources, allowing users to assess detector sensitivity and detection capabilities across various configurations.
 
 - **Integration and Flexibility**: Offers a user-friendly interface to combine various detector noise models, waveform models, detector configurations, and signal parameters.
 

@@ -35,7 +35,7 @@ $$
 \end{align}
 $$
 
-The antenna pattern functions $F_+$ and $F_\times$ depend on the detector's orientation and the source's sky location ($\alpha$, $\delta$), inclination ($\iota$), polarization angle ($\psi$), and geocent time ($t_c$). The waveform polarizations $\tilde{h}_{+,\times}$ themselves depend on both intrinsic parameters (component masses $m_1$, $m_2$, and spins) and extrinsic parameters (luminosity distance $D_L$, inclination angle $\iota$, coalescence phase $\phi_c$, and $t_c$).
+The antenna pattern functions $F_+$ and $F_\times$ depend on the detector's orientation and the source's sky location ($\alpha$, $\delta$), inclination ($\iota$), polarization angle ($\psi$), and geocent time ($t_c$). The waveform polarizations $\tilde{h}_{+,\times}$ themselves depend on both intrinsic parameters (component masses $m_1$, $m_2$, and spins) and extrinsic parameters (luminosity distance $d_L$, inclination angle $\iota$, coalescence phase $\phi_c$, and $t_c$).
 
 
 ### Network Optimal SNR
@@ -48,7 +48,7 @@ $$
 \end{align}
 $$
 
-where $\rho_i$ is the optimal SNR in the $i$-th detector. This quadrature sum assumes that the noise in different detectors is uncorrelated, which is a reasonable approximation for geographically separated gravitational-wave detectors.
+where $\rho_{{\rm opt,} i}$ is the optimal SNR in the $i$-th detector. This quadrature sum assumes that the noise in different detectors is uncorrelated, which is a reasonable approximation for geographically separated gravitational-wave detectors.
 
 ---
 
@@ -85,4 +85,17 @@ param_dict= dict(
 
 # signal-to-noise ratio with detectors LIGO-Hanford, LIGO-Livingston, and Virgo with O4 observing run sensitivity
 snrs = gwsnr.snr(**param_dict)
+
+print('Computed SNRs with inner product:\n', snrs)
 ```
+
+**Expected Output:**
+
+```
+Computed SNRs with inner product:
+{'L1': array([46.53]), 'H1': array([48.20]), 'V1': array([13.21]), 'optimal_snr_net': array([68.28])}
+```
+
+## Performance
+
+When testing with 10,000 BBH samples of IMRPhenomXPHM precessing-waveforms with O4 sensitivity, the noise-weighted inner product method achieves an average computation time of approximately 50 seconds on a single CPU core. This performance is significantly improved when using multiple cores, reducing the average time to around 8.5 seconds with 8 cores. Note that, while the waveform generation is parallelized across multiple CPU cores, the antenna pattern generation and inner product calculation itself is multithreaded using `numba.njit` with `prange` loops, which allows for efficient parallel computation across the available CPU cores and threads.

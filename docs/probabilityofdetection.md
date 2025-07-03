@@ -9,7 +9,7 @@ The most straightforward approach treats detection as a binary outcome based on 
 
 $$
 \begin{align}
-P_{\rm det}(\theta) =
+P_{\rm det, bool}(\theta) =
 \begin{cases}
 1 & \text{if } \rho_{\rm opt}(\theta) > \rho_{\rm th} \\
 0 & \text{otherwise}
@@ -18,8 +18,6 @@ P_{\rm det}(\theta) =
 $$
 
 Here, $\theta$ represents the set of parameters defining the GW source. This method is computationally simple and provides a clear “yes” or “no” answer for detectability based on the ideal SNR.
-
----
 
 ## 2. Probabilistic Detection (Gaussian Noise Model)
 
@@ -34,7 +32,7 @@ $$
 The probability of detection, $P_{\rm det}$, is the probability that the measured SNR will exceed the threshold $\rho_{\rm th}$. This is given by the integral:
 
 $$
-P_{\rm det}(\theta) = \int_{\rho_{\rm th}}^{\infty} p(\rho_{\rm mf} \mid \theta) \, d\rho_{\rm mf}
+P_{\rm det, mf}(\theta) = \int_{\rho_{\rm th}}^{\infty} p(\rho_{\rm mf} \mid \theta) \, d\rho_{\rm mf}
 = \int_{\rho_{\rm th}}^{\infty} \frac{1}{\sqrt{2\pi}} \exp\left[ -\frac{1}{2}(x - \rho_{\rm opt}(\theta))^2 \right] dx\, \tag{3}
 $$
 
@@ -88,7 +86,37 @@ pdet_bool = gwsnr.probability_of_detection(snr_dict=snr_dict, snr_th=8, snr_th_n
 
 # 2. Probabilistic Detection (Gaussian Noise Model)
 pdet_gaussian = gwsnr.probability_of_detection(snr_dict=snr_dict, snr_th=8, snr_th_net=8, type="matched_filter")
-```      
+
+print("SNRs computed with inner product:\n", snr_dict)
+print("Probability of detection (deterministic):\n", pdet_bool)
+print("Probability of detection (probabilistic):\n", pdet_gaussian)
+``` 
+
+**Expected Output:**
+
+```
+SNRs computed with inner product:
+ {'L1': array([ 8.20570674,  6.6467511 , 11.8892919 ,  0.        ]), 'H1': array([6.87033936, 5.48562041, 9.66843147, 0.        ]), 'V1': array([3.56751442, 2.64453924, 4.71463604, 0.        ]), 'optimal_snr_net': array([11.28106135,  9.01470572, 16.03314136,  0.        ])}
+Probability of detection (deterministic):
+ {'L1': array([1, 0, 1, 0]), 'H1': array([0, 0, 1, 0]), 'V1': array([0, 0, 0, 0]), 'pdet_net': array([1, 1, 1, 0])}
+Probability of detection (probabilistic):
+ {'L1': array([5.81490005e-01, 8.79880633e-02, 9.99949731e-01,
+       6.66133815e-16]), 'H1': array([1.29309625e-01, 5.96210075e-03, 9.52384947e-01,
+       6.66133815e-16]), 'V1': array([4.65764666e-06, 4.26693338e-08, 5.09253562e-04,
+       6.66133815e-16]), 'pdet_net': array([9.99482914e-01, 8.44876937e-01, 1.00000000e+00,
+       6.66133815e-16])}
+```
+
+## Visualization of Detection Probability
+
+<div align="center">
+<figure>
+    <img src="_static/pdet_comparison.png" alt="Probability of Detection Comparison" width="600"/>
+    <figcaption align="left"><b>Figure:</b> Comparison of two models for the gravitational-wave probability of detection, $P_{\rm det}$, as a function of the optimal signal-to-noise ratio, $\rho_{\rm opt}$. The deterministic model (blue line) is a step function: detection is certain ($P_{\rm det} = 1$) only if $\rho_{\rm opt}$ exceeds the threshold ($\rho_{\rm th} = 8$, red dashed line). In contrast, the probabilistic model (orange curve) accounts for Gaussian noise fluctuations in the measured SNR, resulting in a smooth transition in detection probability. For an example signal with $\rho_{\rm opt} = 8.2$ (green dashed line), the deterministic model yields $P_{\rm det} = 1$, while the more realistic probabilistic model gives a detection probability of $P_{\rm det} \approx 0.58$.
+    </figcaption>
+</figure>
+</div>
+
 
 <!-- ## Probability of Detection Calculation
 

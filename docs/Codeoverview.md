@@ -1,7 +1,16 @@
 ## Code Overview
 
-<div style="overflow-x: scroll; background: rgb(200,200,200); padding: 1rem; width: 200%; max-width: 100%;">
-  <img src="_static/snr.svg" alt="Code overview flowchart" style="width: 200%; height: auto; max-width: 200%;">
+**Zoom-out view**
+
+<p align="center">
+    <img src="_static/gwsnr_puml.svg" alt="Partial SNR Parameter Dependencies" width="100%"/>
+</p>
+
+
+**Zoom-in view** (<- scroll horizontally to see the full image ->)
+
+<div style="overflow-x: scroll; background: rgb(200,200,200); padding: 1rem; width: 200%; max-width: 120%;">
+  <img src="_static/gwsnr_puml.svg" alt="Code overview flowchart" style="width: 170%; height: auto; max-width: 200%;">
 </div>
 
 <!-- ## Code Overview
