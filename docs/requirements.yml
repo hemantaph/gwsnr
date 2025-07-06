@@ -22,6 +22,7 @@ dependencies:
     - linkify-it-py
     - sphinx-jupyterbook-latex
     - sphinxcontrib.mermaid
+    - sphinx-rtd-dark-mode
     - gwsnr>=0.3.4
 
 # to build the documentation, run:

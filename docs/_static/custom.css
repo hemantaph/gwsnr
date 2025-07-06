@@ -94,3 +94,39 @@
 [data-theme="dark"] .admonition.danger {
   border-left-color: #dc3545;
 }
+
+.red {
+    color: red;
+}
+
+.orange {
+    color: orange;
+}
+
+.blue {
+    color: blue;
+}
+
+.green {
+    color: green;
+}
+
+.pink {
+    color: pink;
+}
+
+.violet {
+    color: violet;
+}
+
+.yellow {
+    color: yellow;
+}
+
+.magenta {
+    color: magenta;
+}
+
+.cyan {
+    color: cyan;
+}

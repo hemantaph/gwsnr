@@ -1,17 +1,18 @@
 Welcome to gwsnr’s documentation!
 ================================
 
-.. image:: _static/logo.svg
-   :align: center
-   :width: 40%
-   :alt: gwsnr logo
+.. raw:: html
 
-gwsnr: Efficient :red_first:`Gravitational-Wave` Signal-to-Noise Ratio Calculator
+   <div style="text-align: center; margin: 20px 0; padding: 20px;">
+      <img src="_static/logo.svg" width="40%" alt="gwsnr logo">
+   </div>
+
+gwsnr: Efficient :red_first:`Gravitational`-:red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Calculator
 ------------------------------
 
 ``gwsnr`` is a Python package for the efficient and accurate computation of the Signal-to-Noise Ratio (SNR) in gravitational-wave (GW) astronomy.
 
-The package addresses the computational bottleneck of traditional SNR calculations by implementing advanced interpolation techniques, Just-in-Time (JIT) compilation, and parallel processing. It offers flexible backends using **Numba** for multi-core CPU optimization and **JAX** for GPU acceleration. With a simple API, ``gwsnr`` is designed for easy integration into existing analysis workflows and is used by the ``ler`` `package <https://ler.readthedocs.io/en/latest/>`_.
+The package addresses the computational bottleneck of traditional SNR calculations by implementing advanced interpolation techniques, Just-in-Time (JIT) compilation, and parallel processing. It offers flexible backends using ``Numba`` for multi-core CPU optimization and ``JAX`` for GPU acceleration. With a simple API, ``gwsnr`` is designed for easy integration into existing analysis workflows and is used by the ``ler`` (`see ler documentation <https://ler.readthedocs.io/en/latest/>`_).
 
 For a detailed technical overview, please see the :doc:`Summary` section.
 
@@ -87,8 +88,8 @@ Glossary
 
          <div style="text-align:center;">
          <img src="_static/gw.gif" width="480px" alt="Animation of GW propagation">
-         <div style="text-align:left; max-width:480px; margin:auto">
-            <p style="font-size: 0.9em; font-family: Arial, sans-serif; margin: 0; line-height: 1.5em;">
+         <div style="text-align:left; max-width:480px">
+            <p style="font-size: 0.9em; font-family: Arial, sans-serif; line-height: 1.5em;">
                Animation showing the propagation of gravitational waves from inspiraling binary black holes. As the waves travel, they stretch and squeeze spacetime in their path. <em>Source: <a href="https://community.wolfram.com/groups/-/m/t/790989">Jeffrey Bryant, Wolfram | Alpha, LLC.</a>.</em>
             </p>
          </div>
@@ -104,8 +105,8 @@ Glossary
 
          <div style="text-align:center;">
          <img src="_static/matched_filtering.gif" width="600px" alt="Animation of Matched Filtering">
-         <div style="text-align:left; max-width:600px; margin:auto">
-            <p style="font-size: 0.9em; font-family: Arial, sans-serif; margin: 0; line-height: 1.5em;">
+         <div style="text-align:left; max-width:600px">
+            <p style="font-size: 0.9em; font-family: Arial, sans-serif; line-height: 1.5em;">
                Animation of the matched filtering technique. The bottom panel shows a theoretical gravitational-wave signal (pink) hidden within noisy detector data (black). The top panel shows the Signal-to-Noise Ratio (SNR) calculated from this data. A confident detection is claimed when the SNR forms a sharp peak that crosses a pre-defined threshold (yellow dashed line).
                   <em>Source: <a href="https://www.youtube.com/watch?v=bBBDR5jf9oU">Alex Nitz | YouTube</a>.</em>
             </p>
