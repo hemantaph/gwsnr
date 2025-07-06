@@ -216,7 +216,7 @@ print(interp_snr_aligned_spins)
        35.13879467,  6.79805569])}
 ```
 
-## Accuracy and Performance
+## Accuracy
 
 The accuracy of the Partial Scaling interpolation method is generally very high, with deviations typically less than 0.5% (and absolute errors on the order of $10^{-2}$) compared to the noise-weighted inner product method. This level of precision is sufficient for most gravitational wave data analysis applications, particularly when considering the inherent uncertainties in astrophysical parameters.
 
@@ -227,3 +227,18 @@ The accuracy of the Partial Scaling interpolation method is generally very high,
     <b>Figure.</b> Comparison of the predicted SNR using the Partial Scaling method (interpolation) against the true SNR from the Bilby library for aligned-spin IMRPhenomD waveforms. The close agreement demonstrates the effectiveness of the interpolation approach.
   </figcaption>
 </figure>
+
+## Performance: Numba vs. JAX in the Partial Scaling Method
+
+The efficiency of `gwsnr` is significantly enhanced by its Just-In-Time (JIT) compilation backends: Numba and JAX. Both options dramatically accelerate SNR calculations with the Partial Scaling Interpolation Method compared to standard Inner Product Methods.
+
+To quantify the performance, we benchmarked the time required to compute SNR for one million aligned-spin samples. Inner Product Methods take approximately 4-14 minutes on a multi-core CPU. In contrast, the JIT backends complete the same task in seconds or even milliseconds, as summarized below:
+
+| Method / Backend         | Execution Time (1M Samples) | Notes                                      |
+|--------------------------|------------------------------|--------------------------------------------|
+| Standard Python (No JIT) | ~4-14 minutes              | Baseline performance on 1-8 CPU cores     |
+| Numba (CPU)              | 2.12 s                     | Uses `@njit` and `prange` for parallelization |
+| JAX (CPU)                | 1.48 s                     | Uses `jit` and `vmap` for efficient vectorization |
+| JAX (GPU)                | 88.9 ms                    | **Recommended**. Over 15× faster than CPU JAX |
+
+Both JIT backends offer substantial speedup over standard Python implementations. While JAX holds a slight performance advantage on CPUs, its true power is unlocked on compatible GPUs (benchmark performed on NVIDIA GeForce RTX 3080). For users seeking maximum performance in large-scale computations, the JAX backend with GPU acceleration is the recommended choice.

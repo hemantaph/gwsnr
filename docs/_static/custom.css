@@ -1,6 +1,96 @@
+/* Enhanced custom styles for GWSNR documentation with dark mode support */
+
+/* Fix package name area - set proper RTD theme blue background with white text */
+.wy-nav-side .wy-nav-top {
+    background-color: #2980b9 !important; /* RTD theme blue background */
+    color: white !important; /* White text */
+}
+
+.wy-nav-side .wy-nav-top a {
+    color: white !important; /* White text for the link */
+    text-decoration: none !important;
+}
+
+/* Dark mode package name styling */
+[data-theme="dark"] .wy-nav-side .wy-nav-top {
+    background-color: #1a1a1a !important; /* Dark background */
+    color: #5dade2 !important; /* Lighter blue text */
+}
+
+[data-theme="dark"] .wy-nav-side .wy-nav-top a {
+    color: #5dade2 !important; /* Lighter blue for dark mode */
+}
+
 .scrollable-image {
   overflow-x: auto; /* Enable horizontal scrolling */
   border: 1px solid #e1e1e1; /* Optional: adds a nice border */
   padding: 10px; /* Optional: adds some space around the image */
   background-color: #fcfcfc; /* Optional: slight background color */
+}
+
+/* Dark mode enhancements */
+[data-theme="dark"] .scrollable-image {
+  border: 1px solid #444; 
+  background-color: #2b2b2b;
+}
+
+/* PlantUML diagram styling */
+.plantuml-diagram {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.plantuml-diagram img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] .plantuml-diagram img {
+  border: 1px solid #555;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Improve code block styling in dark mode */
+[data-theme="dark"] .highlight {
+  background-color: #1e1e1e !important;
+}
+
+[data-theme="dark"] .highlight pre {
+  background-color: #1e1e1e !important;
+  color: #d4d4d4 !important;
+}
+
+/* Enhance table styling for dark mode */
+[data-theme="dark"] table.docutils {
+  border-color: #555;
+}
+
+[data-theme="dark"] table.docutils th {
+  background-color: #404040;
+  border-color: #555;
+}
+
+[data-theme="dark"] table.docutils td {
+  border-color: #555;
+}
+
+/* Better admonition styling in dark mode */
+[data-theme="dark"] .admonition {
+  background-color: #2d2d2d;
+  border-left: 4px solid #0e4b9c;
+}
+
+[data-theme="dark"] .admonition.note {
+  border-left-color: #17a2b8;
+}
+
+[data-theme="dark"] .admonition.warning {
+  border-left-color: #ffc107;
+}
+
+[data-theme="dark"] .admonition.danger {
+  border-left-color: #dc3545;
 }

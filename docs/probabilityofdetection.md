@@ -1,46 +1,46 @@
 # Probability of Detection Calculation
 
-The `gwsnr` package provides tools to calculate the probability of detecting a gravitational-wave (GW) signal, denoted as $P_{\rm det}$. This calculation is based on whether the signal’s signal-to-noise ratio (SNR) is strong enough to be distinguished from the detector’s background noise and deemed significant. For a given detection threshold, $\rho_{\rm th}$, `gwsnr` offers two ways to model this probability.
+The detectability of gravitational-wave events is not the same across all sources. Factors such as distance, mass, orbital orientation, and the spins of the compact objects all influence how strong the signal appears in the detector. Nearby or more massive systems, as long as they merge within the detector’s sensitive frequency band, tend to produce stronger signals. The orientation of the binary is also important: signals from systems that are face-on (viewed from above or below their orbital plane) are much stronger than those from edge-on systems. Spins further modify the waveform and can enhance or diminish detectability.
 
+The `gwsnr` package quantifies the likelihood of detecting a signal with a given set of source parameters, $\theta$, through the probability of detection, $P_{\rm det}$. This probability is defined by whether the signal’s signal-to-noise ratio (SNR) is strong enough to stand out from the detector’s background noise. For a given detection threshold, $\rho_{\rm th}$, `gwsnr` implements two models for $P_{\rm det}$.
 
-## 1. Deterministic Probability (Step Function)
+## Deterministic Threshold (Step Function)
 
-The most straightforward approach treats detection as a binary outcome based on the [optimal SNR](innerproduct.md#optimal-snr-calculation), $\rho_{\rm opt}$. If the signal’s intrinsic strength is greater than the threshold, it is considered detected. This relationship is modeled as a step function:
+In the simplest model, detection is treated as a binary outcome based on the optimal SNR, $\rho_{\rm opt}$. If the intrinsic SNR exceeds the threshold, the event is considered detected; otherwise, it is not. Mathematically, this step function is expressed as:
 
 $$
-\begin{align}
-P_{\rm det, bool}(\theta) =
+P^{\rm step}_{\rm det}(\theta) =
 \begin{cases}
 1 & \text{if } \rho_{\rm opt}(\theta) > \rho_{\rm th} \\
 0 & \text{otherwise}
-\end{cases}\, \tag{1}
+\end{cases}
+$$
+
+
+## Probabilistic Detection (Gaussian Model)
+
+In practice, a signal is identified as detected if its matched-filter SNR, $\rho'_{\rm mf}$ (where the prime denotes maximization over extrinsic parameters such as sky position and orientation), surpasses a set threshold. A more realistic treatment acknowledges that, due to random noise fluctuations, $\rho'_{\rm mf}$ fluctuates around its true value. Following Thrane & Talbot (2019), the probability distribution of $\rho'_{\rm mf}$ is normally distributed with mean $\rho_{\rm opt}$ and unit variance:
+
+$$
+p(\rho'_{\rm mf} \mid \theta) = \frac{1}{\sqrt{2\pi}} \exp\left[ -\frac{1}{2}(\rho'_{\rm mf} - \rho_{\rm opt}(\theta))^2 \right].
+$$
+
+The probability of detection in this scenario, $P^{\rm Gauss}_{\rm det}$, is the probability that the measured SNR exceeds the threshold $\rho_{\rm th}$. This is calculated by integrating the probability density from the threshold to infinity:
+
+$$
+\begin{align}
+P^{\rm Gauss}_{\rm det}(\theta) &= \int_{\rho_{\rm th}}^{\infty} p(\rho'_{\rm mf} \mid \theta) d\rho'_{\rm mf}\,, \notag \\
+&= \int_{\rho_{\rm th}}^{\infty} \frac{1}{\sqrt{2\pi}} \exp\left[ -\frac{1}{2}(x - \rho_{\rm opt}(\theta))^2 \right] dx\,, \notag \\
+&= \frac{1}{2} {\rm erfc}\left( \frac{\rho_{\rm th} - \rho_{\rm opt}(\theta)}{\sqrt{2}} \right)\,.
 \end{align}
 $$
 
-Here, $\theta$ represents the set of parameters defining the GW source. This method is computationally simple and provides a clear “yes” or “no” answer for detectability based on the ideal SNR.
+In `gwsnr`, this probability is efficiently computed using the cumulative distribution function (CDF) of the standard normal distribution.
 
-## 2. Probabilistic Detection (Gaussian Noise Model)
-
-A more realistic model acknowledges that detector noise causes the measured matched-filter SNR, $\rho_{\rm mf}$, to fluctuate around the true optimal SNR, $\rho_{\rm opt}$. Assuming the background noise is Gaussian, these fluctuations can be described by a normal distribution with a mean equal to the optimal SNR and a standard deviation of one.
-
-Following the convention in GW astronomy (e.g., [Thrane & Talbot 2019](https://arxiv.org/abs/1809.02293)), the probability density of measuring a specific $\rho_{\rm mf}$ for a signal with parameters $\theta$ is:
-
-$$
-p(\rho_{\rm mf} \mid \theta) = \frac{1}{\sqrt{2\pi}} \exp\left[ -\frac{1}{2}(\rho_{\rm mf} - \rho_{\rm opt}(\theta))^2 \right]\, \tag{2}
-$$
-
-The probability of detection, $P_{\rm det}$, is the probability that the measured SNR will exceed the threshold $\rho_{\rm th}$. This is given by the integral:
-
-$$
-P_{\rm det, mf}(\theta) = \int_{\rho_{\rm th}}^{\infty} p(\rho_{\rm mf} \mid \theta) \, d\rho_{\rm mf}
-= \int_{\rho_{\rm th}}^{\infty} \frac{1}{\sqrt{2\pi}} \exp\left[ -\frac{1}{2}(x - \rho_{\rm opt}(\theta))^2 \right] dx\, \tag{3}
-$$
-
-In `gwsnr`, this integral is efficiently calculated using the cumulative distribution function (CDF) of the standard normal distribution.
 
 ## Implementation
 
-It is important to clarify that `gwsnr` does not perform a separate matched-filter analysis to find $\rho_{\rm mf}$, as it is not required to get $P_{\rm det}$ evident from Eqn.(3). Instead, it first calculates the optimal SNR ($\rho_{\rm opt}$) using one of its highly efficient methods (such as Partial Scaling or the noise-weighted inner product). This $\rho_{\rm opt}$ value is then used as the mean in the Gaussian model above to derive a realistic detection probability. The implementation in `gwsnr` is equivalent to:
+It is important to clarify that `gwsnr` does not perform a separate matched-filter analysis to find $\rho'_{\rm mf}$, as it is not required to get $P_{\rm det}$ evident from Eqn.(3). Instead, it first calculates the optimal SNR ($\rho_{\rm opt}$) using one of its highly efficient methods (such as Partial Scaling or the noise-weighted inner product). This $\rho_{\rm opt}$ value is then used as the mean in the Gaussian model above to derive a realistic detection probability. The implementation in `gwsnr` is equivalent to:
 
 ```python
 from scipy.stats import norm
@@ -122,7 +122,7 @@ Probability of detection (probabilistic):
 
 The `gwsnr` package provides tools to evaluate the probability of detecting a GW signal, denoted as $P_{\rm det}$. The calculation is based on whether the observed SNR exceeds a specified threshold, $\rho_{\rm th}$, for either individual detectors or a detector network. For most practical applications with Gaussian noise, using an SNR threshold is a reliable (proxy) criterion for detection.
 
-Within gwsnr, two principal approaches are available for computing $P_{\rm det}$: one based on the optimal SNR, $\rho_{\rm opt}$, and another that considers the statistical nature of the matched-filter SNR, $\rho_{\rm mf}$.
+Within gwsnr, two principal approaches are available for computing $P_{\rm det}$: one based on the optimal SNR, $\rho_{\rm opt}$, and another that considers the statistical nature of the matched-filter SNR, $\rho'_{\rm mf}$.
 
 ## Detection Probability Using the Optimal SNR
 
@@ -140,10 +140,10 @@ where $\theta$ represents the set of parameters for the GW signal.
 
 ## Detection Probability with Matched-Filter SNR
 
-For a more realistic scenario, the matched-filter SNR, $\rho_{\rm mf}$, fluctuates due to noise and follows a normal distribution with mean $\rho_{\rm opt}(\theta)$ and unit variance for a given set of parameters $\theta$. Following [Thrane et al. 2019](https://arxiv.org/abs/1809.02293), the probability density for measuring a particular value $\rho_{\rm mf}$ is
+For a more realistic scenario, the matched-filter SNR, $\rho'_{\rm mf}$, fluctuates due to noise and follows a normal distribution with mean $\rho_{\rm opt}(\theta)$ and unit variance for a given set of parameters $\theta$. Following [Thrane et al. 2019](https://arxiv.org/abs/1809.02293), the probability density for measuring a particular value $\rho'_{\rm mf}$ is
 
 $$
-p(\rho_{\rm mf} | \theta) = \frac{1}{\sqrt{2\pi}} \exp\left[-\frac{1}{2} \left( \rho_{\rm mf} - \rho_{\rm opt}(\theta) \right)^2 \right].
+p(\rho'_{\rm mf} | \theta) = \frac{1}{\sqrt{2\pi}} \exp\left[-\frac{1}{2} \left( \rho'_{\rm mf} - \rho_{\rm opt}(\theta) \right)^2 \right].
 $$
 
 The probability that the measured SNR exceeds the threshold, i.e., the probability of detection, is then given by
@@ -158,7 +158,7 @@ Numerically, the integral for the probability of detection can be evaluated usin
 P_det = 1 - norm.cdf(snr_th - snr_opt)
 ```
 
-**Note:** This way of calculating $\rho_{\rm mf}$ doesn't involve matched-filter SNR calculation, but rather uses the optimal SNR $\rho_{\rm opt}$, which is computed using the noise-weighted inner product method or the Partial Scaling method, and then Pdet is derived from the assumption of Gaussian noise.
+**Note:** This way of calculating $\rho'_{\rm mf}$ doesn't involve matched-filter SNR calculation, but rather uses the optimal SNR $\rho_{\rm opt}$, which is computed using the noise-weighted inner product method or the Partial Scaling method, and then Pdet is derived from the assumption of Gaussian noise.
 
 ## Example Usage
 

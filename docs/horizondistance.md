@@ -68,7 +68,7 @@ horizon distance (analytical): {'L1': array([416.49490771]), 'H1': array([416.49
 horizon distance (numerical): {'L1': 416.49483499582857, 'H1': 416.4948722301051, 'V1': 228.76581222284585, 'optimal_snr_net': 557.9508489044383} Mpc
 ```
 
-## Horizon Distance BNS Systems across various Detectors
+## Horizon Distance of a BNS System across various Detectors
 
 <div align="center">
 <figure>

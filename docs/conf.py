@@ -55,6 +55,7 @@ extensions = [
     "autoapi.extension",
     "sphinxcontrib.mermaid",
     "myst_parser",
+    "sphinx_rtd_dark_mode",
 ]
 
 # MathJax configuration for proper math rendering
@@ -114,6 +115,26 @@ myst_update_mathjax = False
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+
+# -- Dark mode configuration for sphinx_rtd_dark_mode -----------------------
+# Enable dark mode toggle
+default_dark_mode = False  # Set to True to default to dark mode
+
+# HTML theme options for better dark mode support
+html_theme_options = {
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    'vcs_pageview_mode': '',
+    'style_nav_header_background': '#2980b9',  # RTD theme blue background
+    # Sidebar navigation
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
+}
 
 # -- Plausible support
 ENABLE_PLAUSIBLE = os.environ.get("READTHEDOCS_VERSION_TYPE", "") in ["branch", "tag"]
