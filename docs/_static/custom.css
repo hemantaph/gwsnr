@@ -1,9 +1,4 @@
-.floating.container.bottom-right {
-    position: fixed;
-    bottom: 0 !important;
-    right: 0 !important;
-    /* ... other styles ... */
-}
+
 
 /* Fix package name area - set proper RTD theme blue background with white text */
 .wy-nav-side .wy-nav-top {
