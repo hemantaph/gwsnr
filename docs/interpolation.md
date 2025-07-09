@@ -92,7 +92,7 @@ This methodology facilitates rapid and precise SNR evaluation throughout the ent
 
 ## Nested 1D Cubic Spline Interpolation
 
-The Partial Scaling method relies on nested one-dimensional (1D) cubic spline interpolation to efficiently estimate the partial-SNR, for a new set of binary parameters. This hierarchical approach avoids the complexity of multi-dimensional spline fitting by applying a sequence of 1D interpolations across each parameter dimension.
+The Partial Scaling method relies on nested one-dimensional (1D) cubic spline interpolation (see [Interpolating with Cubic Hermite Splines](#interpolating-with-cubic-hermite-splines)) to efficiently estimate the partial-SNR, for a new set of binary parameters. This hierarchical approach avoids the complexity of multi-dimensional spline fitting by applying a sequence of 1D interpolations across each parameter dimension.
 
 To illustrate the process, consider the 2D case for a non-spinning system with a pre-computed grid of $\rho_{\frac{1}{2}}$ values over $M$ and $q$ parameter space. The interpolation proceeds in several key steps. First, the axis arrays for $M$ and $q$ are obtained, and the precomputed $\rho_{\frac{1}{2}}$ values are loaded from a pickle file. These $\rho_{\frac{1}{2}}$ values are defined for each $(M, q)$ pair on the grid.
 
@@ -116,58 +116,77 @@ For the spin-aligned IMR waveform, the methodology is conceptually identical but
 
 In the presence of edge cases—particularly when the target parameter lies near or beyond the boundaries of the precomputed grid—the methodology employs a robust fallback: the nearest available value of $\rho_{\frac{1}{2}}$ is utilized. Specifically, if $M_{\rm new} < M_1$ (or $M_0$), where $M_0$ and $M_1$ represent the first and second points along the $M$ axis, the scheme resorts to simple linear interpolation (or extrapolation) based on these initial grid points. This approach ensures both the stability and consistency of the interpolation procedure, even at or outside the defined limits of the parameter space.
 
-## Catmull-Rom Spline Interpolation
+## Interpolating with Cubic Hermite Splines
 
-To estimate the partial SNR, $\rho_{\frac{1}{2}}$, for arbitrary binary parameters, `gwsnr` employs [Catmull-Rom spline interpolation](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline). This technique is particularly well-suited for interpolating smoothly between pre-computed grid values, offering both continuity and accuracy with less computational cost than standard cubic [spline interpolation](https://en.wikipedia.org/wiki/Spline_interpolation).
+The core algorithm for the nested 1D interpolation described previously is the [cubic Hermite spline](https://en.wikipedia.org/wiki/Cubic_Hermite_spline). This technique constructs a piecewise cubic polynomial that ensures continuity of both the function values and their first derivatives at the grid points. Unlike a global spline fit, which can be computationally intensive, Hermite interpolation is a local method. It only requires information from the immediate neighbors of an interval, making it highly efficient and particularly well-suited for non-uniformly spaced data. This approach offers a significant accuracy improvement over simple linear interpolation by capturing the local curvature of the data.
+
+<figure  align="center">
+  <img src="_static/hermite_interpolation_example.png" alt="Cubic Hermite Interpolation Example" width="90%" style="margin-bottom: 15px;"/>
+    <figcaption align="left" style="padding: 0 5%;">
+      <b>Figure.</b> Cubic Hermite interpolation of the partial SNR, $\rho_{\frac{1}{2}}$, along the mass axis for a fixed binary configuration ($q = 0.183$, $a_1 = 0.99$, $a_2 = 0.99$), demonstrating the method’s effectiveness compared to global cubic spline and linear interpolation. The solid blue curve shows the cubic Hermite interpolant constructed using the two central masses ($M_1, M_2$) and endpoint derivatives estimated via a finite difference formula on all four grid points ($M = [9.96,\, 13.66,\, 17.31,\, 20.90]$), which is robust for non-uniform spacing. For reference, the dashed orange curve is the global cubic spline through all points, and the green dotted segment shows simple linear interpolation between the central points. Black circles mark the grid data, with red points indicating the Hermite interval boundaries. While linear interpolation cannot capture the underlying SNR trend between grid points, the cubic Hermite method provides a smooth and locally accurate estimate by matching both value and slope at the endpoints, closely following the physical variation of SNR across the mass parameter space.
+    </figcaption>
+</figure>
+
+### Methodology
 
 Consider interpolation along the $M$-axis while keeping $q$, $a_1$, and $a_2$ fixed. To interpolate the partial SNR, $\rho_{\frac{1}{2}}$, at an arbitrary mass $M_{\text{new}}$, we use four neighboring grid points: $(M_0, \rho_{\frac{1}{2},0})$, $(M_1, \rho_{\frac{1}{2},1})$, $(M_2, \rho_{\frac{1}{2},2})$, and $(M_3, \rho_{\frac{1}{2},3})$, where $M_1 \leq M_{\text{new}} \leq M_2$.
 
-The cubic interpolant is written as:
+The objective is to estimate $\rho_{\frac{1}{2}}(M_{\text{new}})$ by constructing a cubic polynomial that smoothly connects the two central grid points $M_1$ and $M_2$. To work with a standardized interval, we introduce a normalized variable $t$ that maps the physical interval $[M_1, M_2]$ to the computational interval $[0, 1]$:
 
 $$
-\rho_{\frac{1}{2}}(M_{\rm new}) = a_0 + a_1 t + a_2 t^2 + a_3 t^3
+t = \frac{M_{\text{new}} - M_1}{M_2 - M_1}
 $$
 
-where $t$ is the normalized coordinate:
+The cubic polynomial is written as:
 
 $$
-t = \frac{M_{\rm new} - M_1}{M_2 - M_1}, \quad \text{with}\quad 0 \leq t \leq 1
+\rho_{\frac{1}{2}}(t) = \alpha_0 + \alpha_1 t + \alpha_2 t^2 + \alpha_3 t^3
 $$
 
-so that $M_1$ maps to $t=0$ and $M_2$ maps to $t=1$.
+To determine the coefficients $(\alpha_0, \alpha_1, \alpha_2, \alpha_3)$, four constraints are imposed:
 
-To determine the coefficients, we require:
+* The interpolant passes through the central points:
+  - $\rho_{\frac{1}{2}}(M_1) = \alpha_0 = \rho_{\frac{1}{2}, 1}$
+  - $\rho_{\frac{1}{2}}(M_2) = \alpha_0 + \alpha_1 + \alpha_2 + \alpha_3 = \rho_{\frac{1}{2}, 2}$
+
+* The derivatives at the endpoints are set by the slopes at the central points:
+  - $\rho_{\frac{1}{2}}'(M_1) = s_1$
+  - $\rho_{\frac{1}{2}}'(M_2) = s_2$
+
+Since the true derivatives are generally unknown, they are estimated using a [finite difference formula](https://en.wikipedia.org/wiki/Finite_difference) involving the two points surrounding the interval, $M_0$ and $M_3$:
+
+**Slope at $M_1$:**
 
 $$
-\begin{cases}
-\rho_{\frac{1}{2}}(M_1) = a_0 = \rho_{\frac{1}{2},1} \\
-\rho_{\frac{1}{2}}(M_2) = a_0 + a_1 + a_2 + a_3 = \rho_{\frac{1}{2},2} \\
-\rho'_{\frac{1}{2}}(M_1) = \frac{a_1}{h} = \frac{\rho_{\frac{1}{2},2} - \rho_{\frac{1}{2},0}}{2h} \\
-\rho'_{\frac{1}{2}}(M_2) = \frac{a_1 + 2a_2 + 3a_3}{h} = \frac{\rho_{\frac{1}{2},3} - \rho_{\frac{1}{2},1}}{2h}
-\end{cases}
+s_1 = \left(\frac{M_2 - M_1}{M_2 - M_0}\right) \frac{\rho_2 - \rho_1}{M_2 - M_1}
+   + \left(\frac{M_1 - M_0}{M_2 - M_0}\right) \frac{\rho_1 - \rho_0}{M_1 - M_0}
 $$
 
-where $h = M_2 - M_1$ is the grid spacing between the two interior points.
+**Slope at $M_2$:**
 
-These conditions encode:
+$$
+s_2 = \left(\frac{M_2 - M_1}{M_3 - M_1}\right) \frac{\rho_2 - \rho_1}{M_2 - M_1}
+   + \left(\frac{M_3 - M_2}{M_3 - M_1}\right) \frac{\rho_3 - \rho_2}{M_3 - M_2}
+$$
 
-* The interpolant passes through the central two points.
-* The derivatives at the boundaries are set by the Catmull-Rom prescription (using the values at the next neighbors).
+This formulism uses a three-point finite difference scheme to estimate the derivatives at the interval endpoints, $M_1$ and $M_2$. Each derivative is computed as a weighted average of the slopes of the two adjacent intervals. This local approximation is computationally efficient, as it avoids solving a larger system of equations that would be necessary for a global spline fit (see [cubic spline fit for data points](https://blog.timodenk.com/cubic-spline-interpolation/)), yet it provides sufficient accuracy for smooth data.
 
-Solving for $a_0, a_1, a_2, a_3$ in terms of $\rho_{\frac{1}{2},i}$ and $h$ gives:
+With the values and estimated slopes, the coefficients can be directly calculated. Let $h = M_2 - M_1$:
 
 $$
 \begin{align*}
-a_0 &= \rho_{\frac{1}{2},1} \\
-a_1 &= \frac{1}{2} (\rho_{\frac{1}{2},2} - \rho_{\frac{1}{2},0}) \\
-a_2 &= \rho_{\frac{1}{2},0} - 2.5\rho_{\frac{1}{2},1} + 2\rho_{\frac{1}{2},2} - 0.5\rho_{\frac{1}{2},3} \\
-a_3 &= \frac{1}{2} (\rho_{\frac{1}{2},3} - 3\rho_{\frac{1}{2},2} + 3\rho_{\frac{1}{2},1} - \rho_{\frac{1}{2},0}) \\
+\alpha_0 &= \rho_1 \\
+\alpha_1 &= h \cdot s_1 \\
+\alpha_2 &= 3(\rho_2 - \rho_1) - h (2s_1 + s_2) \\
+\alpha_3 &= 2(\rho_1 - \rho_2) + h (s_1 + s_2)
 \end{align*}
 $$
 
-with $t$ as defined above.
+Plugging these coefficients into the polynomial provides the interpolated value at $M_{\text{new}}$.
 
-This approach ensures a smooth and physically consistent interpolation for SNR values across the parameter space, without the computational expense of a full cubic spline solution which requires inverting a matrix of size $8 \times 8$.
+**Summary:**
+Cubic Hermite interpolation combines accuracy, efficiency, and robustness, and is particularly effective for smoothly interpolating non-uniform data using local grid information and endpoint slopes estimated by finite differences.
+
 
 ## Example Usage
 
@@ -218,27 +237,31 @@ print(interp_snr_aligned_spins)
 
 ## Accuracy
 
-The accuracy of the Partial Scaling interpolation method is generally very high, with deviations typically less than 0.5% (and absolute errors on the order of $10^{-2}$) compared to the noise-weighted inner product method. This level of precision is sufficient for most gravitational wave data analysis applications, particularly when considering the inherent uncertainties in astrophysical parameters.
+The Partial Scaling method achieves excellent accuracy, even with a moderately sized pre-computed grid. For a grid of $\rho_{1/2}$ values with dimensions 20x200x10x10 over the parameters $(q, M, a_1, a_2)$, the interpolated SNR shows a mean percentage difference of just 0.02% when compared to the true values from `bilby`. The maximum deviation is only 0.50%, with a standard deviation of 0.02%, confirming the method's consistent precision across the parameter space.
 
 
 <figure  align="center">
-  <img src="_static/snr_comparison_interpolation.png" alt="Partial SNR Parameter Dependencies" width="100%"/>
-  <figcaption align="left">
+  <img src="_static/snr_comparison_interpolation.png" alt="Partial SNR Parameter Dependencies" width="90%" style="margin-bottom: 15px;"/>
+    <figcaption align="left" style="padding: 0 5%;">
     <b>Figure.</b> Comparison of the predicted SNR using the Partial Scaling method (interpolation) against the true SNR from the Bilby library for aligned-spin IMRPhenomD waveforms. The close agreement demonstrates the effectiveness of the interpolation approach.
   </figcaption>
 </figure>
+
+Note that the accuracy can be further improved by increasing the grid resolution, but the current configuration already provides an excellent balance between speed and precision.
 
 ## Performance: Numba vs. JAX in the Partial Scaling Method
 
 The efficiency of `gwsnr` is significantly enhanced by its Just-In-Time (JIT) compilation backends: Numba and JAX. Both options dramatically accelerate SNR calculations with the Partial Scaling Interpolation Method compared to standard Inner Product Methods.
 
-To quantify the performance, we benchmarked the time required to compute SNR for one million aligned-spin samples. Inner Product Methods take approximately 4-14 minutes on a multi-core CPU. In contrast, the JIT backends complete the same task in seconds or even milliseconds, as summarized below:
+To quantify the performance, we benchmarked the time required to compute SNR for one million aligned-spin samples. Inner Product Methods take approximately 6-14 minutes on a multi-core CPU. In contrast, the JIT backends complete the same task in seconds or even milliseconds, as summarized below:
 
 | Method / Backend         | Execution Time (1M Samples) | Notes                                      |
-|--------------------------|------------------------------|--------------------------------------------|
-| Standard Python (No JIT) | ~4-14 minutes              | Baseline performance on 1-8 CPU cores     |
+|--------------------------|----------------------------|--------------------------------------------|
+| Standard Python (No JIT) | ~6-14 minutes              | Baseline performance on 1-8 CPU cores     |
 | Numba (CPU)              | 2.12 s                     | Uses `@njit` and `prange` for parallelization |
 | JAX (CPU)                | 1.48 s                     | Uses `jit` and `vmap` for efficient vectorization |
 | JAX (GPU)                | 88.9 ms                    | **Recommended**. Over 15× faster than CPU JAX |
 
 Both JIT backends offer substantial speedup over standard Python implementations. While JAX holds a slight performance advantage on CPUs, its true power is unlocked on compatible GPUs (benchmark performed on NVIDIA GeForce RTX 3080). For users seeking maximum performance in large-scale computations, the JAX backend with GPU acceleration is the recommended choice.
+
+**Remark:** Since the start of the project, from the calculation of SNR with `bilby`, using `gwsnr` leads to x100000 improvement in speed, and it took 2 years to achieve this performance boost.

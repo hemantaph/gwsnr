@@ -1,4 +1,7 @@
-/* Enhanced custom styles for GWSNR documentation with dark mode support */
+.rtd-flyout {
+    right: auto !important;
+    left: 10px !important; /* Adjust as needed */
+}
 
 /* Fix package name area - set proper RTD theme blue background with white text */
 .wy-nav-side .wy-nav-top {

@@ -554,7 +554,7 @@ Functions
    - Linear interpolation at the left boundary (condition_i=1)
    - Cubic interpolation in the middle region (condition_i=2)
    - Linear interpolation at the right boundary (condition_i=3)
-   The cubic interpolation uses Catmull-Rom spline coefficients for smooth
+   The cubic interpolation uses cubic Hermite spline coefficients for smooth
    interpolation between the middle two points, while the boundary regions
    use linear interpolation for stability.
    :param x_eval: The x-coordinate(s) where interpolation is to be evaluated.
