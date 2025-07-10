@@ -40,7 +40,7 @@ The antenna pattern functions $F_+$ and $F_\times$ depend on the detector's orie
 
 ### Network Optimal SNR
 
-The network optimal SNR combines the individual detector optimal SNRs to provide a single measure of detectability across the entire detector network. For a network of $n$ detectors, the network SNR is calculated as:
+The network optimal SNR, $\rho_{\rm opt, net}$, combines the individual detector optimal SNRs to provide a single measure of detectability across the entire detector network. For a network of $n$ detectors, the network SNR is calculated as:
 
 $$
 \begin{align}
@@ -49,6 +49,8 @@ $$
 $$
 
 where $\rho_{{\rm opt,} i}$ is the optimal SNR in the $i$-th detector. This quadrature sum assumes that the noise in different detectors is uncorrelated, which is a reasonable approximation for geographically separated gravitational-wave detectors.
+
+### Matched Filter SNR
 
 ---
 

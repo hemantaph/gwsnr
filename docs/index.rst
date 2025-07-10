@@ -20,7 +20,7 @@ For a detailed technical overview, please see the :doc:`Summary` section.
 
    <div style="background-color:rgb(233, 233, 233); border-left: 5px solid rgb(247, 159, 43); padding: 10px; margin-top: 20px; margin-bottom: 20px;">
       <p style="font-size: 1em; margin: 0;">
-         <em><strong>Highlight:</strong> Achieve a speed-up of more than <strong>10,000x</strong> in SNR calculations compared to traditional methods, while maintaining an accuracy greater than <strong>99.95%</strong>.</em>
+         <em><strong>Highlight:</strong> Achieve a speed-up of more than <strong>10,000x</strong> in SNR calculations compared to traditional methods, while maintaining an accuracy greater than <strong>99.5%</strong>.</em>
       </p>
    </div>
 
@@ -118,6 +118,16 @@ Glossary
       The central metric used to assess the strength and significance of a potential gravitational-wave signal. It quantifies how much stronger the signal is compared to the average level of the background noise.
 
       A higher SNR indicates a more confident detection, making it easier to distinguish a real astrophysical event from random noise fluctuations. A detection is typically confirmed only when the SNR peak surpasses a certain threshold value. The ``gwsnr`` package is designed to compute this critical quantity efficiently and accurately for a wide range of astrophysical scenarios.
+
+.. raw:: html
+
+    <iframe src="_static/gwlensing.html"
+            width="100%"
+            height="600"
+            frameborder="0"
+            allowfullscreen
+            style="border:1px solid #ccc; border-radius:10px;"></iframe>
+
 
 
 

@@ -107,9 +107,22 @@ $$
 A subsequent cubic spline interpolation is then carried out along the $q$ axis, using these values, to determine the final interpolated result $\rho_{\frac{1}{2}}(M_{\rm new}, q_{\rm new})$.
 
 
-<figure align="center">
-  <img src="_static/grid2D.jpg" alt="Partial SNR Parameter Dependencies" width="400"/>
-</figure>
+<!-- <figure align="center">
+  <img src="_static/nested_interpolation.GIF" alt="Partial SNR Parameter Dependencies" width="500"/>
+</figure> -->
+
+<div class="centered">
+  <iframe src="_static/nested_interpolation.html"
+        width="500"
+        height="400"
+        frameborder="0"
+        allowfullscreen
+        style="border:1px solid #ccc; border-radius:10px;"></iframe>
+
+  <figcaption align="center" style="padding: 2%;">
+    <b>Figure.</b> Nested 1D cubic spline interpolation 
+  </figcaption>
+</div>
 
 
 For the spin-aligned IMR waveform, the methodology is conceptually identical but operates in a four-dimensional grid spanning $(M, q, a_1, a_2)$. The interpolation follows a hierarchical scheme, beginning with the $a_1$ and $a_2$ axes, followed by $M$, and finally $q$, recursively applying the one-dimensional cubic spline interpolation at each stage until the final value, $\rho_{\frac{1}{2}}(M_{\rm new}, q_{\rm new}, a_{1, \rm new}, a_{2, \rm new})$, is obtained.
@@ -237,7 +250,7 @@ print(interp_snr_aligned_spins)
 
 ## Accuracy
 
-The Partial Scaling method achieves excellent accuracy, even with a moderately sized pre-computed grid. For a grid of $\rho_{1/2}$ values with dimensions 20x200x10x10 over the parameters $(q, M, a_1, a_2)$, the interpolated SNR shows a mean percentage difference of just 0.02% when compared to the true values from `bilby`. The maximum deviation is only 0.50%, with a standard deviation of 0.02%, confirming the method's consistent precision across the parameter space.
+The Partial Scaling method achieves excellent accuracy, even with a moderately sized pre-computed grid. For a grid of $\rho_{1/2}$ values with dimensions 20x200x10x10 over the parameters $(q, M, a_1, a_2)$, the interpolated SNR shows a mean percentage difference of just 0.01% when compared to the true values from `bilby`. The maximum deviation is only 0.53%, with a standard deviation of 0.02%, confirming the method's consistent precision across the parameter space.
 
 
 <figure  align="center">
