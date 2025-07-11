@@ -15,16 +15,6 @@
         canvas {
             display: block;
         }
-        #info {
-            position: absolute;
-            top: 10px;
-            width: 100%;
-            text-align: center;
-            z-index: 100;
-            display:block;
-            padding: 10px;
-            background-color: rgba(255,255,255,0.5); /* Lighter info box */
-        }
         .label {
             color: #000; /* Black text for labels */
             font-family: sans-serif;
@@ -36,7 +26,7 @@
         .point-label {
             color: #333;
             font-family: 'Times New Roman', Times, serif; /* Using a serif font for better math-like appearance */
-            font-size: 0.6rem; /* Slightly larger for better readability */
+            font-size: 0.8rem; /* Adjusted for better readability */
             /* padding: 2px 4px;
             background: rgba(255, 255, 255, 0.7);
             border-radius: 3px; */
@@ -98,7 +88,8 @@
             scene.background = new THREE.Color(0xf0f0f0);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(10, 0, 6);
+            // Set a fixed camera position for a clear, angled view
+            camera.position.set(6, 0, 7);
             camera.up.set(0, 0, 1);
             camera.lookAt(scene.position);
 
@@ -330,10 +321,9 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
-            camera.position.x = Math.cos(elapsedTime * 0.15) * 8;
-            camera.position.y = Math.sin(elapsedTime * 0.15) * 8;
-            camera.lookAt(scene.position);
+            
+            // Camera rotation is removed. It remains fixed.
+            
             updateAnimation();
             renderer.render(scene, camera);
             labelRenderer.render(scene, camera);
