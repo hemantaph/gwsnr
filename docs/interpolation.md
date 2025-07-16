@@ -113,8 +113,8 @@ A subsequent cubic spline interpolation is then carried out along the $q$ axis, 
 
 <div class="centered">
   <iframe src="_static/nested_interpolation.html"
-        width="500"
-        height="400"
+        width="600"
+        height="600"
         frameborder="0"
         allowfullscreen
         style="border:1px solid #ccc; border-radius:10px;"></iframe>

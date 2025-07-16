@@ -223,7 +223,7 @@ Classes
                    maximum_frequency = 2048.,
                    length = 4,
                    latitude = 19 + 36. / 60 + 47.9017 / 3600,
-                   longitude = 77 + 01. / 60 + 51.0997 / 3600,
+                   longitude = 77 + 1. / 60 + 51.0997 / 3600,
                    elevation = 450.,
                    xarm_azimuth = 117.6157,
                    yarm_azimuth = 117.6157 + 90.,

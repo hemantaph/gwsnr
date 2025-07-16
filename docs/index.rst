@@ -139,6 +139,7 @@ Glossary
    Codeoverview
    Summary
    innerproduct
+   psd
    interpolation
    probabilityofdetection
    horizondistance

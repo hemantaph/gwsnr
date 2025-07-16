@@ -18,33 +18,28 @@
         .label {
             color: #000; /* Black text for labels */
             font-family: sans-serif;
-            /* padding: 2px;
-            background: rgba(255, 255, 255, 0.6); 
-            border-radius: 4px;
-            border: 1px solid rgba(0,0,0,0.1); */
         }
         .point-label {
             color: #333;
             font-family: 'Times New Roman', Times, serif; /* Using a serif font for better math-like appearance */
             font-size: 0.8rem; /* Adjusted for better readability */
-            /* padding: 2px 4px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 3px; */
             white-space: nowrap;
             /* Styles for gradual fade animation */
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
+            pointer-events: none; /* Make labels non-interactive */
         }
         .point-label.visible {
             opacity: 1;
         }
     </style>
-    <!-- This import map tells the browser where to find the 'three' modules -->
+    <!-- This import map tells the browser where to find the 'three' modules and controls -->
     <script type="importmap">
     {
         "imports": {
             "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
-            "three/examples/jsm/renderers/CSS2DRenderer.js": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/renderers/CSS2DRenderer.js"
+            "three/examples/jsm/renderers/CSS2DRenderer.js": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/renderers/CSS2DRenderer.js",
+            "three/examples/jsm/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/controls/OrbitControls.js"
         }
     }
     </script>
@@ -55,9 +50,10 @@
         // Import the main THREE library and components using the import map
         import * as THREE from 'three';
         import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+        import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
         // --- Scene Setup ---
-        let scene, camera, renderer, labelRenderer;
+        let scene, camera, renderer, labelRenderer, controls;
         let clock = new THREE.Clock();
 
         // --- Animation Objects ---
@@ -83,24 +79,38 @@
             [-2, -1.8, -1, -0.5]
         ];
 
+        // custom axes position
+        const ORIGIN = new THREE.Vector3(-6, 0, 2);
+
+
         function init() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xf0f0f0);
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            // Set a fixed camera position for a clear, angled view
-            camera.position.set(6, 0, 7);
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+            // Set a closer initial camera position
+            camera.position.set(5, 6, 6);
             camera.up.set(0, 0, 1);
-            camera.lookAt(scene.position);
+            
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
+            
+            // Add OrbitControls for interactivity
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 5;
+            controls.maxDistance = 20;
+            controls.target.set(0, 0, 0); // Look at the center of the scene
 
             labelRenderer = new CSS2DRenderer();
             labelRenderer.setSize(window.innerWidth, window.innerHeight);
             labelRenderer.domElement.style.position = 'absolute';
             labelRenderer.domElement.style.top = '0px';
+            labelRenderer.domElement.style.pointerEvents = 'none'; // Make the label renderer non-interactive
             document.body.appendChild(labelRenderer.domElement);
 
             const ambientLight = new THREE.AmbientLight(0xcccccc, 0.8);
@@ -109,12 +119,30 @@
             directionalLight.position.set(5, 10, 7.5);
             scene.add(directionalLight);
 
-            const axesHelper = new THREE.AxesHelper(5);
+            // const axesHelper = new THREE.AxesHelper(5);
+            // scene.add(axesHelper);
+
+            const axesHelper = new THREE.AxesHelper(2.5);
+            axesHelper.position.copy(ORIGIN);
             scene.add(axesHelper);
 
-            createAxisLabel('M', new THREE.Vector3(5.5, 0, 0));
-            createAxisLabel('q', new THREE.Vector3(0, 5.5, 0));
-            createAxisLabel('Partial-SNR (ρ<sub>1/2</sub>)', new THREE.Vector3(0, 0, 5.5));
+
+            // createAxisLabel('M', new THREE.Vector3(5.5, 0, 0));
+            // createAxisLabel('q', new THREE.Vector3(0, 5.5, 0));
+            // createAxisLabel('Partial-SNR (ρ<sub>1/2</sub>)', new THREE.Vector3(0, 0, 5.5));
+                createAxisLabel('M', ORIGIN.clone().add(new THREE.Vector3(2.8, 0, 0)), 0.8);
+            createAxisLabel('q', ORIGIN.clone().add(new THREE.Vector3(0, 2.8, 0)), 0.8);
+            createAxisLabel('Partial-SNR (ρ<sub>1/2</sub>)', ORIGIN.clone().add(new THREE.Vector3(0, 0, 2.8)), 0.7);
+
+            function createAxisLabel(html, position, scale=0.7) {
+                const div = document.createElement('div');
+                div.className = 'label';
+                div.innerHTML = html;
+                div.style.fontSize = `${scale}rem`;
+                const label = new CSS2DObject(div);
+                label.position.copy(position);
+                scene.add(label);
+            }
 
             createGrid();
 
@@ -322,7 +350,7 @@
         function animate() {
             requestAnimationFrame(animate);
             
-            // Camera rotation is removed. It remains fixed.
+            controls.update(); // Update controls in the loop
             
             updateAnimation();
             renderer.render(scene, camera);
