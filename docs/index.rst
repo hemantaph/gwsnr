@@ -119,14 +119,14 @@ Glossary
 
       A higher SNR indicates a more confident detection, making it easier to distinguish a real astrophysical event from random noise fluctuations. A detection is typically confirmed only when the SNR peak surpasses a certain threshold value. The ``gwsnr`` package is designed to compute this critical quantity efficiently and accurately for a wide range of astrophysical scenarios.
 
-.. raw:: html
+.. .. raw:: html
 
-    <iframe src="_static/gwlensing.html"
-            width="100%"
-            height="600"
-            frameborder="0"
-            allowfullscreen
-            style="border:1px solid #ccc; border-radius:10px;"></iframe>
+..     <iframe src="_static/gwlensing.html"
+..             width="100%"
+..             height="600"
+..             frameborder="0"
+..             allowfullscreen
+..             style="border:1px solid #ccc; border-radius:10px;"></iframe>
 
 
 
