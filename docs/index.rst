@@ -3,11 +3,11 @@ Welcome to gwsnr’s documentation!
 
 .. raw:: html
 
-   <div style="text-align: center; margin: 20px 0; padding: 20px;">
-      <img src="_static/logo.svg" width="40%" alt="gwsnr logo">
+   <div style="text-align: center; margin: 10px 0; padding: 10px;">
+      <img src="_static/logo.png" width="60%" alt="gwsnr logo">
    </div>
 
-gwsnr: Efficient :red_first:`Gravitational`-:red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Calculator
+gwsnr: Efficient :orange_first:`Gravitational`-:orange_first:`Wave` :orange_first:`Signal`-to-:orange_first:`Noise` :orange_first:`Ratio` Calculator
 ------------------------------
 
 ``gwsnr`` is a Python package for the efficient and accurate computation of the Signal-to-Noise Ratio (SNR) in gravitational-wave (GW) astronomy.

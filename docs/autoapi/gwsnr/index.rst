@@ -40,7 +40,7 @@ Classes
 
 
 
-.. py:class:: GWSNR(npool=int(4), mtot_min=2 * 4.98, mtot_max=2 * 112.5 + 10.0, ratio_min=0.1, ratio_max=1.0, spin_max=0.99, mtot_resolution=200, ratio_resolution=20, spin_resolution=10, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', frequency_domain_source_model='lal_binary_black_hole', minimum_frequency=20.0, duration_max=None, duration_min=None, snr_type='interpolation_no_spins', psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=False, pdet=False, snr_th=8.0, snr_th_net=8.0, ann_path_dict=None, snr_recalculation=False, snr_recalculation_range=[4, 12], snr_recalculation_waveform_approximant='IMRPhenomXPHM')
+.. py:class:: GWSNR(npool=int(4), mtot_min=2 * 4.98, mtot_max=2 * 112.5 + 10.0, ratio_min=0.1, ratio_max=1.0, spin_max=0.99, mtot_resolution=200, ratio_resolution=20, spin_resolution=10, batch_size_interpolation=1000000, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', frequency_domain_source_model='lal_binary_black_hole', minimum_frequency=20.0, duration_max=None, duration_min=None, snr_type='interpolation_no_spins', psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=False, pdet=False, snr_th=8.0, snr_th_net=8.0, ann_path_dict=None, snr_recalculation=False, snr_recalculation_range=[4, 12], snr_recalculation_waveform_approximant='IMRPhenomXPHM')
 
 
    

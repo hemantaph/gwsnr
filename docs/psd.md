@@ -111,7 +111,7 @@ gwsnr = GWSNR(
   psds = {'L1':1246527224.169434}
 )
 ```
-
+∏
 the psd(s) created will be stored in directory 'psd_data' in the current working directory. Next time when you initialize the `GWSNR` class with the same psd(s), it will use the stored psd(s) instead of downloading the data again.
 
 - custom psd/asd with tet file. It should contain two columns: frequency and psd/asd value, separated by space or tab. No header is required. The frequency values should be in Hz and the psd/asd values should be in strain^2/Hz or strain/√Hz units respectively. The frequency values should be in ascending order and the psd/asd values should be positive. The file name should end with `psd.txt` or `asd.txt` to be recognized by gwsnr. Suppose you have a custom PSD file named `custom_psd.txt`:

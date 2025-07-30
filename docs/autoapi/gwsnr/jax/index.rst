@@ -598,7 +598,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: cubic_spline_4d_jax(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new, mtot_new, a1_new, a2_new)
+.. py:function:: cubic_spline_4d_jax(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new, mtot_new, a1_new, a2_new, int_q, int_m, int_a1, int_a2)
 
    
    Perform 4D cubic spline interpolation using JAX operations.
@@ -637,6 +637,18 @@ Functions
        **a2_new** : float
            New second spin parameter value at which to interpolate.
 
+       **int_q** : int
+           edge condition for q interpolation. Refer to `find_index_1d_numba` for details.
+
+       **int_m** : int
+           edge condition for mtot interpolation. Refer to `find_index_1d_numba` for details.
+
+       **int_a1** : int
+           edge condition for a1 interpolation. Refer to `find_index_1d_numba` for details.
+
+       **int_a2** : int
+           edge condition for a2 interpolation. Refer to `find_index_1d_numba` for details.
+
    :Returns:
 
        float
@@ -668,7 +680,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: cubic_spline_4d_batched_jax(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_batch, mtot_batch, a1_batch, a2_batch)
+.. py:function:: cubic_spline_4d_batched_jax(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new_batch, mtot_new_batch, a1_new_batch, a2_new_batch)
 
    
    Perform batched 4D cubic spline interpolation using JAX vectorization.
@@ -695,16 +707,16 @@ Functions
            4D array of SNR values corresponding to the grid points, with shape
            (len(q_array), len(mtot_array), len(a1_array), len(a2_array)).
 
-       **q_batch** : jax.numpy.ndarray
+       **q_new_batch** : jax.numpy.ndarray
            1D array of mass ratio values to interpolate at.
 
-       **mtot_batch** : jax.numpy.ndarray
+       **mtot_new_batch** : jax.numpy.ndarray
            1D array of total mass values to interpolate at.
 
-       **a1_batch** : jax.numpy.ndarray
+       **a1_new_batch** : jax.numpy.ndarray
            1D array of first spin parameter values to interpolate at.
 
-       **a2_batch** : jax.numpy.ndarray
+       **a2_new_batch** : jax.numpy.ndarray
            1D array of second spin parameter values to interpolate at.
 
    :Returns:

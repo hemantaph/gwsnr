@@ -203,6 +203,17 @@ def red_first_letter(role, rawtext, text, lineno, inliner, options={}, content=[
     rest = nodes.inline(rawtext, text[1:], classes=[])
     return [first_letter, rest], []
 
+# for yellow
+def yellow_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
+    node = nodes.inline(rawtext, text, classes=["yellow"])
+    return [node], []
+
+def yellow_first_letter(role, rawtext, text, lineno, inliner, options={}, content=[]):
+    # Create two nodes: one for the first letter with a class and one for the rest
+    first_letter = nodes.inline(rawtext, text[0], classes=["yellow"])
+    rest = nodes.inline(rawtext, text[1:], classes=[])
+    return [first_letter, rest], []
+
 def setup(app):
     # Register autoapi skip member callback
     app.connect("autoapi-skip-member", skip_member)
