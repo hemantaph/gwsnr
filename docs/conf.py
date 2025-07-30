@@ -182,6 +182,7 @@ def skip_member(app, what, name, obj, skip, options):
 from docutils import nodes
 from docutils.parsers.rst import roles
 
+# orange role
 def orange_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
     node = nodes.inline(rawtext, text, classes=["orange"])
     return [node], []
@@ -214,6 +215,18 @@ def yellow_first_letter(role, rawtext, text, lineno, inliner, options={}, conten
     rest = nodes.inline(rawtext, text[1:], classes=[])
     return [first_letter, rest], []
 
+# for blue
+def blue_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
+    node = nodes.inline(rawtext, text, classes=["blue"])
+    return [node], []
+def blue_first(role, rawtext, text, lineno, inliner, options={}, content=[]):
+    # Create two nodes: one for the first letter with a class and one for the rest
+    first_letter = nodes.inline(rawtext, text[0], classes=["blue"])
+    rest = nodes.inline(rawtext, text[1:], classes=[])
+    return [first_letter, rest], []
+
+
+
 def setup(app):
     # Register autoapi skip member callback
     app.connect("autoapi-skip-member", skip_member)
@@ -222,6 +235,10 @@ def setup(app):
     roles.register_local_role('orange_first', orange_first_letter)
     roles.register_local_role('red', red_role)
     roles.register_local_role('red_first', red_first_letter)
+    roles.register_local_role('blue', blue_role)
+    roles.register_local_role('blue_first', blue_first) 
+    roles.register_local_role('yellow', yellow_role)
+    roles.register_local_role('yellow_first', yellow_first_letter)
 
 source_suffix = {
     '.rst': 'restructuredtext',

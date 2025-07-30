@@ -1,3 +1,4 @@
+/* Fix package name area - set proper RTD theme blue background with white text */
 
 
 /* Fix package name area - set proper RTD theme blue background with white text */
@@ -20,6 +21,7 @@
 [data-theme="dark"] .wy-nav-side .wy-nav-top a {
     color: #5dade2 !important; /* Lighter blue for dark mode */
 }
+
 
 .scrollable-image {
   overflow-x: auto; /* Enable horizontal scrolling */
@@ -96,15 +98,15 @@
 }
 
 .red {
-    color: red;
+    color: #d25847;
 }
 
 .orange {
-    color: orange;
+    color: #D4710B;
 }
 
 .blue {
-    color: blue;
+    color: #64a3da;
 }
 
 .green {
@@ -120,7 +122,7 @@
 }
 
 .yellow {
-    color: yellow;
+    color: #B8860B;
 }
 
 .magenta {
