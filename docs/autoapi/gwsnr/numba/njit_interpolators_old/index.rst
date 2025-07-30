@@ -1,9 +1,9 @@
 :orphan:
 
-:py:mod:`gwsnr.numba.njit_interpolators_`
-=========================================
+:py:mod:`gwsnr.numba.njit_interpolators_old`
+============================================
 
-.. py:module:: gwsnr.numba.njit_interpolators_
+.. py:module:: gwsnr.numba.njit_interpolators_old
 
 
 Module Contents
@@ -15,7 +15,7 @@ Functions
 
 .. autoapisummary::
 
-   gwsnr.numba.njit_interpolators_.cubic_function_4pts_numba
+   gwsnr.numba.njit_interpolators_old.cubic_function_4pts_numba
 
 
 

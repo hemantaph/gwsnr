@@ -1,9 +1,9 @@
 :orphan:
 
-:py:mod:`gwsnr.jax.jaxjit_interpolators copy`
-=============================================
+:py:mod:`gwsnr.jax.jaxjit_interpolators_old`
+============================================
 
-.. py:module:: gwsnr.jax.jaxjit_interpolators copy
+.. py:module:: gwsnr.jax.jaxjit_interpolators_old
 
 
 Module Contents
@@ -15,12 +15,12 @@ Functions
 
 .. autoapisummary::
 
-   gwsnr.jax.jaxjit_interpolators copy.find_index_1d_jax
-   gwsnr.jax.jaxjit_interpolators copy.cubic_function_4pts_jax
-   gwsnr.jax.jaxjit_interpolators copy.cubic_spline_4d_jax
-   gwsnr.jax.jaxjit_interpolators copy.cubic_spline_4d_batched_jax
-   gwsnr.jax.jaxjit_interpolators copy.get_interpolated_snr_aligned_spins_jax
-   gwsnr.jax.jaxjit_interpolators copy.get_interpolated_snr_no_spins_jax
+   gwsnr.jax.jaxjit_interpolators_old.find_index_1d_jax
+   gwsnr.jax.jaxjit_interpolators_old.cubic_function_4pts_jax
+   gwsnr.jax.jaxjit_interpolators_old.cubic_spline_4d_jax
+   gwsnr.jax.jaxjit_interpolators_old.cubic_spline_4d_batched_jax
+   gwsnr.jax.jaxjit_interpolators_old.get_interpolated_snr_aligned_spins_jax
+   gwsnr.jax.jaxjit_interpolators_old.get_interpolated_snr_no_spins_jax
 
 
 
