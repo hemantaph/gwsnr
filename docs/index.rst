@@ -3,26 +3,21 @@ Welcome to :red:`gwsnr`’s documentation!
 
 .. raw:: html
 
-   <div style="text-align: center; margin: 10px 0; padding: 10px;">
-      <img src="_static/logo.png" width="60%" alt="gwsnr logo" style="border:2px solid rgba(0, 0, 0, 0.2); border-radius:10px; margin:5px 0;">
+   <div style="text-align: center; margin-top: 0px; margin-bottom: 10px; padding-top: 0px; padding-bottom: 10px;">
+      <img src="_static/logo.png" width="40%" alt="gwsnr logo" style="border:1.5px solid rgba(0, 0, 0, 0.15); border-radius:9%; margin:0px; padding: 2px;">
    </div>
 
 :red:`gwsnr` : Efficient :red_first:`Gravitational`-:red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Calculator
 ------------------------------
 
-``gwsnr`` is a Python package for the efficient and accurate computation of the Signal-to-Noise Ratio (SNR) in gravitational-wave (GW) astronomy.
+``gwsnr`` is a Python package for rapid and accurate gravitational-wave (GW) Signal-to-Noise Ratio (SNR) calculation, essential for population simulations and hierarchical Bayesian inference with selection effects. It delivers a **speed-up of over 10,000x** compared to traditional methods, while maintaining an **accuracy greater than 99.5%**.
 
-The package addresses the computational bottleneck of traditional SNR calculations by implementing advanced interpolation techniques, Just-in-Time (JIT) compilation, and parallel processing. It offers flexible backends using ``Numba`` for multi-core CPU optimization and ``JAX`` for GPU acceleration. With a simple API, ``gwsnr`` is designed for easy integration into existing analysis workflows and is used by the ``ler`` (`see ler documentation <https://ler.readthedocs.io/en/latest/>`_).
+The package overcomes computational bottlenecks using advanced interpolation, Just-in-Time (JIT) compilation, and parallel processing. It provides flexible backends to optimize performance on different hardware, with a ``numba`` backend for multi-core CPUs and a ``jax`` backend for GPU acceleration.
 
-For a detailed technical overview, please see the :doc:`Summary` section.
+With a simple API, ``gwsnr`` integrates easily into existing workflows. It is used by the ``ler`` package (`see ler documentation <https://ler.readthedocs.io/en/latest/>`_) for simulating lensed and unlensed GWs, allowing researchers to incorporate fast SNR computations with minimal overhead.
 
-.. raw:: html
+For a detailed technical overview, see the :doc:`Summary` section and browse the topics under :blue:`CONTENTS` in the sidebar or the top-left menu on mobile.
 
-   <div style="background-color:rgb(233, 233, 233); border-left: 5px solid rgb(247, 159, 43); padding: 10px; margin-top: 20px; margin-bottom: 20px;">
-      <p style="font-size: 1em; margin: 0;">
-         <em><strong>Highlight:</strong> Achieve a speed-up of more than <strong>10,000x</strong> in SNR calculations compared to traditional methods, while maintaining an accuracy greater than <strong>99.5%</strong>.</em>
-      </p>
-   </div>
 
 Quick Start
 -----------
@@ -42,17 +37,8 @@ Then, compute the SNR for a binary black hole system:
    # Initialize the default calculator
    gwsnr = GWSNR()
 
-   # Compute SNR for a 30-30 Msun binary at 1000 Mpc
-   snrs = gwsnr.snr(
-       mass_1=30,
-       mass_2=30,
-       luminosity_distance=1000,
-       psi=0.0,
-       phase=0.0,
-       geocent_time=1246527224.169434,
-       ra=0.0,
-       dec=0.0
-   )
+   # Compute SNR for a 30-30 Msun binary at 1000 Mpc with other random extrinsic parameters
+   snrs = gwsnr.snr(mass_1=30, mass_2=30, luminosity_distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
 
    print(f"Network Optimal SNR: {snrs['optimal_snr_net']:.2f}")
 
