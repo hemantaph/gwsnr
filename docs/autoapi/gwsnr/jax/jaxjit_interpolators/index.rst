@@ -122,61 +122,12 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: cubic_spline_4d_jax(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new, mtot_new, a1_new, a2_new, int_q, int_m, int_a1, int_a2)
+.. py:function:: cubic_spline_4d_jax(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new, mtot_new, a1_new, a2_new)
 
    
-   Perform 4D cubic spline interpolation using JAX operations.
-   This function interpolates a 4D array (snrpartialscaled_array) at specified points
-   using cubic spline interpolation. The interpolation is performed sequentially
-   along each dimension: first a2, then a1, then mtot, and finally q.
-
-
-   :Parameters:
-
-       **q_array** : jax.numpy.ndarray
-           1D array containing the q-dimension coordinate values.
-
-       **mtot_array** : jax.numpy.ndarray
-           1D array containing the total mass dimension coordinate values.
-
-       **a1_array** : jax.numpy.ndarray
-           1D array containing the first spin parameter dimension coordinate values.
-
-       **a2_array** : jax.numpy.ndarray
-           1D array containing the second spin parameter dimension coordinate values.
-
-       **snrpartialscaled_array** : jax.numpy.ndarray
-           4D array containing the SNR partial scaled values to be interpolated.
-           Shape should be (len(q_array), len(mtot_array), len(a1_array), len(a2_array)).
-
-       **q_new** : float
-           New q value at which to interpolate.
-
-       **mtot_new** : float
-           New total mass value at which to interpolate.
-
-       **a1_new** : float
-           New first spin parameter value at which to interpolate.
-
-       **a2_new** : float
-           New second spin parameter value at which to interpolate.
-
-       **int_q** : int
-           edge condition for q interpolation. Refer to `find_index_1d_numba` for details.
-
-       **int_m** : int
-           edge condition for mtot interpolation. Refer to `find_index_1d_numba` for details.
-
-       **int_a1** : int
-           edge condition for a1 interpolation. Refer to `find_index_1d_numba` for details.
-
-       **int_a2** : int
-           edge condition for a2 interpolation. Refer to `find_index_1d_numba` for details.
-
-   :Returns:
-
-       float
-           Interpolated SNR value at the specified (q_new, mtot_new, a1_new, a2_new) point.
+   Helper function that performs the FULL 4D interpolation for a SINGLE point.
+   This function finds indices, slices data, and then uses vmap internally
+   to perform interpolation efficiently without Python loops.
 
 
 
@@ -185,17 +136,9 @@ Functions
 
 
 
-   .. rubric:: Notes
 
-   This function uses nested loops to perform interpolation sequentially along each
-   dimension. It relies on helper functions `find_index_1d_jax` for finding array
-   indices and `cubic_function_4pts_jax` for 1D cubic interpolation using 4 points.
-   The interpolation process:
-   1. Find indices and interpolation weights for each dimension
-   2. Interpolate along a2 dimension for each combination of q, mtot, a1 indices
-   3. Interpolate along a1 dimension using results from step 2
-   4. Interpolate along mtot dimension using results from step 3
-   5. Interpolate along q dimension to get the final result
+
+
 
 
 
@@ -208,45 +151,6 @@ Functions
 
    
    Perform batched 4D cubic spline interpolation using JAX vectorization.
-   This function applies 4D cubic spline interpolation to batches of input parameters
-   using JAX's vmap for efficient vectorized computation. It interpolates SNR values
-   based on mass ratio (q), total mass (mtot), and two spin parameters (a1, a2).
-
-
-   :Parameters:
-
-       **q_array** : jax.numpy.ndarray
-           1D array of mass ratio grid points for interpolation.
-
-       **mtot_array** : jax.numpy.ndarray
-           1D array of total mass grid points for interpolation.
-
-       **a1_array** : jax.numpy.ndarray
-           1D array of first spin parameter grid points for interpolation.
-
-       **a2_array** : jax.numpy.ndarray
-           1D array of second spin parameter grid points for interpolation.
-
-       **snrpartialscaled_array** : jax.numpy.ndarray
-           4D array of SNR values corresponding to the grid points, with shape
-           (len(q_array), len(mtot_array), len(a1_array), len(a2_array)).
-
-       **q_new_batch** : jax.numpy.ndarray
-           1D array of mass ratio values to interpolate at.
-
-       **mtot_new_batch** : jax.numpy.ndarray
-           1D array of total mass values to interpolate at.
-
-       **a1_new_batch** : jax.numpy.ndarray
-           1D array of first spin parameter values to interpolate at.
-
-       **a2_new_batch** : jax.numpy.ndarray
-           1D array of second spin parameter values to interpolate at.
-
-   :Returns:
-
-       jax.numpy.ndarray
-           1D array of interpolated SNR values with the same length as the input batches.
 
 
 
@@ -255,11 +159,9 @@ Functions
 
 
 
-   .. rubric:: Notes
 
-   - All batch arrays must have the same length.
-   - Uses JAX's vmap for efficient vectorized computation.
-   - Calls cubic_spline_4d_jax internally for each set of parameters.
+
+
 
 
 
