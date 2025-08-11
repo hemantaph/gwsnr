@@ -96,11 +96,13 @@ References
        library for gravitational-wave astronomy", Astrophys. J. Suppl. 241, 27.
 """
 
-
 import shutil
 import os
 from importlib.resources import path
 import pathlib
+
+import jax
+# jax.config.update("jax_enable_x64", True)
 
 import multiprocessing as mp
 
@@ -182,7 +184,7 @@ class GWSNR:
         Minimum duration for waveform generation. Default is None.
     snr_type : `str`
         Type of SNR calculation. Default is 'interpolation'.
-        options: 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'inner_product', 'inner_product_jax', 'ann'
+        options: 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_no_spins_mlx', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'interpolation_aligned_spins_mlx', 'inner_product', 'inner_product_jax', 'ann'
     psds : `dict`
         Dictionary of psds for different detectors. Default is None. If None, bilby's default psds will be used. Other options:\n
         Example 1: when values are psd name from pycbc analytical psds, psds={'L1':'aLIGOaLIGODesignSensitivityT1800044','H1':'aLIGOaLIGODesignSensitivityT1800044','V1':'AdvVirgo'}. To check available psd name run \n
@@ -204,7 +206,7 @@ class GWSNR:
                 maximum_frequency = 2048.,
                 length = 4,
                 latitude = 19 + 36. / 60 + 47.9017 / 3600,
-                longitude = 77 + 01. / 60 + 51.0997 / 3600,
+                longitude = 77 + 1. / 60 + 51.0997 / 3600,
                 elevation = 450.,
                 xarm_azimuth = 117.6157,
                 yarm_azimuth = 117.6157 + 90.,
@@ -456,7 +458,7 @@ class GWSNR:
 
     snr_type = None
     """``str`` \n
-    Type of SNR calculation. Options: 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'inner_product', 'inner_product_jax', 'ann'."""
+    Type of SNR calculation. Options: 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_no_spins_mlx', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'interpolation_aligned_spins_mlx', 'inner_product', 'inner_product_jax', 'ann'."""
 
     psds_list = None
     """``list`` of bilby's PowerSpectralDensity ``object`` \n
@@ -549,6 +551,7 @@ class GWSNR:
         mtot_resolution=200,
         ratio_resolution=20,
         spin_resolution=10,
+        batch_size_interpolation=1000000,
         sampling_frequency=2048.0,
         waveform_approximant="IMRPhenomD",
         frequency_domain_source_model='lal_binary_black_hole',
@@ -608,6 +611,7 @@ class GWSNR:
         self.duration_min = duration_min
         self.snr_type = snr_type
         self.spin_max = spin_max
+        self.batch_size_interpolation = batch_size_interpolation
 
         # getting interpolator data from the package
         # first check if the interpolator directory './interpolator_pickle' exists
@@ -693,10 +697,17 @@ class GWSNR:
 
 
         # now generate interpolator, if not exists
-        if snr_type == "interpolation" or snr_type == "interpolation_no_spins" or snr_type == "interpolation_no_spins_jax":
+        list_no_spins = ["interpolation", "interpolation_no_spins", "interpolation_no_spins_numba", "interpolation_no_spins_jax", "interpolation_no_spins_mlx"]
+        list_aligned_spins = ["interpolation_aligned_spins", "interpolation_aligned_spins_numba", "interpolation_aligned_spins_jax", "interpolation_aligned_spins_mlx"]
+
+        if snr_type in list_no_spins:
+
             if snr_type == "interpolation_no_spins_jax":
                 from ..jax import get_interpolated_snr_no_spins_jax
                 self.get_interpolated_snr = get_interpolated_snr_no_spins_jax
+            elif snr_type == "interpolation_no_spins_mlx":
+                from ..mlx import get_interpolated_snr_no_spins_mlx
+                self.get_interpolated_snr = get_interpolated_snr_no_spins_mlx
             else:
                 from ..numba import get_interpolated_snr_no_spins_numba
                 self.get_interpolated_snr = get_interpolated_snr_no_spins_numba
@@ -704,11 +715,14 @@ class GWSNR:
             # dealing with interpolator
             self.path_interpolator = self.interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
 
-        elif snr_type == "interpolation_aligned_spins" or snr_type == "interpolation_aligned_spins_jax":
+        elif snr_type in list_aligned_spins:
 
             if snr_type == "interpolation_aligned_spins_jax":
                 from ..jax import get_interpolated_snr_aligned_spins_jax
                 self.get_interpolated_snr = get_interpolated_snr_aligned_spins_jax
+            elif snr_type == "interpolation_aligned_spins_mlx":
+                from ..mlx import get_interpolated_snr_aligned_spins_mlx
+                self.get_interpolated_snr = get_interpolated_snr_aligned_spins_mlx
             else:
                 from ..numba import get_interpolated_snr_aligned_spins_numba
                 self.get_interpolated_snr = get_interpolated_snr_aligned_spins_numba
@@ -751,7 +765,7 @@ class GWSNR:
             self.snr_type = "ann"
 
         else:
-            raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'inner_product', 'inner_product_jax', 'ann'.")
+            raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_no_spins_mlx', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'interpolation_aligned_spins_mlx', 'inner_product', 'inner_product_jax', 'ann'.")
 
         # change back to original
         self.psds_list = psds_list
@@ -1264,9 +1278,13 @@ class GWSNR:
         interpolation_list = [
             "interpolation",
             "interpolation_no_spins",
+            "interpolation_no_spins_numba",
             "interpolation_aligned_spins",
+            "interpolation_aligned_spins_numba",
             "interpolation_no_spins_jax",
             "interpolation_aligned_spins_jax",
+            "interpolation_no_spins_mlx",
+            "interpolation_aligned_spins_mlx",
         ]
 
         if self.snr_type in interpolation_list:
@@ -1752,49 +1770,70 @@ class GWSNR:
         # mp.set_start_method('spawn', force=True)
 
         # Get interpolated SNR
-        if self.snr_type == "interpolation" or self.snr_type == "interpolation_no_spins" or self.snr_type == "interpolation_aligned_spins":
-            
-            snr, snr_effective, _, _ = self.get_interpolated_snr(
-                np.array(mass_1[idx2], dtype=np.float64),
-                np.array(mass_2[idx2], dtype=np.float64),
-                np.array(luminosity_distance[idx2], dtype=np.float64),
-                np.array(theta_jn[idx2], dtype=np.float64),
-                np.array(psi[idx2], dtype=np.float64),
-                np.array(geocent_time[idx2], dtype=np.float64),
-                np.array(ra[idx2], dtype=np.float64),
-                np.array(dec[idx2], dtype=np.float64),
-                np.array(a_1[idx2], dtype=np.float64),
-                np.array(a_2[idx2], dtype=np.float64),
-                np.array(detector_tensor, dtype=np.float64),
-                np.array(snr_partialscaled, dtype=np.float64),
-                np.array(self.ratio_arr, dtype=np.float64),
-                np.array(self.mtot_arr, dtype=np.float64),
-                np.array(self.a_1_arr, dtype=np.float64),
-                np.array(self.a_2_arr, dtype=np.float64),
-            )
-        elif self.snr_type == "interpolation_no_spins_jax" or self.snr_type == "interpolation_aligned_spins_jax":
-            import jax
-            import jax.numpy as jnp
-            jax.config.update("jax_enable_x64", True)
+        snr, snr_effective, _, _ = self.get_interpolated_snr(
+            np.array(mass_1[idx2], dtype=np.float64),
+            np.array(mass_2[idx2], dtype=np.float64),
+            np.array(luminosity_distance[idx2], dtype=np.float64),
+            np.array(theta_jn[idx2], dtype=np.float64),
+            np.array(psi[idx2], dtype=np.float64),
+            np.array(geocent_time[idx2], dtype=np.float64),
+            np.array(ra[idx2], dtype=np.float64),
+            np.array(dec[idx2], dtype=np.float64),
+            np.array(a_1[idx2], dtype=np.float64),
+            np.array(a_2[idx2], dtype=np.float64),
+            np.array(detector_tensor, dtype=np.float64),
+            np.array(snr_partialscaled, dtype=np.float64),
+            np.array(self.ratio_arr, dtype=np.float64),
+            np.array(self.mtot_arr, dtype=np.float64),
+            np.array(self.a_1_arr, dtype=np.float64),
+            np.array(self.a_2_arr, dtype=np.float64),
+            int(self.batch_size_interpolation),
+        )
 
-            snr, snr_effective, _, _ = self.get_interpolated_snr(
-                jnp.array(mass_1[idx2]),
-                jnp.array(mass_2[idx2]),
-                jnp.array(luminosity_distance[idx2]),
-                jnp.array(theta_jn[idx2]),
-                jnp.array(psi[idx2]),
-                jnp.array(geocent_time[idx2]),
-                jnp.array(ra[idx2]),
-                jnp.array(dec[idx2]),
-                jnp.array(a_1[idx2]),
-                jnp.array(a_2[idx2]),
-                jnp.array(detector_tensor),
-                jnp.array(snr_partialscaled),
-                jnp.array(self.ratio_arr),
-                jnp.array(self.mtot_arr),
-                jnp.array(self.a_1_arr),
-                jnp.array(self.a_2_arr),
-            )
+        # if self.snr_type == "interpolation" or self.snr_type == "interpolation_no_spins" or self.snr_type == "interpolation_aligned_spins":
+            
+        #     snr, snr_effective, _, _ = self.get_interpolated_snr(
+        #         np.array(mass_1[idx2], dtype=np.float64),
+        #         np.array(mass_2[idx2], dtype=np.float64),
+        #         np.array(luminosity_distance[idx2], dtype=np.float64),
+        #         np.array(theta_jn[idx2], dtype=np.float64),
+        #         np.array(psi[idx2], dtype=np.float64),
+        #         np.array(geocent_time[idx2], dtype=np.float64),
+        #         np.array(ra[idx2], dtype=np.float64),
+        #         np.array(dec[idx2], dtype=np.float64),
+        #         np.array(a_1[idx2], dtype=np.float64),
+        #         np.array(a_2[idx2], dtype=np.float64),
+        #         np.array(detector_tensor, dtype=np.float64),
+        #         np.array(snr_partialscaled, dtype=np.float64),
+        #         np.array(self.ratio_arr, dtype=np.float64),
+        #         np.array(self.mtot_arr, dtype=np.float64),
+        #         np.array(self.a_1_arr, dtype=np.float64),
+        #         np.array(self.a_2_arr, dtype=np.float64),
+        #         int(self.batch_size_interpolation),
+        #     )
+        # elif self.snr_type == "interpolation_no_spins_jax" or self.snr_type == "interpolation_aligned_spins_jax":
+        #     import jax
+        #     import jax.numpy as jnp
+        #     # jax.config.update("jax_enable_x64", True)
+
+        #     snr, snr_effective, _, _ = self.get_interpolated_snr(
+        #         jnp.array(mass_1[idx2]),
+        #         jnp.array(mass_2[idx2]),
+        #         jnp.array(luminosity_distance[idx2]),
+        #         jnp.array(theta_jn[idx2]),
+        #         jnp.array(psi[idx2]),
+        #         jnp.array(geocent_time[idx2]),
+        #         jnp.array(ra[idx2]),
+        #         jnp.array(dec[idx2]),
+        #         jnp.array(a_1[idx2]),
+        #         jnp.array(a_2[idx2]),
+        #         jnp.array(detector_tensor),
+        #         jnp.array(snr_partialscaled),
+        #         jnp.array(self.ratio_arr),
+        #         jnp.array(self.mtot_arr),
+        #         jnp.array(self.a_1_arr),
+        #         jnp.array(self.a_2_arr),
+        #     )
 
         # Create optimal_snr dictionary using dictionary comprehension
         optimal_snr = {det: np.zeros(size) for det in detectors}
@@ -1881,11 +1920,12 @@ class GWSNR:
         ratio_table = np.asarray(ratio_table)
         mtot_table = np.asarray(mtot_table)
 
-        list_1 = ["interpolation_aligned_spins", "interpolation_aligned_spins_numba", "interpolation_aligned_spins_jax"]
-        list_2 = ["interpolation", "interpolation_no_spins", "interpolation_no_spins_numba", "interpolation_no_spins_jax"]
         
+        list_no_spins = ["interpolation", "interpolation_no_spins", "interpolation_no_spins_numba", "interpolation_no_spins_jax", "interpolation_no_spins_mlx"]
+        list_aligned_spins = ["interpolation_aligned_spins", "interpolation_aligned_spins_numba", "interpolation_aligned_spins_jax", "interpolation_aligned_spins_mlx"]
+
         # Create broadcastable 4D grids
-        if self.snr_type in list_1:
+        if self.snr_type in list_aligned_spins:
             a_1_table = self.a_1_arr.copy()
             a_2_table = self.a_2_arr.copy()
             size3 = self.spin_resolution
@@ -1896,7 +1936,7 @@ class GWSNR:
             q, mtot, a_1, a_2 = np.meshgrid(
                 ratio_table, mtot_table, a_1_table, a_2_table, indexing='ij'
             )
-        elif self.snr_type  in list_2:
+        elif self.snr_type  in list_no_spins:
             q, mtot = np.meshgrid(ratio_table, mtot_table, indexing='ij')
             a_1 = np.zeros_like(mtot)
             a_2 = a_1
@@ -1948,13 +1988,11 @@ class GWSNR:
         Mchirp = ((mass_1 * mass_2) ** (3 / 5)) / ((mass_1 + mass_2) ** (1 / 5)) # shape (size1, size2, size3, size4)
         Mchirp_scaled = Mchirp ** (5.0 / 6.0)
         # filling in interpolation table for different detectors
-        list_1 = ["interpolation_aligned_spins", "interpolation_aligned_spins_numba", "interpolation_aligned_spins_jax"]
-        list_2 = ["interpolation", "interpolation_no_spins", "interpolation_no_spins_numba", "interpolation_no_spins_jax"]
 
         for j in num_det:
-            if self.snr_type in list_1:
+            if self.snr_type in list_aligned_spins:
                 snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2, size3, size4)) * dl_eff[j] / Mchirp_scaled, dtype=np.float32), # shape (size1, size2, size3, size4)
-            elif self.snr_type in list_2:
+            elif self.snr_type in list_no_spins:
                 snr_partial_ = np.array(np.reshape(optimal_snr_unscaled[detectors[j]],(size1, size2)) * dl_eff[j] / Mchirp_scaled, dtype=np.float32), # shape (size1, size2, size3, size4)
             else:
                 raise ValueError(f"snr_type {self.snr_type} is not supported for interpolation.")
@@ -2366,6 +2404,7 @@ class GWSNR:
             phi_jl=phi_jl[idx],
         )
 
+        # from ripple_class.noise_weighted_inner_product_jax
         hp_inner_hp, hc_inner_hc = self.noise_weighted_inner_product_jax(
             gw_param_dict=input_dict, 
             psd_list=psd_list,

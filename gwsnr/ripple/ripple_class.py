@@ -5,7 +5,7 @@ from multiprocessing import Pool
 import numpy as np
 import jax
 import jax.numpy as jnp
-jax.config.update("jax_enable_x64", True)
+# jax.config.update("jax_enable_x64", True)
 from ripple import ms_to_Mc_eta
 from jax import vmap
 from jax import jit

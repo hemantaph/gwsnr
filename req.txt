@@ -9,4 +9,5 @@ sphinx-jupyterbook-latex
 myst-parser
 linkify-it-py
 sphinxcontrib.mermaid
+sphinx-rtd-dark-mode
 # npm install -g @mermaid-js/mermaid-cli

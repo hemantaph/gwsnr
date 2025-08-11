@@ -10,7 +10,7 @@ from ..core import GWSNR
 from ..utils import append_json, get_param_from_json, load_json, load_ann_h5
 from scipy.optimize import curve_fit
 import jax
-jax.config.update("jax_enable_x64", True)
+# jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp
 
 import tensorflow as tf

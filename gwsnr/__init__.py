@@ -24,18 +24,18 @@ def set_multiprocessing_start_method():
             print("GWSNR: Setting multiprocessing start method to 'spawn' per environment variable.")
         else:
             method = "fork"
-            print(
-                "GWSNR: Setting multiprocessing start method to 'fork'.\n"
-                "If you need to use the 'spawn' method (in case error or warning due to other library dependencies),\n"
-                "set the environment variable GWSNR_USE_SPAWN=True *before* running your script."
-                "\n"
-                "Command line (single line):\n"
-                "    GWSNR_USE_SPAWN=True python yourscript.py\n"
-                "In a Python script (before importing GWSNR):\n"
-                "    import os\n"
-                "    os.environ['GWSNR_USE_SPAWN'] = 'True'\n"
-                "    import gwsnr\n"
-            )
+            # print(
+            #     "GWSNR: Setting multiprocessing start method to 'fork'.\n"
+            #     "If you need to use the 'spawn' method (in case error or warning due to other library dependencies),\n"
+            #     "set the environment variable GWSNR_USE_SPAWN=True *before* running your script."
+            #     "\n"
+            #     "Command line (single line):\n"
+            #     "    GWSNR_USE_SPAWN=True python yourscript.py\n"
+            #     "In a Python script (before importing GWSNR):\n"
+            #     "    import os\n"
+            #     "    os.environ['GWSNR_USE_SPAWN'] = 'True'\n"
+            #     "    import gwsnr\n"
+            # )
         try:
             mp.set_start_method(method, force=True)
         except RuntimeError:

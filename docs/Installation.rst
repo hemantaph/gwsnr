@@ -8,11 +8,11 @@ Installation
 
 .. tabs::
         
-   .. code-tab:: console pip
+   .. code-tab:: bash pip
 
         pip install gwsnr
 
-   .. code-tab:: console pip with GPU support
+   .. code-tab:: bash pip with GPU support
 
       pip install gwsnr
       pip install -U "jax[cuda12]"
@@ -39,7 +39,7 @@ To install ``gwsnr`` for development purposes use `github.gwsnr <https://github.
     
 .. tabs::
 
-     .. code-tab:: console with new conda env
+     .. code-tab:: bash with new conda env
 
         git clone https://github.com/hemantaph/gwsnr.git
         cd gwsnr
@@ -47,7 +47,7 @@ To install ``gwsnr`` for development purposes use `github.gwsnr <https://github.
         conda activate gwsnr
         pip install -e .
         
-     .. code-tab:: with existing conda env
+     .. code-tab:: bash with existing conda env
      
         git clone https://github.com/hemantaph/gwsnr.git
         cd gwsnr
@@ -58,6 +58,6 @@ To install ``gwsnr`` for development purposes use `github.gwsnr <https://github.
 Installation of numba with conda
 =======================
 
-.. code-block:: console
+.. code-block:: bash
 
     conda install -c conda-forge numba

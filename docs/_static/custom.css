@@ -132,3 +132,14 @@
 .cyan {
     color: cyan;
 }
+
+/* custom.css */
+@media (prefers-color-scheme: dark) {
+  .sphinx-tabs .sphinx-tabs-tab-content pre {
+    background: #222 !important;
+    color: #e0e0e0 !important;
+  }
+  .sphinx-tabs .sphinx-tabs-tab-content code {
+    color: #e0e0e0 !important;
+  }
+}
