@@ -1,9 +1,9 @@
 :orphan:
 
-:py:mod:`gwsnr.jax`
+:py:mod:`gwsnr.mlx`
 ===================
 
-.. py:module:: gwsnr.jax
+.. py:module:: gwsnr.mlx
 
 
 Submodules
@@ -12,7 +12,7 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
-   jaxjit_functions/index.rst
+   mlx_functions/index.rst
 
 
 Package Contents
@@ -24,36 +24,36 @@ Functions
 
 .. autoapisummary::
 
-   gwsnr.jax.findchirp_chirptime_jax
-   gwsnr.jax.antenna_response_plus
-   gwsnr.jax.antenna_response_cross
-   gwsnr.jax.antenna_response_array
-   gwsnr.jax.get_interpolated_snr_aligned_spins_jax
-   gwsnr.jax.get_interpolated_snr_no_spins_jax
+   gwsnr.mlx.findchirp_chirptime_mlx
+   gwsnr.mlx.antenna_response_plus
+   gwsnr.mlx.antenna_response_cross
+   gwsnr.mlx.antenna_response_array
+   gwsnr.mlx.get_interpolated_snr_aligned_spins_mlx
+   gwsnr.mlx.get_interpolated_snr_no_spins_mlx
 
 
 
-.. py:function:: findchirp_chirptime_jax(m1, m2, fmin)
+.. py:function:: findchirp_chirptime_mlx(m1, m2, fmin)
 
    
-   Function to calculate the chirp time from minimum frequency to last stable orbit (JAX implementation).
+   Function to calculate the chirp time from minimum frequency to last stable orbit (MLX implementation).
 
    Time taken from f_min to f_lso (last stable orbit). 3.5PN in fourier phase considered.
 
    :Parameters:
 
-       **m1** : `float`
+       **m1** : `float` or `mx.array`
            Mass of the first body in solar masses.
 
-       **m2** : `float`
+       **m2** : `float` or `mx.array`
            Mass of the second body in solar masses.
 
-       **fmin** : `float`
+       **fmin** : `float` or `mx.array`
            Lower frequency cutoff in Hz.
 
    :Returns:
 
-       **chirp_time** : `float`
+       **chirp_time** : `mx.array`
            Time taken from f_min to f_lso (last stable orbit frequency) in seconds.
 
 
@@ -67,8 +67,8 @@ Functions
 
    Calculates chirp time using 3.5PN approximation for gravitational wave Fourier phase.
    The time represents frequency evolution from fmin to last stable orbit frequency.
-   Uses post-Newtonian expansion coefficients optimized for efficient JAX computation.
-   JAX implementation supports automatic differentiation and GPU acceleration.
+   Uses post-Newtonian expansion coefficients optimized for efficient MLX computation.
+   MLX implementation supports JIT compilation.
 
 
 
@@ -231,7 +231,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_interpolated_snr_aligned_spins_jax(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, a_1, a_2, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, batch_size=100000)
+.. py:function:: get_interpolated_snr_aligned_spins_mlx(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, a_1, a_2, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, batch_size=100000)
 
    
    Calculate interpolated signal-to-noise ratio (SNR) for aligned spin gravitational wave signals using JAX.
@@ -328,7 +328,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_interpolated_snr_no_spins_jax(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, a_1, a_2, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, batch_size=100000)
+.. py:function:: get_interpolated_snr_no_spins_mlx(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, a_1, a_2, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, batch_size=100000)
 
    
    Calculate interpolated signal-to-noise ratio (SNR) for aligned spin gravitational wave signals using JAX.

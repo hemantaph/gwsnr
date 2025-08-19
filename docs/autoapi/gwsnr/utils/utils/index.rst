@@ -40,6 +40,7 @@ Functions
    gwsnr.utils.utils.load_json_from_module
    gwsnr.utils.utils.load_pickle_from_module
    gwsnr.utils.utils.dealing_with_psds
+   gwsnr.utils.utils.power_spectral_density_bilby
    gwsnr.utils.utils.power_spectral_density_pycbc
    gwsnr.utils.utils.interpolator_check
    gwsnr.utils.utils.interpolator_pickle_path
@@ -511,6 +512,38 @@ Functions
 
        **detector_list** : `list`
            list of detector names
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: power_spectral_density_bilby(psd_txt)
+
+   
+   psd array finder from bilby
+
+
+   :Parameters:
+
+       **psd_txt** : str
+           name of the psd
+           e.g. 'aLIGOaLIGODesignSensitivityT1800044'
+
+   :Returns:
+
+       **psd_array** : bilby.gw.detector.psd.PowerSpectralDensity object
+           ..
 
 
 

@@ -124,6 +124,7 @@ Glossary
    Installation
    Codeoverview
    Summary
+   performancesummary
    innerproduct
    psd
    interpolation

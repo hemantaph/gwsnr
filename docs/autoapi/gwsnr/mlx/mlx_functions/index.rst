@@ -1,13 +1,13 @@
-:py:mod:`gwsnr.jax.jaxjit_functions`
-====================================
+:py:mod:`gwsnr.mlx.mlx_functions`
+=================================
 
-.. py:module:: gwsnr.jax.jaxjit_functions
+.. py:module:: gwsnr.mlx.mlx_functions
 
 .. autoapi-nested-parse::
 
-   JAX-JIT compiled functions for gravitational wave data analysis.
+   MLX-compiled functions for gravitational wave data analysis.
 
-   This module provides high-performance JAX implementations of core functions used in
+   This module provides high-performance MLX implementations of core functions used in
    gravitational wave signal-to-noise ratio (SNR) calculations and parameter estimation.
    Key features include:
 
@@ -16,11 +16,9 @@
    - Polarization tensor calculations for plus and cross modes
    - Coordinate transformations between celestial and detector frames
    - Vectorized operations for efficient batch processing
-   - Automatic parallelization through JAX's vmap for multi-dimensional arrays
+   - Automatic parallelization through MLX's vmap for multi-dimensional arrays
 
-   All functions are compiled with JAX's @jit decorator for optimal performance and GPU acceleration. The implementations
-   are optimized for use in Bayesian inference pipelines and matched filtering
-   applications in gravitational wave astronomy.
+   All functions are compiled with MLX's @mx.compile decorator for optimal performance and efficient computation on Apple silicon's unified memory. The implementations are optimized for use in Bayesian inference pipelines and matched filtering applications in gravitational wave astronomy.
 
    ..
        !! processed by numpydoc !!
@@ -35,38 +33,38 @@ Functions
 
 .. autoapisummary::
 
-   gwsnr.jax.jaxjit_functions.findchirp_chirptime_jax
-   gwsnr.jax.jaxjit_functions.gps_to_gmst
-   gwsnr.jax.jaxjit_functions.ra_dec_to_theta_phi
-   gwsnr.jax.jaxjit_functions.get_polarization_tensor_plus
-   gwsnr.jax.jaxjit_functions.get_polarization_tensor_cross
-   gwsnr.jax.jaxjit_functions.antenna_response_plus
-   gwsnr.jax.jaxjit_functions.antenna_response_cross
-   gwsnr.jax.jaxjit_functions.antenna_response_array
+   gwsnr.mlx.mlx_functions.findchirp_chirptime_mlx
+   gwsnr.mlx.mlx_functions.gps_to_gmst
+   gwsnr.mlx.mlx_functions.ra_dec_to_theta_phi
+   gwsnr.mlx.mlx_functions.get_polarization_tensor_plus
+   gwsnr.mlx.mlx_functions.get_polarization_tensor_cross
+   gwsnr.mlx.mlx_functions.antenna_response_plus
+   gwsnr.mlx.mlx_functions.antenna_response_cross
+   gwsnr.mlx.mlx_functions.antenna_response_array
 
 
 
-.. py:function:: findchirp_chirptime_jax(m1, m2, fmin)
+.. py:function:: findchirp_chirptime_mlx(m1, m2, fmin)
 
    
-   Function to calculate the chirp time from minimum frequency to last stable orbit (JAX implementation).
+   Function to calculate the chirp time from minimum frequency to last stable orbit (MLX implementation).
 
    Time taken from f_min to f_lso (last stable orbit). 3.5PN in fourier phase considered.
 
    :Parameters:
 
-       **m1** : `float`
+       **m1** : `float` or `mx.array`
            Mass of the first body in solar masses.
 
-       **m2** : `float`
+       **m2** : `float` or `mx.array`
            Mass of the second body in solar masses.
 
-       **fmin** : `float`
+       **fmin** : `float` or `mx.array`
            Lower frequency cutoff in Hz.
 
    :Returns:
 
-       **chirp_time** : `float`
+       **chirp_time** : `mx.array`
            Time taken from f_min to f_lso (last stable orbit frequency) in seconds.
 
 
@@ -80,8 +78,8 @@ Functions
 
    Calculates chirp time using 3.5PN approximation for gravitational wave Fourier phase.
    The time represents frequency evolution from fmin to last stable orbit frequency.
-   Uses post-Newtonian expansion coefficients optimized for efficient JAX computation.
-   JAX implementation supports automatic differentiation and GPU acceleration.
+   Uses post-Newtonian expansion coefficients optimized for efficient MLX computation.
+   MLX implementation supports JIT compilation.
 
 
 

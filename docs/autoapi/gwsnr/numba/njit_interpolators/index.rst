@@ -16,9 +16,9 @@ Functions
 .. autoapisummary::
 
    gwsnr.numba.njit_interpolators.find_index_1d_numba
-   gwsnr.numba.njit_interpolators.cubic_function_4pts_numba
-   gwsnr.numba.njit_interpolators.cubic_spline_4d_numba
-   gwsnr.numba.njit_interpolators.cubic_spline_4d_batched_numba
+   gwsnr.numba.njit_interpolators.spline_interp_4pts_numba
+   gwsnr.numba.njit_interpolators.spline_interp_4x4x4x4pts_numba
+   gwsnr.numba.njit_interpolators.spline_interp_4x4x4x4pts_batched_numba
 
 
 
@@ -67,7 +67,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: cubic_function_4pts_numba(x_eval, x_pts, y_pts, condition_i)
+.. py:function:: spline_interp_4pts_numba(x_eval, x_pts, y_pts, condition_i)
 
    
    Evaluate a cubic function at a given point using 4-point interpolation.
@@ -122,7 +122,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: cubic_spline_4d_numba(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new, mtot_new, a1_new, a2_new, int_q, int_m, int_a1, int_a2)
+.. py:function:: spline_interp_4x4x4x4pts_numba(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new, mtot_new, a1_new, a2_new, int_q, int_m, int_a1, int_a2)
 
    
    Perform cubic spline interpolation in 4D for the given arrays and new values.
@@ -194,7 +194,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: cubic_spline_4d_batched_numba(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new_batch, mtot_new_batch, a1_new_batch, a2_new_batch)
+.. py:function:: spline_interp_4x4x4x4pts_batched_numba(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new_batch, mtot_new_batch, a1_new_batch, a2_new_batch)
 
    
    Perform cubic spline interpolation in 4D for a batch of new values.

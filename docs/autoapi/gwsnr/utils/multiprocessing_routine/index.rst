@@ -87,8 +87,6 @@ Functions
                list of psds for each detector
            params[24] : str
                frequency_domain_source_model name
-           params[25:] : list
-               list of detectors
 
    :Returns:
 

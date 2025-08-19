@@ -19,7 +19,7 @@ Classes
 
 
 
-.. py:class:: RippleInnerProduct(waveform_name, minimum_frequency=20.0, sampling_frequency=2048.0, reference_frequency=None)
+.. py:class:: RippleInnerProduct(waveform_name='IMRPhenomD', minimum_frequency=20.0, sampling_frequency=2048.0, reference_frequency=None)
 
 
    
