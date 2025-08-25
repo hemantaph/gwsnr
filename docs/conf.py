@@ -53,7 +53,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
     "autoapi.extension",
-    "sphinxcontrib.mermaid",
+    # "sphinxcontrib.mermaid",
     "myst_parser",
     "sphinx_rtd_dark_mode",
 ]
@@ -86,7 +86,7 @@ pygments_style = 'sphinx'
 smartquotes_action = "qe"
 
 # -- MyST Parser Configuration -----------------------------------------------
-myst_fence_as_directive = ["mermaid"]
+# myst_fence_as_directive = ["mermaid"]
 myst_enable_extensions = [
     "amsmath",
     "colon_fence",
@@ -250,5 +250,5 @@ source_suffix = {
 }
 
 # Configure Mermaid
-mermaid_cmd = 'mmdc'
-mermaid_params = ['--theme', 'forest', '--width', '800', '--backgroundColor', 'transparent']
+# mermaid_cmd = 'mmdc'
+# mermaid_params = ['--theme', 'forest', '--width', '800', '--backgroundColor', 'transparent']

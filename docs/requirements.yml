@@ -21,7 +21,6 @@ dependencies:
     - sphinx-autoapi==3.0.0
     - linkify-it-py
     - sphinx-jupyterbook-latex
-    - sphinxcontrib.mermaid
     - sphinx-rtd-dark-mode
     - gwsnr>=0.3.4
 

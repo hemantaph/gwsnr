@@ -1,12 +1,16 @@
+html5lib
+setuptools
 sphinx
 sphinx-autoapi
 autoapi
 nbsphinx
+sphinx-copybutton
 sphinx-rtd-theme
 numpydoc
 sphinx-tabs
 sphinx-jupyterbook-latex
 myst-parser
+sphinx-autoapi
 linkify-it-py
 sphinxcontrib.mermaid
 sphinx-rtd-dark-mode
