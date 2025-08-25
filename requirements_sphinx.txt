@@ -1,3 +1,4 @@
+pandoc
 html5lib
 setuptools
 sphinx
