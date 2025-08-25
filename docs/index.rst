@@ -149,7 +149,7 @@ Glossary
    :caption: Examples:
 
    examples/snr_generation
-   examples/model_generation
+   examples/ann_model_generation_custom
 
 
 Indices and tables
