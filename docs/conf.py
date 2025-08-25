@@ -144,6 +144,9 @@ html_context = {"enable_plausible": ENABLE_PLAUSIBLE}
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+# Add this line to ensure the .nojekyll file is copied
+html_extra_path = ['_static/.nojekyll']
+
 html_css_files = [
     'custom.css',  # Add this line to include your custom CSS
 ]
