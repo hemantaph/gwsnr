@@ -32,7 +32,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install dependencies
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+      - name: Install Python dependencies
         run: |
           pip install -r requirements_sphinx.txt  # Or pip install sphinx sphinx-rtd-theme
       - name: Build Sphinx documentation
@@ -44,7 +48,7 @@ jobs:
           # Upload entire directory
           path: './docs/build/html' # Path to your generated HTML files
   
-          
+
   # Deployment job
   deploy:
     environment:
