@@ -31,7 +31,7 @@ Functions
    gwsnr.numba.noise_weighted_inner_product
    gwsnr.numba.effective_distance
    gwsnr.numba.effective_distance_array
-   gwsnr.numba.cubic_spline_interpolator
+   gwsnr.numba.linear_interpolator
    gwsnr.numba.get_interpolated_snr_aligned_spins_numba
    gwsnr.numba.get_interpolated_snr_no_spins_numba
 
@@ -343,27 +343,27 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: cubic_spline_interpolator(xnew_array, coefficients, x)
+.. py:function:: linear_interpolator(xnew_array, y_array, x_array, fill_value=np.inf)
 
    
-   Function to calculate the interpolated value of snr_halfscaled given the total mass (xnew). This is based off 1D cubic spline interpolation.
+   Linear interpolator for 1D data.
 
 
    :Parameters:
 
        **xnew_array** : `numpy.ndarray`
-           Total mass of the binary.
+           New x values to interpolate.
 
-       **coefficients** : `numpy.ndarray`
-           Array of coefficients for the cubic spline interpolation.
+       **y_array** : `numpy.ndarray`
+           y values corresponding to the x_array.
 
-       **x** : `numpy.ndarray`
-           Array of total mass values for the coefficients.
+       **x_array** : `numpy.ndarray`
+           Original x values.
 
    :Returns:
 
-       **result** : `float`
-           Interpolated value of snr_halfscaled.
+       **result** : `numpy.ndarray`
+           Interpolated y values at xnew_array.
 
 
 

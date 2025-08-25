@@ -1,30 +1,138 @@
-:orphan:
+:py:mod:`gwsnr.core.gwsnr_new`
+==============================
 
-:py:mod:`gwsnr.core`
-====================
+.. py:module:: gwsnr.core.gwsnr_new
 
-.. py:module:: gwsnr.core
+.. autoapi-nested-parse::
+
+   Gravitational-wave signal-to-noise ratio calculation.
+
+   This module provides efficient calculation of signal-to-noise ratio (SNR)
+   for gravitational-wave signals from compact binary coalescences (CBCs).
+
+   The module implements multiple computational backends optimized for different
+   use cases: interpolation-based methods for fast evaluation, noise-weighted
+   inner products for high accuracy, JAX-accelerated computation for vectorized
+   operations, and artificial neural networks for rapid probability estimation.
+
+   .. method:: The package supports five main computational approaches:
 
 
-Submodules
-----------
-.. toctree::
-   :titlesonly:
-   :maxdepth: 1
 
-   gwsnr/index.rst
-   gwsnr_new/index.rst
+   .. method:: Interpolation Method (Partial-Scaled SNR)
+
+      Fast bicubic interpolation of precomputed partial-scaled SNRs. Efficient
+      for aligned-spin or non-spinning systems. Uses grids of intrinsic
+      parameters decoupled from extrinsic parameters. Supports waveform
+      approximants: IMRPhenomD, TaylorF2, IMRPhenomXPHM.
 
 
-Package Contents
-----------------
+   .. method:: Noise-Weighted Inner Product Method
+
+      Standard matched-filtering SNR calculation using inner-product integral
+      between waveform and noise PSD. Supports multiprocessing and waveform
+      generation from lalsimulation and ripple. Compatible with arbitrary
+      frequency-domain models including precession and higher harmonics.
+
+
+   .. method:: JAX-based Inner Product
+
+      Hardware-accelerated computation using ripple waveform generator with
+      JAX jit compilation and vmap vectorization for batched evaluation.
+
+
+   .. method:: Artificial Neural Network (ANN) Estimation
+
+      Rapid probability of detection estimation for spin-precessing systems
+      using trained neural network models. Uses partial-scaled SNR as summary
+      statistic to reduce dimensionality. Supports user-supplied models.
+
+
+   .. method:: Hybrid SNR Recalculation
+
+      Combines fast interpolation with accurate inner-product recalculation
+      for systems near detection threshold.
+
+
+   .. method:: Features
+
+   .. method:: --------
+
+   .. method:: - Customizable detector configurations and power spectral densities
+
+   .. method:: - Bilby interferometer and PSD interface compatibility
+
+   .. method:: - Large-scale population synthesis optimization
+
+   .. method:: - Integration with gravitational-wave lensing tools
+
+   .. method:: - Automated interpolator generation and caching
+
+   .. method:: - Extensible neural network model framework
+
+
+
+   .. rubric:: Examples
+
+   Basic SNR calculation using interpolation:
+
+   >>> from gwsnr import GWSNR
+   >>> snr_calc = GWSNR(snr_type='interpolation',
+   ...                  waveform_approximant='IMRPhenomD')
+   >>> result = snr_calc.snr(mass_1=30, mass_2=30,
+   ...                       luminosity_distance=100,
+   ...                       theta_jn=0.0, ra=0.0, dec=0.0)
+
+   Custom detector configuration:
+
+   >>> import bilby
+   >>> ifo = bilby.gw.detector.interferometer.Interferometer(
+   ...     name='LIO',
+   ...     power_spectral_density=bilby.gw.detector.PowerSpectralDensity(
+   ...         asd_file='custom_psd.txt'),
+   ...     minimum_frequency=10.0,
+   ...     maximum_frequency=2048.0,
+   ...     length=4,
+   ...     latitude=19.613, longitude=77.031, elevation=450.0,
+   ...     xarm_azimuth=117.6, yarm_azimuth=207.6)
+   >>> snr_calc = GWSNR(psds={'LIO': 'custom_psd.txt'}, ifos=[ifo])
+
+   .. rubric:: Notes
+
+   The interpolation methods are particularly efficient for population studies
+   involving thousands to millions of systems. For individual high-precision
+   calculations, the inner product methods provide the most accurate results.
+
+   Neural network estimation is experimental and currently optimized for
+   specific detector configurations and parameter ranges.
+
+   .. rubric:: References
+
+   .. [R92f9417408a4-1] Phurailatpam & Hannuksela (2025), "gwsnr: A Python package for
+          efficient signal-to-noise calculation of gravitational-waves",
+          JOSS Publications.
+   .. [R92f9417408a4-2] Allen et al. (2012), "FINDCHIRP: An algorithm for detection of
+          gravitational waves from inspiraling compact binaries",
+          Phys. Rev. D 85, 122006.
+   .. [R92f9417408a4-3] Edwards et al. (2024), "Differentiable and hardware-accelerated
+          waveforms for gravitational wave data analysis", Phys. Rev. D.
+   .. [R92f9417408a4-4] Ashton et al. (2019), "Bilby: A user-friendly Bayesian inference
+          library for gravitational-wave astronomy", Astrophys. J. Suppl. 241, 27.
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+Module Contents
+---------------
 
 Classes
 ~~~~~~~
 
 .. autoapisummary::
 
-   gwsnr.core.GWSNR
+   gwsnr.core.gwsnr_new.GWSNR
 
 
 

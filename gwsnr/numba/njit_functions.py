@@ -160,10 +160,9 @@ def gps_to_gmst(gps_time):
     gmst : `float`
         Greenwich mean sidereal time in radians.
     """
-    slope = 7.292115855382993e-05
-    time0 = 1126259642.413
-    time = gps_time - time0
-    return slope*time+36137.068361399164
+    slope = 7.292115855425873e-05
+    intercept = -45991.08966925838
+    return slope*gps_time+intercept
 
 @njit
 def ra_dec_to_theta_phi(ra, dec, gmst):
@@ -446,6 +445,43 @@ def noise_weighted_inner_product(
 
     nwip_arr = np.conj(signal1) * signal2 / psd
     return 4 / duration * np.sum(nwip_arr)
+
+@njit(parallel=True)
+def linear_interpolator(xnew_array, y_array, x_array, fill_value=np.inf):
+    """
+    Linear interpolator for 1D data.
+
+    Parameters
+    ----------
+    xnew_array : `numpy.ndarray`
+        New x values to interpolate.
+    y_array : `numpy.ndarray`
+        y values corresponding to the x_array.
+    x_array : `numpy.ndarray`
+        Original x values.
+
+    Returns
+    -------
+    result : `numpy.ndarray`
+        Interpolated y values at xnew_array.
+    """
+
+    result = np.zeros_like(xnew_array)
+    len_ = xnew_array.shape[0]
+
+    for j in prange(len_):
+        xnew = xnew_array[j]
+        # Handling extrapolation
+        i = np.searchsorted(x_array, xnew) - 1
+        # Linear interpolation
+        if (i < len(x_array) - 1) and (i > 0):
+            x0, x1 = x_array[i], x_array[i + 1]
+            y0, y1 = y_array[i], y_array[i + 1]
+            result[j] = y0 + (y1 - y0) * (xnew - x0) / (x1 - x0)
+        else:
+            result[j] = fill_value
+
+    return result
 
 # @njit
 # def _helper_hphc(hp,hc,fsize_arr,fs,size,f_l,i):

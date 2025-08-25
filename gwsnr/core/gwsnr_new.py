@@ -2211,6 +2211,7 @@ class GWSNR:
             iterations_i,
             psd_list,
             frequency_domain_source_model,
+            detector_tensor
             ) for (mass_1_i, mass_2_i, luminosity_distance_i, theta_jn_i, psi_i, phase_i, ra_i, dec_i, geocent_time_i, a_1_i, a_2_i, tilt_1_i, tilt_2_i, phi_12_i, phi_jl_i, lambda_1_i, lambda_2_i, eccentricity_i, duration_i, iterations_i) in zip(
                 mass_1[idx],
                 mass_2[idx],
@@ -2236,8 +2237,10 @@ class GWSNR:
         ]
 
         # np.shape(hp_inner_hp) = (len(num_det), size1)
-        hp_inner_hp = np.zeros((len(num_det), size1), dtype=np.complex128)
-        hc_inner_hc = np.zeros((len(num_det), size1), dtype=np.complex128)
+        # hp_inner_hp = np.zeros((len(num_det), size1), dtype=np.complex128)
+        # hc_inner_hc = np.zeros((len(num_det), size1), dtype=np.complex128)
+        snr_list = np.zeros((len(num_det), size1), dtype=np.float64)
+        snr_effective = np.zeros(size1, dtype=np.float64)
 
         # to access multi-cores instead of multithreading
         if mp.current_process().name != 'MainProcess':
@@ -2260,42 +2263,44 @@ class GWSNR:
                     ncols=100,
                 ):
                     # but, np.shape(hp_inner_hp_i) = (size1, len(num_det))
-                    hp_inner_hp_i, hc_inner_hc_i, iter_i = result
-                    hp_inner_hp[:, iter_i] = hp_inner_hp_i
-                    hc_inner_hc[:, iter_i] = hc_inner_hc_i
+                    # hp_inner_hp_i, hc_inner_hc_i, iter_i = result
+                    # hp_inner_hp[:, iter_i] = hp_inner_hp_i
+                    # hc_inner_hc[:, iter_i] = hc_inner_hc_i
+                    snr_list_i, snr_effective_i, iter_i = result
+                    snr_list[:, iter_i] = snr_list_i
+                    snr_effective[iter_i] = snr_effective_i
             else:
                 # with map, without tqdm
                 for result in pool.map(noise_weighted_inner_prod, input_arguments):
-                    hp_inner_hp_i, hc_inner_hc_i, iter_i = result
-                    hp_inner_hp[:, iter_i] = hp_inner_hp_i
-                    hc_inner_hc[:, iter_i] = hc_inner_hc_i
+                    # hp_inner_hp_i, hc_inner_hc_i, iter_i = result
+                    # hp_inner_hp[:, iter_i] = hp_inner_hp_i
+                    # hc_inner_hc[:, iter_i] = hc_inner_hc_i
+                    snr_list_i, snr_effective_i, iter_i = result
+                    snr_list[:, iter_i] = snr_list_i
+                    snr_effective[iter_i] = snr_effective_i
         
         # close forked processes
         # get polarization tensor
         # np.shape(Fp) = (size1, len(num_det))
-        Fp, Fc = antenna_response_array(
-            ra[idx], dec[idx], geocent_time[idx], psi[idx], detector_tensor
-        )
-        snrs_sq = abs((Fp**2) * hp_inner_hp + (Fc**2) * hc_inner_hc)
-        snr = np.sqrt(snrs_sq)
-        snr_effective = np.sqrt(np.sum(snrs_sq, axis=0))
+        # Fp, Fc = antenna_response_array(
+        #     ra[idx], dec[idx], geocent_time[idx], psi[idx], detector_tensor
+        # )
+        # snrs_sq = abs((Fp**2) * hp_inner_hp + (Fc**2) * hc_inner_hc)
+        # snr = np.sqrt(snrs_sq)
+        # snr_effective = np.sqrt(np.sum(snrs_sq, axis=0))
 
-        # for j, det in enumerate(detectors):
-        #     print(f"Detector: {det}")
-        #     print(f"hp_inner_hp: {hp_inner_hp[j]}")
-        #     print(f"hc_inner_hc: {hc_inner_hc[j]}")
-        #     print(f"Fp: {Fp[j]}, type: {type(Fp[j])}")
-        #     print(f"Fc: {Fc[j]}, type: {type(Fc[j])}")
 
         # organizing the snr dictionary
         optimal_snr = dict()
         for j, det in enumerate(detectors):
-            snr_buffer = np.zeros(num)
-            snr_buffer[idx] = snr[j]
-            optimal_snr[det] = snr_buffer
-        snr_buffer = np.zeros(num)
-        snr_buffer[idx] = snr_effective
-        optimal_snr["optimal_snr_net"] = snr_buffer
+            optimal_snr[det] = snr_list[j]
+        optimal_snr["optimal_snr_net"] = snr_effective
+        #     snr_buffer = np.zeros(num)
+        #     snr_buffer[idx] = snr[j]
+        #     optimal_snr[det] = snr_buffer
+        # snr_buffer = np.zeros(num)
+        # snr_buffer[idx] = snr_effective
+        # optimal_snr["optimal_snr_net"] = snr_buffer
 
         # Save as JSON file
         if output_jsonfile:

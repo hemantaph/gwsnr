@@ -16,6 +16,8 @@ import pickle
 import numpy as np
 import bilby
 from gwpy.timeseries import TimeSeries
+# from scipy.interpolate import CubicSpline
+from scipy.interpolate import interp1d
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -41,11 +43,19 @@ def save_json(file_name, param):
         json file name for storing the parameters.
     param : `dict`
         dictionary to be saved as a json file.
+
+    Example
+    ----------
+    >>> from ler.utils import save_json, load_json
+    >>> param = dict_list = [{"name": "lens_mass", "type": "cubic_spline", "x": np.array([0, 1, 2, 3]), "y": [0, 1, 0, 1]},]
+    >>> save_json("param.json", param)
+    >>> param = load_json("param.json")
     """
-    with open(file_name, "w", encoding="utf-8") as write_file:
-        try:
+    try:
+        with open(file_name, "w", encoding="utf-8") as write_file:
             json.dump(param, write_file)
-        except:
+    except:
+        with open(file_name, "w", encoding="utf-8") as write_file:
             json.dump(param, write_file, indent=4, cls=NumpyEncoder)
 
 def load_json(file_name):
@@ -442,19 +452,10 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
 
         if type(psds[det]) == str and psds[det][-3:] == "txt":
 
-            if psds[det][-7:] == "psd.txt":
-                psds_list.append(
-                    bilby.gw.detector.PowerSpectralDensity(psd_file=psds[det])
-                )
-
-            elif psds[det][-7:] == "asd.txt":
-                psds_list.append(
-                    bilby.gw.detector.PowerSpectralDensity(asd_file=psds[det])
-                )
-            else:
-                raise ValueError(
-                    "psd file name should end with either 'psd.txt' or 'asd.txt'"
-                )
+            psds_list.append(
+                # bilby.gw.detector.PowerSpectralDensity(asd_file=psds[det])
+                power_spectral_density_bilby(psds[det])
+            )
 
         elif isinstance(psds[det], float):
             # get the psd from the open data
@@ -510,6 +511,36 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
         detector_tensor_list.append(ifos[i].detector_tensor)
 
     return psds_list, detector_tensor_list, detector_list
+
+def power_spectral_density_bilby(psd_txt):
+    """
+    psd array finder from bilby
+
+    Parameters
+    ----------
+    psd_txt : str
+        name of the psd
+        e.g. 'aLIGOaLIGODesignSensitivityT1800044'
+
+    Returns
+    -------
+    psd_array : bilby.gw.detector.psd.PowerSpectralDensity object
+    """
+    if psd_txt[-7:] == "asd.txt":
+        psd_object = bilby.gw.detector.PowerSpectralDensity(asd_file=psd_txt)
+    elif psd_txt[-7:] == "psd.txt":
+        psd_object = bilby.gw.detector.PowerSpectralDensity(psd_file=psd_txt)
+    else:
+        raise ValueError(
+            "psd file name should end with either 'psd.txt' or 'asd.txt'"
+        )
+
+    frequency_array = psd_object.frequency_array
+    psd_array = psd_object.psd_array
+    # spline_coeff = CubicSpline(frequency_array, psd_array).c
+    spline_coeff = interp1d(frequency_array, psd_array, bounds_error=False, fill_value=np.inf)
+
+    return [frequency_array, psd_array, spline_coeff]
 
 def power_spectral_density_pycbc(psd, f_min=20.0, sampling_frequency=2048.0):
     """
@@ -663,7 +694,7 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
 
     len_ = len(param_dict_stored)
     # del param_dict_given["psds"]
-    param_dict_given["psds"] = str(param_dict_given["psds"].psd_array)
+    param_dict_given["psds"] = str(param_dict_given["psds"])
     param_dict_given["detector_tensor"] = str(param_dict_given["detector_tensor"])
 
     # # expilcitly check if the param_dict_given is not available in the param_dict_stored

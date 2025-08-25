@@ -12,23 +12,17 @@ Installation
 
         pip install gwsnr
 
-   .. code-tab:: bash pip with GPU support
+   .. code-tab:: bash pip with Nvidia GPU support
 
       pip install gwsnr
       pip install -U "jax[cuda12]"
 
+   .. code-tab:: bash pip with Apple Silicon GPU support
+
+      pip install gwsnr
+      pip install -U mlx
 
 This will also install the dependencies needed by the lastest ``gwsnr`` version.  
-
-.. ``gwsnr`` includes `JAXs <https://jax.readthedocs.io/en/latest/>`_ functionalities. For faster SNR interpolation computation using Nvidia GPU, install ``JAX`` with GPU support.
-
-.. .. tabs::
-
-..    .. code-tab:: console pip with GPU support
-
-..       pip install gwsnr
-..       pip install -U "jax[cuda12]"
-      
 
 .. _development:
 gwsnr for development
@@ -53,11 +47,3 @@ To install ``gwsnr`` for development purposes use `github.gwsnr <https://github.
         cd gwsnr
         conda env update --file gwsnr.yml
         pip install -e .
-    
-.. _dependencies:
-Installation of numba with conda
-=======================
-
-.. code-block:: bash
-
-    conda install -c conda-forge numba

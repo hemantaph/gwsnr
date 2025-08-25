@@ -6,7 +6,7 @@ Helper functions for multiprocessing in snr generation
 import numpy as np
 import bilby
 
-from ..numba import noise_weighted_inner_product
+from ..numba import noise_weighted_inner_product, antenna_response_plus, antenna_response_cross, antenna_response_array
 
 
 def noise_weighted_inner_prod(params):
@@ -68,7 +68,8 @@ def noise_weighted_inner_prod(params):
             list of psds for each detector
         params[24] : str
             frequency_domain_source_model name
-        
+        params[25] : list
+            list of detector tensors
 
     Returns
     -------
@@ -121,16 +122,17 @@ def noise_weighted_inner_prod(params):
     # h = F+.h+ + Fx.hx
     # <h|h> = <h+,h+> + <hx,hx> + 2<h+,hx>
     # <h|h> = <h+,h+> + <hx,hx>, if h+ and hx are orthogonal
-    hp_inner_hp_list = []
-    hc_inner_hc_list = []
+    # hp_inner_hp_list = []
+    # hc_inner_hc_list = []
+    snr_list = []
+    snr_effective = 0.0
     # list_of_detectors = params[25:].tolist()
     psds_objects = params[23]
     for idx in range(len(psds_objects)):
-    # for idx, det in enumerate(list_of_detectors):
 
         # need to compute the inner product for
+        # p_array = psds_objects[det].get_power_spectral_density_array(waveform_generator.frequency_array)
         p_array = psds_objects[idx][2](waveform_generator.frequency_array)
-        # p_array =  cubic_spline_interpolator(xnew_array=waveform_generator.frequency_array, coefficients=psds_objects[idx][2], x=psds_objects[idx][0])
 
         idx2 = (p_array != 0.0) & (p_array != np.inf)
         hp_inner_hp = noise_weighted_inner_product(
@@ -154,10 +156,23 @@ def noise_weighted_inner_prod(params):
         #     waveform_generator.duration,
         # )
 
-        hp_inner_hp_list.append(hp_inner_hp)
-        hc_inner_hc_list.append(hc_inner_hc)
+        # hp_inner_hp_list.append(hp_inner_hp)
+        # hc_inner_hc_list.append(hc_inner_hc)
 
-    return (hp_inner_hp_list, hc_inner_hc_list, params[22])
+        Fp = antenna_response_plus(ra=params[6], dec=params[7], time=params[8], psi=params[4], detector_tensor=params[25][idx])
+        Fc = antenna_response_cross(ra=params[6], dec=params[7], time=params[8], psi=params[4], detector_tensor=params[25][idx])
+        # Fp = antenna_response_plus(ra=np.array([params[6]]), dec=np.array([params[7]]), time=np.array([params[8]]), psi=np.array([params[4]]), detector_tensor=params[25][idx])[0]
+        # Fc = antenna_response_cross(ra=np.array([params[6]]), dec=np.array([params[7]]), time=np.array([params[8]]), psi=np.array([params[4]]), detector_tensor=params[25][idx])[0]
+
+        snrs_sq = abs((Fp**2) * hp_inner_hp + (Fc**2) * hc_inner_hc)
+        snr_list.append(np.sqrt(snrs_sq))
+        snr_effective += np.sum(snrs_sq, axis=0)
+
+    snr_effective = np.sqrt(snr_effective)
+
+    return (snr_list, snr_effective, params[22])
+
+    # return (hp_inner_hp_list, hc_inner_hc_list, params[22])
 
 
 def noise_weighted_inner_prod_ripple(params):
@@ -223,6 +238,7 @@ def noise_weighted_inner_prod_ripple(params):
     for psd in psds_objects:
 
         # need to compute the inner product for
+        # p_array = psd.get_power_spectral_density_array(fs)
         p_array = psds_objects[idx][2](fs)
 
         idx2 = (p_array != 0.0) & (p_array != np.inf)

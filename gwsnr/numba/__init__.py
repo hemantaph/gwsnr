@@ -6,6 +6,7 @@ from .njit_functions import (
     noise_weighted_inner_product,
     effective_distance,
     effective_distance_array,
+    linear_interpolator
 )
 
 from .njit_interpolators import (
@@ -22,6 +23,7 @@ __all__ = [
     'noise_weighted_inner_product',
     'effective_distance',
     'effective_distance_array',
+    'linear_interpolator',
     # njit_interpolators
     'get_interpolated_snr_aligned_spins_numba',
     'get_interpolated_snr_no_spins_numba',

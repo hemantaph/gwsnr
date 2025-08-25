@@ -10,13 +10,13 @@ Welcome to :red:`gwsnr`’s documentation!
 :red:`gwsnr` : Efficient :red_first:`Gravitational`-:red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Calculator
 ------------------------------
 
-``gwsnr`` is a Python package for rapid and accurate gravitational-wave (GW) Signal-to-Noise Ratio (SNR) calculation, essential for population simulations and hierarchical Bayesian inference with selection effects. It delivers a **speed-up of over 10,000x** compared to traditional methods, while maintaining an **accuracy greater than 99.5%**.
+``gwsnr`` is a Python package for rapid and accurate gravitational-wave (GW) Signal-to-Noise Ratio (SNR) calculation, essential for population simulations and hierarchical Bayesian inference with selection effects. It delivers a **speed-up of over 5,000x** compared to traditional methods, while maintaining an **accuracy greater than 99.5%**.
 
-The package overcomes computational bottlenecks using advanced interpolation, Just-in-Time (JIT) compilation, and parallel processing. It provides flexible backends to optimize performance on different hardware, with a ``numba`` backend for multi-core CPUs and a ``jax`` backend for GPU acceleration.
+This package eliminates computational bottlenecks through sophisticated interpolation techniques, Just-in-Time (JIT) compilation, and parallel processing. It offers multiple optimized backends tailored for different hardware configurations: a ``numba`` backend for multi-threaded CPU performance and ``jax`` and ``mlx`` backends for GPU acceleration.
 
 With a simple API, ``gwsnr`` integrates easily into existing workflows. It is used by the ``ler`` package (`see ler documentation <https://ler.readthedocs.io/en/latest/>`_) for simulating lensed and unlensed GWs, allowing researchers to incorporate fast SNR computations with minimal overhead.
 
-For a detailed technical overview, see the :doc:`Summary` section and browse the topics under :blue:`CONTENTS` in the sidebar or the top-left menu on mobile.
+For a detailed technical overview, see the :doc:`Summary` section and browse the topics under :blue:`CONTENTS` in the sidebar (or top-left menu) on your web-browser.
 
 
 Quick Start
@@ -44,7 +44,7 @@ Then, compute the SNR for a binary black hole system:
 
 .. note::
 
-   ``gwsnr`` supports Python 3.10+ and automatically utilizes multi-core CPUs and NVIDIA GPUs when available. Refer to the :doc:`Installation` section for detailed setup instructions.
+   ``gwsnr`` supports Python 3.10+ and automatically utilizes multi-core CPUs and NVIDIA GPUs (or Apple Silicon GPUs) when available. Refer to the :doc:`Installation` section for detailed setup instructions.
 
 About the Project
 -----------------
@@ -74,7 +74,7 @@ Glossary
 
          <div style="text-align:center;">
          <img src="_static/gw.gif" width="480px" alt="Animation of GW propagation">
-         <div style="text-align:left; max-width:480px">
+          <div style="text-align:left; max-width:480px; margin: 0 auto;">
             <p style="font-size: 0.9em; font-family: Arial, sans-serif; line-height: 1.5em;">
                Animation showing the propagation of gravitational waves from inspiraling binary black holes. As the waves travel, they stretch and squeeze spacetime in their path. <em>Source: <a href="https://community.wolfram.com/groups/-/m/t/790989">Jeffrey Bryant, Wolfram | Alpha, LLC.</a>.</em>
             </p>
@@ -85,15 +85,15 @@ Glossary
 
       The effect of a passing gravitational wave is incredibly subtle. To detect these faint signals, scientists use enormous L-shaped instruments called laser interferometers. The most prominent detectors are the two LIGO observatories in the United States, the Virgo detector in Italy, and the KAGRA detector in Japan. These instruments use lasers to measure minute changes in the lengths of their kilometers-long arms—changes on the order of 1/10,000th the width of a proton.
 
-      Because the signals are so weak, they are often buried in the detector's background noise. To find them, scientists use a technique called **matched filtering**. This involves comparing the noisy detector data against a large bank of theoretical waveform templates. When a segment of the data closely matches a template, the signal "rings up," indicating a potential detection.
+      Since gravitational-wave signals are extremely weak, they are typically obscured by the detector's background noise. Scientists employ a data analysis technique called **matched filtering** to extract these hidden signals and compute the **Signal-to-Noise Ratio**. This process involves cross-correlating the noisy detector data with an extensive library of theoretical gravitational-wave templates. When the data containing a genuine signal aligns with a matching template, the SNR increases dramatically, creating a distinctive peak that indicates a potential detection once it exceeds a predetermined significance threshold.
 
       .. raw:: html
 
          <div style="text-align:center;">
          <img src="_static/matched_filtering.gif" width="600px" alt="Animation of Matched Filtering">
-         <div style="text-align:left; max-width:600px">
+         <div style="text-align:left; max-width:600px; margin: 0 auto;">
             <p style="font-size: 0.9em; font-family: Arial, sans-serif; line-height: 1.5em;">
-               Animation of the matched filtering technique. The bottom panel shows a theoretical gravitational-wave signal (pink) hidden within noisy detector data (black). The top panel shows the Signal-to-Noise Ratio (SNR) calculated from this data. A confident detection is claimed when the SNR forms a sharp peak that crosses a pre-defined threshold (yellow dashed line).
+               Animation of the matched filtering technique. The bottom panel shows a theoretical gravitational-wave signal (pink) scanning a hidden signal within noisy detector data (black). The top panel shows the Signal-to-Noise Ratio (SNR) calculated from this data. A confident detection is claimed when the SNR forms a sharp peak that crosses a pre-defined threshold (yellow dashed line).
                   <em>Source: <a href="https://www.youtube.com/watch?v=bBBDR5jf9oU">Alex Nitz | YouTube</a>.</em>
             </p>
          </div>

@@ -202,13 +202,14 @@ def get_interpolated_snr_aligned_spins_mlx(mass_1, mass_2, luminosity_distance, 
         mx.array(a_2_arr),
         mx.array(Fp),
         mx.array(Fc),
-         mx.array(detector_tensor)
+        mx.array(detector_tensor),
+        batch_size
     )
 
     return np.array(snr), np.array(snr_effective), np.array(snr_partial_), np.array(d_eff)
 
 @mx.compile
-def get_interpolated_snr_aligned_spins_helper(mass_1, mass_2, luminosity_distance, theta_jn, a_1, a_2, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, Fp, Fc, detector_tensor):
+def get_interpolated_snr_aligned_spins_helper(mass_1, mass_2, luminosity_distance, theta_jn, a_1, a_2, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, Fp, Fc, detector_tensor, batch_size):
     """
     Calculate interpolated signal-to-noise ratio (SNR) for aligned spin gravitational wave signals using JAX.
     This function computes the SNR for gravitational wave signals with aligned spins across multiple 
@@ -288,7 +289,13 @@ def get_interpolated_snr_aligned_spins_helper(mass_1, mass_2, luminosity_distanc
     snr = mx.zeros((det_len,size))
     # loop over the detectors
     for j in range(det_len):
-        snr_partial_[j] = mx.array(spline_interp_4x4x4x4pts_batched_mlx(
+        # Iterate over the data in batches
+        for i in range(0, size, batch_size):
+            # Define the start and end indices for the current batch
+            start_idx = i
+            end_idx = min(i + batch_size, size)
+
+            snr_partial_[j, start_idx:end_idx] = mx.array(spline_interp_4x4x4x4pts_batched_mlx(
                 q_array=ratio_arr,
                 mtot_array=mtot_arr,
                 a1_array=a1_arr,
@@ -330,13 +337,13 @@ def spline_interp_4x4pts_mlx(q_array, mtot_array, snrpartialscaled_array, q_new,
     # # We expand the index arrays with new dimensions so they broadcast correctly
     # # to select a 4x4 cube from the larger array.
     offsets = mx.arange(-1, 3)
-    q_indices  = (q_idx + offsets).reshape(4, 1, 1, 1)
-    m_indices  = (m_idx + offsets).reshape(1, 4, 1, 1)
+    q_indices  = (q_idx + offsets).reshape(4, 1)
+    m_indices  = (m_idx + offsets).reshape(1, 4)
 
     # Perform a single, efficient "gather" operation using the broadcasted indices.
     data_cube = snrpartialscaled_array[q_indices, m_indices]
 
-    # 3. Perform 4D interpolation using vmap to eliminate loops
+    # 3. Perform 2D interpolation using vmap to eliminate loops
     # Interpolate along the mtot dimension
     interp_on_m = mx.vmap(
         lambda y_slice: spline_interp_4pts_mlx(mtot_new, m_pts, y_slice, int_m)
@@ -350,7 +357,7 @@ def spline_interp_4x4pts_mlx(q_array, mtot_array, snrpartialscaled_array, q_new,
 @mx.compile
 def spline_interp_4x4pts_batched_mlx(q_array, mtot_array, snrpartialscaled_array, q_new_batch, mtot_new_batch):
     """
-    Perform batched 4D cubic spline interpolation using JAX vectorization.
+    Perform batched 2D cubic spline interpolation using MLX vectorization.
     """
     # Vectorize the complete single-point interpolation function.
     # This is the only vmap call needed at the top level.
@@ -444,13 +451,14 @@ def get_interpolated_snr_no_spins_mlx(mass_1, mass_2, luminosity_distance, theta
         mx.array(mtot_arr), 
         mx.array(Fp),
         mx.array(Fc),
-        mx.array(detector_tensor)
+        mx.array(detector_tensor),
+        batch_size
     )
 
     return np.array(snr), np.array(snr_effective), np.array(snr_partial_), np.array(d_eff)
 
 @mx.compile
-def get_interpolated_snr_no_spins_helper(mass_1, mass_2, luminosity_distance, theta_jn, snr_partialscaled, ratio_arr, mtot_arr, Fp, Fc, detector_tensor):
+def get_interpolated_snr_no_spins_helper(mass_1, mass_2, luminosity_distance, theta_jn, snr_partialscaled, ratio_arr, mtot_arr, Fp, Fc, detector_tensor, batch_size):
     """
     Calculate interpolated signal-to-noise ratio (SNR) for non-spinning gravitational wave signals using JAX.
     This function computes the SNR for gravitational wave signals without spins across multiple 
@@ -474,14 +482,20 @@ def get_interpolated_snr_no_spins_helper(mass_1, mass_2, luminosity_distance, th
     snr = mx.zeros((det_len,size))
     # loop over the detectors
     for j in range(det_len):
-        snr_partial_[j] = mx.array(spline_interp_4x4pts_batched_mlx(
-                q_array=ratio_arr,
-                mtot_array=mtot_arr,
-                snrpartialscaled_array=snr_partialscaled[j],
-                q_new_batch=ratio,
-                mtot_new_batch=mtot
+        # Iterate over the data in batches
+        for i in range(0, size, batch_size):
+            # Define the start and end indices for the current batch
+            start_idx = i
+            end_idx = min(i + batch_size, size)
+            
+            snr_partial_[j, start_idx:end_idx] = mx.array(spline_interp_4x4pts_batched_mlx(
+                    q_array=ratio_arr,
+                    mtot_array=mtot_arr,
+                    snrpartialscaled_array=snr_partialscaled[j],
+                    q_new_batch=ratio,
+                    mtot_new_batch=mtot
+                )
             )
-        )
 
         d_eff[j] = luminosity_distance / mx.sqrt(Fp[j] ** 2 * ci_param + Fc[j] ** 2 * ci_2)
         # Calculate the SNR for this detector
