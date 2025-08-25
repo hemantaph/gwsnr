@@ -34,7 +34,7 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: |
-          pip install -r docs/req.txt  # Or pip install sphinx sphinx-rtd-theme
+          pip install -r req.txt  # Or pip install sphinx sphinx-rtd-theme
       - name: Build Sphinx documentation
         run: |
           make -C docs html  # Assumes your docs are in a 'docs/' directory
