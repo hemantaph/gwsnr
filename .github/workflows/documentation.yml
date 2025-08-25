@@ -39,14 +39,23 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install -r requirements_sphinx.txt  # Or pip install sphinx sphinx-rtd-theme
+      - name: Install project dependencies
+        run: |
+          pip install -e .
       - name: Build Sphinx documentation
         run: |
-          make -C docs html  # Assumes your docs are in a 'docs/' directory
+          cd docs
+          make html
+      - name: List build directory contents
+        run: |
+          ls -la docs/
+          ls -la docs/_build/ || echo "_build directory not found"
+          ls -la docs/_build/html/ || echo "html directory not found"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire directory
-          path: './docs/build/html' # Path to your generated HTML files
+          path: './docs/_build/html' # Correct path based on Makefile
   
 
   # Deployment job
