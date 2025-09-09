@@ -103,7 +103,9 @@ Glossary
    
       The central metric used to assess the strength and significance of a potential gravitational-wave signal. It quantifies how much stronger the signal is compared to the average level of the background noise.
 
-      A higher SNR indicates a more confident detection, making it easier to distinguish a real astrophysical event from random noise fluctuations. A detection is typically confirmed only when the SNR peak surpasses a certain threshold value. The ``gwsnr`` package is designed to compute this critical quantity efficiently and accurately for a wide range of astrophysical scenarios.
+      A higher SNR indicates a more confident detection, making it easier to distinguish a real astrophysical event from random noise fluctuations. Detection is typically confirmed when the SNR peak surpasses a predetermined threshold value. 
+      
+      The ``gwsnr`` package efficiently computes this critical quantity for large-scale astrophysical simulations. Unlike detection pipelines such as ``PyCBC`` and ``GstLAL``, ``gwsnr`` is optimized for rapid SNR computation across thousands or millions of gravitational-wave events in population studies.
 
 .. .. raw:: html
 
@@ -126,6 +128,7 @@ Glossary
    Summary
    performancesummary
    innerproduct
+   detectionstatistics
    psd
    interpolation
    probabilityofdetection

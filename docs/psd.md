@@ -2,6 +2,94 @@
 
 The detection of gravitational waves relies on distinguishing faint astrophysical signals from background noise in detectors like LIGO and Virgo. The Power Spectral Density (PSD, $S_n(f)$) provides a statistical characterization of this noise as a function of frequency, serving as a important tool for signal detection and parameter estimation.
 
+## Understanding PSD from detection statistics
+
+Given some random process, $n(t)$ as noise recorded by the detector, that is also stationary and has zero mean $\langle n(t) \rangle = 0$, then we can use the general definition of power, time average of the squared signal, and write the power in the noise as:
+
+$$
+\begin{align}
+P = \lim_{T \to \infty} \frac{1}{T} \int_{-T/2}^{T/2} n^2(t) dt
+\end{align}
+$$
+
+defining a windowed function of the noise as:
+
+$$
+\begin{align}
+n_T(t) = \begin{cases}
+n(t) & -T/2 \leq t \leq T/2 \\
+0 & \text{otherwise}
+\end{cases}
+\end{align}
+$$
+
+Now we have,
+
+$$
+\begin{align}
+P = \lim_{T \to \infty} \frac{1}{T} \int_{-\infty}^{\infty} n_T^2(t) dt
+\end{align}
+$$
+
+Using Parseval's theorem, we can express the power in the frequency domain as:
+
+$$
+\begin{align}
+P &= \lim_{T \to \infty} \frac{1}{T} \int_{-\infty}^{\infty} \vert\tilde{n}_T(f)\vert^2 df \\
+&= \lim_{T \to \infty} \frac{2}{T} \int_{0}^{\infty} \vert\tilde{n}_T(f)\vert^2 df
+\end{align}
+$$
+
+Where I have also used $\tilde{n}_T(-f)=\tilde{n}^*_T(f)$, as $n_T(t)$ is real. continuing, we can write the power as:
+
+$$
+\begin{align}
+P &= \int_{0}^{\infty} \left( \lim_{T \to \infty} \frac{2}{T} \vert\tilde{n}_T(f)\vert^2 \right) df \\
+&= \int_{0}^{\infty} S_n(f) df
+\end{align}
+$$
+
+where we have defined the **one-sided power spectral density (PSD)** as:
+
+$$
+\begin{align}
+S_n(f) &= \lim_{T \to \infty} \frac{2}{T} \vert\tilde{n}_T(f)\vert^2 \\
+&= \lim_{T \to \infty} \frac{2}{T} \left\vert \int_{-T/2}^{T/2}n_T(t) e^{-2\pi i f t} dt \right\vert^2
+\end{align}
+$$
+
+Let us express the PSD in terms of the autocorrelation function of the noise, $R_n(\tau) = \langle n(t) n(t+\tau) \rangle$. 
+
+$$
+\begin{align}
+S_n(f) &= \lim_{T \to \infty} \frac{2}{T} \left\{ \int_{-T/2}^{T/2}n_T(t) e^{-2\pi i f t} dt \right\} \left\{ \int_{-T/2}^{T/2}n_T(t') e^{2\pi i f t'} dt' \right\} \\
+\end{align}
+$$
+
+change of variables, $t' = t + \tau$ and $dt' = d\tau$, we can write
+
+$$
+\begin{align}
+S_n(f) &= \int_{-\infty}^{\infty} \left\{ \lim_{T \to \infty} \frac{2}{T} \int_{-T/2}^{T/2} n_T(t) n_T(t + \tau) dt\right\} e^{-2\pi i f \tau} d\tau \\
+&= 2 \int_{-\infty}^{\infty} R_n(\tau) e^{-2\pi i f \tau} d\tau
+\end{align}
+$$
+
+So, PSD is twice the Fourier transform of the autocorrelation function of the noise. Let us relate the PSD to the autocorrelation of the frequency domain noise, $\tilde{n}(f)$.
+
+$$
+\begin{align}
+\langle \tilde{n}(f) \tilde{n}^*(f') \rangle &= \left\langle \int_{-\infty}^{\infty} n(t) e^{-2\pi i f t} dt \int_{-\infty}^{\infty} n(t') e^{2\pi i f' t'} dt' \right\rangle \\
+&= \left\langle \int_{-\infty}^{\infty} n(t) e^{-2\pi i f t} dt \int_{-\infty}^{\infty} n(t+\tau) e^{2\pi i f' (t+\tau)} d\tau \right\rangle \\
+&= \int_{-\infty}^{\infty} e^{-2\pi i (f - f') t} dt \int_{-\infty}^{\infty} \langle n(t) n(t+\tau) \rangle  e^{-2\pi i f' \tau}  d\tau \\
+&= \delta(f - f') \int_{-\infty}^{\infty} R_n(\tau) e^{-2\pi i f' \tau} d\tau \\
+&= \frac{1}{2} \delta(f - f') S_n(f')\\
+&= \frac{1}{2} S_n(f) \delta(f - f')
+\end{align}
+$$
+
+This form of equation is often used in expressing variance of the data-filter (noise only) correlation, in terms of the PSD (see [match filtering](detectionstatistics.md#Match-Filtering-in-the-context-of-Gravitational-Wave-Detection) for details).
+
 ## Physical Origin and Significance of Detector Noise
 
 Gravitational-wave detectors are limited by various noise sources, with three main types dominating different frequency ranges: (i) at low frequencies (< 10 Hz), seismic noise from ground motion dominates; (ii) at intermediate frequencies (10-100 Hz), thermal noise in mirror suspensions and optics is most significant; and (iii) at high frequencies (> 100 Hz), quantum (shot) noise from laser light fluctuations prevails. The PSD quantifies the noise power as a function of frequency, thereby establishing the detector's sensitivity floor. The detectability of a gravitational-wave signal is determined by its signal-to-noise ratio (SNR)—a measure calculated by comparing the signal's strength to the noise level described by the PSD (see [Noise-Weighted Inner Product Method](innerproduct.md#noise-weighted-inner-product-method) for details). A detection is claimed only if this SNR surpasses a pre-defined threshold.

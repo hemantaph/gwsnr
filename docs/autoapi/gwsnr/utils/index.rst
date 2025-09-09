@@ -13,7 +13,6 @@ Submodules
    :maxdepth: 1
 
    multiprocessing_routine/index.rst
-   multiprocessing_routine_new/index.rst
    utils/index.rst
 
 
