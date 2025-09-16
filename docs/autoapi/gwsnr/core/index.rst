@@ -13,7 +13,6 @@ Submodules
    :maxdepth: 1
 
    gwsnr/index.rst
-   gwsnr_new/index.rst
 
 
 Package Contents

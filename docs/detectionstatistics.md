@@ -115,88 +115,106 @@ $$
 $$
 
 The right side of this inequality contains terms proportional to the optimal signal power and the filter variance. Equality holds, and thus the SNR is maximized, when the two bracketed functions are proportional:
+
 $$
 \begin{align}
 \tilde{q}(f) e^{2\pi i f \tau} \sqrt{S_n(f)}  &=k  \frac{\tilde{h}(f)}{\sqrt{S_n(f)}}
 \end{align}
 $$
+
 Solving this equation for the filter $\tilde{q}(f)$ gives us the form of the optimal filter:
+
 $$
 \begin{align}
 \tilde{q}(f) = k \frac{\tilde{h}(f)}{S_n(f)}e^{-2\pi i f \tau}
 \end{align}
 $$
+
 Taking the complex conjugate, which is the term that appears in the correlation integral, yields:
+
 $$
 \begin{align}
 \tilde{q}^*(f) = k^* \frac{\tilde{h}^*(f)}{S_n(f)}e^{2\pi i f \tau}
 \end{align}
 $$
+
 This result demonstrates that the optimal filter for matched filtering is the signal template itself, $\tilde{h}(f)$, "whitened" by the inverse of the detector's noise power spectral density, $S_n(f)$. This whitening process de-emphasizes frequencies where the noise is high and amplifies frequencies where the noise is low. The filter is also time-shifted by $\tau$ to match the signal's arrival time. The scaling factor $k$ is an arbitrary constant that cancels out during the calculation of the SNR and can therefore be ignored in the following derivations.
 
-## Defining Optimal SNR
+### Defining Optimal SNR
 
-SNR is maximized when the optimal filter is used, i.e. the signal template itself, whitened by the noise PSD.
+When the optimal filter is used, the SNR reaches its maximum possible value. This maximum, known as the **Optimal SNR** ($\rho_{\rm opt}$), represents the theoretical upper limit achievable under ideal conditions: the signal template $h(t)$ perfectly matches the actual gravitational wave signal in the data, the arrival time $\tau$ is precisely known, and the detector noise is stationary, Gaussian with zero mean and a perfectly characterized PSD. This optimal SNR value represents an expectation taken over all possible noise realizations.
 
-So the numerators and denominators of the optimal SNR become,
+We derive the mathematical form for the optimal SNR by substituting the form of the optimal filter, $\tilde{q}^*(f) \propto \frac{\tilde{h}^*(f)}{S_n(f)}e^{2\pi i f \tau}$, back into the expressions for the squared mean and the variance. Inserting the filter and its conjugate into the squared mean calculation causes the time-shift terms $e^{\pm 2\pi i f \tau}$ to cancel out:
 
 $$
 \begin{align}
-\vert\langle z(\tau) \rangle\vert^2 &= \left\vert\ \int_{0}^{\infty} \left[ \tilde{h}(f) \left\{\frac{\tilde{h}^*(f)}{S_n(f)}e^{2\pi i f \tau}\right\} e^{-2\pi i f \tau}\right.\right. \\
-&\left.\left. \;\;\;\;\; + \tilde{h}^*(f) \left\{\frac{\tilde{h}(f)}{S_n(f)} e^{-2\pi i f \tau}\right\} e^{2\pi i f \tau} \right] df \right\vert^2 \\
+\vert\langle z(\tau) \rangle\vert^2 &= \left\vert\ \int_{0}^{\infty} \left[ \tilde{h}(f) \left\{\frac{\tilde{h}^*(f)}{S_n(f)}e^{2\pi i f \tau}\right\} e^{-2\pi i f \tau} + \tilde{h}^*(f) \left\{\frac{\tilde{h}(f)}{S_n(f)} e^{-2\pi i f \tau}\right\} e^{2\pi i f \tau} \right] df \right\vert^2 \\
 &= \left\vert\ \int_{0}^{\infty} \frac{1}{{S_n(f)}}\left[ \tilde{h}(f) \tilde{h}^*(f) + \tilde{h}^*(f) \tilde{h}(f)\right] df \right\vert^2 \\
-&= \left\vert\ 2 \int_{0}^{\infty} \frac{\tilde{h}(f) \tilde{h}^*(f)}{S_n(f)} df \right\vert^2 \\
-\text{Var}(z(\tau)) 
-&= \int_{0}^{\infty} S_n(f) \left\{\frac{\tilde{h}(f)}{S_n(f)} e^{-2\pi i f \tau}\right\} \left\{\frac{\tilde{h}^*(f)}{S_n(f)}e^{2\pi i f \tau}\right\} df \\
-&= \int_{0}^{\infty} \frac{\tilde{h}(f) \tilde{h}^*(f)}{S_n(f)} df \\
+&= \left\vert\ 2 \int_{0}^{\infty} \frac{|\tilde{h}(f)|^2}{S_n(f)} df \right\vert^2 = 4 \left( \int_{0}^{\infty} \frac{|\tilde{h}(f)|^2}{S_n(f)} df \right)^2
 \end{align}
 $$
 
-So the optimal-SNR becomes,
+Next, we substitute the optimal filter into the variance expression:
 
 $$
 \begin{align}
-\rho_{\rm opt}^2 &= \frac{\left\vert\ 2 \int_{0}^{\infty} \frac{\tilde{h}^*(f) \tilde{h}(f)}{S_n(f)} df \right\vert^2}{\int_{0}^{\infty} \frac{\tilde{h}(f) \tilde{h}^*(f)}{S_n(f)} df} \\
-&= 4 \frac{\left\vert \int_{0}^{\infty} \frac{\vert\tilde{h}(f) \vert^2}{S_n(f)} df \right\vert^2}{\int_{0}^{\infty} \frac{\vert\tilde{h}(f) \vert^2}{S_n(f)} df} \\
-&= 4 \int_{0}^{\infty} \frac{\vert\tilde{h}(f) \vert^2}{S_n(f)} df \\
-&= 4 {\cal R} \int_{0}^{\infty} \frac{\tilde{h}^*(f) \tilde{h}(f)}{S_n(f)} df \\
+\text{Var}(z(\tau)) &= \int_{0}^{\infty} S_n(f) |\tilde{q}(f)|^2 df = \int_{0}^{\infty} S_n(f) \left\{\frac{\tilde{h}(f)}{S_n(f)} e^{-2\pi i f \tau}\right\} \left\{\frac{\tilde{h}^*(f)}{S_n(f)}e^{2\pi i f \tau}\right\} df \\
+&= \int_{0}^{\infty} \frac{\tilde{h}(f) \tilde{h}^*(f)}{S_n(f)} df = \int_{0}^{\infty} \frac{|\tilde{h}(f)|^2}{S_n(f)} df
 \end{align}
 $$
 
-Let's define the noise-weighted inner product between two real-valued $a(t)$ and $b(t)$, with one-sided PSD, as
+The squared optimal SNR, $\rho_{\rm opt}^2$, is the ratio of the squared mean to the variance. This division causes one of the two identical integral factors in the numerator to cancel with the entire denominator:
 
 $$
 \begin{align}
-(a, b) &=  2 \int_{0}^{\infty} \frac{1}{{S_n(f)}}\left[ \tilde{a}(f) \tilde{b}^*(f) + \tilde{a}^*(f) \tilde{b}(f)\right] df\\
-&= 4\,{\cal R} \int_{0}^{\infty} \frac{\tilde{a}(f)\, \tilde{b}^*(f)}{S_n(f)} df
+\rho_{\rm opt}^2 &= \frac{4 \left( \int_{0}^{\infty} \frac{|\tilde{h}(f)|^2}{S_n(f)} df \right)^2}{\int_{0}^{\infty} \frac{|\tilde{h}(f)|^2}{S_n(f)} df} \\
+&= 4 \int_{0}^{\infty} \frac{|\tilde{h}(f)|^2}{S_n(f)} df \\
+&= 4 \mathcal{R} \int_{0}^{\infty} \frac{\tilde{h}^*(f) \tilde{h}(f)}{S_n(f)} df
 \end{align}
 $$
 
-So, 
+This final, simplified expression leads to the definition of a vital mathematical construct: the **noise-weighted inner product**. For any two real-valued signals, $a(t)$ and $b(t)$, given a one-sided PSD $S_n(f)$, their inner product $(a, b)$ is defined as:
 
 $$
 \begin{align}
-\rho_{\rm opt}^2 
-&= (h, h) \\
+(a, b) &= 2 \int_{0}^{\infty} \frac{1}{{S_n(f)}}\left[ \tilde{a}(f) \tilde{b}^*(f) + \tilde{a}^*(f) \tilde{b}(f)\right] df \\
+&= 4 \mathcal{R} \int_{0}^{\infty} \frac{\tilde{a}(f)\, \tilde{b}^*(f)}{S_n(f)} df
+\end{align}
+$$
+
+Using this compact notation, the squared optimal SNR can be expressed simply as the inner product of the signal template $h(t)$ with itself. This provides the fundamental definition of the optimal signal-to-noise ratio in gravitational wave astronomy:
+
+$$
+\begin{align}
+\rho_{\rm opt}^2 &= (h, h) \\
 \rho_{\rm opt} &= \sqrt{(h, h)}
 \end{align}
 $$
 
-In the real case detection scenario, with random noise realization; without taking mean to all noise realization, and the signal and time of arrival is not exactly known, we can write the matched filter SNR as,
+## Defining Match Filter SNR
+
+In a realistic detection scenario, we analyze a single realization of random detector noise rather than an average over all possibilities. Furthermore, the presence of a signal and its precise parameters, such as arrival time, are not known in advance. For this context, we define the **Match-Filter SNR** ($\rho_{\rm mf}$), as the output of the filtering process at a specific time $\tau$, normalized by the expected standard deviation of the noise. This statistic is constructed by taking the noise-weighted inner product of the complete data stream $d(t)$ with a signal template $h(t)$, and dividing by the norm of that template:
+
+$$
+\begin{align}
+\rho_{\rm mf} = \frac{(d, h)}{\sqrt{(h, h)}}
+\end{align}
+$$
+
+The squared value of this quantity, $\rho_{\rm mf}^2 = \frac{(d, h)^2}{(h, h)}$, corresponds to the ratio of the squared filter output to the expected variance, consistent with our previous derivations, as shown below,
 
 $$
 \begin{align}
 \rho_{\rm mf}^2 &= \frac{\vert z(\tau) \vert^2}{\text{Var}(z(\tau))}\\
 &= \frac{4}{4}\times\frac{\left\vert \int_{0}^{\infty} \frac{1}{{S_n(f)}}\left[ \tilde{d}(f) \tilde{h}^*(f) + \tilde{d}^*(f) \tilde{h}(f)\right] df \right\vert^2}{\int_{0}^{\infty} \frac{\tilde{h}(f) \tilde{h}^*(f)}{S_n(f)} df} \\
-&= \frac{(d, h) ^2}{(h, h)} \\
-\rho_{\rm mf} &= \frac{(d, h)}{\sqrt{(h, h)}}
+&= \frac{(d, h) ^2}{(h, h)} 
 \end{align}
 $$
 
-Let's see what's the distribution of the matched filter SNR, supposing that the template exactly matches the signal.
+We can analyze the statistical distribution of an ideal $\rho_{\rm mf}$ by assuming the data contains a signal $h$ that perfectly matches our template, such that $d(t) = h(t) + n(t)$. By substituting this into our definition and using the linearity of the inner product, we can separate the signal and noise components:
 
 $$
-\begin{align} 
+\begin{align}
 \rho_{\rm mf} &= \frac{(h+n, h)}{\sqrt{(h, h)}} \\
 &= \frac{(h, h) + (n, h)}{\sqrt{(h, h)}} \\
 &= \frac{(h, h)}{\sqrt{(h, h)}} + \frac{(n, h)}{\sqrt{(h, h)}} \\
@@ -204,118 +222,145 @@ $$
 \end{align}
 $$
 
-With $\langle \tilde{n}(f) \tilde{n}^*(f') \rangle = \frac{1}{2} S_n(\vert f \vert) \delta(f-f')$ and $\langle \tilde{n}(f)  \rangle = 0$, we have
+This result shows that the measured SNR in a single instance is the sum of the optimal SNR, $\rho_{\rm opt} = \sqrt{(h, h)}$, and a fluctuating term that depends linearly on the noise realization.
 
-so the mean is,
+We can determine the properties of this distribution by calculating its mean and variance over many noise realizations. Given our assumption that the noise has zero mean, $\langle \tilde{n}(f) \rangle = 0$, the expected value of the noise inner product term is zero, $(\langle n\rangle, h) = 0$. This simplifies the mean of the matched filter SNR:
 
 $$
-\begin{align} 
+\begin{align}
 \langle \rho_{\rm mf} \rangle &= \left\langle \sqrt{(h, h)} + \frac{(n, h)}{\sqrt{(h, h)}} \right\rangle \\
-&= \sqrt{(h, h)} +  \frac{(\langle n\rangle, h)}{\sqrt{(h, h)}}  \\
+&= \sqrt{(h, h)} + \frac{(\langle n\rangle, h)}{\sqrt{(h, h)}} \\
 &= \sqrt{(h, h)}
 \end{align}
 $$
 
-and the variance is,
+This confirms that the expected value of the measured SNR, when a signal is present, is the optimal SNR.
 
-$$
-\begin{align} 
-\text{Var}(\rho_{\rm mf}) &= \left\langle \left\vert \rho_{\rm mf} - \langle \rho_{\rm mf} \rangle\right\vert^2 \right\rangle \\
-&= \left\langle \left\vert \frac{(n, h)}{\sqrt{(h, h)}} \right\vert^2 \right\rangle \\
-&= \frac{1}{(h, h)} \left\langle \left\vert (n, h) \right\vert^2 \right\rangle \\
-&= \frac{1}{(h, h)} \left\langle \left\vert 4{\cal R}\int\frac{\tilde{n}(f)\tilde{h}^*(f)}{S_n(f)} df \right\vert^2 \right\rangle \\
-&= \frac{1}{(h, h)} \frac{1}{2} \left\langle \left\vert 4\int\frac{\tilde{n}(f)\tilde{h}^*(f)}{S_n(f)} df \right\vert^2 \right\rangle \\
-&= \frac{1}{(h, h)} \frac{1}{2} \left\langle \left\{ 16\int\frac{\tilde{n}(f)\tilde{h}^*(f)}{S_n(f)} df\int\frac{\tilde{n}^*(f')\tilde{h}(f')}{S_n(f')} df' \right\} \right\rangle \\
-&= \frac{1}{(h, h)} \frac{1}{2}\left\{ 16\int\int\frac{\left\langle\tilde{n}(f)\tilde{n}^*(f')\right\rangle\tilde{h}^*(f)\tilde{h}(f')}{S_n(f)S_n(f')} df\, df'\right\} \\
-&= \frac{1}{(h, h)} \left\{ 4\int\frac{\tilde{h}^*(f)\tilde{h}(f)}{S_n(f)} df\right\} \\
-&= \frac{1}{(h, h)} \left\{ 4 {\cal R} \int\frac{\tilde{h}(f)\tilde{h}^*(f)}{S_n(f)} df\right\} \\
-&= 1
-\end{align}
-$$
-
-Thus, the distribution of matched filter SNR in many noise realization is a normal distribution with $\rho_{\rm mf} \sim \mathcal{N}(\sqrt{(h, h)}, 1)$.
-
-## Detection statistics in Bayesian context
-
-* Bayes theorem: 
-
-$$
-P({\cal H}_1 | d(t)) = \frac{P(d(t) | {\cal H}_1) P({\cal H}_1)}{P(d(t))}
-$$
-
-* where $P(d(t) | {\cal H}_1)$ is the likelihood of observing data $d(t)$ given hypothesis ${\cal H}_1$, $P({\cal H}_1)$ is the prior probability of hypothesis ${\cal H}_1$, and $P(d(t))$ is the total probability of observing data $d(t)$ under all hypotheses.
-
-* hypothesis testing in probability theory
-  * Null Hypothesis ${\cal H}_0$: $d(t)=n(t)$ (noise only)
-  * Alternative Hypothesis ${\cal H}_1$: $d(t)=n(t)+h(t)$ (signal + noise)
-
-* checking how much ${\cal H}_1$ is favoured over ${\cal H}_0$ given the data $d(t)$, using odds ratio $\mathcal{O}$ and Bayes theorem.
-
-$$ 
-\begin{align} 
-\mathcal{O} &= \frac{P({\cal H}_1 | d(t))}{P({\cal H}_0 | d(t))} \\
-&= \frac{P(d(t) | {\cal H}_1) }{P(d(t) | {\cal H}_0) } \frac{P({\cal H}_1)}{ P({\cal H}_0)}  \\
-&\propto \frac{P(d(t) | {\cal H}_1) }{P(d(t) | {\cal H}_0) } \\
-\end{align}
-$$
-
-* we will ignore the prior odds $\frac{P({\cal H}_1)}{ P({\cal H}_0)}$ as it is often not known, and we are interested in how much the data $d(t)$ favours one hypothesis over the other. So the odds ratio is proportional to the Bayes factor $\mathcal{B}$, or the likelihood ratio reads,
-
-$$
-\begin{align} 
-\mathcal{B} &= \Lambda({\cal H}_1|d) = \frac{P(d(t) | {\cal H}_1)}{P(d(t) | {\cal H}_0)} \\
-\end{align}
-$$
-
-
-* assuming stationary Gaussian noise with zero mean, we can connect the likelihoods to the probability of observing any specific noise data stream $n(t)$ and it is given by a Gaussian probability distribution
-
-$$
-\begin{align} 
-p(d) 
-&\propto \exp\left[-\frac{1}{2}(d, d)\right] \\
-&= \exp\left[-2\int_{0}^{\infty} \frac{\tilde{d}(f) \tilde{d}^*(f)}{S_n(f)} df\right] \\
-\end{align}
-$$
-
-* you can see that this is just an aggregate probability of observing any specific noise data stream $n(t)$, in a probability distribution of gaussian noise with zero mean and variance defined by the PSD $S_n(f)$.
-
-* Noise Hypothesis ${\cal H}_0$: $d(t)=n(t)$ (noise only); the likelihood of observing data $d(t)$ given the noise hypothesis ${\cal H}_0$ is,
+Next, we calculate the variance of $\rho_{\rm mf}$, which is the variance of the fluctuating noise term. The calculation involves finding the expectation of the squared noise inner product, $\langle \left\vert (n, h) \right\vert^2 \rangle$. Following the derivation, this expectation is evaluated using the statistical properties of the noise, $\langle \tilde{n}(f) \tilde{n}^*(f') \rangle = \frac{1}{2} S_n(\vert f \vert) \delta(f-f')$, which causes the double integral to collapse:
 
 $$
 \begin{align}
-P(d | {\cal H}_0)
-&= {\cal C} \times \exp\left[-\frac{1}{2}(d, d)\right] \\
+\text{Var}(\rho_{\rm mf}) &= \left\langle \left\vert \rho_{\rm mf} - \langle \rho_{\rm mf} \rangle\right\vert^2 \right\rangle = \left\langle \left\vert \frac{(n, h)}{\sqrt{(h, h)}} \right\vert^2 \right\rangle = \frac{1}{(h, h)} \left\langle \left\vert (n, h) \right\vert^2 \right\rangle \\
+&= \frac{1}{(h, h)} \left\langle \left\vert 4{\cal R}\int_0^\infty\frac{\tilde{n}(f)\tilde{h}^*(f)}{S_n(f)} df \right\vert^2 \right\rangle \\
+&= \frac{1}{(h, h)} \left\{ 4 \mathcal{R} \int_0^\infty \frac{\tilde{h}(f)\tilde{h}^*(f)}{S_n(f)} df\right\}
 \end{align}
 $$
 
-* Signal + Noise Hypothesis ${\cal H}_1$: $d(t)=n(t)+h(t,\vec{\theta})$ (signal + noise); the likelihood of observing data $d(t)$ given the signal + noise hypothesis ${\cal H}_1$ is,
+The term in the curly braces is, by definition, the noise-weighted inner product $(h, h)$. The variance calculation therefore simplifies to:
 
 $$
 \begin{align}
-P(d | {\cal H}_1)
-&= {\cal C} \times \exp\left[-\frac{1}{2}(d-h, d-h)\right] \\
+\text{Var}(\rho_{\rm mf}) = \frac{(h, h)}{(h, h)} = 1
 \end{align}
 $$
 
-* Now the Bayes factor becomes,
+Because matched filtering is a linear operation performed on Gaussian noise, the resulting statistic $\rho_{\rm mf}$ is itself a Gaussian-distributed random variable. Having found its mean to be the optimal SNR and its variance to be exactly 1, we can fully describe its probability distribution as a normal distribution: $\rho_{\rm mf} \sim \mathcal{N}(\sqrt{(h, h)}, 1)$.
+
+<figure align="center">
+  <img src="_static/snrdistribution.png" alt="snr" width="80%" style="margin: 0; padding: 0;"/>
+  <figcaption align="left">
+    <b>Figure.</b> This figure illustrates the probability distribution of the matched-filter signal-to-noise ratio (&rho;<sub>mf</sub>) for a known gravitational-wave signal injected into many realizations of simulated, idealized detector noise. The histogram of numerically recovered SNR values (blue) is overlaid with the theoretical prediction (orange curve), which is a normal distribution with a mean equal to the optimal SNR (&rho;<sub>opt</sub>, indicated by the dashed line) and a standard deviation of one. The excellent agreement between the simulation and the analytic model validates the statistical principle that the measured SNR for a perfectly matched signal is a Gaussian-distributed random variable, confirming that &rho;<sub>mf</sub> ~ &#x1D4A9;(&rho;<sub>opt</sub>, 1). <em>Source: <a href="https://arxiv.org/abs/1809.02293"> </a>Thrane et al 2019, DOI: 10.1017/pasa.2019.2</em>
+  </figcaption>
+</figure>
+
+## Detection Statistics in a Bayesian Context
+
+Bayesian inference offers a formal method for hypothesis testing, providing a powerful framework to assess whether the detector data contains a gravitational wave signal. The problem is structured as a comparison between two competing models: the null hypothesis, $\mathcal{H}_0$, which posits that the data $d$ consists solely of noise ($d = n$), and the alternative hypothesis, $\mathcal{H}_1$, which posits that the data contains a signal embedded in noise ($d = n + h$).  
+
+Formally, Bayes' theorem relates the posterior probability of a hypothesis given the observed data $P({\cal H}| d)$ to the likelihood of the data under that hypothesis $P(d | {\cal H})$ and the prior probability of the hypothesis itself $P({\cal H})$:
 
 $$
 \begin{align}
-\Lambda({\cal H}_1|d) &= \frac{P(d | {\cal H}_1)}{P(d | {\cal H}_0)} \\
-&= \frac{{\cal C} \times \exp\left[-\frac{1}{2}(d-h, d-h)\right]}{{\cal C} \times \exp\left[-\frac{1}{2}(d, d)\right]} \\
+P({\cal H} | d) = \frac{P(d | {\cal H}) P({\cal H})}{P(d)}
+\end{align}
+$$
+
+To quantify how much the data favors one hypothesis over the other, we use the posterior odds ratio, $\mathcal{O}$. This is the ratio of the posterior probability of the signal hypothesis to that of the noise hypothesis. Applying Bayes' theorem to each term, the odds ratio can be expressed as:
+
+$$
+\begin{align}
+\mathcal{O} &= \frac{P(\mathcal{H}_1 | d)}{P(\mathcal{H}_0 | d)} \\
+&= \frac{P(d | \mathcal{H}_1) }{P(d | \mathcal{H}_0) } \frac{P(\mathcal{H}_1)}{ P(\mathcal{H}_0)} 
+\end{align}
+$$
+
+This expression separates the odds ratio into two components: the prior odds, $P(\mathcal{H}_1)/P(\mathcal{H}_0)$, which represents our belief before observing the data, and the Bayes factor, $\mathcal{B}$. Since the prior odds can be subjective or unknown, analysis often focuses on the Bayes factor, which is the ratio of the likelihoods of the data under the two hypotheses. The Bayes factor, also called the likelihood ratio $\Lambda$, quantifies the evidence provided by the data itself.
+
+$$
+\begin{align}
+\mathcal{B} &= \Lambda(\mathcal{H}_1|d) = \frac{P(d | \mathcal{H}_1)}{P(d | \mathcal{H}_0)}
+\end{align}
+$$
+
+To calculate the likelihoods, we assume the detector noise is a stationary, zero-mean Gaussian process. Under this assumption, the probability of observing any specific data stream is given by a Gaussian probability distribution, which can be expressed compactly using the noise-weighted inner product:
+$$
+\begin{align}
+p(d) &\propto \exp\left[-\frac{1}{2}(d, d)\right] = \exp\left[-2\int_{0}^{\infty} \frac{|\tilde{d}(f)|^2}{S_n(f)} df\right]
+\end{align}
+$$
+Under the noise hypothesis $\mathcal{H}_0$, the data is the noise realization ($d=n$), so the likelihood is $P(d | \mathcal{H}_0) \propto \exp\left[-\frac{1}{2}(d, d)\right]$. Under the signal hypothesis $\mathcal{H}_1$ for a specific signal template $h$, the noise realization is the residual $n = d-h$. The likelihood is therefore $P(d | \mathcal{H}_1) \propto \exp\left[-\frac{1}{2}(d-h, d-h)\right]$.
+
+Substituting these expressions into the Bayes factor and canceling the normalization constants $\mathcal{C}$ gives:
+$$
+\begin{align}
+\Lambda(\mathcal{H}_1|d) &= \frac{\exp\left[-\frac{1}{2}(d-h, d-h)\right]}{\exp\left[-\frac{1}{2}(d, d)\right]} \\
 &= \exp\left[-\frac{1}{2}(d-h, d-h) + \frac{1}{2}(d, d)\right] \\
-&= \exp\left[(d, h) - \frac{1}{2}(h, h)\right] \\
+&= \exp\left[-\frac{1}{2}((d,d) - 2(d,h) + (h,h)) + \frac{1}{2}(d, d)\right] \\
+&= \exp\left[(d, h) - \frac{1}{2}(h, h)\right]
 \end{align}
 $$
-
-* log-likelihood ratio becomes,
-
+For convenience, it is common to work with the natural logarithm of this quantity, known as the log-likelihood ratio. This derivation is for a signal template $h$ with precisely known parameters. The log-likelihood ratio is:
 $$
 \begin{align}
-\ln \Lambda({\cal H}_1|d) &= (d, h) - \frac{1}{2}(h, h) \\
+\ln \Lambda(\mathcal{H}_1|d) &= (d, h) - \frac{1}{2}(h, h)
 \end{align}
 $$
+This equation provides a direct link between the Bayesian evidence and the matched-filtering statistics. The term $(d, h)$ is the matched filter output, and $(h, h)$ is the squared optimal SNR of the template, $\rho_{\rm opt}^2$. A large positive value for the log-likelihood ratio indicates strong evidence in favor of the signal hypothesis.
+
+## Maximum Likelihood Ratio over Extrinsic Parameters
+
+A realistic gravitational wave signal model depends on numerous parameters. These can be categorized into intrinsic parameters, $\vec{\theta}$ (such as masses and spins), which define the waveform's morphology, and extrinsic parameters, which describe its presentation in the detector. The key extrinsic parameters are the overall amplitude $A$ (which depends on the source's distance and orientation), the coalescence phase $\phi$, and the signal's arrival time $t_0$. The log-likelihood ratio derived previously assumed a perfectly known template. In a real search, this likelihood must be maximized over these unknown extrinsic parameters to find the best possible evidence for a signal.
+
+This maximization is approached with a hybrid strategy. The amplitude and phase can be maximized analytically, while the arrival time is maximized numerically. The numerical maximization over time is efficiently handled by computing the full signal-to-noise ratio time series using an Inverse Fast Fourier Transform (IFFT) and finding the time at which its value peaks. The following derivation focuses on the analytical maximization of the log-likelihood ratio with respect to the signal amplitude, $A$.
+
+### Amplitude Maximization
+
+We begin with the log-likelihood ratio, explicitly factoring out the amplitude $A$ from the signal template $h$. Using the linearity of the inner product, we can write:
+$$
+\begin{align}
+\ln \Lambda(\mathcal{H}_1|d) &= (d, A h) - \frac{1}{2}(A h, A h) \\
+&= A (d, h) - \frac{1}{2} A^2 (h, h)
+\end{align}
+$$
+This expression is a quadratic function of $A$. To find the amplitude, $A_{\rm max}$, that maximizes the log-likelihood, we take the derivative with respect to $A$ and set it to zero:
+$$
+\begin{align}
+\frac{d}{dA} \ln \Lambda(\mathcal{H}_1|d) &= (d, h) - A (h, h) = 0
+\end{align}
+$$
+Solving for $A$ yields the maximum likelihood estimator for the amplitude:
+$$
+\begin{align}
+A_{\rm max} &= \frac{(d, h)}{(h, h)}
+\end{align}
+$$
+Next, we substitute this optimal amplitude back into the log-likelihood ratio to find its value at the maximum. This maximized value is often referred to as the "maximized log-likelihood statistic."
+$$
+\begin{align}
+\ln \Lambda(\mathcal{H}_1|d) \bigg\vert_{A=A_{\rm max}} &= A_{\rm max} (d, h) - \frac{1}{2} A_{\rm max}^2 (h, h) \\
+&= \frac{(d, h)}{(h, h)} (d, h) - \frac{1}{2} \left(\frac{(d, h)}{(h, h)}\right)^2 (h, h) \\
+&= \frac{(d, h)^2}{(h, h)} - \frac{1}{2} \frac{(d, h)^2}{(h, h)} \\
+&= \frac{1}{2} \frac{(d, h)^2}{(h, h)}
+\end{align}
+$$
+We can immediately recognize the term $\frac{(d, h)^2}{(h, h)}$ as the squared matched-filter SNR, $\rho_{\rm mf}^2$. This leads to an elegant and fundamentally important result that connects the Bayesian likelihood to the frequentist detection statistic:
+$$
+\begin{align}
+\ln \Lambda(\mathcal{H}_1|d) \bigg\vert_{A=A_{\rm max}} = \frac{1}{2} \rho_{\rm mf}^2
+\end{align}
+$$
+This shows that the log-likelihood ratio, when maximized over the unknown signal amplitude, is equivalent to one-half of the squared matched-filter SNR. This result forms a crucial bridge between Bayesian evidence and the SNR values produced by gravitational-wave search pipelines.
+
 
 ## Maximum Likelihood Ratio wrt to Amplitude, Phase and Time of Arrival
 

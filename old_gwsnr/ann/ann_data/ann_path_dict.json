@@ -1,0 +1,29 @@
+{
+    "L1": {
+        "model_path": "./ann_data/ann_model_L1.h5",
+        "scaler_path": "./ann_data/scaler_L1.pkl",
+        "error_adjustment_path": "./ann_data/error_adjustment_L1.json",
+        "sampling_frequency": 2048.0,
+        "minimum_frequency": 20.0,
+        "waveform_approximant": "IMRPhenomXPHM",
+        "snr_th": 8.0
+    },
+    "H1": {
+        "model_path": "./ann_data/ann_model_H1.h5",
+        "scaler_path": "./ann_data/scaler_H1.pkl",
+        "error_adjustment_path": "./ann_data/error_adjustment_H1.json",
+        "sampling_frequency": 2048.0,
+        "minimum_frequency": 20.0,
+        "waveform_approximant": "IMRPhenomXPHM",
+        "snr_th": 8.0
+    },
+    "V1": {
+        "model_path": "./ann_data/ann_model_V1.h5",
+        "scaler_path": "./ann_data/scaler_V1.pkl",
+        "error_adjustment_path": "./ann_data/error_adjustment_V1.json",
+        "sampling_frequency": 2048.0,
+        "minimum_frequency": 20.0,
+        "waveform_approximant": "IMRPhenomXPHM",
+        "snr_th": 8.0
+    }
+}
