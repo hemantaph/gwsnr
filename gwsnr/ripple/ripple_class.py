@@ -43,26 +43,26 @@ class RippleInnerProduct:
 
         # self.vmap_arange = vmap(jnp.arange, in_axes=(None, 0, 0))
 
-    def noise_weighted_inner_product(
-        self, signal1, signal2, psd, duration,
-    ):
-        """
-        Noise weighted inner product of two time series data sets.
+    # def noise_weighted_inner_product(
+    #     self, signal1, signal2, psd, duration,
+    # ):
+    #     """
+    #     Noise weighted inner product of two time series data sets.
 
-        Parameters
-        ----------
-        signal1: `numpy.ndarray` or `float`
-            First series data set.
-        signal2: `numpy.ndarray` or `float`
-            Second series data set.
-        psd: `numpy.ndarray` or `float`
-            Power spectral density of the detector.
-        duration: `float`
-            Duration of the data.
-        """
+    #     Parameters
+    #     ----------
+    #     signal1: `numpy.ndarray` or `float`
+    #         First series data set.
+    #     signal2: `numpy.ndarray` or `float`
+    #         Second series data set.
+    #     psd: `numpy.ndarray` or `float`
+    #         Power spectral density of the detector.
+    #     duration: `float`
+    #         Duration of the data.
+    #     """
 
-        nwip_arr = np.conj(signal1) * signal2 / psd
-        return 4 / duration * np.sum(nwip_arr)
+    #     nwip_arr = np.conj(signal1) * signal2 / psd
+    #     return 4 / duration * np.sum(nwip_arr)
 
     def arg_selection(self, waveform_name):
         """
@@ -216,8 +216,6 @@ class RippleInnerProduct:
             if duration_min:
                 duration[duration < duration_min] = duration_min
 
-        print(duration.shape[0], gw_param_dict['mass_1'])
-
         # Frequency array calculation for each of the mass combination
         del_f = 1.0 / duration
         fs = []
@@ -246,23 +244,12 @@ class RippleInnerProduct:
         # mp.set_start_method('spawn', force=True)
         hp, hc = self.vmap_waveform(fs, theta_ripple, f_ref)
         hp, hc = np.array(hp, dtype=np.complex128), np.array(hc, dtype=np.complex128)
+        # print(f"fs : {fs}")
+        # print(f"theta_ripple : {theta_ripple}")
+        # print(f"hp : {hp}")
+        # print(f"hc : {hc}")
         fs = np.array(fs, dtype=np.float64)
 
-        # input_arguments = []
-        # for i in range(size):
-        #     input_arguments.append(
-        #         [
-        #             hp[i],
-        #             hc[i],
-        #             fs[i],
-        #             fsize_arr[i],
-        #             self.f_l,
-        #             duration[i],
-        #             i,
-        #             psd_list,
-        #         ]
-        #     )
-        # input_arguments = np.array(input_arguments, dtype=object)
         input_arguments = [
             (hp_i, hc_i, fs_i, fsize_arr_i, self.f_l, duration_i, idx, psd_list)
             for idx, (hp_i, hc_i, fs_i, fsize_arr_i, duration_i)

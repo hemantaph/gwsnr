@@ -6,11 +6,6 @@ Helper functions for gwsnr
 import os
 import json
 
-# supress warning
-import absl.logging
-absl.logging.set_verbosity(absl.logging.ERROR)
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-from tensorflow.keras.models import load_model
 from importlib import resources
 import pickle
 import numpy as np
@@ -119,7 +114,11 @@ def load_ann_h5(filename):
     model : `keras.models.Model`
         Keras model loaded from the .h5 file
     """
-
+    # supress warning
+    import absl.logging
+    absl.logging.set_verbosity(absl.logging.ERROR)
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    from tensorflow.keras.models import load_model
     return load_model(filename)
 
 def append_json(file_name, new_dictionary, old_dictionary=None, replace=False):
@@ -283,6 +282,11 @@ def load_ann_h5_from_module(package, directory, filename):
     model : `keras.models.Model`
         Keras model loaded from the .h5 file
     """
+    # supress warning
+    import absl.logging
+    absl.logging.set_verbosity(absl.logging.ERROR)
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    from tensorflow.keras.models import load_model
 
     with resources.path(package + '.' + directory, filename) as h5_path:
         return load_model(h5_path)
@@ -569,9 +573,12 @@ def power_spectral_density_pycbc(psd, f_min=20.0, sampling_frequency=2048.0):
     flen = int(sampling_frequency / delta_f)
     low_frequency_cutoff = f_min
     psd_ = pycbc.psd.from_string(psd, flen, delta_f, low_frequency_cutoff)
-    return bilby.gw.detector.PowerSpectralDensity(
-        frequency_array=psd_.sample_frequencies, psd_array=psd_.data
-    )
+    frequency_array = psd_.get_sample_frequencies().data
+    psd_array = psd_.to_frequencyseries().data
+    # spline_coeff = CubicSpline(frequency_array, psd_array).c
+    spline_coeff = interp1d(frequency_array, psd_array, bounds_error=False, fill_value=np.inf)
+
+    return [frequency_array, psd_array, spline_coeff]
 
 
 # interpolator check and generation

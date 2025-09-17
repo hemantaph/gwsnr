@@ -220,7 +220,7 @@ def noise_weighted_inner_prod_ripple(params):
     hc_inner_hc_list = []
     psds_objects = params[7]
     
-    for psd in psds_objects:
+    for idx in range(len(psds_objects)):
 
         # need to compute the inner product for
         p_array = psds_objects[idx][2](fs)

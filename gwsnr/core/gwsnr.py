@@ -101,9 +101,6 @@ import os
 from importlib.resources import path
 import pathlib
 
-import jax
-# jax.config.update("jax_enable_x64", True)
-
 import multiprocessing as mp
 
 import numpy as np
@@ -767,7 +764,7 @@ class GWSNR:
             self.snr_type = "ann"
 
         else:
-            raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_jax', 'interpolation_no_spins_mlx', 'interpolation_aligned_spins', 'interpolation_aligned_spins_jax', 'interpolation_aligned_spins_mlx', 'inner_product', 'inner_product_jax', 'ann'.")
+            raise ValueError("SNR function type not recognised. Please choose from 'interpolation', 'interpolation_no_spins', 'interpolation_no_spins_numba', 'interpolation_no_spins_jax', 'interpolation_no_spins_mlx', 'interpolation_aligned_spins', 'interpolation_aligned_spins_numba', 'interpolation_aligned_spins_jax', 'interpolation_aligned_spins_mlx', 'inner_product', 'inner_product_jax', 'ann'.")
 
         # change back to original
         self.psds_list = psds_list
