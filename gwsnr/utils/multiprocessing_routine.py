@@ -59,14 +59,16 @@ def noise_weighted_inner_prod(params):
         params[19] : float
             f_min
         params[20] : float
-            duration
+            f_ref
         params[21] : float
+            duration
+        params[22] : float
             sampling_frequency
-        params[22] : int
+        params[23] : int
             index tracker
-        params[23] : list
+        params[24] : list
             list of psds for each detector
-        params[24] : str
+        params[25] : str
             frequency_domain_source_model name
         
 
@@ -102,18 +104,18 @@ def noise_weighted_inner_prod(params):
     }
 
     # print('eccentricity', params[17])
-    # print('frequency_domain_source_model', params[24])
+    # print('frequency_domain_source_model', params[25])
 
     waveform_arguments = dict(
         waveform_approximant=params[18],
-        reference_frequency=20.0,
+        reference_frequency=params[20],
         minimum_frequency=params[19],
     )
 
     waveform_generator = bilby.gw.WaveformGenerator(
-        duration=params[20],
-        sampling_frequency=params[21],
-        frequency_domain_source_model=getattr(bilby.gw.source, params[24]),
+        duration=params[21],
+        sampling_frequency=params[22],
+        frequency_domain_source_model=getattr(bilby.gw.source, params[25]),
         waveform_arguments=waveform_arguments,
     )
     polas = waveform_generator.frequency_domain_strain(parameters=parameters)
@@ -123,8 +125,8 @@ def noise_weighted_inner_prod(params):
     # <h|h> = <h+,h+> + <hx,hx>, if h+ and hx are orthogonal
     hp_inner_hp_list = []
     hc_inner_hc_list = []
-    # list_of_detectors = params[25:].tolist()
-    psds_objects = params[23]
+    # list_of_detectors = params[26:].tolist()
+    psds_objects = params[24]
     for idx in range(len(psds_objects)):
     # for idx, det in enumerate(list_of_detectors):
 
@@ -157,7 +159,7 @@ def noise_weighted_inner_prod(params):
         hp_inner_hp_list.append(hp_inner_hp)
         hc_inner_hc_list.append(hc_inner_hc)
 
-    return (hp_inner_hp_list, hc_inner_hc_list, params[22])
+    return (hp_inner_hp_list, hc_inner_hc_list, params[23])
 
 
 def noise_weighted_inner_prod_ripple(params):

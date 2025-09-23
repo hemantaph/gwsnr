@@ -20,7 +20,12 @@ class RippleInnerProduct:
     Class to compute the noise weighted inner product for a given waveform and PSD
     """
 
-    def __init__(self, waveform_name='IMRPhenomD', minimum_frequency=20.0, sampling_frequency=2048.0, reference_frequency=None):
+    def __init__(self, 
+                 waveform_name='IMRPhenomD', 
+                 minimum_frequency=20.0, 
+                 sampling_frequency=2048.0, 
+                 reference_frequency=None
+                ):
 
         # instance initialization
         self.f_u = sampling_frequency/2

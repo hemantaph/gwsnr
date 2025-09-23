@@ -175,6 +175,8 @@ class GWSNR:
         Source model for frequency domain waveform generation. Default is 'lal_binary_black_hole'.
     minimum_frequency : `float`
         Minimum frequency of the waveform. Default is 20.0.
+    reference_frequency : `float` or `None`
+        Reference frequency of the waveform. Default is None (sets to minimum_frequency).
     duration_max : `float` or `None`
         Maximum duration for waveform generation. Default is None. Automatically set to 64.0 for IMRPhenomXPHM on Intel processors.
     duration_min : `float` or `None`
@@ -280,6 +282,8 @@ class GWSNR:
     |:attr:`~frequency_domain_source_model`| `str`                           |
     +-------------------------------------+----------------------------------+
     |:attr:`~f_min`                       | `float`                          |
+    +-------------------------------------+----------------------------------+
+    |:attr:`~f_ref`                       | `float`                          |
     +-------------------------------------+----------------------------------+
     |:attr:`~duration_max`                | `float`                          |
     +-------------------------------------+----------------------------------+
@@ -445,6 +449,10 @@ class GWSNR:
     """``float`` \n
     Minimum frequency of the waveform."""
 
+    f_ref = None
+    """``float`` \n
+    Reference frequency of the waveform."""
+
     duration_max = None
     """``float`` or ``None`` \n
     Maximum duration for waveform generation."""
@@ -553,6 +561,7 @@ class GWSNR:
         waveform_approximant="IMRPhenomD",
         frequency_domain_source_model='lal_binary_black_hole',
         minimum_frequency=20.0,
+        reference_frequency=None,
         duration_max=None,
         duration_min=None,
         fixed_duration=None,
@@ -657,6 +666,7 @@ class GWSNR:
         self.waveform_approximant = waveform_approximant
         self.frequency_domain_source_model = frequency_domain_source_model
         self.f_min = minimum_frequency
+        self.f_ref = reference_frequency
         self.interpolator_dir = interpolator_dir
         self.multiprocessing_verbose = multiprocessing_verbose
 
@@ -681,10 +691,16 @@ class GWSNR:
             "mtot_resolution": self.mtot_resolution,
             "ratio_min": self.ratio_min,
             "ratio_max": self.ratio_max,
+            "spin_max": self.spin_max,
             "ratio_resolution": self.ratio_resolution,
             "sampling_frequency": self.sampling_frequency,
             "waveform_approximant": self.waveform_approximant,
             "minimum_frequency": self.f_min,
+            "reference_frequency": self.f_ref if self.f_ref is not None else self.f_min,
+            "duration_max": self.duration_max,
+            "duration_min": self.duration_min,
+            "fixed_duration": self.fixed_duration,
+            "frequency_domain_source_model": self.frequency_domain_source_model,
             "detector": detector_list,
             "psds": psds_list,
             "detector_tensor": detector_tensor_list,
@@ -741,9 +757,9 @@ class GWSNR:
 
             ripple_class = RippleInnerProduct(
                 waveform_name=waveform_approximant, 
-                minimum_frequency=minimum_frequency, 
+                minimum_frequency=self.f_min, 
                 sampling_frequency=sampling_frequency, 
-                reference_frequency=minimum_frequency
+                reference_frequency=self.f_ref if self.f_ref is not None else self.f_min,
                 )
 
             self.noise_weighted_inner_product_jax = ripple_class.noise_weighted_inner_product_jax
@@ -915,7 +931,7 @@ class GWSNR:
         # first check if the ann_data directory './ann_data' exists
         if not pathlib.Path('./ann_data').exists():
             # Get the path to the resource
-            with path('self.ann', 'ann_data') as resource_path:
+            with path('gwsnr.ann', 'ann_data') as resource_path:
                 print(f"Copying ANN data from the library resource {resource_path} to the current working directory.")
                 resource_path = pathlib.Path(resource_path)  # Ensure it's a Path object
 
@@ -1119,6 +1135,7 @@ class GWSNR:
             print("waveform approximant: ", self.waveform_approximant)
             print("sampling frequency: ", self.sampling_frequency)
             print("minimum frequency (fmin): ", self.f_min)
+            print("reference frequency (f_ref): ", self.f_ref if self.f_ref is not None else self.f_min)
             print("mtot=mass1+mass2")
             print("min(mtot): ", self.mtot_min)
             print(
@@ -2133,6 +2150,9 @@ class GWSNR:
         detector_tensor = np.array(self.detector_tensor_list.copy())
         approximant = self.waveform_approximant
         f_min = self.f_min
+        f_ref = self.f_ref
+        if f_ref is None:
+            f_ref = f_min
         num_det = np.arange(len(detectors), dtype=int)
 
         # get the psds for the required detectors
@@ -2203,6 +2223,7 @@ class GWSNR:
             eccentricity_i,
             approximant,
             f_min,
+            f_ref,
             duration_i,
             sampling_frequency,
             iterations_i,
@@ -2320,6 +2341,9 @@ class GWSNR:
         tilt_2=0.0,
         phi_12=0.0,
         phi_jl=0.0,
+        lambda_1=0.0,
+        lambda_2=0.0,
+        eccentricity=0.0,
         gw_param_dict=False,
         output_jsonfile=False,
     ):
@@ -2414,9 +2438,9 @@ class GWSNR:
 
         # if gw_param_dict is given, then use that
         if gw_param_dict is not False:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, _, _, _ = get_gw_parameters(gw_param_dict)
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, lambda_1, lambda_2, eccentricity  = get_gw_parameters(gw_param_dict)
         else:
-            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, _, _, _ = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl))
+            mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, lambda_1, lambda_2, eccentricity = get_gw_parameters(dict(mass_1=mass_1, mass_2=mass_2, luminosity_distance=luminosity_distance, theta_jn=theta_jn, psi=psi, phase=phase, geocent_time=geocent_time, ra=ra, dec=dec, a_1=a_1, a_2=a_2, tilt_1=tilt_1, tilt_2=tilt_2, phi_12=phi_12, phi_jl=phi_jl, lambda_1=lambda_1, lambda_2=lambda_2, eccentricity=eccentricity))
 
         npool = self.npool
         detectors = self.detector_list.copy()
@@ -2430,7 +2454,10 @@ class GWSNR:
         # setting up parameters for multiprocessing #
         #############################################
         mtot = mass_1 + mass_2
-        idx = (mtot >= self.mtot_min) & (mtot <= self.mtot_max)
+        if self.mtot_cut:
+            idx = np.logical_and(mtot >= self.mtot_min, mtot <= self.mtot_max)
+        else:
+            idx = np.ones_like(mtot, dtype=bool)
         # size1 = np.sum(idx)
         # iterations = np.arange(size1)  # to keep track of index
 
@@ -2450,6 +2477,9 @@ class GWSNR:
             tilt_2=tilt_2[idx],
             phi_12=phi_12[idx],
             phi_jl=phi_jl[idx],
+            lambda_1=lambda_1[idx],
+            lambda_2=lambda_2[idx],
+            eccentricity=eccentricity[idx],
         )
 
         # from ripple_class.noise_weighted_inner_product_jax
@@ -2676,7 +2706,6 @@ class GWSNR:
 
             # Horizon calculation
             horizon[det] = (dl_eff[j] / snr_th) * optimal_snr_unscaled[det]
-
 
         # dl_eff = 1/np.sqrt(np.sum((1/dl_eff)**2))
         # horizon["net"] = (dl_eff / snr_th_net) * optimal_snr_unscaled["optimal_snr_net"]
