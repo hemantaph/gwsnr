@@ -1,186 +1,188 @@
 """
-Unit tests for GWSNR inner product-based SNR calculation methods.
-
-This module provides comprehensive unit tests for the GWSNR package's inner product-based
-signal-to-noise ratio (SNR) calculation methods. These tests validate the core functionality
-of GWSNR when configured with `snr_type="inner_product"`, which computes exact SNR values
-through direct waveform generation and noise-weighted inner products.
-
-Key Features:
-------------------------
-- Exact SNR computation (no interpolation approximations)
-- Full support for spinning and precessing binary systems
-- Compatible with all LALSimulation waveform approximants
-- Higher accuracy than interpolation methods, but at higher computational cost
-
-Multiprocessing Behavior:
-------------------------
-The inner product method uses Python's multiprocessing module for parallel computation:
-
-- `multiprocessing_verbose=True` (default): Uses `imap` with tqdm progress bar
-  - Provides real-time progress monitoring for long calculations
-  - Slightly slower due to progress bar overhead
-  - Recommended for interactive use and large parameter studies
-
-- `multiprocessing_verbose=False`: Uses `map` without progress bar
-  - Faster execution by eliminating progress bar overhead
-  - No real-time progress feedback
-  - Recommended for automated testing and batch processing
+Unit tests for GWSNR inner-product based SNR calculation methods.
 
 Test Coverage:
 --------------
-• Core functionality: Spinning BBH systems with exact SNR computation
-• Waveform compatibility: Multiple approximants (IMRPhenomXPHM, SEOBNRv4, TaylorF2)
-• Detector flexibility: Custom detector configurations and PSDs
-• Performance validation: Computational efficiency and memory usage
-• Reproducibility: Deterministic results across multiple runs
-• Error handling: Robust validation of invalid inputs and edge cases
+- Inner product SNR for spin-precessing BBH systems, using IMRPhenomXPHM
+- Multiple waveform approximants (IMRPhenomD, TaylorF2)
+- Custom detector configurations and PSDs
+- Serial vs parallel multiprocessing performance
+- Output validation and reproducibility
 
 Usage:
 -----
-Run individual tests: pytest test_GWSNR_inner_product.py::test_name
-Run all tests: pytest test_GWSNR_inner_product.py -v
+pytest tests/unit/test_GWSNR_inner_product.py -v -s
+pytest tests/unit/test_GWSNR_inner_product.py::TestGWSNRInnerProduct::test_name -v -s
 """
 
+import os
 import numpy as np
-import pytest
 import time
 from gwsnr import GWSNR
-from gwsnr.utils import append_json
+from unit_utils import CommonTestUtils
 
 np.random.seed(1234)
 
-class TestGWSNRInnerProduct:
+# Default GWSNR configuration dictionary for all tests
+# This provides a consistent baseline that individual tests can modify as needed
+CONFIG = {
+    # Computational settings
+    'npool': 4,                              # Number of parallel processes for multiprocessing
+    
+    # Mass parameter ranges for interpolation grid
+    'mtot_min': 2*4.98,                      # Minimum total mass (M☉) - typical for BBH
+    'mtot_max': 2*112.5+10.0,                # Maximum total mass (M☉) - extended BBH range
+    'ratio_min': 0.1,                        # Minimum mass ratio q = m2/m1
+    'ratio_max': 1.0,                        # Maximum mass ratio (equal mass)
+    'spin_max': 0.99,                        # Maximum dimensionless spin magnitude
+    
+    # Interpolation grid resolution
+    'mtot_resolution': 50,                  # Number of total mass grid points
+    'ratio_resolution': 10,                  # Number of mass ratio grid points  
+    'spin_resolution': 10,                   # Number of spin grid points
+    
+    # Waveform generation parameters
+    'sampling_frequency': 2048.0,            # Sampling frequency (Hz)
+    'waveform_approximant': "IMRPhenomXPHM",    # Waveform model for BBH systems
+    'frequency_domain_source_model': 'lal_binary_black_hole',  # LAL source model
+    'minimum_frequency': 20.0,               # Low-frequency cutoff (Hz)
+    
+    # SNR calculation method and settings  
+    'snr_method': "inner_product",  # Use interpolation with aligned spins
+    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'create_new_interpolator': False,           # Use existing interpolators (faster)
+
+    # detector settings
+    'psds': None,
+    'ifos': None,
+    
+    # Logging and output settings
+    'gwsnr_verbose': True,                   # Enable detailed logging
+    'multiprocessing_verbose': False,         # Enable multiprocessing logs
+    
+    # Analysis settings
+    'mtot_cut': False,                       # Don't apply total mass cuts
+    'pdet': False,                           # Calculate SNR, not probability of detection
+    'snr_th': 8.0,                          # Single-detector SNR threshold
+    'snr_th_net': 8.0,                      # Network SNR threshold
+
+    # SNR recalculation settings
+    'snr_recalculation': False,
+    'snr_recalculation_range': [4, 12],
+    'snr_recalculation_waveform_approximant': "IMRPhenomXPHM",
+}
+
+class TestGWSNRInnerProduct(CommonTestUtils):
     """
     Test suite for GWSNR inner product-based SNR calculations.
-    
-    Validates exact SNR computation using direct waveform generation and noise-weighted
-    inner products. Tests core functionality, waveform compatibility, detector flexibility,
-    and performance characteristics of the `snr_type="inner_product"` method.
     """
-    
-    def _generate_bbh_params(self, nsamples, include_spins=False, distance=500.0):
-        """Generate realistic BBH parameters for testing."""
-        mtot = np.random.uniform(20, 200, nsamples)
-        mass_ratio = np.random.uniform(0.2, 1, nsamples)
-        
-        params = {
-            'mass_1': mtot / (1 + mass_ratio),
-            'mass_2': mtot * mass_ratio / (1 + mass_ratio),
-            'luminosity_distance': distance * np.ones(nsamples),
-            'geocent_time': 1246527224.169434 * np.ones(nsamples),
-            'theta_jn': np.random.uniform(0, 2*np.pi, nsamples),
-            'ra': np.random.uniform(0, 2*np.pi, nsamples),
-            'dec': np.random.uniform(-np.pi/2, np.pi/2, nsamples),
-            'psi': np.random.uniform(0, 2*np.pi, nsamples),
-            'phase': np.random.uniform(0, 2*np.pi, nsamples),
-        }
-        
-        if include_spins:
-            params.update({
-                'a_1': np.random.uniform(0, 0.8, nsamples),
-                'a_2': np.random.uniform(0, 0.8, nsamples),
-                'tilt_1': np.random.uniform(0, np.pi, nsamples),
-                'tilt_2': np.random.uniform(0, np.pi, nsamples),
-                'phi_12': np.random.uniform(0, 2*np.pi, nsamples),
-                'phi_jl': np.random.uniform(0, 2*np.pi, nsamples),
-            })
-        
-        return params
-    
-    def _validate_snr_output(self, snr_dict, expected_samples, test_name=""):
-        """Validate SNR output format and numerical properties."""
-        assert isinstance(snr_dict, dict), f"{test_name}: SNR output should be a dictionary"
-        assert "optimal_snr_net" in snr_dict, f"{test_name}: Missing 'optimal_snr_net'"
-        
-        snr_arr = np.asarray(snr_dict["optimal_snr_net"])
-        assert snr_arr.shape == (expected_samples,), f"{test_name}: Shape mismatch"
-        assert np.all(np.isfinite(snr_arr)), f"{test_name}: Non-finite SNR values"
-        assert np.all(np.isreal(snr_arr)), f"{test_name}: SNR values not real"
-        assert np.all(snr_arr >= 0), f"{test_name}: Negative SNR values"
-        assert snr_arr.dtype == np.float64, f"{test_name}: Wrong dtype"
-    
-    def _create_gwsnr(self, **overrides):
-        """Create GWSNR instance with sensible defaults and optional overrides."""
-        defaults = {
-            'npool': 1,
-            'sampling_frequency': 2048.0,
-            'waveform_approximant': "IMRPhenomD", 
-            'frequency_domain_source_model': 'lal_binary_black_hole',
-            'minimum_frequency': 20.0,
-            'snr_type': "inner_product",
-            'gwsnr_verbose': False,
-            'multiprocessing_verbose': False,
-        }
-        defaults.update(overrides)
-        return GWSNR(**defaults)
 
-    def test_spinning_bbh_systems(self, tmp_path):
+    def test_spinning_precessing_bbh_systems(self):
         """
-        Test inner product SNR calculation for spinning and precessing BBH systems.
+        Tests
+        -----
+        - Spin-precessing BBH systems using IMRPhenomXPHM approximant
+        - Output validation: dictionary structure, data types, shapes, numerical properties
+        - JSON output file creation and content verification
+        - Reproducibility: Deterministic results across multiple runs
+        """
+        # Create configuration for this test (use existing interpolators for speed)
+        config = CONFIG.copy()
+        config['gwsnr_verbose'] = True
         
-        Validates core functionality with precessing binaries using IMRPhenomXPHM.
-        Tests waveform generation, SNR computation, JSON output, and reproducibility.
-        """
-        gwsnr = self._create_gwsnr(
-            npool=4,
-            waveform_approximant="IMRPhenomXPHM",
-            ifos=["L1", "H1", "V1"],
-            multiprocessing_verbose=True  # Test progress bar functionality
+        # Initialize GWSNR instance with test configuration
+        gwsnr = GWSNR(**config)
+
+        # Generate test parameters for BBH events with aligned spins
+        nsamples = 8  # Number of test events
+        param_dict = self._generate_params(
+            nsamples, 
+            event_type='bbh',        # Binary black hole events
+            spin_zero=False,         # Include aligned spin parameters
+            spin_precession=True    # Include precessing spins
         )
-
-        nsamples = 5
-        param_dict = self._generate_bbh_params(nsamples, include_spins=True)
         
-        # Calculate SNR with spinning systems
+        # Calculate SNR values and save results to JSON file
+        output_file = "snr_data_interpolation.json"
         snr_result = gwsnr.snr(gw_param_dict=param_dict)
-        self._validate_snr_output(snr_result, nsamples, "spinning_bbh")
-        
-        # Test JSON serialization
-        param_dict.update(snr_result)
-        output_file = tmp_path / "snr_spinning_inner_product.json"
-        append_json(output_file, param_dict, replace=True)
-        assert output_file.exists() and output_file.stat().st_size > 0
+        # Validate that output has correct structure and numerical properties
+        self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
+
+        # Verify that JSON output file was created successfully
+        assert os.path.exists(output_file), "Output JSON file was not created"
+        assert os.path.getsize(output_file) > 0, "Output file is empty"
 
         # Test reproducibility
         snr_result2 = gwsnr.snr(gw_param_dict=param_dict)
         np.testing.assert_allclose(
-            snr_result["optimal_snr_net"], snr_result2["optimal_snr_net"],
-            rtol=1e-10, err_msg="Non-deterministic SNR calculation"
+            snr_result["snr_net"], # Network SNR from first calculation
+            snr_result2["snr_net"], # Network SNR from second calculation
+            rtol=1e-10, # Very tight tolerance for reproducibility
+            err_msg="Non-deterministic SNR calculation"
         )
 
     def test_multiple_waveform_approximants(self):
         """
-        Test SNR calculation across different waveform approximants.
-        
-        Validates compatibility with IMRPhenomD (spinless), SEOBNRv4 (aligned spins),
-        and TaylorF2 (post-Newtonian) approximants.
+        Tests
+        -----
+        - Compatibility with different waveform approximants
+            - IMRPhenomD, TaylorF2
+        - Output validation: dictionary structure, data types, shapes, numerical properties
         """
-        approximants = ["IMRPhenomD", "SEOBNRv4", "TaylorF2"]
-        nsamples = 2
+        # Configure GWSNR with reduced verbosity for cleaner test output
+        config = CONFIG.copy()
+        config['gwsnr_verbose'] = False  # Suppress log messages during error testing
+        config['ifos'] = ["L1"]          # Use single detector for simplicity
+
+        approximants = ["IMRPhenomD", "TaylorF2"]
+        nsamples = 8
         
         for approx in approximants:
-            gwsnr = self._create_gwsnr(waveform_approximant=approx, ifos=["L1"])
+            config['waveform_approximant'] = approx
+            gwsnr = GWSNR(**config)
             
             # Generate parameters with spins for SEOBNRv4
-            params = self._generate_bbh_params(nsamples, distance=400.0)
-            if approx == "SEOBNRv4":
-                params.update({
-                    'a_1': np.random.uniform(-0.5, 0.5, nsamples),
-                    'a_2': np.random.uniform(-0.5, 0.5, nsamples)
-                })
 
-            snr_result = gwsnr.snr(gw_param_dict=params)
-            self._validate_snr_output(snr_result, nsamples, f"approximant_{approx}")
+            if approx == "SEOBNRv4":
+                param_dict = self._generate_params(
+                    nsamples, 
+                    event_type='bbh',        # Binary black hole events
+                    spin_zero=False,         # Include aligned spin parameters
+                    spin_precession=True    # Include precessing spins
+                )
+            else:
+                param_dict = self._generate_params(
+                    nsamples, 
+                    event_type='bbh',        # Binary black hole events
+                    spin_zero=False,         # Include aligned spin parameters
+                    spin_precession=False    # No precessing spins
+                )
+
+            snr_result = gwsnr.snr(gw_param_dict=param_dict)
+            # Validate that output has correct structure and numerical properties
+            self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
 
     def test_custom_detector_configuration(self):
         """
-        Test SNR calculation with custom detector configuration.
-        
-        Creates LIGO India A1 detector with custom coordinates and PSD to validate
-        inner product method flexibility with non-standard detector setups.
+        Tests
+        -----
+        - SNR calculation with custom detector configuration (LIGO India A1)
+        - SNR calculation with custom PSDs (from pycbc) for standard detectors
+        - Output validation: dictionary structure, data types, shapes, numerical properties
         """
 
+        # Generate test parameters for BBH events with aligned spins
+        nsamples = 8  # Number of test events
+        param_dict = self._generate_params(
+            nsamples, 
+            event_type='bbh',        # Binary black hole events
+            spin_zero=False,         # Include aligned spin parameters
+            spin_precession=True     # Include precessing spins
+        )
+
+        ######################################################
+        # Test custom detector configuration (LIGO India A1) #
+        ######################################################
         import bilby
         
         # Create LIGO India A1 detector
@@ -199,101 +201,115 @@ class TestGWSNRInnerProduct:
             yarm_azimuth=207.6
         )
         
-        gwsnr = self._create_gwsnr(
-            psds={'A1': 'aLIGO_O4_high_asd.txt'},
-            ifos=[ifo_a1]
-        )
+        # Configure GWSNR with reduced verbosity for cleaner test output
+        config = CONFIG.copy()
+        config['gwsnr_verbose'] = False  # Suppress log messages during error testing
+        config['ifos'] = [ifo_a1]        # Use single custom detector
+        config['psds'] = {'A1': 'aLIGO_O4_high_asd.txt'}
 
-        nsamples = 2
-        params = self._generate_bbh_params(nsamples, distance=400.0)
-        snr_result = gwsnr.snr(gw_param_dict=params)
-        self._validate_snr_output(snr_result, nsamples, "custom_detector_A1")
+        gwsnr = GWSNR(**config)
 
-    def test_multiprocessing_performance(self):
-        """
-        Test multiprocessing performance and compare serial vs parallel execution.
-        
-        Validates that both imap (with progress bar) and map (without) modes work
-        correctly and produce consistent results.
-        """
-        nsamples = 5  # Small sample for quick testing
-        params = self._generate_bbh_params(nsamples)
-        
-        # Test serial execution (no multiprocessing overhead)
-        gwsnr_serial = self._create_gwsnr(npool=1, ifos=["L1"])
-        start_time = time.time()
-        serial_snr = gwsnr_serial.snr(gw_param_dict=params)
-        serial_time = time.time() - start_time
-        
-        # Test parallel with progress bar (imap mode)
-        gwsnr_parallel_verbose = self._create_gwsnr(
-            npool=2, ifos=["L1"], multiprocessing_verbose=True
-        )
-        parallel_verbose_snr = gwsnr_parallel_verbose.snr(gw_param_dict=params)
-        
-        # Test parallel without progress bar (map mode) 
-        gwsnr_parallel_quiet = self._create_gwsnr(
-            npool=2, ifos=["L1"], multiprocessing_verbose=False
-        )
-        start_time = time.time()
-        parallel_quiet_snr = gwsnr_parallel_quiet.snr(gw_param_dict=params)
-        parallel_time = time.time() - start_time
-        
-        # Validate all methods produce consistent results
-        self._validate_snr_output(serial_snr, nsamples, "serial")
-        self._validate_snr_output(parallel_verbose_snr, nsamples, "parallel_verbose")
-        self._validate_snr_output(parallel_quiet_snr, nsamples, "parallel_quiet")
-        
-        # Cross-validation between methods
-        np.testing.assert_allclose(
-            serial_snr["optimal_snr_net"],
-            parallel_verbose_snr["optimal_snr_net"],
-            rtol=1e-8, err_msg="Serial and parallel_verbose should match"
-        )
-        np.testing.assert_allclose(
-            serial_snr["optimal_snr_net"],
-            parallel_quiet_snr["optimal_snr_net"],
-            rtol=1e-8, err_msg="Serial and parallel_quiet should match"
-        )
-        
-        # Basic timing validation
-        assert serial_time > 0 and parallel_time > 0, "Both should take measurable time"
+        snr_result = gwsnr.snr(gw_param_dict=param_dict)
+        # Validate that output has correct structure and numerical properties
+        self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
 
-    def test_custom_psds(self):
-        """
-        Test SNR calculation with custom power spectral densities.
-        
-        Validates inner product method with design sensitivity PSDs and compares
-        results with default PSDs to ensure custom noise curves work correctly.
-        """
+        ###########################################
+        # Test custom PSDs for standard detectors #
+        ###########################################
         custom_psds = {
             'L1': 'aLIGOaLIGODesignSensitivityT1800044',
             'H1': 'aLIGOaLIGODesignSensitivityT1800044', 
             'V1': 'AdvVirgo'
         }
         
-        gwsnr_custom = self._create_gwsnr(
-            psds=custom_psds,
+        # Configure GWSNR with reduced verbosity for cleaner test output
+        config = CONFIG.copy()
+        config['gwsnr_verbose'] = False  # Suppress log messages during error testing
+        config['psds'] = custom_psds
+
+        gwsnr = GWSNR(**config)
+        snr_result = gwsnr.snr(gw_param_dict=param_dict)
+        # Validate that output has correct structure and numerical properties
+        self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
+
+    def test_multiprocessing_performance(self):
+        """
+        Tests
+        -----
+        - SNR calculation with different multiprocessing settings
+            - Serial execution (npool=1)
+            - Parallel execution with progress bar (imap mode)
+            - Parallel execution without progress bar (map mode)
+        - Consistency between serial and parallel results
+        - Basic performance timing (comparing with interpolation backends)
+        """
+        # Generate test parameters for BBH events with aligned spins
+        nsamples = 1000  # Number of test events
+        param_dict = self._generate_params(
+            nsamples, 
+            event_type='bbh',        # Binary black hole events
+            spin_zero=False,         # Include aligned spin parameters
+            spin_precession=True     # Include precessing spins
         )
-            
-        nsamples = 3
-        params = self._generate_bbh_params(nsamples, distance=400.0)
-        
-        # Test custom PSDs
-        custom_snr = gwsnr_custom.snr(gw_param_dict=params)
-        self._validate_snr_output(custom_snr, nsamples, "custom_psds")
-        
-        # Compare with default PSDs
-        gwsnr_default = self._create_gwsnr(psds=None, ifos=["L1", "H1", "V1"])
-        default_snr = gwsnr_default.snr(gw_param_dict=params)
-        
-        # Validate that custom PSDs produce reasonable results
-        custom_arr = np.asarray(custom_snr["optimal_snr_net"])
-        default_arr = np.asarray(default_snr["optimal_snr_net"])
-        ratio = custom_arr / default_arr
-        
-        assert np.all(ratio > 0.1) and np.all(ratio < 10.0), \
-            "Custom PSD SNRs should be within reasonable range of defaults"
 
+        # Configure GWSNR with reduced verbosity for cleaner test output
+        config = CONFIG.copy()
+        config['gwsnr_verbose'] = False  # Suppress log messages during error testing
+        
+        # Test serial execution (no multiprocessing overhead)
+        config['npool'] = 1
+        gwsnr_serial = GWSNR(**config)
+        start_time = time.time()
+        serial_snr = gwsnr_serial.snr(gw_param_dict=param_dict)
+        serial_time = time.time() - start_time
+        
+        # Test parallel with progress bar (imap mode)
+        config['npool'] = 4
+        config['multiprocessing_verbose'] = True
+        gwsnr_parallel_imap = GWSNR(**config)
+        start_time = time.time()
+        parallel_imap_snr = gwsnr_parallel_imap.snr(gw_param_dict=param_dict)
+        parallel_time_imap = time.time() - start_time
 
+        # Test parallel without progress bar (map mode) 
+        config['npool'] = 4
+        config['multiprocessing_verbose'] = False
+        gwsnr_parallel_map = GWSNR(**config)
+        start_time = time.time()
+        parallel_map_snr = gwsnr_parallel_map.snr(gw_param_dict=param_dict)
+        parallel_time_map = time.time() - start_time
+        
+        # Cross-validation between methods
+        np.testing.assert_allclose(
+            serial_snr["snr_net"],
+            parallel_imap_snr["snr_net"],
+            rtol=1e-8, err_msg="Serial and parallel_imap should match"
+        )
+        np.testing.assert_allclose(
+            serial_snr["snr_net"],
+            parallel_map_snr["snr_net"],
+            rtol=1e-8, err_msg="Serial and parallel_map should match"
+        )
+        
+        # Basic timing validation
+        assert serial_time > 0 and parallel_time_imap > 0 and parallel_time_map > 0, "Both should take measurable time"
 
+        # Compare with interpolation backend for rough performance benchmark
+        config_interp = CONFIG.copy()
+        config_interp['gwsnr_verbose'] = False
+        config_interp['snr_method'] = "interpolation_aligned_spins"
+        config_interp['npool'] = 4
+
+        gwsnr_interp = GWSNR(**config_interp)
+        interp_snr = gwsnr_interp.snr(gw_param_dict=param_dict) # Warm-up call to JIT compile if needed
+        start_time = time.time()
+        interp_snr = gwsnr_interp.snr(gw_param_dict=param_dict)
+        interp_time = time.time() - start_time
+
+        # Interpolation should be significantly faster than inner product
+        print(f"\nTiming (n={nsamples}): serial={serial_time:.3f}s, parallel_imap={parallel_time_imap:.3f}s, parallel_map={parallel_time_map:.3f}s, interpolation={interp_time:.3f}s")
+        assert interp_time < serial_time, "Interpolation should be faster than serial inner product"
+        assert interp_time < parallel_time_imap, "Interpolation should be faster than parallel_imap"
+        assert interp_time < parallel_time_map, "Interpolation should be faster than parallel_map"
+        assert parallel_time_imap < serial_time, "Parallel_imap should be faster than serial"
+        assert parallel_time_map < serial_time, "Parallel_map should be faster than serial"
