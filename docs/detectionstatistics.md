@@ -263,6 +263,8 @@ Because matched filtering is a linear operation performed on Gaussian noise, the
   </figcaption>
 </figure>
 
+In a realistic matched-filter search, the optimal template that perfectly matches the signal is not known. However, if the distribution of templates in the relevant parameter space is dense enough, and the signal strength is high enough (e.g. $\rho_{\rm opt}>9$ for O4), then the distribution of $\rho_{\rm mf}$, maximized over templates, will be approximately normal with mean $\rho_{\rm opt}$ and standard deviation 1. This is discussed in more detail in [Essick et. al. 2023a](https://arxiv.org/abs/2307.02765).
+
 ## Detection Statistics in a Bayesian Context
 
 Bayesian inference offers a formal method for hypothesis testing, providing a powerful framework to assess whether the detector data contains a gravitational wave signal. The problem is structured as a comparison between two competing models: the null hypothesis, $\mathcal{H}_0$, which posits that the data $d$ consists solely of noise ($d = n$), and the alternative hypothesis, $\mathcal{H}_1$, which posits that the data contains a signal embedded in noise ($d = n + h$).  

@@ -93,7 +93,7 @@ import numpy as np
 
 # initializing the GWSNR class with inner product as the signal-to-noise ratio type
 # IMRPhenomXPHM precessing waveform approximant is used
-gwsnr = gwsnr.GWSNR(snr_type='inner_product', waveform_approximant='IMRPhenomXPHM')
+gwsnr = gwsnr.GWSNR(snr_method='inner_product', waveform_approximant='IMRPhenomXPHM')
 
 # defining the parameters for the gravitational wave signal for a BBH with GW150914 like parameters
 param_dict= dict(
@@ -123,7 +123,7 @@ print('Computed SNRs with inner product:\n', snrs)
 
 ```
 Computed SNRs with inner product:
-{'L1': array([46.53]), 'H1': array([48.20]), 'V1': array([13.21]), 'optimal_snr_net': array([68.28])}
+{'L1': array([46.53]), 'H1': array([48.20]), 'V1': array([13.21]), 'snr_net': array([68.28])}
 ```
 
 ## Performance

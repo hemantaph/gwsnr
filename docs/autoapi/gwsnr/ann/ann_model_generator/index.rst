@@ -24,7 +24,7 @@ Classes
 
 
 
-.. py:class:: ANNModelGenerator(directory='./gwsnr_data', npool=4, gwsnr_verbose=True, snr_th=8.0, snr_type='interpolation_aligned_spins', waveform_approximant='IMRPhenomXPHM', **kwargs)
+.. py:class:: ANNModelGenerator(directory='./gwsnr_data', npool=4, gwsnr_verbose=True, snr_th=8.0, snr_method='interpolation_aligned_spins', waveform_approximant='IMRPhenomXPHM', **kwargs)
 
 
    

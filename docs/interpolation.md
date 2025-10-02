@@ -212,7 +212,7 @@ import numpy as np
 # for aligned-spinning IMRPhenomD waveform
 gwsnr_aligned_spins = GWSNR(
     npool=8,
-    snr_type='interpolation_aligned_spins', # or 'interpolation_aligned_spins_jax'
+    snr_method='interpolation_aligned_spins', # or 'interpolation_aligned_spins_jax'
     gwsnr_verbose=False,
 )
 
@@ -244,7 +244,7 @@ print(interp_snr_aligned_spins)
 {'L1': array([ 0.32863562, 12.80466615,  4.64289071, ...,  9.40759371,
        18.66322763,  3.73022863]), 'H1': array([ 0.90286756, 15.01545159,  5.19427481, ..., 11.65219727,
        23.79538297,  5.33905121]), 'V1': array([ 1.85612149, 12.78743709,  2.20533615, ...,  9.99559578,
-       17.89409329,  1.94768776]), 'optimal_snr_net': array([ 2.09006176, 23.51471473,  7.30755995, ..., 18.00523412,
+       17.89409329,  1.94768776]), 'snr_net': array([ 2.09006176, 23.51471473,  7.30755995, ..., 18.00523412,
        35.13879467,  6.79805569])}
 ```
 

@@ -42,42 +42,6 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: noise_weighted_inner_product(signal1, signal2, psd, duration)
-
-      
-      Noise weighted inner product of two time series data sets.
-
-
-      :Parameters:
-
-          **signal1: `numpy.ndarray` or `float`**
-              First series data set.
-
-          **signal2: `numpy.ndarray` or `float`**
-              Second series data set.
-
-          **psd: `numpy.ndarray` or `float`**
-              Power spectral density of the detector.
-
-          **duration: `float`**
-              Duration of the data.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
    .. py:method:: arg_selection(waveform_name)
 
       

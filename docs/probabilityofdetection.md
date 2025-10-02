@@ -96,7 +96,7 @@ print("Probability of detection (probabilistic):\n", pdet_gaussian)
 
 ```
 SNRs computed with inner product:
- {'L1': array([ 8.20570674,  6.6467511 , 11.8892919 ,  0.        ]), 'H1': array([6.87033936, 5.48562041, 9.66843147, 0.        ]), 'V1': array([3.56751442, 2.64453924, 4.71463604, 0.        ]), 'optimal_snr_net': array([11.28106135,  9.01470572, 16.03314136,  0.        ])}
+ {'L1': array([ 8.20570674,  6.6467511 , 11.8892919 ,  0.        ]), 'H1': array([6.87033936, 5.48562041, 9.66843147, 0.        ]), 'V1': array([3.56751442, 2.64453924, 4.71463604, 0.        ]), 'snr_net': array([11.28106135,  9.01470572, 16.03314136,  0.        ])}
 Probability of detection (deterministic):
  {'L1': array([1, 0, 1, 0]), 'H1': array([0, 0, 1, 0]), 'V1': array([0, 0, 0, 0]), 'pdet_net': array([1, 1, 1, 0])}
 Probability of detection (probabilistic):
@@ -170,7 +170,7 @@ import gwsnr
 import numpy as np
 
 # initializing the GWSNR class with inner product as the signal-to-noise ratio type
-gwsnr = gwsnr.GWSNR(snr_type='inner_product', waveform_approximant='IMRPhenomXPHM')
+gwsnr = gwsnr.GWSNR(snr_method='inner_product', waveform_approximant='IMRPhenomXPHM')
 
 # defining the parameters for the gravitational wave signal for a BBH with GW150914 like parameters
 param_dict= dict(
