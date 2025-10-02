@@ -1,9 +1,9 @@
 :orphan:
 
-:py:mod:`gwsnr.ripple.rippleInnerproduct`
+:py:mod:`gwsnr.ripple.rippleinnerproduct`
 =========================================
 
-.. py:module:: gwsnr.ripple.rippleInnerproduct
+.. py:module:: gwsnr.ripple.rippleinnerproduct
 
 
 Module Contents
@@ -14,7 +14,7 @@ Classes
 
 .. autoapisummary::
 
-   gwsnr.ripple.rippleInnerproduct.RippleInnerProduct
+   gwsnr.ripple.rippleinnerproduct.RippleInnerProduct
 
 
 
