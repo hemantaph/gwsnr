@@ -42,7 +42,6 @@ jobs:
       - name: Install project dependencies
         run: |
           pip install -e .
-          pip install ripplegw
       - name: Build Sphinx documentation
         run: |
           cd docs

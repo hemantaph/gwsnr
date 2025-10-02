@@ -56,6 +56,7 @@ extensions = [
     # "sphinxcontrib.mermaid",
     "myst_parser",
     "sphinx_rtd_dark_mode",
+    "sphinx.ext.githubpages",
 ]
 
 # MathJax configuration for proper math rendering
