@@ -149,8 +149,8 @@ html_static_path = ['_static']
 html_extra_path = ['_static/.nojekyll']
 
 html_css_files = [
+    'scalefix.css',
     'custom.css',  # Add this line to include your custom CSS
-    'scale-fix.css',
 ]
 
 # -- Configure autoapi -------------------------------------------------------

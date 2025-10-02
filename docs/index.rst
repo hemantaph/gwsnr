@@ -140,12 +140,14 @@ Glossary
    :maxdepth: 2
    :caption: API:
 
-   autoapi/gwsnr/core/index.rst
-   autoapi/gwsnr/ann/index.rst
-   autoapi/gwsnr/numba/index.rst
-   autoapi/gwsnr/jax/index.rst
-   autoapi/gwsnr/ripple/index.rst
-   autoapi/gwsnr/utils/index.rst
+   autoapi/gwsnr/core/index
+   autoapi/gwsnr/numba/index
+   autoapi/gwsnr/jax/index
+   autoapi/gwsnr/mlx/index
+   autoapi/gwsnr/ann/index
+   autoapi/gwsnr/ripple/index
+   autoapi/gwsnr/utils/index
+
    
 .. toctree::
    :maxdepth: 2
