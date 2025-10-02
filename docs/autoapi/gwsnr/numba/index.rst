@@ -32,8 +32,6 @@ Functions
    gwsnr.numba.effective_distance
    gwsnr.numba.effective_distance_array
    gwsnr.numba.linear_interpolator
-   gwsnr.numba.get_interpolated_snr_aligned_spins_numba
-   gwsnr.numba.get_interpolated_snr_no_spins_numba
 
 
 
@@ -379,6 +377,4 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
-
 

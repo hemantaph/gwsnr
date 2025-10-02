@@ -48,7 +48,6 @@ Functions
    gwsnr.utils.power_spectral_density_pycbc
    gwsnr.utils.interpolator_check
    gwsnr.utils.interpolator_pickle_path
-   gwsnr.utils.get_gw_parameters
    gwsnr.utils.noise_weighted_inner_prod_h_inner_h
    gwsnr.utils.noise_weighted_inner_prod_d_inner_h
    gwsnr.utils.noise_weighted_inner_prod_ripple
@@ -658,7 +657,6 @@ Functions
 
    ..
        !! processed by numpydoc !!
-
 
 .. py:function:: noise_weighted_inner_prod_h_inner_h(params)
 
