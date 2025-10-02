@@ -4,7 +4,7 @@ Welcome to :red:`gwsnr`’s documentation!
 .. raw:: html
 
    <div style="text-align: center; margin-top: 0px; margin-bottom: 10px; padding-top: 0px; padding-bottom: 10px;">
-      <img src="_static/logo.png" width="40%" alt="gwsnr logo">
+      <img src="_static/logo.png" width="220rem" alt="gwsnr logo">
    </div>
 
 :red:`gwsnr` : Efficient :red_first:`Gravitational`-:red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Calculator
