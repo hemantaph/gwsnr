@@ -42,9 +42,12 @@ jobs:
       - name: Install project dependencies
         run: |
           pip install -e .
+          pip install ripplegw
       - name: Build Sphinx documentation
         run: |
           cd docs
+          rm -r autoapi/*
+          make clean
           make html
       - name: List build directory contents
         run: |
