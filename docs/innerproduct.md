@@ -114,7 +114,7 @@ param_dict= dict(
 )
 
 # signal-to-noise ratio with detectors LIGO-Hanford, LIGO-Livingston, and Virgo with O4 observing run sensitivity
-snrs = gwsnr.snr(**param_dict)
+snrs = gwsnroptimal_snr(**param_dict)
 
 print('Computed SNRs with inner product:\n', snrs)
 ```

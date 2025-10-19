@@ -1,0 +1,6 @@
+/* Normalize base type scale across RTD theme versions */
+html { font-size: 100%; }      /* 16px on most browsers */
+body { font-size: 1rem; }      /* inherit 16px base */
+
+.rst-content { font-size: 1rem; line-height: 1.6; }
+.wy-nav-content { max-width: 1100px; }  /* optional, avoids “giant” full-width feel */

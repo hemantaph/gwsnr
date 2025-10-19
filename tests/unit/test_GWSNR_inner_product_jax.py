@@ -135,8 +135,8 @@ class TestGWSNRInnerProductJAX:
         })
         
         # Calculate SNR with both methods
-        jax_snr = gwsnr_jax.snr(gw_param_dict=params)
-        standard_snr = gwsnr_standard.snr(gw_param_dict=params)
+        jax_snr = gwsnr_jaxoptimal_snr(gw_param_dict=params)
+        standard_snr = gwsnr_standardoptimal_snr(gw_param_dict=params)
         
         # Validate both outputs
         self._validate_snr_output(jax_snr, nsamples)
@@ -190,7 +190,7 @@ class TestGWSNRInnerProductJAX:
                     'lambda_2': np.zeros(nsamples)*10.,
                 }
 
-            snr_result = gwsnr.snr(gw_param_dict=params)
+            snr_result = gwsnroptimal_snr(gw_param_dict=params)
             self._validate_snr_output(snr_result, nsamples)
 
     def test_jax_reproducibility(self):
@@ -211,8 +211,8 @@ class TestGWSNRInnerProductJAX:
         params = self._generate_bbh_params(3, include_spins=False)
         
         # Calculate SNR multiple times
-        snr1 = gwsnr.snr(gw_param_dict=params)
-        snr2 = gwsnr.snr(gw_param_dict=params)
+        snr1 = gwsnroptimal_snr(gw_param_dict=params)
+        snr2 = gwsnroptimal_snr(gw_param_dict=params)
         
         # Should be identical
         np.testing.assert_array_equal(

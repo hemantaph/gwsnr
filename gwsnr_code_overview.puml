@@ -11,23 +11,23 @@ title GWSNR Package Code Overview - Architecture & Workflow
 ' Main GWSNR Class
 package "gwsnr.core" {
     class GWSNR #E1F5FE {
-        + __init__(snr_type, waveform_approximant, ...)
+        + __init__(snr_method, waveform_approximant, ...)
         + snr() : Main SNR calculation dispatcher
         --
-        + snr_with_interpolation()
-        + snr_with_ann()
-        + compute_bilby_snr()
-        + compute_ripple_snr()
+        + optimal_snr_with_interpolation()
+        + optimal_snr_with_ann()
+        + optimal_snr_with_inner_product()
+        + optimal_snr_with_inner_product_ripple()
         --
         + init_partialscaled()
         + interpolator_setup()
         + ann_initialization()
         --
-        + probability_of_detection()
+        + pdet()
         + horizon_distance_analytical()
         + horizon_distance_numerical()
         --
-        - snr_type : str
+        - snr_method : str
         - detector_list : list
         - psds_list : list
         - get_interpolated_snr : function
@@ -134,7 +134,7 @@ end note
 
 note left of GWSNR
 Main Workflow:
-1. Initialize with snr_type
+1. Initialize with snr_method
 2. Setup detectors & PSDs
 3. Load/generate interpolators
 4. Call snr() method

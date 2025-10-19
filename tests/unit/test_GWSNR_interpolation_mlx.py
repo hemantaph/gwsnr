@@ -98,13 +98,13 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         )
         
         # Calculate SNR using MLX backend  
-        snr_result = gwsnr.snr(gw_param_dict=param_dict)
+        snr_result = gwsnroptimal_snr(gw_param_dict=param_dict)
         
         # Validate MLX output structure and numerical properties
         self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
         
         # Test MLX reproducibility (JIT compilation should be deterministic)
-        snr_result2 = gwsnr.snr(gw_param_dict=param_dict)  # Second call uses compiled function
+        snr_result2 = gwsnroptimal_snr(gw_param_dict=param_dict)  # Second call uses compiled function
         np.testing.assert_allclose(
             snr_result["snr_net"],   # Network SNR from first calculation
             snr_result2["snr_net"],  # Network SNR from second calculation (JIT compiled)
@@ -124,7 +124,7 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         })
         
         gwsnr_numba = GWSNR(**config_numba)
-        snr_numba = gwsnr_numba.snr(gw_param_dict=param_dict)
+        snr_numba = gwsnr_numbaoptimal_snr(gw_param_dict=param_dict)
         
         # Cross-validate: MLX and Numba should produce reasonably consistent results
         # (Allow some tolerance due to different interpolation implementations)
@@ -162,7 +162,7 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         )
         
         # Calculate SNR using MLX no-spins backend
-        snr_result = gwsnr.snr(gw_param_dict=param_dict)
+        snr_result = gwsnroptimal_snr(gw_param_dict=param_dict)
         
         # Validate output
         self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)

@@ -514,7 +514,7 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
         
         detector_tensor_list.append(ifos[i].detector_tensor)
 
-    return psds_list, detector_tensor_list, detector_list
+    return psds_list, detector_tensor_list, detector_list, ifos
 
 def power_spectral_density_bilby(psd_txt):
     """
@@ -765,11 +765,11 @@ def get_gw_parameters(gw_param_dict):
             raise ValueError(f"Parameter '{key}' contains invalid value: {value}")
 
         if key in ["mass_1", "mass_2", "luminosity_distance", "geocent_time"]:
-            if np.any(value < 0):
+            if np.any(np.array(value) < 0):
                 raise ValueError(f"Parameter '{key}' contains negative values: {value}")
             
         if key in ["a_1", "a_2", "eccentricity"]:
-            if np.any(value > 1):
+            if np.any(np.array(value) > 1):
                 raise ValueError(f"Parameter '{key}' contains invalid values: {value}")
 
     mass_1 = gw_param_dict.get("mass_1")

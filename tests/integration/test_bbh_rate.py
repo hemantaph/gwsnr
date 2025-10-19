@@ -112,9 +112,9 @@ class TestBBHRateCalculation():
 
         start = time.time()
         # SNR calculation
-        snr = gwsnr.snr(gw_param_dict=gw_params)
+        snr = gwsnroptimal_snr(gw_param_dict=gw_params)
         # Pdet calculation
-        pdet = gwsnr.probability_of_detection(snr_dict=snr)
+        pdet = gwsnr.pdet(snr_dict=snr)
         # rate calculation
         rate = self.intrinsic_BBH_merger_rate * np.average(pdet["pdet_net"])
 

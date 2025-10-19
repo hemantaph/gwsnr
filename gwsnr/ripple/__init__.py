@@ -1,5 +1,5 @@
-from .ripple_class import RippleInnerProduct
+from .rippleInnerproduct import RippleInnerProduct
 
-__all__ = [
-    'RippleInnerProduct',
-]
+# __all__ = [
+#     'RippleInnerProduct',
+# ]

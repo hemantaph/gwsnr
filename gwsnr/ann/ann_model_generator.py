@@ -55,7 +55,7 @@ class ANNModelGenerator():
         npool=4,
         gwsnr_verbose=True,
         snr_th=8.0,
-        snr_type="interpolation_aligned_spins",
+        snr_method="interpolation_aligned_spins",
         waveform_approximant="IMRPhenomXPHM",
         **kwargs,  # ler and gwsnr arguments
     ):
@@ -82,7 +82,7 @@ class ANNModelGenerator():
             sampling_frequency=2048.0,
             waveform_approximant=waveform_approximant,
             minimum_frequency=20.0,
-            snr_type="interpolation_aligned_spins",
+            snr_method="interpolation_aligned_spins",
             psds=None,
             ifos=None,
             interpolator_dir="./interpolator_pickle",
@@ -110,7 +110,7 @@ class ANNModelGenerator():
             sampling_frequency=self.gwsnr_args['sampling_frequency'],
             waveform_approximant=self.gwsnr_args['waveform_approximant'],
             minimum_frequency=self.gwsnr_args['minimum_frequency'],
-            snr_type=snr_type,
+            snr_method=snr_method,
             psds=self.gwsnr_args['psds'],
             ifos=self.gwsnr_args['ifos'],
             interpolator_dir=self.gwsnr_args['interpolator_dir'],
@@ -137,8 +137,8 @@ class ANNModelGenerator():
         # output data
         # get snr for y train
         det_ = self.gwsnr.detector_list[0]
-        if 'optimal_snr_net' in params:
-            y1 = np.array(params['optimal_snr_net'])
+        if 'snr_net' in params:
+            y1 = np.array(params['snr_net'])
         elif det_ in params:
             y1 = np.array(params[det_])
         else:

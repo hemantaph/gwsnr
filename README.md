@@ -1,8 +1,11 @@
 # gwsnr: Gravitational Wave Signal-to-Noise Ratio Computation Package
-[![DOI](https://zenodo.org/badge/626733473.svg)]() [![PyPI version](https://badge.fury.io/py/ler.svg)](https://badge.fury.io/py/gwsnr) [![DOCS](https://readthedocs.org/projects/gwsnr/badge/?version=latest)](https://gwsnr.readthedocs.io/en/latest/)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-orange)](https://hemantaph.github.io/gwsnr/) [![PyPI version](https://badge.fury.io/py/ler.svg)](https://badge.fury.io/py/gwsnr) [![DOI](https://zenodo.org/badge/626733473.svg)]()
+
+
+
 
 <p align="center">
-  <img src="docs/_static/logo.svg" alt="Your Logo" width="200" height="200">
+  <img src="docs/_static/logo.png" alt="Your Logo" width="200" height="200">
 </p>
 
 ## Installation
@@ -16,7 +19,7 @@ pip install gwsnr
 ```python
 from gwsnr import GWSNR
 gwsnr = GWSNR()
-snrs = gwsnr.snr(mass_1=30, mass_2=30, distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+snrs = gwsnroptimal_snr(mass_1=30, mass_2=30, distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
 print(f"SNR value: {snrs}")
 ```
 

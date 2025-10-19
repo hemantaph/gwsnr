@@ -4,19 +4,19 @@ Welcome to :red:`gwsnr`’s documentation!
 .. raw:: html
 
    <div style="text-align: center; margin-top: 0px; margin-bottom: 10px; padding-top: 0px; padding-bottom: 10px;">
-      <img src="_static/logo.png" width="40%" alt="gwsnr logo">
+      <img src="_static/logo.png" width="220rem" alt="gwsnr logo">
    </div>
 
 :red:`gwsnr` : Efficient :red_first:`Gravitational`-:red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Calculator
 ------------------------------
 
-``gwsnr`` is a Python package for rapid and accurate gravitational-wave (GW) Signal-to-Noise Ratio (SNR) calculation, essential for population simulations and hierarchical Bayesian inference with selection effects. It delivers a **speed-up of over 5,000x** compared to traditional methods, while maintaining an **accuracy greater than 99.5%**.
+``gwsnr`` is a Python package for fast and accurate gravitational-wave (GW) Signal-to-Noise Ratio (SNR) calculation. It is designed for semi-analytical Probability of Detection (Pdet) estimation in population simulations and for hierarchical Bayesian inference with selection effects. The package achieves a **speed-up of more than 5,000x** compared to traditional methods, while maintaining an **accuracy above 99.5%**.
 
-This package eliminates computational bottlenecks through sophisticated interpolation techniques, Just-in-Time (JIT) compilation, and parallel processing. It offers multiple optimized backends tailored for different hardware configurations: a ``numba`` backend for multi-threaded CPU performance and ``jax`` and ``mlx`` backends for GPU acceleration.
+``gwsnr`` removes computational bottlenecks using advanced interpolation, Just-in-Time (JIT) compilation, and parallel processing. It provides multiple backends optimized for different hardware: ``numba`` for multi-threaded CPU performance, and ``jax`` or ``mlx`` for GPU acceleration.
 
-With a simple API, ``gwsnr`` integrates easily into existing workflows. It is used by the ``ler`` package (`see ler documentation <https://ler.readthedocs.io/en/latest/>`_) for simulating lensed and unlensed GWs, allowing researchers to incorporate fast SNR computations with minimal overhead.
+With a simple API, ``gwsnr`` integrates smoothly into existing workflows. It is also used by the ``ler`` package (`see ler documentation <https://ler.readthedocs.io/en/latest/>`_), which simulates detectable lensed and unlensed GWs. This allows researchers to include fast Pdet calculations (via SNR) with minimal overhead.
 
-For a detailed technical overview, see the :doc:`Summary` section and browse the topics under :blue:`CONTENTS` in the sidebar (or top-left menu) on your web-browser.
+For a detailed technical overview, see the :doc:`Summary` section, and browse the topics under :blue:`CONTENTS` in the sidebar (or top-left menu) of your browser.
 
 
 Quick Start
@@ -38,7 +38,7 @@ Then, compute the SNR for a binary black hole system:
    gwsnr = GWSNR()
 
    # Compute SNR for a 30-30 Msun binary at 1000 Mpc with other random extrinsic parameters
-   snrs = gwsnr.snr(mass_1=30, mass_2=30, luminosity_distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+   snrs = gwsnroptimal_snr(mass_1=30, mass_2=30, luminosity_distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
 
    print(f"Network Optimal SNR: {snrs['snr_net']:.2f}")
 
@@ -85,7 +85,7 @@ Glossary
 
       The effect of a passing gravitational wave is incredibly subtle. To detect these faint signals, scientists use enormous L-shaped instruments called laser interferometers. The most prominent detectors are the two LIGO observatories in the United States, the Virgo detector in Italy, and the KAGRA detector in Japan. These instruments use lasers to measure minute changes in the lengths of their kilometers-long arms—changes on the order of 1/10,000th the width of a proton.
 
-      Since gravitational-wave signals are extremely weak, they are typically obscured by the detector's background noise. Scientists employ a data analysis technique called **matched filtering** to extract these hidden signals and compute the **Signal-to-Noise Ratio**. This process involves cross-correlating the noisy detector data with an extensive library of theoretical gravitational-wave templates. When the data containing a genuine signal aligns with a matching template, the SNR increases dramatically, creating a distinctive peak that indicates a potential detection once it exceeds a predetermined significance threshold.
+      Since gravitational-wave signals are extremely weak, they are typically obscured by the detector's background noise. Scientists employ a data analysis technique called **matched filtering** to extract these hidden signals and compute the **Signal-to-Noise Ratio**. This process involves cross-correlating the noisy detector data with an extensive library of theoretical gravitational-wave templates. When the data containing a genuine signal aligns with a matching template, the SNR increases dramatically, creating a distinctive peak that indicates a potential detection once it exceeds a pre-determined threshold.
 
       .. raw:: html
 
@@ -99,24 +99,7 @@ Glossary
          </div>
          </div>
 
-   Signal-to-noise ratio (SNR)
-   
-      The central metric used to assess the strength and significance of a potential gravitational-wave signal. It quantifies how much stronger the signal is compared to the average level of the background noise.
-
-      A higher SNR indicates a more confident detection, making it easier to distinguish a real astrophysical event from random noise fluctuations. Detection is typically confirmed when the SNR peak surpasses a predetermined threshold value. 
-      
-      The ``gwsnr`` package efficiently computes this critical quantity for large-scale astrophysical simulations. Unlike detection pipelines such as ``PyCBC`` and ``GstLAL``, ``gwsnr`` is optimized for rapid SNR computation across thousands or millions of gravitational-wave events in population studies.
-
-.. .. raw:: html
-
-..     <iframe src="_static/gwlensing.html"
-..             width="100%"
-..             height="600"
-..             frameborder="0"
-..             allowfullscreen
-..             style="border:1px solid #ccc; border-radius:10px;"></iframe>
-
-
+      The ``gwsnr`` package efficiently computes this critical quantity for large-scale astrophysical simulations. Unlike detection pipelines such as ``PyCBC`` and ``GstLAL``, ``gwsnr`` is optimized for rapid SNR calculation across thousands or even millions of gravitational-wave simulated events in population studies.
 
 
 .. toctree::
@@ -140,12 +123,14 @@ Glossary
    :maxdepth: 2
    :caption: API:
 
-   autoapi/gwsnr/core/index.rst
-   autoapi/gwsnr/ann/index.rst
-   autoapi/gwsnr/numba/index.rst
-   autoapi/gwsnr/jax/index.rst
-   autoapi/gwsnr/ripple/index.rst
-   autoapi/gwsnr/utils/index.rst
+   autoapi/gwsnr/core/index
+   autoapi/gwsnr/numba/index
+   autoapi/gwsnr/jax/index
+   autoapi/gwsnr/mlx/index
+   autoapi/gwsnr/ann/index
+   autoapi/gwsnr/ripple/index
+   autoapi/gwsnr/utils/index
+
    
 .. toctree::
    :maxdepth: 2

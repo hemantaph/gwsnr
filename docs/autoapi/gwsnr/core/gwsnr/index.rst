@@ -79,7 +79,7 @@
    >>> from gwsnr import GWSNR
    >>> snr_calc = GWSNR(snr_method='interpolation',
    ...                  waveform_approximant='IMRPhenomD')
-   >>> result = snr_calc.snr(mass_1=30, mass_2=30,
+   >>> result = snr_calcoptimal_snr(mass_1=30, mass_2=30,
    ...                       luminosity_distance=100,
    ...                       theta_jn=0.0, ra=0.0, dec=0.0)
 
@@ -244,7 +244,7 @@ Classes
            If True, print all the parameters of the class instance. Default is True.
 
        **multiprocessing_verbose** : `bool`
-           If True, it will show progress bar while computing SNR (inner product) with :meth:`~snr_with_interpolation`. Default is True. If False, it will not show progress bar but will be faster.
+           If True, it will show progress bar while computing SNR (inner product) with :meth:`~optimal_snr_with_interpolation`. Default is True. If False, it will not show progress bar but will be faster.
 
        **mtot_cut** : `bool`
            If True, it will set the maximum total mass of the binary according to the minimum frequency of the waveform. This is done searching for the maximum total mass corresponding to zero chirp time, i.e. the sytem merge below the minimum frequency. This is done to avoid unnecessary computation of SNR for systems that will not be detected. Default is False.
@@ -284,7 +284,7 @@ Classes
 
    >>> from gwsnr import GWSNR
    >>> snr = GWSNR()
-   >>> snr.snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+   >>> snroptimal_snr(mass_1=10.0, mass_2=10.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
 
    Instance Attributes
    ----------
@@ -385,24 +385,24 @@ Classes
    |                                     | appropriate SNR calculation      |
    |                                     | based on :attr:`~snr_method`.      |
    +-------------------------------------+----------------------------------+
-   |:meth:`~snr_with_interpolation`      | Calculates SNR using             |
+   |:meth:`~optimal_snr_with_interpolation`      | Calculates SNR using             |
    |                                     | interpolation method.            |
    +-------------------------------------+----------------------------------+
-   |:meth:`~snr_with_ann`                | Calculates SNR using             |
+   |:meth:`~optimal_snr_with_ann`                | Calculates SNR using             |
    |                                     | artificial neural network.       |
    +-------------------------------------+----------------------------------+
-   |:meth:`~compute_bilby_snr`           | Calculates SNR using             |
+   |:meth:`~optimal_snr_with_inner_product`           | Calculates SNR using             |
    |                                     | inner product method             |
    |                                     | (python multiprocessing).        |
    +-------------------------------------+----------------------------------+
-   |:meth:`~compute_ripple_snr`          | Calculates SNR using             |
+   |:meth:`~optimal_snr_with_inner_product_ripple`          | Calculates SNR using             |
    |                                     | inner product method             |
    |                                     | (jax.jit+jax.vmap).              |
    +-------------------------------------+----------------------------------+
    |:meth:`~horizon_distance`            | Calculates detector horizon      |
    |                                     | distance.                        |
    +-------------------------------------+----------------------------------+
-   |:meth:`~probability_of_detection`    | Calculates probability of        |
+   |:meth:`~pdet`    | Calculates probability of        |
    |                                     | detection.                       |
    +-------------------------------------+----------------------------------+
    |:meth:`~print_all_params`            | Prints all the parameters of     |
@@ -1779,22 +1779,22 @@ Classes
       >>> from gwsnr import GWSNR
       >>> # Basic interpolation-based SNR calculation
       >>> snr = GWSNR(snr_method='interpolation')
-      >>> result = snr.snr(mass_1=30.0, mass_2=30.0, luminosity_distance=100.0)
+      >>> result = snroptimal_snr(mass_1=30.0, mass_2=30.0, luminosity_distance=100.0)
 
       >>> # Using parameter dictionary
       >>> params = {'mass_1': [20, 30], 'mass_2': [20, 30], 'luminosity_distance': [100, 200]}
-      >>> result = snr.snr(gw_param_dict=params)
+      >>> result = snroptimal_snr(gw_param_dict=params)
 
       >>> # With probability of detection
       >>> snr_pdet = GWSNR(snr_method='interpolation', pdet=True)
-      >>> pdet_result = snr_pdet.snr(mass_1=30.0, mass_2=30.0, luminosity_distance=100.0)
+      >>> pdet_result = snr_pdetoptimal_snr(mass_1=30.0, mass_2=30.0, luminosity_distance=100.0)
 
 
 
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: snr_with_ann(mass_1=30.0, mass_2=29.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, gw_param_dict=False, output_jsonfile=False)
+   .. py:method:: optimal_snr_with_ann(mass_1=30.0, mass_2=29.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, gw_param_dict=False, output_jsonfile=False)
 
       
       Function to calculate SNR using artificial neural network (ANN) estimation method.
@@ -1898,13 +1898,13 @@ Classes
       >>> # Initialize with ANN method
       >>> snr = GWSNR(snr_method='ann', waveform_approximant='IMRPhenomXPHM')
       >>> # Calculate SNR using ANN
-      >>> result = snr.snr_with_ann(mass_1=30.0, mass_2=25.0, luminosity_distance=200.0,
+      >>> result = snr.optimal_snr_with_ann(mass_1=30.0, mass_2=25.0, luminosity_distance=200.0,
       ...                          a_1=0.5, a_2=0.3, tilt_1=0.2, tilt_2=0.1)
 
       >>> # Using parameter dictionary
       >>> params = {'mass_1': [20, 30], 'mass_2': [20, 25], 'luminosity_distance': [100, 200],
       ...           'a_1': [0.2, 0.5], 'tilt_1': [0.1, 0.3]}
-      >>> result = snr.snr_with_ann(gw_param_dict=params)
+      >>> result = snr.optimal_snr_with_ann(gw_param_dict=params)
 
 
 
@@ -1963,7 +1963,7 @@ Classes
       - Aligned spin components are computed as a_i * cos(tilt_i) for chi_eff calculation
       - Chirp mass Mc = (m1*m2)^(3/5) / (m1+m2)^(1/5) is used for amplitude scaling
       - Effective spin chi_eff = (m1*a1z + m2*a2z) / (m1+m2) where aiz are aligned components
-      - Feature scaling is applied later using pre-loaded scalers in :meth:`~snr_with_ann`
+      - Feature scaling is applied later using pre-loaded scalers in :meth:`~optimal_snr_with_ann`
 
 
 
@@ -1972,7 +1972,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: snr_with_interpolation(mass_1=30.0, mass_2=29.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, output_jsonfile=False, gw_param_dict=False)
+   .. py:method:: optimal_snr_with_interpolation(mass_1=30.0, mass_2=29.0, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, output_jsonfile=False, gw_param_dict=False)
 
       
       Function to calculate SNR using bicubic interpolation of precomputed partial-scaled SNR coefficients.
@@ -2060,16 +2060,16 @@ Classes
       >>> from gwsnr import GWSNR
       >>> # No-spin interpolation
       >>> snr = GWSNR(snr_method='interpolation_no_spins')
-      >>> result = snr.snr_with_interpolation(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
+      >>> result = snr.optimal_snr_with_interpolation(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
 
       >>> # Aligned-spin interpolation
       >>> snr_spin = GWSNR(snr_method='interpolation_aligned_spins')
-      >>> result = snr_spin.snr_with_interpolation(mass_1=30.0, mass_2=25.0,
+      >>> result = snr_spin.optimal_snr_with_interpolation(mass_1=30.0, mass_2=25.0,
       ...                                         luminosity_distance=100.0, a_1=0.5, a_2=0.3)
 
       >>> # Using parameter dictionary
       >>> params = {'mass_1': [20, 30], 'mass_2': [20, 25], 'luminosity_distance': [100, 200]}
-      >>> result = snr.snr_with_interpolation(gw_param_dict=params)
+      >>> result = snr.optimal_snr_with_interpolation(gw_param_dict=params)
 
 
 
@@ -2090,7 +2090,7 @@ Classes
       - For no-spin methods: 2D grid over (mass_ratio, total_mass)
       - For aligned-spin methods: 4D grid over (mass_ratio, total_mass, a_1, a_2)
 
-      For each grid point, it computes the optimal SNR using :meth:`~compute_bilby_snr` with fixed
+      For each grid point, it computes the optimal SNR using :meth:`~optimal_snr_with_inner_product` with fixed
       extrinsic parameters, then scales by effective luminosity distance and chirp mass to create
       the partial-scaled SNR coefficients. These coefficients are saved as pickle files for later
       use during interpolation-based SNR calculations.
@@ -2120,7 +2120,7 @@ Classes
       .. rubric:: Notes
 
       - Uses fixed extrinsic parameters: luminosity_distance=100 Mpc, theta_jn=0, ra=0, dec=0, psi=0, phase=0
-      - Calls :meth:`~compute_bilby_snr` to generate unscaled SNR values across the parameter grid
+      - Calls :meth:`~optimal_snr_with_inner_product` to generate unscaled SNR values across the parameter grid
       - Partial-scaled SNR = (optimal_SNR * d_eff) / Mc^(5/6) where Mc is chirp mass
       - Grid dimensions depend on resolution parameters: :attr:`~ratio_resolution`, :attr:`~mtot_resolution`, :attr:`~spin_resolution`
       - For aligned-spin methods, grid covers spin range [-spin_max, +spin_max] for both objects
@@ -2142,7 +2142,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: compute_bilby_snr(mass_1=10, mass_2=10, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False)
+   .. py:method:: optimal_snr_with_inner_product(mass_1=10, mass_2=10, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False)
 
       
       Function to calculate SNR using noise-weighted inner product method with LAL waveform generation.
@@ -2253,22 +2253,22 @@ Classes
       >>> # Initialize with inner product method
       >>> snr = GWSNR(snr_method='inner_product')
       >>> # Calculate SNR for aligned systems
-      >>> result = snr.compute_bilby_snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
+      >>> result = snr.optimal_snr_with_inner_product(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
 
       >>> # Calculate SNR for precessing systems
-      >>> result = snr.compute_bilby_snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0,
+      >>> result = snr.optimal_snr_with_inner_product(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0,
       ...                               a_1=0.5, a_2=0.3, tilt_1=0.2, tilt_2=0.1)
 
       >>> # Using parameter dictionary
       >>> params = {'mass_1': [20, 30], 'mass_2': [20, 25], 'luminosity_distance': [100, 200]}
-      >>> result = snr.compute_bilby_snr(gw_param_dict=params)
+      >>> result = snr.optimal_snr_with_inner_product(gw_param_dict=params)
 
 
 
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: compute_ripple_snr(mass_1=10, mass_2=10, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False)
+   .. py:method:: optimal_snr_with_inner_product_ripple(mass_1=10, mass_2=10, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False)
 
       
       Function to calculate SNR using JAX-accelerated noise-weighted inner product method with Ripple waveform generation.
@@ -2372,22 +2372,22 @@ Classes
       >>> # Initialize with JAX inner product method
       >>> snr = GWSNR(snr_method='inner_product_jax', waveform_approximant='IMRPhenomD')
       >>> # Calculate SNR for aligned systems
-      >>> result = snr.compute_ripple_snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
+      >>> result = snr.optimal_snr_with_inner_product_ripple(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
 
       >>> # Calculate SNR for precessing systems
-      >>> result = snr.compute_ripple_snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0,
+      >>> result = snr.optimal_snr_with_inner_product_ripple(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0,
       ...                                a_1=0.5, a_2=0.3, tilt_1=0.2, tilt_2=0.1)
 
       >>> # Using parameter dictionary
       >>> params = {'mass_1': [20, 30], 'mass_2': [20, 25], 'luminosity_distance': [100, 200]}
-      >>> result = snr.compute_ripple_snr(gw_param_dict=params)
+      >>> result = snr.optimal_snr_with_inner_product_ripple(gw_param_dict=params)
 
 
 
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: probability_of_detection(snr_dict, snr_th=None, snr_th_net=None, type='matched_filter')
+   .. py:method:: pdet(snr_dict, snr_th=None, snr_th_net=None, type='matched_filter')
 
       
       Function to calculate probability of detection for gravitational wave signals using SNR threshold criteria.
@@ -2446,12 +2446,12 @@ Classes
       >>> from gwsnr import GWSNR
       >>> snr = GWSNR(snr_method='interpolation', pdet=True)
       >>> # Calculate SNR first
-      >>> snr_result = snr.snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
+      >>> snr_result = snroptimal_snr(mass_1=30.0, mass_2=25.0, luminosity_distance=100.0)
       >>> # Calculate detection probability manually
-      >>> pdet_result = snr.probability_of_detection(snr_result, snr_th=8.0, type='matched_filter')
+      >>> pdet_result = snr.pdet(snr_result, snr_th=8.0, type='matched_filter')
 
       >>> # Using different thresholds for different detectors
-      >>> pdet_result = snr.probability_of_detection(snr_result, snr_th=[8.0, 8.0, 7.0], type='bool')
+      >>> pdet_result = snr.pdet(snr_result, snr_th=[8.0, 8.0, 7.0], type='bool')
 
 
 
@@ -2502,7 +2502,7 @@ Classes
       - Horizon distance = (d_eff/SNR_th) × SNR_100Mpc where d_eff is effective distance
       - Network horizon uses quadrature sum of effective distances from all detectors
       - Compatible with all waveform approximants supported by the inner product method
-      - Uses :meth:`~compute_bilby_snr` for reference SNR calculation at 100 Mpc
+      - Uses :meth:`~optimal_snr_with_inner_product` for reference SNR calculation at 100 Mpc
 
 
       .. rubric:: Examples

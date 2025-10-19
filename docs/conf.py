@@ -78,7 +78,7 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.ipynb_checkpoints','.ipynb', "venv", ".*", '**.ipynb_checkpoints', '**/*.ipynb_checkpoints', '**/**/*.ipynb_checkpoints', '**/**/**/*.ipynb_checkpoints']
 autodoc_member_order = 'bysource'
 numpydoc_show_class_members = False
-autoapi_add_toctree_entry = False
+
 # -- Napoleon options
 napoleon_include_special_with_doc = True
 pygments_style = 'sphinx'
@@ -149,6 +149,7 @@ html_static_path = ['_static']
 html_extra_path = ['_static/.nojekyll']
 
 html_css_files = [
+    'scalefix.css',
     'custom.css',  # Add this line to include your custom CSS
 ]
 
@@ -157,14 +158,13 @@ autodoc_typehints = "signature"  # autoapi respects this
 
 autoapi_type = "python"
 autoapi_dirs = ["../gwsnr"]
+autoapi_root = "autoapi"             # default output subdir used by toctree refs
 autoapi_template_dir = "_templates/autoapi"
 autoapi_options = [
-    "members",
-    "show-inheritance",
-    "show-module-summary",
-    "imported-members",
-    "special-members",
+    "members", "undoc-members", "show-module-summary",
+    "show-inheritance", "special-members", "imported-members",
 ]
+autoapi_add_toctree_entry = True
 # autoapi_python_use_implicit_namespaces = True
 autoapi_keep_files = True
 # autoapi_generate_api_docs = False

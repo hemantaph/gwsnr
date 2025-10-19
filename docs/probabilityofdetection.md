@@ -77,15 +77,15 @@ param_dict= dict(
 )
 
 # signal-to-noise ratio with detectors LIGO-Hanford, LIGO-Livingston, and Virgo with O4 observing run sensitivity
-snr_dict = gwsnr.snr(**param_dict)
+snr_dict = gwsnroptimal_snr(**param_dict)
 
 # probability of detection with a threshold of 8. The result is a dict with keys as detector names and values as the detection probabilities, and also the network detection probability.
 
 # 1. Deterministic Probability (Step Function)
-pdet_bool = gwsnr.probability_of_detection(snr_dict=snr_dict, snr_th=8, snr_th_net=8, type="bool") 
+pdet_bool = gwsnr.pdet(snr_dict=snr_dict, snr_th=8, snr_th_net=8, type="bool") 
 
 # 2. Probabilistic Detection (Gaussian Noise Model)
-pdet_gaussian = gwsnr.probability_of_detection(snr_dict=snr_dict, snr_th=8, snr_th_net=8, type="matched_filter")
+pdet_gaussian = gwsnr.pdet(snr_dict=snr_dict, snr_th=8, snr_th_net=8, type="matched_filter")
 
 print("SNRs computed with inner product:\n", snr_dict)
 print("Probability of detection (deterministic):\n", pdet_bool)
@@ -192,8 +192,8 @@ param_dict= dict(
 
 # 
 # signal-to-noise ratio with detectors LIGO-Hanford, LIGO-Livingston, and Virgo with O4 observing run sensitivity
-snr_dict = gwsnr.snr(**param_dict)
+snr_dict = gwsnroptimal_snr(**param_dict)
 
 # Calculate the probability of detection with a threshold of 8 for matched filter SNR
-pdet = gwsnr.probability_of_detection(snr_dict=snr_dict, snr_th=8., snr_th_net=8., type="matched_filter") # or type="bool"
+pdet = gwsnr.pdet(snr_dict=snr_dict, snr_th=8., snr_th_net=8., type="matched_filter") # or type="bool"
 ``` -->

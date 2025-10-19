@@ -102,11 +102,11 @@ class TestGWSNRANN(CommonTestUtils):
         # here pdet is calculated instead of SNR
         times = {}
         start = time.time()
-        ann_pdet = gwsnr_ann.snr(gw_param_dict=param_dict)
+        ann_pdet = gwsnr_annoptimal_snr(gw_param_dict=param_dict)
         times["hybrid"] = time.time() - start
 
         start = time.time()
-        bilby_pdet = gwsnr_bilby.snr(gw_param_dict=param_dict)
+        bilby_pdet = gwsnr_bilbyoptimal_snr(gw_param_dict=param_dict)
         times["bilby"] = time.time() - start
 
         self._validate_output(ann_pdet, (nsamples,), gwsnr_ann.detector_list, pdet=True)

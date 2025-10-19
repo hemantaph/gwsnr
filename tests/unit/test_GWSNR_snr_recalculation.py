@@ -108,13 +108,13 @@ class TestGWSNRSNRRecalculation(CommonTestUtils):
 
         # Test hybrid vs bilby accuracy
         times = {}
-        hybrid_snr = gwsnr_hybrid.snr_with_interpolation(gw_param_dict=param_dict)  # Warm-up call to JIT compile
+        hybrid_snr = gwsnr_hybrid.optimal_snr_with_interpolation(gw_param_dict=param_dict)  # Warm-up call to JIT compile
         start = time.time()
-        hybrid_snr = gwsnr_hybrid.snr(gw_param_dict=param_dict)
+        hybrid_snr = gwsnr_hybridoptimal_snr(gw_param_dict=param_dict)
         times["hybrid"] = time.time() - start
 
         start = time.time()
-        bilby_snr = gwsnr_bilby.snr(gw_param_dict=param_dict)
+        bilby_snr = gwsnr_bilbyoptimal_snr(gw_param_dict=param_dict)
         times["bilby"] = time.time() - start
 
         self._validate_output(hybrid_snr, (nsamples,), gwsnr_hybrid.detector_list, pdet=False)
@@ -131,8 +131,8 @@ class TestGWSNRSNRRecalculation(CommonTestUtils):
             assert np.allclose(hybrid_arr[recalc_indices], bilby_arr[recalc_indices], rtol=1e-6)
 
         # Test Pdet consistency
-        pdet_hybrid = gwsnr_hybrid.probability_of_detection(snr_dict=hybrid_snr, type="bool")["pdet_net"]
-        pdet_bilby = gwsnr_bilby.probability_of_detection(snr_dict=bilby_snr, type="bool")["pdet_net"]
+        pdet_hybrid = gwsnr_hybrid.pdet(snr_dict=hybrid_snr, type="bool")["pdet_net"]
+        pdet_bilby = gwsnr_bilby.pdet(snr_dict=bilby_snr, type="bool")["pdet_net"]
 
         agreement = np.mean(np.asarray(pdet_hybrid) == np.asarray(pdet_bilby))
         assert agreement >= 0.9, f"Pdet agreement {agreement:.1%} < 90%"

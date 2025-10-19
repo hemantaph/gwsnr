@@ -102,7 +102,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Calculate SNR values and save results to JSON file
         output_file = "snr_data_interpolation.json"
-        interp_snr = gwsnr.snr(gw_param_dict=param_dict, output_jsonfile=output_file)
+        interp_snr = gwsnroptimal_snr(gw_param_dict=param_dict, output_jsonfile=output_file)
 
         # Validate that output has correct structure and numerical properties
         self._validate_output(interp_snr, (nsamples,), gwsnr.detector_list, pdet=False)
@@ -112,7 +112,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         assert os.path.getsize(output_file) > 0, "Output file is empty"
 
         # Test computational reproducibility (same inputs should give identical outputs)
-        interp_snr2 = gwsnr.snr(gw_param_dict=param_dict)  # Calculate again with same parameters
+        interp_snr2 = gwsnroptimal_snr(gw_param_dict=param_dict)  # Calculate again with same parameters
         np.testing.assert_allclose(
             interp_snr["snr_net"],   # Network SNR from first calculation
             interp_snr2["snr_net"],  # Network SNR from second calculation
@@ -136,7 +136,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         
         # Test Case 1: Negative masses (physically impossible)
         with pytest.raises((ValueError, AssertionError)):
-            gwsnr.snr(gw_param_dict={
+            gwsnroptimal_snr(gw_param_dict={
                 'mass_1': np.array([-30]),      # Negative primary mass (invalid)
                 'mass_2': np.array([20]),       # Positive secondary mass
                 'luminosity_distance': np.array([400]),  # Valid distance
@@ -144,7 +144,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Test Case 2: NaN (Not a Number) values in input
         with pytest.raises((TypeError, ValueError)):
-            gwsnr.snr(gw_param_dict={
+            gwsnroptimal_snr(gw_param_dict={
                 'mass_1': np.array([30, 40]),           # Valid primary masses
                 'mass_2': np.array([20, np.nan]),       # NaN in secondary mass (invalid)
                 'luminosity_distance': np.array([400, 500]),  # Valid distances
@@ -152,7 +152,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Test Case 3: Infinite values in input  
         with pytest.raises((TypeError, ValueError)):
-            gwsnr.snr(gw_param_dict={
+            gwsnroptimal_snr(gw_param_dict={
                 'mass_1': np.array([30, 40]),           # Valid primary masses
                 'mass_2': np.array([20, np.inf]),       # Infinite secondary mass (invalid)
                 'luminosity_distance': np.array([400, 500]),  # Valid distances
@@ -160,7 +160,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Test Case 4: Empty input arrays (no events to process)
         with pytest.raises((ValueError, AssertionError)):
-            gwsnr.snr(gw_param_dict={
+            gwsnroptimal_snr(gw_param_dict={
                 'mass_1': np.array([]),                 # Empty mass array
                 'mass_2': np.array([]),                 # Empty mass array  
                 'luminosity_distance': np.array([]),    # Empty distance array
@@ -197,7 +197,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         }
         
         # Calculate SNR for the single event
-        interp_snr = gwsnr.snr(gw_param_dict=param_dict)
+        interp_snr = gwsnroptimal_snr(gw_param_dict=param_dict)
         
         # Validate output structure (expecting single event output shape)
         self._validate_output(interp_snr, (1,), gwsnr.detector_list, pdet=False)
@@ -245,7 +245,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         gwsnr = GWSNR(**config)
         
         # Calculate SNR for BNS test events
-        interp_snr = gwsnr.snr(gw_param_dict=param_dict)
+        interp_snr = gwsnroptimal_snr(gw_param_dict=param_dict)
         
         # Validate output structure and properties
         self._validate_output(interp_snr, (nsamples,), gwsnr.detector_list, pdet=False)
@@ -282,7 +282,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         # Initialize GWSNR for direct boolean pdet calculation
         gwsnr_pdet = GWSNR(**config_pdet)
         # Calculate boolean pdet values (0 = not detected, 1 = detected)
-        interp_pdet = gwsnr_pdet.snr(gw_param_dict=param_dict)
+        interp_pdet = gwsnr_pdetoptimal_snr(gw_param_dict=param_dict)
         # Validate boolean pdet output structure
         self._validate_output(interp_pdet, (nsamples,), gwsnr_pdet.detector_list, pdet='bool')
 
@@ -293,11 +293,11 @@ class TestGWSNRInterpolation(CommonTestUtils):
         # Initialize GWSNR for SNR calculation
         gwsnr_snr = GWSNR(**config_snr)
         # Calculate optimal SNR values for all events
-        interp_snr = gwsnr_snr.snr(gw_param_dict=param_dict)
+        interp_snr = gwsnr_snroptimal_snr(gw_param_dict=param_dict)
 
         # Derive different types of pdet from the calculated SNR values
         # Boolean pdet: binary decision based on SNR thresholds
-        interp_pdet_optimal = gwsnr_snr.probability_of_detection(
+        interp_pdet_optimal = gwsnr_snr.pdet(
             snr_dict=interp_snr,    # Input SNR dictionary
             snr_th=8.0,             # Single-detector SNR threshold  
             snr_th_net=8.0,         # Network SNR threshold
@@ -305,7 +305,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         )
         
         # Matched-filter pdet: continuous probability based on noise statistics
-        interp_pdet_match_filter = gwsnr_snr.probability_of_detection(
+        interp_pdet_match_filter = gwsnr_snr.pdet(
             snr_dict=interp_snr,    # Input SNR dictionary
             snr_th=8.0,             # Single-detector SNR threshold
             snr_th_net=8.0,         # Network SNR threshold  
@@ -320,5 +320,5 @@ class TestGWSNRInterpolation(CommonTestUtils):
             np.testing.assert_array_equal(
                 interp_pdet[key],           # Direct boolean pdet calculation
                 interp_pdet_optimal[key],   # Boolean pdet derived from SNR
-                err_msg=f"Pdet outputs from snr() and probability_of_detection() do not match for key {key}"
+                err_msg=f"Pdet outputs from snr() and pdet() do not match for key {key}"
             )
