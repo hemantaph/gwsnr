@@ -295,14 +295,17 @@ $$
 $$
 
 To calculate the likelihoods, we assume the detector noise is a stationary, zero-mean Gaussian process. Under this assumption, the probability of observing any specific data stream is given by a Gaussian probability distribution, which can be expressed compactly using the noise-weighted inner product:
+
 $$
 \begin{align}
 p(d) &\propto \exp\left[-\frac{1}{2}(d, d)\right] = \exp\left[-2\int_{0}^{\infty} \frac{|\tilde{d}(f)|^2}{S_n(f)} df\right]
 \end{align}
 $$
+
 Under the noise hypothesis $\mathcal{H}_0$, the data is the noise realization ($d=n$), so the likelihood is $P(d | \mathcal{H}_0) \propto \exp\left[-\frac{1}{2}(d, d)\right]$. Under the signal hypothesis $\mathcal{H}_1$ for a specific signal template $h$, the noise realization is the residual $n = d-h$. The likelihood is therefore $P(d | \mathcal{H}_1) \propto \exp\left[-\frac{1}{2}(d-h, d-h)\right]$.
 
 Substituting these expressions into the Bayes factor and canceling the normalization constants $\mathcal{C}$ gives:
+
 $$
 \begin{align}
 \Lambda(\mathcal{H}_1|d) &= \frac{\exp\left[-\frac{1}{2}(d-h, d-h)\right]}{\exp\left[-\frac{1}{2}(d, d)\right]} \\
@@ -311,12 +314,15 @@ $$
 &= \exp\left[(d, h) - \frac{1}{2}(h, h)\right]
 \end{align}
 $$
+
 For convenience, it is common to work with the natural logarithm of this quantity, known as the log-likelihood ratio. This derivation is for a signal template $h$ with precisely known parameters. The log-likelihood ratio is:
+
 $$
 \begin{align}
 \ln \Lambda(\mathcal{H}_1|d) &= (d, h) - \frac{1}{2}(h, h)
 \end{align}
 $$
+
 This equation provides a direct link between the Bayesian evidence and the matched-filtering statistics. The term $(d, h)$ is the matched filter output, and $(h, h)$ is the squared optimal SNR of the template, $\rho_{\rm opt}^2$. A large positive value for the log-likelihood ratio indicates strong evidence in favor of the signal hypothesis.
 
 ## Maximum Likelihood Ratio over Extrinsic Parameters
@@ -328,25 +334,32 @@ This maximization is approached with a hybrid strategy. The amplitude and phase 
 ### Amplitude Maximization
 
 We begin with the log-likelihood ratio, explicitly factoring out the amplitude $A$ from the signal template $h$. Using the linearity of the inner product, we can write:
+
 $$
 \begin{align}
 \ln \Lambda(\mathcal{H}_1|d) &= (d, A h) - \frac{1}{2}(A h, A h) \\
 &= A (d, h) - \frac{1}{2} A^2 (h, h)
 \end{align}
 $$
+
 This expression is a quadratic function of $A$. To find the amplitude, $A_{\rm max}$, that maximizes the log-likelihood, we take the derivative with respect to $A$ and set it to zero:
+
 $$
 \begin{align}
 \frac{d}{dA} \ln \Lambda(\mathcal{H}_1|d) &= (d, h) - A (h, h) = 0
 \end{align}
 $$
+
 Solving for $A$ yields the maximum likelihood estimator for the amplitude:
+
 $$
 \begin{align}
 A_{\rm max} &= \frac{(d, h)}{(h, h)}
 \end{align}
 $$
+
 Next, we substitute this optimal amplitude back into the log-likelihood ratio to find its value at the maximum. This maximized value is often referred to as the "maximized log-likelihood statistic."
+
 $$
 \begin{align}
 \ln \Lambda(\mathcal{H}_1|d) \bigg\vert_{A=A_{\rm max}} &= A_{\rm max} (d, h) - \frac{1}{2} A_{\rm max}^2 (h, h) \\
@@ -355,12 +368,14 @@ $$
 &= \frac{1}{2} \frac{(d, h)^2}{(h, h)}
 \end{align}
 $$
+
 We can immediately recognize the term $\frac{(d, h)^2}{(h, h)}$ as the squared matched-filter SNR, $\rho_{\rm mf}^2$. This leads to an elegant and fundamentally important result that connects the Bayesian likelihood to the frequentist detection statistic:
 $$
 \begin{align}
 \ln \Lambda(\mathcal{H}_1|d) \bigg\vert_{A=A_{\rm max}} = \frac{1}{2} \rho_{\rm mf}^2
 \end{align}
 $$
+
 This shows that the log-likelihood ratio, when maximized over the unknown signal amplitude, is equivalent to one-half of the squared matched-filter SNR. This result forms a crucial bridge between Bayesian evidence and the SNR values produced by gravitational-wave search pipelines.
 
 
