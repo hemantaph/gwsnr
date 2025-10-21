@@ -370,6 +370,7 @@ $$
 $$
 
 We can immediately recognize the term $\frac{(d, h)^2}{(h, h)}$ as the squared matched-filter SNR, $\rho_{\rm mf}^2$. This leads to an elegant and fundamentally important result that connects the Bayesian likelihood to the frequentist detection statistic:
+
 $$
 \begin{align}
 \ln \Lambda(\mathcal{H}_1|d) \bigg\vert_{A=A_{\rm max}} = \frac{1}{2} \rho_{\rm mf}^2
