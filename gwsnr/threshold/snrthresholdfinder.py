@@ -105,7 +105,7 @@ class SNRThresholdFinder:
             selection_range = dict(
                 key_name = 'mass1_source',
                 parameter = None,
-                range = (5, 200)
+                range = (30, 60),
             )
         self.selection_range = selection_range
 

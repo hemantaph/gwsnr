@@ -138,6 +138,7 @@ Glossary
 
    examples/snr_generation
    examples/ann_model_generation_custom
+   examples/threshold
 
 
 Indices and tables

@@ -1,4 +1,4 @@
-## Code Overview
+# Code Overview
 
 **Zoom-out view**
 

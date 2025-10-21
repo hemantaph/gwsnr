@@ -34,6 +34,8 @@ Functions
 .. autoapisummary::
 
    gwsnr.mlx.mlx_functions.findchirp_chirptime_mlx
+   gwsnr.mlx.mlx_functions.trunc_mlx
+   gwsnr.mlx.mlx_functions.fmod_mlx
    gwsnr.mlx.mlx_functions.gps_to_gmst
    gwsnr.mlx.mlx_functions.ra_dec_to_theta_phi
    gwsnr.mlx.mlx_functions.get_polarization_tensor_plus
@@ -87,6 +89,12 @@ Functions
 
    ..
        !! processed by numpydoc !!
+
+.. py:function:: trunc_mlx(x)
+
+
+.. py:function:: fmod_mlx(x, y)
+
 
 .. py:function:: gps_to_gmst(gps_time)
 

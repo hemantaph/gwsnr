@@ -1,5 +1,3 @@
-:orphan:
-
 :py:mod:`gwsnr.mlx.mlx_interpolators`
 =====================================
 
@@ -15,6 +13,8 @@ Functions
 
 .. autoapisummary::
 
+   gwsnr.mlx.mlx_interpolators.find_index_1d_mlx
+   gwsnr.mlx.mlx_interpolators.spline_interp_4pts_mlx
    gwsnr.mlx.mlx_interpolators.spline_interp_4x4x4x4pts_mlx
    gwsnr.mlx.mlx_interpolators.spline_interp_4x4x4x4pts_batched_mlx
    gwsnr.mlx.mlx_interpolators.get_interpolated_snr_aligned_spins_mlx
@@ -24,6 +24,12 @@ Functions
    gwsnr.mlx.mlx_interpolators.get_interpolated_snr_no_spins_mlx
    gwsnr.mlx.mlx_interpolators.get_interpolated_snr_no_spins_helper
 
+
+
+.. py:function:: find_index_1d_mlx(x_array, x_new)
+
+
+.. py:function:: spline_interp_4pts_mlx(x_eval, x_pts, y_pts, condition_i)
 
 
 .. py:function:: spline_interp_4x4x4x4pts_mlx(q_array, mtot_array, a1_array, a2_array, snrpartialscaled_array, q_new, mtot_new, a1_new, a2_new)

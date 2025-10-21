@@ -1,5 +1,3 @@
-:orphan:
-
 :py:mod:`gwsnr.mlx`
 ===================
 
@@ -13,6 +11,7 @@ Submodules
    :maxdepth: 1
 
    mlx_functions/index.rst
+   mlx_interpolators/index.rst
 
 
 Package Contents

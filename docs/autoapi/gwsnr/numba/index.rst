@@ -1,5 +1,3 @@
-:orphan:
-
 :py:mod:`gwsnr.numba`
 =====================
 
@@ -13,6 +11,7 @@ Submodules
    :maxdepth: 1
 
    njit_functions/index.rst
+   njit_interpolators/index.rst
 
 
 Package Contents
@@ -32,6 +31,8 @@ Functions
    gwsnr.numba.effective_distance
    gwsnr.numba.effective_distance_array
    gwsnr.numba.linear_interpolator
+   gwsnr.numba.get_interpolated_snr_aligned_spins_numba
+   gwsnr.numba.get_interpolated_snr_no_spins_numba
 
 
 
@@ -377,4 +378,10 @@ Functions
 
    ..
        !! processed by numpydoc !!
+
+.. py:function:: get_interpolated_snr_aligned_spins_numba(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, a_1, a_2, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, batch_size=100000)
+
+
+.. py:function:: get_interpolated_snr_no_spins_numba(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, a_1, a_2, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, batch_size=100000)
+
 

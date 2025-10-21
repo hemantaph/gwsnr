@@ -1,5 +1,3 @@
-:orphan:
-
 :py:mod:`gwsnr.jax`
 ===================
 
@@ -13,6 +11,7 @@ Submodules
    :maxdepth: 1
 
    jaxjit_functions/index.rst
+   jaxjit_interpolators/index.rst
 
 
 Package Contents

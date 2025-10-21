@@ -75,6 +75,9 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: get_input_output_data(params=None, randomize=True)
+
+
    .. py:method:: get_input_data(params)
 
       
@@ -105,5 +108,44 @@ Classes
 
       ..
           !! processed by numpydoc !!
+
+   .. py:method:: standard_scaling_initialization(X_train)
+
+
+   .. py:method:: ann_model_4layers(num_nodes_list, activation_fn_list, optimizer, loss, metrics)
+
+
+   .. py:method:: get_parameters(gw_param_dict)
+
+
+   .. py:method:: get_scaled_data(gw_param_dict, randomize=True, test_size=0.1, random_state=42)
+
+
+   .. py:method:: ann_model_training(gw_param_dict, randomize=True, test_size=0.1, random_state=42, num_nodes_list=[5, 32, 32, 1], activation_fn_list=['relu', 'relu', 'sigmoid', 'linear'], optimizer='adam', loss='mean_squared_error', metrics=['accuracy'], batch_size=32, epochs=100, error_adjustment_snr_range=[4, 10], ann_file_name='ann_model.h5', scaler_file_name='scaler.pkl', error_adjustment_file_name='error_adjustment.json', ann_path_dict_file_name='ann_path_dict.json')
+
+
+   .. py:method:: pdet_error(gw_param_dict=None, randomize=True, error_adjustment=True)
+
+
+   .. py:method:: save_ann_path_dict(ann_file_name='ann_model.h5', scaler_file_name='scaler.pkl', error_adjustment_file_name='error_adjustment.json', ann_path_dict_file_name='ann_path_dict.json')
+
+
+   .. py:method:: pdet_confusion_matrix(gw_param_dict=None, randomize=True, snr_threshold=8.0)
+
+
+   .. py:method:: load_model_scaler_error(ann_file_name='ann_model.h5', scaler_file_name='scaler.pkl', error_adjustment_file_name=False)
+
+
+   .. py:method:: helper_error_adjustment(y_pred, y_test, snr_range=[4, 10])
+
+
+   .. py:method:: snr_error_adjustment(gw_param_dict=None, randomize=True, snr_threshold=8.0, snr_range=[4, 10], error_adjustment_file_name='error_adjustment.json')
+
+
+   .. py:method:: predict_snr(gw_param_dict, error_adjustment=True)
+
+
+   .. py:method:: predict_pdet(gw_param_dict, snr_threshold=8.0, error_adjustment=True)
+
 
 

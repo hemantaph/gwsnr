@@ -1,5 +1,3 @@
-:orphan:
-
 :py:mod:`gwsnr.numba.njit_interpolators`
 ========================================
 
@@ -19,6 +17,10 @@ Functions
    gwsnr.numba.njit_interpolators.spline_interp_4pts_numba
    gwsnr.numba.njit_interpolators.spline_interp_4x4x4x4pts_numba
    gwsnr.numba.njit_interpolators.spline_interp_4x4x4x4pts_batched_numba
+   gwsnr.numba.njit_interpolators.get_interpolated_snr_aligned_spins_numba
+   gwsnr.numba.njit_interpolators.spline_interp_4x4pts_numba
+   gwsnr.numba.njit_interpolators.spline_interp_4x4pts_batched_numba
+   gwsnr.numba.njit_interpolators.get_interpolated_snr_no_spins_numba
 
 
 
@@ -249,4 +251,16 @@ Functions
 
    ..
        !! processed by numpydoc !!
+
+.. py:function:: get_interpolated_snr_aligned_spins_numba(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, a_1, a_2, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, batch_size=100000)
+
+
+.. py:function:: spline_interp_4x4pts_numba(q_array, mtot_array, snrpartialscaled_array, q_new, mtot_new, int_q, int_m)
+
+
+.. py:function:: spline_interp_4x4pts_batched_numba(q_array, mtot_array, snrpartialscaled_array, q_new_batch, mtot_new_batch)
+
+
+.. py:function:: get_interpolated_snr_no_spins_numba(mass_1, mass_2, luminosity_distance, theta_jn, psi, geocent_time, ra, dec, a_1, a_2, detector_tensor, snr_partialscaled, ratio_arr, mtot_arr, a1_arr, a_2_arr, batch_size=100000)
+
 

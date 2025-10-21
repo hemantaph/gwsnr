@@ -1,5 +1,3 @@
-:orphan:
-
 :py:mod:`gwsnr.jax.jaxjit_interpolators`
 ========================================
 

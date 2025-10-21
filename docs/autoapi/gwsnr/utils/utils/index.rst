@@ -44,6 +44,7 @@ Functions
    gwsnr.utils.utils.power_spectral_density_pycbc
    gwsnr.utils.utils.interpolator_check
    gwsnr.utils.utils.interpolator_pickle_path
+   gwsnr.utils.utils.get_gw_parameters
 
 
 
@@ -682,4 +683,7 @@ Functions
 
    ..
        !! processed by numpydoc !!
+
+.. py:function:: get_gw_parameters(gw_param_dict)
+
 

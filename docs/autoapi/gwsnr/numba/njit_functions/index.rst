@@ -43,6 +43,30 @@ Functions
 
 
 
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   gwsnr.numba.njit_functions.Gamma
+   gwsnr.numba.njit_functions.Pi
+   gwsnr.numba.njit_functions.MTSUN_SI
+
+
+.. py:data:: Gamma
+   :value: 0.5772156649015329
+
+   
+
+.. py:data:: Pi
+
+   
+
+.. py:data:: MTSUN_SI
+   :value: 4.925491025543576e-06
+
+   
+
 .. py:function:: findchirp_chirptime(m1, m2, fmin)
 
    
