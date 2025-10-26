@@ -96,6 +96,15 @@ class TestGWSNRANN(CommonTestUtils):
             spin_zero=False,         # Include aligned spin parameters
             spin_precession=True    # Include precessing spins
         )
+        nsamples_warm_up = 10
+        warm_up_params = self._generate_params(
+            nsamples_warm_up, 
+            event_type='bbh',        # Binary black hole events
+            spin_zero=False,         # Include aligned spin parameters
+            spin_precession=True    # Include precessing spins
+        )
+        # Warm up JIT compilation
+        _ = gwsnr_ann.pdet(gw_param_dict=warm_up_params)
 
         # Test hybrid vs bilby accuracy
         # here pdet is calculated instead of SNR
