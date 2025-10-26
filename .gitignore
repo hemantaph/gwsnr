@@ -4,6 +4,11 @@ __pycache__/
 *$py.class
 *.so
 .pypirc
+.pytest_cache/
+.venv/
+.vscode/
+interpolator_pickle/
+ann_data/
 
 # Jupyter
 .ipynb_checkpoints/

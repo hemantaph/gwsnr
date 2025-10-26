@@ -5,15 +5,24 @@ in binary black hole (BBH) systems. These tests assess the consistency,
 physical validity, and reproducibility of the ANN model, and benchmark its
 detection outputs against the direct inner product method.
 
+Requirements:
+-------------
+- pip install gwsnr scikit-learn tensorflow
+- Upgrading `ml-dtypes` may be required for compatibility.
+  - pip install --upgrade ml-dtypes
+- pip install pytest
+
 Test Coverage:
+--------------
 - Spinning BBH systems with spin-precession
 - Output validation: dictionary structure, data types, shapes, numerical properties
 - Probability of detection (Pdet) consistency between ANN and bilby methods
 - Performance: ANN should be faster than full bilby recalculation
 
 Usage:
-Run full suite: pytest tests/unit/test_GWSNR_ann.py -v -s
-Run individual tests: pytest tests/unit/test_GWSNR_ann.py::TestGWSNRANN::test_spinning_bbh -v -s
+-----
+pytest tests/unit/test_GWSNR_ann.py -v -s
+pytest tests/unit/test_GWSNR_ann.py::TestGWSNRANN::test_spinning_bbh -v -s
 """
 
 import numpy as np
@@ -49,7 +58,7 @@ CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "ann",  # Use ANN for SNR and pdet calculatio=12]
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings

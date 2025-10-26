@@ -72,7 +72,7 @@ Attributes
 
    
 
-.. py:class:: GWSNR(npool=int(4), mtot_min=2 * 4.98, mtot_max=2 * 112.5 + 10.0, ratio_min=0.1, ratio_max=1.0, spin_max=0.99, mtot_resolution=200, ratio_resolution=20, spin_resolution=10, batch_size_interpolation=1000000, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', frequency_domain_source_model='lal_binary_black_hole', minimum_frequency=20.0, reference_frequency=None, duration_max=None, duration_min=None, fixed_duration=None, snr_method='interpolation_no_spins', snr_type='optimal_snr', noise_realization=None, psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=False, pdet_kwargs=None, ann_path_dict=None, snr_recalculation=False, snr_recalculation_range=[4, 12], snr_recalculation_waveform_approximant='IMRPhenomXPHM')
+.. py:class:: GWSNR(npool=int(4), mtot_min=2 * 4.98, mtot_max=2 * 112.5 + 10.0, ratio_min=0.1, ratio_max=1.0, spin_max=0.99, mtot_resolution=200, ratio_resolution=20, spin_resolution=10, batch_size_interpolation=1000000, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', frequency_domain_source_model='lal_binary_black_hole', minimum_frequency=20.0, reference_frequency=None, duration_max=None, duration_min=None, fixed_duration=None, snr_method='interpolation_no_spins', snr_type='optimal_snr', noise_realization=None, psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=False, pdet_kwargs=None, ann_path_dict=None, snr_recalculation=False, snr_recalculation_range=[6, 14], snr_recalculation_waveform_approximant='IMRPhenomXPHM')
 
 
    
@@ -1321,7 +1321,7 @@ Attributes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: ann_initilization(ann_path_dict, detector_list, sampling_frequency, minimum_frequency, waveform_approximant, snr_th)
+   .. py:method:: ann_initilization(ann_path_dict, detector_list, sampling_frequency, minimum_frequency, waveform_approximant)
 
       
       Initialize ANN models and feature scalers for detection probability estimation.
@@ -1472,7 +1472,7 @@ Attributes
       ..
           !! processed by numpydoc !!
 
-   .. py:method::optimal_snr(mass_1=np.array([10.0]), mass_2=np.array([10.0]), luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False)
+   .. py:method:: optimal_snr(mass_1=np.array([10.0]), mass_2=np.array([10.0]), luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False)
 
       
       Calculate optimal SNR for gravitational wave signals from compact binary coalescences.
@@ -2053,7 +2053,7 @@ Attributes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: pdet(mass_1=np.array([10.0]), mass_2=np.array([10.0]), luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False, snr_th=None, snr_th_net=None, pdet_type=None, distribution_type=None)
+   .. py:method:: pdet(mass_1=np.array([10.0]), mass_2=np.array([10.0]), luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False, snr_th=None, snr_th_net=None, pdet_type=None, distribution_type=None, include_optimal_snr=False, include_observed_snr=False)
 
       
       Calculate probability of detection for gravitational wave signals.
@@ -2183,11 +2183,11 @@ Attributes
    .. py:method:: horizon_distance_analytical(mass_1=1.4, mass_2=1.4, snr_th=None, snr_th_net=None)
 
       
-      Calculate detector horizon distance for compact binary coalescences.
+      Calculate detector horizon distance for compact binary coalescences. Follows analytical formula from arXiv:gr-qc/0509116 .
 
-      Computes the maximum range at which a source can be detected with optimal
-      orientation (face-on, overhead). Uses reference SNR at 100 Mpc scaled by
-      effective distance and detection threshold.
+      This method doesn't calculate horizon distance for the detector network, but for individual detectors only. Use horizon_distance_numerical for network horizon.
+
+      Computes the maximum range at which a source can be detected with optimal orientation (face-on, overhead). Uses reference SNR at 100 Mpc scaled by  effective distance and detection threshold.
 
       :Parameters:
 
@@ -2205,9 +2205,10 @@ Attributes
 
       :Returns:
 
-          dict
+          **horizon_distance_dict** : dict
               Horizon distances in Mpc for each detector and network.
               Keys: detector names ('H1', 'L1', etc.) and 'snr_net'.
+              Values: array of horizon distances in Mpc.
 
 
 
@@ -2219,7 +2220,7 @@ Attributes
       .. rubric:: Notes
 
       - Assumes optimal orientation: θ_jn=0, overhead sky location
-      - Formula: d_horizon = (d_eff/SNR_th) × SNR_100Mpc
+      - Formula: d_horizon = (d_eff/SNR_th) x SNR_100Mpc
       - Network horizon uses quadrature sum of detector responses
       - Compatible with all waveform approximants
 
@@ -2235,7 +2236,7 @@ Attributes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: horizon_distance_numerical(mass_1=1.4, mass_2=1.4, psi=0.0, phase=0.0, geocent_time=1246527224.169434, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, snr_th=None, snr_th_net=None, detector_location_as_optimal_sky=False, minimize_function_dict=None, root_scalar_dict=None, maximization_check=False)
+   .. py:method:: horizon_distance_numerical(mass_1=1.4, mass_2=1.4, luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, snr_th=None, snr_th_net=None, detector_location_as_optimal_sky=False, minimize_function_dict=None, root_scalar_dict=None, maximization_check=False)
 
       
       Calculate detector horizon distance with optimal sky positioning and arbitrary spin parameters.
@@ -2246,46 +2247,46 @@ Attributes
 
       :Parameters:
 
-          **mass_1** : array_like or float, default=1.4
+          **mass_1** : float, default=1.4
               Primary mass in solar masses.
 
-          **mass_2** : array_like or float, default=1.4
+          **mass_2** : float, default=1.4
               Secondary mass in solar masses.
 
-          **psi** : array_like or float, default=0.0
+          **psi** : float, default=0.0
               Polarization angle in radians.
 
-          **phase** : array_like or float, default=0.0
+          **phase** : float, default=0.0
               Coalescence phase in radians.
 
           **geocent_time** : float, default=1246527224.169434
               GPS coalescence time at geocenter in seconds.
 
-          **a_1** : array_like or float, default=0.0
+          **a_1** : float, default=0.0
               Primary spin magnitude (dimensionless).
 
-          **a_2** : array_like or float, default=0.0
+          **a_2** : float, default=0.0
               Secondary spin magnitude (dimensionless).
 
-          **tilt_1** : array_like or float, default=0.0
+          **tilt_1** : float, default=0.0
               Primary spin tilt angle in radians.
 
-          **tilt_2** : array_like or float, default=0.0
+          **tilt_2** : float, default=0.0
               Secondary spin tilt angle in radians.
 
-          **phi_12** : array_like or float, default=0.0
+          **phi_12** : float, default=0.0
               Azimuthal angle between spins in radians.
 
-          **phi_jl** : array_like or float, default=0.0
+          **phi_jl** : float, default=0.0
               Azimuthal angle between total and orbital angular momentum in radians.
 
-          **lambda_1** : array_like or float, default=0.0
+          **lambda_1** : float, default=0.0
               Primary tidal deformability (dimensionless).
 
-          **lambda_2** : array_like or float, default=0.0
+          **lambda_2** : float, default=0.0
               Secondary tidal deformability (dimensionless).
 
-          **eccentricity** : array_like or float, default=0.0
+          **eccentricity** : float, default=0.0
               Orbital eccentricity at reference frequency.
 
           **gw_param_dict** : dict or bool, default=False
@@ -2325,7 +2326,7 @@ Attributes
           **horizon** : dict
               Horizon distances in Mpc for each detector and network ('snr_net').
 
-          **sky_location** : dict
+          **optimal_sky_location** : dict
               Optimal sky coordinates (ra, dec) in radians for maximum SNR at given geocent_time.
 
 

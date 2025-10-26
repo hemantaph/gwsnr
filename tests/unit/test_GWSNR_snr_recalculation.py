@@ -4,6 +4,13 @@ Unit tests for GWSNR hybrid SNR recalculation functionality.
 Tests the hybrid approach: fast interpolation + selective bilby recalculation 
 for events within [4, 12] SNR range.
 
+Requirements:
+-------------
+- pip install gwsnr scikit-learn tensorflow
+- Upgrading `ml-dtypes` may be required for compatibility.
+  - pip install --upgrade ml-dtypes
+- pip install pytest
+
 Test Coverage:
 --------------
 - Hybrid vs bilby SNR accuracy for spin-precessing BBH, using IMRPhenomXPHM
@@ -12,8 +19,8 @@ Test Coverage:
 
 Usage:
 -----
-Run full suite: pytest tests/unit/test_GWSNR_snr_recalculation.py -v -s
-Run individual tests: pytest tests/unit/test_GWSNR_snr_recalculation.py::TestGWSNRSNRRecalculation::test_name
+pytest tests/unit/test_GWSNR_snr_recalculation.py -v -s
+pytest tests/unit/test_GWSNR_snr_recalculation.py::TestGWSNRSNRRecalculation::test_name
 """
 
 import os
@@ -50,7 +57,7 @@ CONFIG = {
 
     # SNR calculation method and settings
     'snr_method': "ann",  # Use ANN for SNR calculation
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings

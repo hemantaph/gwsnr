@@ -5,6 +5,11 @@ This test suite validates the horizon distance calculation functionality in GWSN
 testing both numerical and analytical methods for determining the luminosity distance
 at which gravitational wave signals reach detection threshold.
 
+Requirements:
+-------------
+- pip install gwsnr
+- pip install pytest
+
 Test Coverage:
 --------------
 - Numerical horizon distance calculation with optimized sky location
@@ -53,7 +58,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
     
     # detector settings

@@ -7,20 +7,29 @@ Installation
     For package development and contribution refer here (:ref:`development`).
 
 .. tabs::
-        
-   .. code-tab:: bash pip
+
+   .. code-tab:: bash pip (standard with Numba; CPU)
 
         pip install gwsnr
 
-   .. code-tab:: bash pip with Nvidia GPU support
+   .. code-tab:: bash pip (with JAX; CPU or Nvidia GPU)
 
-      pip install gwsnr
-      pip install -U "jax[cuda12]"
+      pip install gwsnr jax jaxlib
+      pip install -U "jax[cuda12]" # optional, for Nvidia GPU support
 
-   .. code-tab:: bash pip with Apple Silicon GPU support
+   .. code-tab:: bash pip (with MLX; Apple Silicon)
 
-      pip install gwsnr
-      pip install -U mlx
+      pip install gwsnr mlx
+
+   .. code-tab:: bash pip (with ripple based JAX waveforms)
+
+      pip install gwsnr jax jaxlib ripplegw
+
+   .. code-tab:: bash pip (with tensorflow based ANN)
+
+      pip install gwsnr scikit-learn tensorflow
+      pip install --upgrade ml-dtypes # optional, for compatibility
+
 
 This will also install the dependencies needed by the lastest ``gwsnr`` version.  
 

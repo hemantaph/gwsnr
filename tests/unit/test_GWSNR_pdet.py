@@ -5,13 +5,20 @@ This test suite validates the probability of detection functionality in GWSNR,
 testing both boolean and probability distribution outputs with different
 statistical distributions (non-central chi-squared and Gaussian).
 
+Requirements:
+-------------
+- pip install gwsnr
+- pip install pytest
+
 Test Coverage:
+--------------
 - Boolean probability of detection with non-central chi-squared and Gaussian distributions
 - Probability distribution calculations with different statistical models
 - Output validation: structure, data types, shapes, and numerical properties
 - Consistent behavior across different distribution types
 
 Usage:
+-----
 pytest tests/unit/test_GWSNR_pdet.py -v -s
 pytest tests/unit/test_GWSNR_pdet.py::TestGWSNRPdet::test_name -v -s
 """
@@ -49,7 +56,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
     
     # detector settings

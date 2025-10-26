@@ -8,13 +8,20 @@ Rate Calculation:
     
     Where detectable events are those with network SNR >= threshold (8.0)
 
+Requirements:
+-------------
+- pip install gwsnr
+- pip install pytest
+
 Test Coverage:
-    - End-to-end BBH rate calculation workflow
-    - SNR computation across astrophysical parameter space
-    - Data validation: types, shapes, finite values, realistic ranges
-    - Performance benchmarks for efficiency
+--------------
+- End-to-end BBH rate calculation workflow
+- SNR computation across astrophysical parameter space
+- Data validation: types, shapes, finite values, realistic ranges
+- Performance benchmarks for efficiency
 
 Usage:
+-----
 pytest tests/integration/test_bbh_rate.py -v -s
 pytest tests/integration/test_bbh_rate.py::TestBBHRateCalculation::test_rate_bbh -v -s
 """
@@ -53,7 +60,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
     
     # detector settings

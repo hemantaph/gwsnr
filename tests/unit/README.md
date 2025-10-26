@@ -164,21 +164,21 @@ pytest tests/unit/test_GWSNR_interpolation_default_numba.py::TestGWSNRInterpolat
 
 ## Expected Performance
 
-- **Individual Tests**: 10-60 seconds per test method
-- **Full Test Suite**: 5-15 minutes for all unit tests
+- **Full Test Suite**: within 5 minutes for all unit tests
+
+<!-- - **Individual Tests**: 10-60 seconds per test method
+
 - **Memory Usage**: < 2GB for typical test runs
-- **CPU Utilization**: Efficient multiprocessing when enabled
+- **CPU Utilization**: Efficient multiprocessing when enabled  -->
 
 ## Dependencies
 
 ### Required
-- `pytest`, `numpy`, `gwsnr`, `bilby`
-- Test data files (`injection_data.json`)
 
-### Optional
-- `jax` and `jaxlib` (JAX acceleration tests)
-- `mlx` (Apple Silicon optimization tests)
-- GPU drivers (CUDA/Metal for acceleration)
+- `pytest`, `gwsnr`, `jax`, `jaxlib`, `ripplegw`, `scikit-learn`, `tensorflow`, `ml-dtypes`
+- Test data files (`injection_data.json`)
+- Optional: `mlx` for MLX tests with Apple Silicon Hardware. `"jax[cuda12]"` for Nvidia GPU support.
+
 
 ## Common Test Patterns
 

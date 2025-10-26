@@ -40,7 +40,7 @@ Functions
 .. py:function:: cross_entropy_difference(input_args)
 
 
-.. py:class:: SNRThresholdFinder(catalog_file=None, npool=4, multiprocessing_verbose=True, original_detection_statistic=None, projected_detection_statistic=None, parameters_to_fit=None, sample_size=20000, selection_range=None)
+.. py:class:: SNRThresholdFinder(catalog_file=None, npool=4, selection_range=None, original_detection_statistic=None, projected_detection_statistic=None, parameters_to_fit=None, sample_size=20000, multiprocessing_verbose=True)
 
 
    

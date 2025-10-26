@@ -4,7 +4,13 @@ Unit Tests for GWSNR MLX-Accelerated Interpolation Backend. This test can only r
 IMPORTANT: These tests only run on Apple Silicon (ARM64 macOS) with MLX package installed.
 Tests will be automatically skipped on other platforms or when MLX is not available.
 
+Requirements:
+-------------
+- pip install gwsnr mlx
+- pip install pytest
+
 Test Coverage:
+--------------
 - MLX aligned spins interpolation: "interpolation_aligned_spins_mlx" backend, using IMRPhenomD waveform model
 - MLX no spins interpolation: "interpolation_no_spins_mlx" backend, using IMRPhenomD waveform model
 - Output validation: dictionary structure, data types, shapes, numerical properties
@@ -12,6 +18,9 @@ Test Coverage:
 - Cross-validation: Comparison with standard Numba backend results
 
 Usage:
+-----
+First change the name of this file to test_GWSNR_interpolation_mlx.py
+
 pytest tests/unit/test_GWSNR_interpolation_mlx.py -v -s
 pytest tests/unit/test_GWSNR_interpolation_mlx.py::TestGWSNRInterpolationMLX::test_name -v -s
 """
@@ -65,7 +74,7 @@ MLX_CONFIG = {
     
     # MLX-specific SNR calculation settings
     'snr_method': "interpolation_aligned_spins_mlx", # Default to MLX aligned spins backend
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings

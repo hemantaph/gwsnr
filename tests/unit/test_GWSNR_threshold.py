@@ -4,6 +4,11 @@ Unit Tests for SNRThresholdFinder (Threshold optimization via cross-entropy meth
 This test suite validates the SNR threshold optimization functionality using
 cross-entropy methods for gravitational wave detection statistics.
 
+Requirements:
+-------------
+- pip install gwsnr
+- pip install pytest
+
 Test Coverage:
 --------------
 - Threshold optimization with real astrophysical BBH injection data

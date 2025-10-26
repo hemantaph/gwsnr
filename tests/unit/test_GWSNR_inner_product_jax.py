@@ -1,6 +1,11 @@
 """
 Unit tests for GWSNR JAX-accelerated inner product SNR calculation methods.
 
+Requirements:
+-------------
+- pip install gwsnr ripplegw jax jaxlib
+- pip install pytest
+
 Test Coverage:
 --------------
 - JAX-accelerated inner product SNR calculations using ripplegw library
@@ -49,7 +54,7 @@ CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "inner_product_jax",       # Use JAX-accelerated inner product
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings

@@ -78,11 +78,9 @@ tests/
 ## Requirements
 
 - **Core**: `pytest`, `numpy`, `gwsnr`
-- **Optional**: `jax` (JAX tests), `mlx` (MLX tests), required for full test coverage
+- **Optional**: `jax` (JAX tests), `mlx` (MLX tests), `ripplegw` (inner_product_jax tests), `tensorflow` and `scikit-learn` (ANN tests). Upgrading `ml-dtypes` may be required for compatibility.
 - **Data**: Test data files (`injection_data.json`, `bbh_gw_params.json`) included
 
 ## Performance Expectations
 
-- **Unit Tests**: Individual tests complete within 10-60 seconds
-- **Integration Tests**: End-to-end workflows complete within 60-300 seconds
-- **Full Suite**: Complete test suite runs in 10-30 minutes depending on hardware
+- **Full Suite**: Complete test suite runs in within 5 minutes. 

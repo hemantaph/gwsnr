@@ -5,6 +5,11 @@ This test suite validates the selection effect function calculation P(λ|SNR_th)
 using GWSNR's probability of detection (Pdet) functionality. The selection effect
 represents the detectable fraction of a BBH population given detection thresholds.
 
+Requirements:
+-------------
+- pip install gwsnr
+- pip install pytest
+
 Test Coverage:
 --------------
 - BBH population detectable fraction calculation using Pdet methods
@@ -53,7 +58,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
     
     # detector settings

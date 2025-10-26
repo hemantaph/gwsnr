@@ -154,22 +154,21 @@ pytest tests/integration/test_bbh_rate.py::TestBBHRateCalculation::test_rate_bbh
 
 ## Expected Performance
 
-### **Execution Times**
+<!-- ### **Execution Times**
 - **Horizon Distance**: 30-60 seconds per calculation
 - **Detectable Fraction**: 1-5 minutes for 10k events  
-- **Rate Calculation**: 2-10 minutes for complete workflow
-- **Full Integration Suite**: 5-15 minutes total
+- **Rate Calculation**: 2-10 minutes for complete workflow -->
+- **Full Integration Suite**: within 5 minutes total
 
-### **Resource Requirements**
+<!-- ### **Resource Requirements**
 - **Memory**: 1-4 GB for large populations
 - **CPU**: Efficient multiprocessing utilization
-- **Storage**: Minimal (test data ~10-50 MB)
+- **Storage**: Minimal (test data ~10-50 MB) -->
 
 ## Dependencies
 
 ### **Core Requirements**
-- `gwsnr`, `numpy`, `pytest`
-- `bilby` (gravitational wave parameter estimation)
+- `gwsnr`, `pytest`
 - Test data files (`bbh_gw_params.json`)
 
 ### **Scientific Context**

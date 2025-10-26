@@ -1,6 +1,11 @@
 """
 Unit tests for GWSNR inner-product based SNR calculation methods.
 
+Requirements:
+-------------
+- pip install gwsnr
+- pip install pytest
+
 Test Coverage:
 --------------
 - Inner product SNR for spin-precessing BBH systems, using IMRPhenomXPHM
@@ -49,7 +54,7 @@ CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "inner_product",  # Use interpolation with aligned spins
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings

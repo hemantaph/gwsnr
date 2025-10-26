@@ -4,7 +4,13 @@ Unit Tests for GWSNR Interpolation-based SNR Calculations (Numba Implementation)
 This test suite validates the core functionality of GWSNR's interpolation-based
 SNR calculation methods, ensuring accuracy, robustness, and reproducibility.
 
+Requirements:
+-------------
+- pip install gwsnr
+- pip install pytest
+
 Test Coverage:
+--------------
 - SNR calculations for BBH/BNS events with aligned and non-spinning configurations, using IMRPhenomD and TaylorF2 waveform models
 - Output validation: structure, data types, shapes, and numerical properties
 - Computational reproducibility and deterministic results
@@ -14,6 +20,7 @@ Test Coverage:
 - JSON file output generation and integrity
 
 Usage:
+-----
 pytest tests/unit/test_GWSNR_interpolation_default_numba.py -v -s
 pytest tests/unit/test_GWSNR_interpolation_default_numba.py::TestGWSNRInterpolation::test_custom_input_arguments -v -s
 """
@@ -52,7 +59,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
     
     # detector settings

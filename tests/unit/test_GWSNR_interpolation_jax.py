@@ -1,7 +1,14 @@
 """
 Unit Tests for GWSNR JAX-Accelerated Interpolation Backend
 
+Requirements:
+-------------
+- pip install gwsnr jax jaxlib
+- optional: pip install -U "jax[cuda12]"  # for CUDA 12 GPU support
+- pip install pytest
+
 Test Coverage:
+--------------
 - JAX aligned spins interpolation: "interpolation_aligned_spins_jax" backend, using IMRPhenomD waveform model
 - JAX no spins interpolation: "interpolation_no_spins_jax" backend, using IMRPhenomD waveform model
 - Output validation: dictionary structure, data types, shapes, numerical properties
@@ -9,6 +16,7 @@ Test Coverage:
 - Cross-validation: Comparison with standard Numba backend results
 
 Usage:
+-----
 pytest tests/unit/test_GWSNR_interpolation_jax.py -v -s
 pytest tests/unit/test_GWSNR_interpolation_jax.py::TestGWSNRInterpolationJAX::test_name -v -s
 """
@@ -45,7 +53,7 @@ JAX_CONFIG = {
     
     # JAX-specific SNR calculation settings
     'snr_method': "interpolation_aligned_spins_jax", # Default to JAX aligned spins backend
-    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings
