@@ -1,8 +1,8 @@
 """
-Unit Tests for GWSNR MLX-Accelerated Interpolation Backend
+Unit Tests for GWSNR MLX-Accelerated Interpolation Backend. This test can only run on Apple Silicon (ARM64 macOS) with MLX installed.
 
-IMPORTANT: These tests only run on Apple Silicon (ARM64 macOS) as MLX is Apple Silicon-specific.
-Tests will be automatically skipped on other platforms.
+IMPORTANT: These tests only run on Apple Silicon (ARM64 macOS) with MLX package installed.
+Tests will be automatically skipped on other platforms or when MLX is not available.
 
 Test Coverage:
 - MLX aligned spins interpolation: "interpolation_aligned_spins_mlx" backend, using IMRPhenomD waveform model
@@ -26,6 +26,18 @@ np.random.seed(1234)
 
 # Check if running on Apple Silicon (ARM64 architecture on macOS)
 is_apple_silicon = platform.system() == "Darwin" and platform.machine() == "arm64"
+
+# Check if MLX is available (only on Apple Silicon)
+mlx_available = False
+if is_apple_silicon:
+    try:
+        import mlx
+        mlx_available = True
+    except ImportError:
+        mlx_available = False
+
+# Skip all tests if not on Apple Silicon or MLX not available
+skip_mlx_tests = not (is_apple_silicon and mlx_available)
 
 # MLX-specific GWSNR configuration dictionary for all tests
 # Optimized for MLX backend performance with reduced resolution for faster testing
@@ -72,6 +84,7 @@ MLX_CONFIG = {
 class TestGWSNRInterpolationMLX(CommonTestUtils):
     """Test suite for GWSNR MLX-accelerated interpolation backends."""
 
+    @pytest.mark.skipif(skip_mlx_tests, reason="MLX tests require Apple Silicon (ARM64 macOS) with MLX package installed")
     def test_mlx_aligned_spins_interpolation(self):
         """
         Tests
@@ -136,6 +149,7 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
             err_msg="MLX and Numba backends should produce similar SNR values"
         )
 
+    @pytest.mark.skipif(skip_mlx_tests, reason="MLX tests require Apple Silicon (ARM64 macOS) with MLX package installed")
     def test_mlx_no_spins_interpolation(self):
         """
         Tests
