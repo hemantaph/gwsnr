@@ -200,6 +200,9 @@ class TestGWSNRInnerProductJAX(CommonTestUtils):
         assert os.path.exists(output_file), "Output JSON file was not created"
         assert os.path.getsize(output_file) > 0, "Output file is empty"
 
+        # cleanup - delete the output file after verification
+        os.remove(output_file)
+
         # Test reproducibility
         snr_result2 = gwsnr.optimal_snr(gw_param_dict=param_dict)
         np.testing.assert_allclose(

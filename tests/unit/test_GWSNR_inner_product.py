@@ -102,13 +102,16 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         
         # Calculate SNR values and save results to JSON file
         output_file = "snr_data_interpolation.json"
-        snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
+        snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict, output_jsonfile=output_file)
         # Validate that output has correct structure and numerical properties
         self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
         # Verify that JSON output file was created successfully
         assert os.path.exists(output_file), "Output JSON file was not created"
         assert os.path.getsize(output_file) > 0, "Output file is empty"
+
+        # delete the output file after verification
+        os.remove(output_file)
 
         # Test reproducibility
         snr_result2 = gwsnr.optimal_snr(gw_param_dict=param_dict)

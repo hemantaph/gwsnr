@@ -109,6 +109,9 @@ class TestGWSNRInterpolation(CommonTestUtils):
         assert os.path.exists(output_file), "Output JSON file was not created"
         assert os.path.getsize(output_file) > 0, "Output file is empty"
 
+        # delete the output file after verification
+        os.remove(output_file)
+
         # Test computational reproducibility (same inputs should give identical outputs)
         interp_snr2 = gwsnr.optimal_snr(gw_param_dict=param_dict)  # Calculate again with same parameters
         np.testing.assert_allclose(
