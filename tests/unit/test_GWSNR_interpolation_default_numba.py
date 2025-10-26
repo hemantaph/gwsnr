@@ -15,7 +15,7 @@ Test Coverage:
 
 Usage:
 pytest tests/unit/test_GWSNR_interpolation_default_numba.py -v -s
-pytest tests/unit/test_GWSNR_interpolation_default_numba.py::TestGWSNRInterpolation::test_name -v -s
+pytest tests/unit/test_GWSNR_interpolation_default_numba.py::TestGWSNRInterpolation::test_custom_input_arguments -v -s
 """
 
 import os
@@ -247,6 +247,8 @@ class TestGWSNRInterpolation(CommonTestUtils):
         
         # Calculate SNR for BNS test events
         interp_snr = gwsnr.optimal_snr(gw_param_dict=param_dict)
+
+        print(interp_snr)
         
         # Validate output structure and properties
         self._validate_snr_output(interp_snr, (nsamples,), gwsnr.detector_list)
