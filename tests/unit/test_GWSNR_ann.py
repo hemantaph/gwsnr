@@ -25,6 +25,7 @@ pytest tests/unit/test_GWSNR_ann.py -v -s
 pytest tests/unit/test_GWSNR_ann.py::TestGWSNRANN::test_spinning_bbh -v -s
 """
 
+import os
 import numpy as np
 import time
 from gwsnr import GWSNR
@@ -87,6 +88,9 @@ class TestGWSNRANN(CommonTestUtils):
         """
         # Create configuration for this test (use existing interpolators for speed)
         config = CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['snr_method'] = 'ann'
         config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
         

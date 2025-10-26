@@ -21,6 +21,7 @@ pytest tests/unit/test_GWSNR_interpolation_jax.py -v -s
 pytest tests/unit/test_GWSNR_interpolation_jax.py::TestGWSNRInterpolationJAX::test_name -v -s
 """
 
+import os
 import numpy as np
 from gwsnr import GWSNR
 from unit_utils import CommonTestUtils
@@ -82,6 +83,9 @@ class TestGWSNRInterpolationJAX(CommonTestUtils):
         - Cross-validation: Comparison with standard Numba backend results
         """
         config = JAX_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
         })
@@ -118,6 +122,9 @@ class TestGWSNRInterpolationJAX(CommonTestUtils):
         ################################################
         # Standard Numba backend for comparison
         config_numba = JAX_CONFIG.copy()  # Use same base config
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config_numba['interpolator_dir'] = gwsnr_dir
         config_numba.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
             'create_new_interpolator': False,    # Use existing interpolators
@@ -145,6 +152,9 @@ class TestGWSNRInterpolationJAX(CommonTestUtils):
         """
         # Configure GWSNR for JAX no spins interpolation
         config = JAX_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
             'snr_method': "interpolation_no_spins_jax"  # Use no-spins interpolation method

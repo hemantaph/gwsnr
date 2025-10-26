@@ -95,6 +95,9 @@ class TestSNRThresholdFinder:
 
         # Create configuration for this test with real injection data
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config.update({
             'multiprocessing_verbose': True,     # Enable detailed progress logging
             'sample_size': 10000,               # Reduced sample size for faster testing

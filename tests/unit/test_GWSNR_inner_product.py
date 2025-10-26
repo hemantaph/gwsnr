@@ -91,6 +91,9 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         """
         # Create configuration for this test (use existing interpolators for speed)
         config = CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = True
         
         # Initialize GWSNR instance with test configuration
@@ -137,6 +140,9 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         """
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
         config['ifos'] = ["L1"]          # Use single detector for simplicity
 
@@ -209,6 +215,9 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
         config['ifos'] = [ifo_a1]        # Use single custom detector
         config['psds'] = {'A1': 'aLIGO_O4_high_asd.txt'}
@@ -230,6 +239,9 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
         config['psds'] = custom_psds
 
@@ -260,6 +272,9 @@ class TestGWSNRInnerProduct(CommonTestUtils):
 
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
         
         # Test serial execution (no multiprocessing overhead)

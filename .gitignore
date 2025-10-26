@@ -7,8 +7,10 @@ __pycache__/
 .pytest_cache/
 .venv/
 .vscode/
-interpolator_pickle/
 ann_data/
+tests/interpolator_pickle/
+tests/ann_data/
+
 
 # Jupyter
 .ipynb_checkpoints/

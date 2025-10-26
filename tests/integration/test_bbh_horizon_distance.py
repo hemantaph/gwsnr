@@ -25,6 +25,7 @@ pytest tests/integration/test_bbh_horizon_distance.py -v -s
 pytest tests/integration/test_bbh_horizon_distance.py::TestBBHHorizonDistanceCalculation::test_name -v -s
 """
 
+import os
 import numpy as np
 import time
 import pytest
@@ -93,6 +94,9 @@ class TestBBHHorizonDistanceCalculation():
         """
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False
         config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
         
@@ -164,6 +168,9 @@ class TestBBHHorizonDistanceCalculation():
         """
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False
         config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
         

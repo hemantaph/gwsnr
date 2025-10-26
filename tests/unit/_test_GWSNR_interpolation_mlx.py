@@ -25,6 +25,7 @@ pytest tests/unit/test_GWSNR_interpolation_mlx.py -v -s
 pytest tests/unit/test_GWSNR_interpolation_mlx.py::TestGWSNRInterpolationMLX::test_name -v -s
 """
 
+import os
 import numpy as np
 import platform
 import pytest
@@ -104,9 +105,13 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         - Cross-validation: Comparison with standard Numba backend results
         """
         config = MLX_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
         })
+        
         
         # Initialize GWSNR with MLX configuration
         gwsnr = GWSNR(**config)
@@ -140,6 +145,9 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         ################################################
         # Standard Numba backend for comparison
         config_numba = MLX_CONFIG.copy()  # Use same base config
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config_numba['interpolator_dir'] = gwsnr_dir
         config_numba.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
             'create_new_interpolator': False,    # Use existing interpolators
@@ -168,6 +176,9 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         """
         # Configure GWSNR for MLX no spins interpolation
         config = MLX_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
             'snr_method': "interpolation_no_spins_mlx"  # Use no-spins interpolation method

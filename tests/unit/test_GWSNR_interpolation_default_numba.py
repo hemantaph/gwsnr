@@ -92,6 +92,9 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)
@@ -137,6 +140,9 @@ class TestGWSNRInterpolation(CommonTestUtils):
         """
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
         
         # Initialize GWSNR instance for error testing
@@ -183,6 +189,9 @@ class TestGWSNRInterpolation(CommonTestUtils):
         """
         # Configure GWSNR for non-spinning binary analysis
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
             'snr_method': "interpolation_no_spins" # Use no-spins interpolation method
@@ -231,6 +240,9 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Create custom configuration optimized for BNS events
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config.update({            
             # Analysis method  
             'snr_method': "interpolation_no_spins", # No-spins method for BNS

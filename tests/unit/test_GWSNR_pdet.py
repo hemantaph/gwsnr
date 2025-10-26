@@ -89,6 +89,9 @@ class TestGWSNRPdet(CommonTestUtils):
 
         # Create configuration for this test 
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
         
         # Initialize GWSNR instance with test configuration
@@ -124,6 +127,9 @@ class TestGWSNRPdet(CommonTestUtils):
 
         # Create configuration for this test 
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='gaussian')
         
         # Initialize GWSNR instance with test configuration
@@ -159,6 +165,9 @@ class TestGWSNRPdet(CommonTestUtils):
 
         # Create configuration for this test 
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='probability_distribution', distribution_type='noncentral_chi2')
         
         # Initialize GWSNR instance with test configuration
@@ -194,6 +203,9 @@ class TestGWSNRPdet(CommonTestUtils):
 
         # Create configuration for this test 
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='probability_distribution', distribution_type='gaussian')
         
         # Initialize GWSNR instance with test configuration

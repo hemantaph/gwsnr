@@ -26,9 +26,9 @@ pytest tests/integration/test_bbh_rate.py -v -s
 pytest tests/integration/test_bbh_rate.py::TestBBHRateCalculation::test_rate_bbh -v -s
 """
 
+import os
 import numpy as np
 import time
-import os
 from gwsnr import GWSNR
 from gwsnr.utils import load_json
 
@@ -97,6 +97,9 @@ class TestBBHRateCalculation():
         """
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False
         config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
         

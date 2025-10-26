@@ -138,6 +138,9 @@ class TestGWSNRInnerProductJAX(CommonTestUtils):
         """
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during testing
 
         approximants = ["IMRPhenomXAS", "IMRPhenomD", "IMRPhenomD_NRTidalv2"]
@@ -180,6 +183,9 @@ class TestGWSNRInnerProductJAX(CommonTestUtils):
         """
         # Create configuration for this test
         config = CONFIG.copy()
+        gwsnr_dir = os.path.dirname(__file__)
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        config['interpolator_dir'] = gwsnr_dir
         config['waveform_approximant'] = "IMRPhenomD"
         config['gwsnr_verbose'] = False
         
