@@ -12,8 +12,8 @@ Test Coverage:
 - Performance: ANN should be faster than full bilby recalculation
 
 Usage:
-pytest tests/unit/test_GWSNR_ann.py -v -s
-pytest tests/unit/test_GWSNR_ann.py::TestGWSNRANN::test_spinning_bbh -v -s
+Run full suite: pytest tests/unit/test_GWSNR_ann.py -v -s
+Run individual tests: pytest tests/unit/test_GWSNR_ann.py::TestGWSNRANN::test_spinning_bbh -v -s
 """
 
 import numpy as np
@@ -62,9 +62,7 @@ CONFIG = {
     
     # Analysis settings
     'mtot_cut': False,                       # Don't apply total mass cuts
-    'pdet': True,                           # Calculate SNR, not probability of detection
-    'snr_th': 8.0,                          # Single-detector SNR threshold
-    'snr_th_net': 8.0,                      # Network SNR threshold
+    'pdet_kwargs': None,                           # Calculate SNR, not probability of detection
 }
 
 class TestGWSNRANN(CommonTestUtils):
@@ -80,7 +78,8 @@ class TestGWSNRANN(CommonTestUtils):
         """
         # Create configuration for this test (use existing interpolators for speed)
         config = CONFIG.copy()
-        config['gwsnr_verbose'] = False
+        config['snr_method'] = 'ann'
+        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
         
         # hybrid initialization
         gwsnr_ann = GWSNR(**config)
@@ -102,14 +101,14 @@ class TestGWSNRANN(CommonTestUtils):
         # here pdet is calculated instead of SNR
         times = {}
         start = time.time()
-        ann_pdet = gwsnr_annoptimal_snr(gw_param_dict=param_dict)
+        ann_pdet = gwsnr_ann.pdet(gw_param_dict=param_dict)
         times["hybrid"] = time.time() - start
 
         start = time.time()
-        bilby_pdet = gwsnr_bilbyoptimal_snr(gw_param_dict=param_dict)
+        bilby_pdet = gwsnr_bilby.pdet(gw_param_dict=param_dict)
         times["bilby"] = time.time() - start
 
-        self._validate_output(ann_pdet, (nsamples,), gwsnr_ann.detector_list, pdet=True)
+        self._validate_pdet_output(ann_pdet, (nsamples,), gwsnr_ann.detector_list, pdet_type='boolean')
         # self._validate_snr_output(bilby_snr, nsamples) # Bilby output already validated in other tests
 
         # Test Pdet consistency

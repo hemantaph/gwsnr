@@ -1,4 +1,4 @@
-from .rippleInnerproduct import RippleInnerProduct
+from .rippleinnerproduct import RippleInnerProduct
 
 # __all__ = [
 #     'RippleInnerProduct',

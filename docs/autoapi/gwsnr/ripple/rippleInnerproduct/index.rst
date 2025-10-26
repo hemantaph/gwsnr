@@ -1,7 +1,7 @@
-:py:mod:`gwsnr.ripple.rippleinnerproduct`
+:py:mod:`gwsnr.ripple.RippleInnerProduct`
 =========================================
 
-.. py:module:: gwsnr.ripple.rippleinnerproduct
+.. py:module:: gwsnr.ripple.RippleInnerProduct
 
 
 Module Contents
@@ -12,7 +12,7 @@ Classes
 
 .. autoapisummary::
 
-   gwsnr.ripple.rippleinnerproduct.RippleInnerProduct
+   gwsnr.ripple.RippleInnerProduct.RippleInnerProduct
 
 
 

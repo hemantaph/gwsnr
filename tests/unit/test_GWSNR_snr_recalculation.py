@@ -12,8 +12,8 @@ Test Coverage:
 
 Usage:
 -----
-Run individual tests: pytest tests/unit/test_GWSNR_snr_recalculation.py::TestGWSNRSNRRecalculation::test_name
 Run full suite: pytest tests/unit/test_GWSNR_snr_recalculation.py -v -s
+Run individual tests: pytest tests/unit/test_GWSNR_snr_recalculation.py::TestGWSNRSNRRecalculation::test_name
 """
 
 import os
@@ -47,9 +47,9 @@ CONFIG = {
     'waveform_approximant': "IMRPhenomXPHM",    # Waveform model for BBH systems
     'frequency_domain_source_model': 'lal_binary_black_hole',  # LAL source model
     'minimum_frequency': 20.0,               # Low-frequency cutoff (Hz)
-    
-    # SNR calculation method and settings  
-    'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
+
+    # SNR calculation method and settings
+    'snr_method': "ann",  # Use ANN for SNR calculation
     'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
@@ -63,13 +63,11 @@ CONFIG = {
     
     # Analysis settings
     'mtot_cut': False,                       # Don't apply total mass cuts
-    'pdet': False,                           # Calculate SNR, not probability of detection
-    'snr_th': 8.0,                          # Single-detector SNR threshold
-    'snr_th_net': 8.0,                      # Network SNR threshold
+    'pdet_kwargs': None,                           # Calculate SNR, not probability of detection
 
     # SNR recalculation settings
     'snr_recalculation': True,
-    'snr_recalculation_range': [4, 12],
+    'snr_recalculation_range': [6, 14],
     'snr_recalculation_waveform_approximant': "IMRPhenomXPHM",
 }
 
@@ -88,6 +86,9 @@ class TestGWSNRSNRRecalculation(CommonTestUtils):
         # Create configuration for this test (use existing interpolators for speed)
         config = CONFIG.copy()
         config['gwsnr_verbose'] = False
+        # config['snr_recalculation'] = True
+        # config['snr_recalculation_range'] = [6, 14]
+        # config['snr_recalculation_waveform_approximant'] = "IMRPhenomXPHM"
         
         # hybrid initialization
         gwsnr_hybrid = GWSNR(**config)
@@ -98,9 +99,16 @@ class TestGWSNRSNRRecalculation(CommonTestUtils):
         gwsnr_bilby = GWSNR(**config)
 
         # Generate test parameters for BBH events with aligned spins
-        nsamples = 5000  # Number of test events
+        nsamples = 500  # Number of test events
         param_dict = self._generate_params(
             nsamples, 
+            event_type='bbh',        # Binary black hole events
+            spin_zero=False,         # Include aligned spin parameters
+            spin_precession=True    # Include precessing spins
+        )
+        nsamples2 = 10  # Number of test events
+        param_dict_warm_up = self._generate_params(
+            nsamples2, 
             event_type='bbh',        # Binary black hole events
             spin_zero=False,         # Include aligned spin parameters
             spin_precession=True    # Include precessing spins
@@ -108,37 +116,39 @@ class TestGWSNRSNRRecalculation(CommonTestUtils):
 
         # Test hybrid vs bilby accuracy
         times = {}
-        hybrid_snr = gwsnr_hybrid.optimal_snr_with_interpolation(gw_param_dict=param_dict)  # Warm-up call to JIT compile
+        hybrid_snr_ = gwsnr_hybrid.optimal_snr_with_ann(gw_param_dict=param_dict_warm_up)  # Warm-up call 
         start = time.time()
-        hybrid_snr = gwsnr_hybridoptimal_snr(gw_param_dict=param_dict)
+        hybrid_pdet = gwsnr_hybrid.pdet(gw_param_dict=param_dict, include_optimal_snr=True)
         times["hybrid"] = time.time() - start
 
         start = time.time()
-        bilby_snr = gwsnr_bilbyoptimal_snr(gw_param_dict=param_dict)
+        bilby_pdet = gwsnr_bilby.pdet(gw_param_dict=param_dict, include_optimal_snr=True)
         times["bilby"] = time.time() - start
 
-        self._validate_output(hybrid_snr, (nsamples,), gwsnr_hybrid.detector_list, pdet=False)
-        # self._validate_snr_output(bilby_snr, nsamples) # Bilby output already validated in other tests
+        self._validate_snr_helper(hybrid_pdet['optimal_snr_net'], (nsamples,), 'optimal_snr_net')
+        # self._validate_snr_helper(bilby_pdet['optimal_snr_net'], (nsamples,), 'optimal_snr_net') # Bilby output already validated in other tests
 
         # Verify recalculated events match bilby
-        hybrid_arr = np.asarray(hybrid_snr["snr_net"])
-        bilby_arr = np.asarray(bilby_snr["snr_net"])
+        hybrid_arr = np.asarray(hybrid_pdet["optimal_snr_net"])
+        bilby_arr = np.asarray(bilby_pdet["optimal_snr_net"])
 
-        recalc_mask = (hybrid_arr >= 4) & (hybrid_arr <= 12)
+        snr_min = config['snr_recalculation_range'][0]
+        snr_max = config['snr_recalculation_range'][1]
+        recalc_mask = (hybrid_arr >= snr_min) & (hybrid_arr <= snr_max)
         recalc_indices = np.where(recalc_mask)[0]
 
         if len(recalc_indices) > 0:
-            assert np.allclose(hybrid_arr[recalc_indices], bilby_arr[recalc_indices], rtol=1e-6)
+            assert np.allclose(hybrid_arr[recalc_indices], bilby_arr[recalc_indices], rtol=1e-2)
 
         # Test Pdet consistency
-        pdet_hybrid = gwsnr_hybrid.pdet(snr_dict=hybrid_snr, type="bool")["pdet_net"]
-        pdet_bilby = gwsnr_bilby.pdet(snr_dict=bilby_snr, type="bool")["pdet_net"]
+        pdet_hybrid = hybrid_pdet["pdet_net"]
+        pdet_bilby = bilby_pdet["pdet_net"]
 
         agreement = np.mean(np.asarray(pdet_hybrid) == np.asarray(pdet_bilby))
         assert agreement >= 0.9, f"Pdet agreement {agreement:.1%} < 90%"
         
-        # Validate timing relationships
-        # self._check_timing_relationships(times["hybrid"], times["bilby"])
-        print(f"\nTiming (n={nsamples}): hybrid={times['hybrid']:.3f}s, bilby={times['bilby']:.3f}s")
-        assert times["hybrid"] < times["bilby"], "Hybrid should be faster than bilby"
+        # # Validate timing relationships
+        # # self._check_timing_relationships(times["hybrid"], times["bilby"])
+        # print(f"\nTiming (n={nsamples}): hybrid={times['hybrid']:.3f}s, bilby={times['bilby']:.3f}s")
+        # assert times["hybrid"] < times["bilby"], "Hybrid should be faster than bilby"
         

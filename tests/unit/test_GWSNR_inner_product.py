@@ -62,9 +62,7 @@ CONFIG = {
     
     # Analysis settings
     'mtot_cut': False,                       # Don't apply total mass cuts
-    'pdet': False,                           # Calculate SNR, not probability of detection
-    'snr_th': 8.0,                          # Single-detector SNR threshold
-    'snr_th_net': 8.0,                      # Network SNR threshold
+    'pdet_kwargs': None,                           # Calculate SNR, not probability of detection
 
     # SNR recalculation settings
     'snr_recalculation': False,
@@ -104,16 +102,16 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         
         # Calculate SNR values and save results to JSON file
         output_file = "snr_data_interpolation.json"
-        snr_result = gwsnroptimal_snr(gw_param_dict=param_dict)
+        snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         # Validate that output has correct structure and numerical properties
-        self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
+        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
         # Verify that JSON output file was created successfully
         assert os.path.exists(output_file), "Output JSON file was not created"
         assert os.path.getsize(output_file) > 0, "Output file is empty"
 
         # Test reproducibility
-        snr_result2 = gwsnroptimal_snr(gw_param_dict=param_dict)
+        snr_result2 = gwsnr.optimal_snr(gw_param_dict=param_dict)
         np.testing.assert_allclose(
             snr_result["snr_net"], # Network SNR from first calculation
             snr_result2["snr_net"], # Network SNR from second calculation
@@ -158,9 +156,9 @@ class TestGWSNRInnerProduct(CommonTestUtils):
                     spin_precession=False    # No precessing spins
                 )
 
-            snr_result = gwsnroptimal_snr(gw_param_dict=param_dict)
+            snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
             # Validate that output has correct structure and numerical properties
-            self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
+            self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
     def test_custom_detector_configuration(self):
         """
@@ -209,9 +207,9 @@ class TestGWSNRInnerProduct(CommonTestUtils):
 
         gwsnr = GWSNR(**config)
 
-        snr_result = gwsnroptimal_snr(gw_param_dict=param_dict)
+        snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         # Validate that output has correct structure and numerical properties
-        self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
+        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
         ###########################################
         # Test custom PSDs for standard detectors #
@@ -228,9 +226,9 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         config['psds'] = custom_psds
 
         gwsnr = GWSNR(**config)
-        snr_result = gwsnroptimal_snr(gw_param_dict=param_dict)
+        snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         # Validate that output has correct structure and numerical properties
-        self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
+        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
     def test_multiprocessing_performance(self):
         """
@@ -260,7 +258,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         config['npool'] = 1
         gwsnr_serial = GWSNR(**config)
         start_time = time.time()
-        serial_snr = gwsnr_serialoptimal_snr(gw_param_dict=param_dict)
+        serial_snr = gwsnr_serial.optimal_snr(gw_param_dict=param_dict)
         serial_time = time.time() - start_time
         
         # Test parallel with progress bar (imap mode)
@@ -268,7 +266,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         config['multiprocessing_verbose'] = True
         gwsnr_parallel_imap = GWSNR(**config)
         start_time = time.time()
-        parallel_imap_snr = gwsnr_parallel_imapoptimal_snr(gw_param_dict=param_dict)
+        parallel_imap_snr = gwsnr_parallel_imap.optimal_snr(gw_param_dict=param_dict)
         parallel_time_imap = time.time() - start_time
 
         # Test parallel without progress bar (map mode) 
@@ -276,7 +274,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         config['multiprocessing_verbose'] = False
         gwsnr_parallel_map = GWSNR(**config)
         start_time = time.time()
-        parallel_map_snr = gwsnr_parallel_mapoptimal_snr(gw_param_dict=param_dict)
+        parallel_map_snr = gwsnr_parallel_map.optimal_snr(gw_param_dict=param_dict)
         parallel_time_map = time.time() - start_time
         
         # Cross-validation between methods
@@ -301,9 +299,9 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         config_interp['npool'] = 4
 
         gwsnr_interp = GWSNR(**config_interp)
-        interp_snr = gwsnr_interpoptimal_snr(gw_param_dict=param_dict) # Warm-up call to JIT compile if needed
+        interp_snr = gwsnr_interp.optimal_snr(gw_param_dict=param_dict) # Warm-up call to JIT compile if needed
         start_time = time.time()
-        interp_snr = gwsnr_interpoptimal_snr(gw_param_dict=param_dict)
+        interp_snr = gwsnr_interp.optimal_snr(gw_param_dict=param_dict)
         interp_time = time.time() - start_time
 
         # Interpolation should be significantly faster than inner product

@@ -19,7 +19,7 @@ pip install gwsnr
 ```python
 from gwsnr import GWSNR
 gwsnr = GWSNR()
-snrs = gwsnroptimal_snr(mass_1=30, mass_2=30, distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+snrs = gwsnr.optimal_snr(mass_1=30, mass_2=30, distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
 print(f"SNR value: {snrs}")
 ```
 

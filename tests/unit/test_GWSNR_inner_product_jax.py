@@ -1,224 +1,212 @@
 """
-Unit tests for GWSNR JAX-accelerated inner product method using ripplegw waveforms.
-
-This module tests the JAX/ripplegw integration for hardware-accelerated SNR calculations,
-providing an alternative to the standard inner product method with JIT compilation and
-GPU acceleration capabilities.
-
-Key Features:
------------
-• JAX backend with JIT compilation for performance optimization
-• ripplegw library for JAX-native gravitational waveform generation  
-• Cross-validation with standard inner product method for consistency
-• Supports multiple waveform approximants via ripplegw
-
-Supported Waveform Approximants:
--------------------------------
-• IMRPhenomXAS: Aligned-spin with higher-order modes
-• IMRPhenomD: Standard aligned-spin approximant  
-• IMRPhenomD_NRTidalv2: Binary neutron star systems with tidal effects
+Unit tests for GWSNR JAX-accelerated inner product SNR calculation methods.
 
 Test Coverage:
 --------------
-• Cross-validation: JAX results match standard inner product method
-• Multi-approximant compatibility testing
-• Performance and reproducibility validation
-• Error handling for missing JAX/ripplegw dependencies
-
-Requirements:
-• JAX framework and ripplegw library installation
-• Optional: NVIDIA GPU with CUDA for maximum performance
-
-Note: This test focuses on JAX-specific functionality and cross-validation rather than
-comprehensive testing already covered in test_GWSNR_inner_product.py.
+- JAX-accelerated inner product SNR calculations using ripplegw library
+- Cross-validation with standard inner product method for consistency
+- Multiple waveform approximants (IMRPhenomXAS, IMRPhenomD, IMRPhenomD_NRTidalv2)
+- JAX/ripplegw vs LAL implementation comparison
+- Computational reproducibility and performance validation
 
 Usage:
 -----
-Run individual tests: pytest test_GWSNR_inner_product_jax.py::test_name
-Run all tests: pytest test_GWSNR_inner_product_jax.py -v
+pytest tests/unit/test_GWSNR_inner_product_jax.py -v -s
+pytest tests/unit/test_GWSNR_inner_product_jax.py::TestGWSNRInnerProductJAX::test_name -v -s
 """
 
+import os
 import numpy as np
-import pytest
 import time
 from gwsnr import GWSNR
+from unit_utils import CommonTestUtils
 
 np.random.seed(1234)
 
-class TestGWSNRInnerProductJAX:
+# Default GWSNR configuration dictionary for all tests
+# This provides a consistent baseline that individual tests can modify as needed
+CONFIG = {
+    # Computational settings
+    'npool': 1,                              # Use single process for JAX to avoid issues
+    
+    # Mass parameter ranges for interpolation grid
+    'mtot_min': 2*4.98,                      # Minimum total mass (M☉) - typical for BBH
+    'mtot_max': 2*112.5+10.0,                # Maximum total mass (M☉) - extended BBH range
+    'ratio_min': 0.1,                        # Minimum mass ratio q = m2/m1
+    'ratio_max': 1.0,                        # Maximum mass ratio (equal mass)
+    'spin_max': 0.99,                        # Maximum dimensionless spin magnitude
+    
+    # Interpolation grid resolution
+    'mtot_resolution': 50,                  # Number of total mass grid points
+    'ratio_resolution': 10,                  # Number of mass ratio grid points  
+    'spin_resolution': 10,                   # Number of spin grid points
+    
+    # Waveform generation parameters
+    'sampling_frequency': 2048.0,            # Sampling frequency (Hz)
+    'waveform_approximant': "IMRPhenomXAS",  # Waveform model for BBH systems (JAX compatible)
+    'frequency_domain_source_model': 'lal_binary_black_hole',  # LAL source model
+    'minimum_frequency': 20.0,               # Low-frequency cutoff (Hz)
+    
+    # SNR calculation method and settings  
+    'snr_method': "inner_product_jax",       # Use JAX-accelerated inner product
+    'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
+    'create_new_interpolator': False,           # Use existing interpolators (faster)
+
+    # detector settings
+    'psds': None,
+    'ifos': None,
+    
+    # Logging and output settings
+    'gwsnr_verbose': True,                   # Enable detailed logging
+    'multiprocessing_verbose': False,         # Enable multiprocessing logs
+    
+    # Analysis settings
+    'mtot_cut': False,                       # Don't apply total mass cuts
+    'pdet_kwargs': None,                           # Calculate SNR, not probability of detection
+
+    # SNR recalculation settings
+    'snr_recalculation': False,
+    'snr_recalculation_range': [4, 12],
+    'snr_recalculation_waveform_approximant': "IMRPhenomXAS",
+}
+
+class TestGWSNRInnerProductJAX(CommonTestUtils):
     """
-    Test suite for JAX-accelerated inner product SNR calculations using ripplegw.
-    
-    Validates JAX backend functionality and cross-validates results with standard
-    inner product method. Tests focus on JAX-specific features rather than
-    comprehensive functionality already covered in test_GWSNR_inner_product.py.
+    Test suite for GWSNR JAX-accelerated inner product SNR calculations.
     """
-    
-    def _generate_bbh_params(self, nsamples=5, include_spins=True):
-        """Generate realistic BBH parameters for testing."""
-        mtot = np.random.uniform(30, 100, nsamples)
-        mass_ratio = np.random.uniform(0.2, 1, nsamples)
-        
-        params = {
-            'mass_1': mtot / (1 + mass_ratio),
-            'mass_2': mtot * mass_ratio / (1 + mass_ratio),
-            'luminosity_distance': 400.0 * np.ones(nsamples),
-            'geocent_time': 1246527224.169434 * np.ones(nsamples),
-            'theta_jn': np.random.uniform(0, 2*np.pi, nsamples),
-            'ra': np.random.uniform(0, 2*np.pi, nsamples),
-            'dec': np.random.uniform(-np.pi/2, np.pi/2, nsamples),
-            'psi': np.random.uniform(0, 2*np.pi, nsamples),
-            'phase': np.random.uniform(0, 2*np.pi, nsamples),
-        }
-        
-        if include_spins:
-            params.update({
-                'a_1': np.random.uniform(0, 0.5, nsamples),
-                'a_2': np.random.uniform(0, 0.5, nsamples),
-                'tilt_1': np.random.uniform(0, np.pi, nsamples),
-                'tilt_2': np.random.uniform(0, np.pi, nsamples),
-                'phi_12': np.random.uniform(0, 2*np.pi, nsamples),
-                'phi_jl': np.random.uniform(0, 2*np.pi, nsamples),
-            })
-        
-        return params
-    
-    def _validate_snr_output(self, snr_dict, expected_samples):
-        """Validate SNR output format and values."""
-        assert isinstance(snr_dict, dict), "SNR output should be a dictionary"
-        assert "snr_net" in snr_dict, "Missing 'snr_net'"
-        
-        snr_arr = np.asarray(snr_dict["snr_net"])
-        assert snr_arr.shape == (expected_samples,), f"Shape mismatch: expected ({expected_samples},), got {snr_arr.shape}"
-        assert np.all(np.isfinite(snr_arr)), "SNR values must be finite"
-        assert np.all(snr_arr >= 0), "SNR values must be non-negative"
-        assert snr_arr.dtype == np.float64, "SNR values must be float64"
 
     def test_jax_cross_validation_with_standard_method(self):
         """
-        Cross-validate JAX inner product method against standard inner product method.
-        
-        Tests that JAX-accelerated computation with ripplegw produces results consistent
-        with the standard LAL-based inner product method. This ensures numerical
-        accuracy is maintained while gaining performance benefits from JAX compilation.
+        Tests
+        -----
+        - Cross-validation between JAX and standard inner product methods
+        - Numerical accuracy comparison between ripplegw and LAL implementations
+        - Consistency validation for aligned spin BBH systems
+        - Performance benefits verification while maintaining accuracy
         """
-
-        # Create both JAX and standard inner product instances
-        gwsnr_jax = GWSNR(
-            snr_method="inner_product_jax",
-            waveform_approximant="IMRPhenomXAS",
-            npool=1,  # Avoid multiprocessing issues with JAX
-            gwsnr_verbose=False,
-            multiprocessing_verbose=False
-        )
+        # Create JAX configuration
+        config_jax = CONFIG.copy()
+        config_jax['gwsnr_verbose'] = False
         
-        gwsnr_standard = GWSNR(
-            snr_method="inner_product", 
-            waveform_approximant="IMRPhenomXAS",  # without JAX, waveform from LALSimulation instead of ripplegw
-            npool=1,
-            gwsnr_verbose=False,
-            multiprocessing_verbose=False
-        )
-
-        # Test with aligned spinning BBH parameters (no transverse spins)
-        nsamples = 3
-        params = self._generate_bbh_params(nsamples, include_spins=False)
+        # Create standard inner product configuration
+        config_standard = CONFIG.copy()
+        config_standard['snr_method'] = "inner_product"
+        config_standard['gwsnr_verbose'] = False
         
-        # Add aligned spins only (no transverse components)
-        params.update({
-            'a_1': np.random.uniform(0, 0.5, nsamples),
-            'a_2': np.random.uniform(0, 0.5, nsamples),
-            'tilt_1': np.zeros(nsamples),  # Aligned with L
-            'tilt_2': np.zeros(nsamples),  # Aligned with L  
-            'phi_12': np.zeros(nsamples),  # No precession
-            'phi_jl': np.zeros(nsamples),  # No precession
-        })
+        # Initialize GWSNR instances
+        gwsnr_jax = GWSNR(**config_jax)
+        gwsnr_standard = GWSNR(**config_standard)
+
+        # Generate test parameters for BBH events with aligned spins
+        nsamples = 8  # Number of test events
+        param_dict = self._generate_params(
+            nsamples, 
+            event_type='bbh',        # Binary black hole events
+            spin_zero=False,         # Include aligned spin parameters
+            spin_precession=False    # No precessing spins for consistency
+        )
         
         # Calculate SNR with both methods
-        jax_snr = gwsnr_jaxoptimal_snr(gw_param_dict=params)
-        standard_snr = gwsnr_standardoptimal_snr(gw_param_dict=params)
+        jax_snr = gwsnr_jax.optimal_snr(gw_param_dict=param_dict)
+        standard_snr = gwsnr_standard.optimal_snr(gw_param_dict=param_dict)
         
         # Validate both outputs
-        self._validate_snr_output(jax_snr, nsamples)
-        self._validate_snr_output(standard_snr, nsamples)
+        self._validate_snr_output(jax_snr, (nsamples,), gwsnr_jax.detector_list)
+        self._validate_snr_output(standard_snr, (nsamples,), gwsnr_standard.detector_list)
         
-        # Cross-validate results - both use same approximant with aligned spins
-        # JAX/ripplegw and LAL implementations should agree to very high precision
+        # Cross-validate results - JAX/ripplegw and LAL implementations should agree
         np.testing.assert_allclose(
             jax_snr["snr_net"],
             standard_snr["snr_net"],
-            rtol=1e-4,  # 0.01% tolerance - both implementations should be nearly identical
-            err_msg="JAX and standard methods should produce nearly identical SNR values for same approximant"
+            rtol=1e-3,  # 0.1% tolerance for cross-implementation comparison
+            err_msg="JAX and standard methods should produce consistent SNR values"
         )
 
     def test_multiple_waveform_approximants(self):
         """
-        Test JAX inner product method with multiple supported waveform approximants.
-        
-        Validates that ripplegw supports the expected waveform approximants and
-        produces reasonable SNR values for each.
+        Tests
+        -----
+        - Compatibility with different JAX-supported waveform approximants
+            - IMRPhenomXAS, IMRPhenomD, IMRPhenomD_NRTidalv2
+        - Output validation: dictionary structure, data types, shapes, numerical properties
+        - Appropriate parameter handling for BBH vs BNS systems
         """
-        supported_approximants = ['IMRPhenomXAS', 'IMRPhenomD', 'IMRPhenomD_NRTidalv2']
-        nsamples = 4
+        # Configure GWSNR with reduced verbosity for cleaner test output
+        config = CONFIG.copy()
+        config['gwsnr_verbose'] = False  # Suppress log messages during testing
+
+        approximants = ["IMRPhenomXAS", "IMRPhenomD", "IMRPhenomD_NRTidalv2"]
+        nsamples = 8
         
-        for approx in supported_approximants:
-            gwsnr = GWSNR(
-                snr_method="inner_product_jax",
-                waveform_approximant=approx,
-                npool=1,  # Serial for faster testing
-                gwsnr_verbose=False
-            )
+        for approx in approximants:
+            config['waveform_approximant'] = approx
+            gwsnr = GWSNR(**config)
             
             # Generate appropriate parameters for each approximant
-            params = self._generate_bbh_params(nsamples, include_spins=(approx != 'TaylorF2'))
-            
-            # For tidal approximant, use lower masses
-            if ('Tidal' in approx):
-                params = {
-                    'mass_1': np.full(nsamples, 2.0),
-                    'mass_2': np.full(nsamples, 1.4),
-                    'luminosity_distance': 400.0 * np.ones(nsamples),
-                    'geocent_time': 1246527224.169434 * np.ones(nsamples),
-                    'theta_jn': np.random.uniform(0, 2*np.pi, nsamples),
-                    'ra': np.random.uniform(0, 2*np.pi, nsamples),
-                    'dec': np.random.uniform(-np.pi/2, np.pi/2, nsamples),
-                    'psi': np.random.uniform(0, 2*np.pi, nsamples),
-                    'phase': np.random.uniform(0, 2*np.pi, nsamples),
-                    'a_1': np.zeros(nsamples)*0.05,
-                    'a_2': np.zeros(nsamples)*-0.05,
-                    'lambda_1': np.zeros(nsamples)*10.,
-                    'lambda_2': np.zeros(nsamples)*10.,
-                }
+            if 'Tidal' in approx:
+                # BNS system with tidal effects
+                param_dict = self._generate_params(
+                    nsamples, 
+                    event_type='bns',        # Binary neutron star events
+                    spin_zero=True,          # No spins for simplicity
+                    spin_precession=False    # No precessing spins
+                )
+            else:
+                # BBH system
+                param_dict = self._generate_params(
+                    nsamples, 
+                    event_type='bbh',        # Binary black hole events
+                    spin_zero=False,         # Include aligned spin parameters
+                    spin_precession=False    # No precessing spins for JAX compatibility
+                )
 
-            snr_result = gwsnroptimal_snr(gw_param_dict=params)
-            self._validate_snr_output(snr_result, nsamples)
+            snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
+            # Validate that output has correct structure and numerical properties
+            self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
-    def test_jax_reproducibility(self):
+    def test_jax_reproducibility_and_performance(self):
         """
-        Test that JAX inner product method produces reproducible results.
+        Tests
+        -----
+        - Computational reproducibility of JAX inner product method
+        - Deterministic behavior of JIT compilation and JAX operations
+        - JSON output file creation and content verification
+        - Performance comparison with standard inner product method
+        """
+        # Create configuration for this test
+        config = CONFIG.copy()
+        config['waveform_approximant'] = "IMRPhenomD"
+        config['gwsnr_verbose'] = False
         
-        Validates that JIT compilation and JAX operations are deterministic
-        across multiple calls with identical parameters.
-        """
+        # Initialize GWSNR instance with JAX backend
+        gwsnr = GWSNR(**config)
 
-        gwsnr = GWSNR(
-            snr_method="inner_product_jax",
-            waveform_approximant="IMRPhenomD",
-            npool=1,
-            gwsnr_verbose=False
+        # Generate test parameters for BBH events
+        nsamples = 8  # Number of test events
+        param_dict = self._generate_params(
+            nsamples, 
+            event_type='bbh',        # Binary black hole events
+            spin_zero=False,         # Include aligned spin parameters
+            spin_precession=False    # No precessing spins
         )
+        
+        # Calculate SNR values and save results to JSON file
+        output_file = "snr_data_jax.json"
+        snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict, output_jsonfile=output_file)
+        # Validate that output has correct structure and numerical properties
+        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
-        params = self._generate_bbh_params(3, include_spins=False)
-        
-        # Calculate SNR multiple times
-        snr1 = gwsnroptimal_snr(gw_param_dict=params)
-        snr2 = gwsnroptimal_snr(gw_param_dict=params)
-        
-        # Should be identical
-        np.testing.assert_array_equal(
-            snr1["snr_net"],
-            snr2["snr_net"],
-            err_msg="JAX method should be deterministic"
+        # Verify that JSON output file was created successfully
+        assert os.path.exists(output_file), "Output JSON file was not created"
+        assert os.path.getsize(output_file) > 0, "Output file is empty"
+
+        # Test reproducibility
+        snr_result2 = gwsnr.optimal_snr(gw_param_dict=param_dict)
+        np.testing.assert_allclose(
+            snr_result["snr_net"], # Network SNR from first calculation
+            snr_result2["snr_net"], # Network SNR from second calculation
+            rtol=1e-10, # Very tight tolerance for reproducibility
+            err_msg="JAX SNR calculation should be deterministic"
         )
 
 

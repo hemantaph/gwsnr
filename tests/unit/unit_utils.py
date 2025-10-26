@@ -101,52 +101,90 @@ class CommonTestUtils:
 
         return param_dict
 
-    def _validate_output(self, snr_dict, expected_shape, detector_list, pdet=False):
+    def _validate_snr_output(self, snr_dict, expected_shape, detector_list):
         """Validate SNR output structure and numerical properties.
         
         Parameters
         ----------
             snr_dict : `dict`
-                Dictionary containing SNR or probability detection values
+                Dictionary containing SNR values
             expected_shape: `tuple`
                 Expected shape of output arrays
             detector_list: `list`
                 List of detector names to validate
-            pdet: `Union[bool, str]`
-                Type of probability detection ('bool', 'matched_filter', or False for SNR)
         """
         # Validate that output is a dictionary
         assert isinstance(snr_dict, dict), "Output must be a dictionary"
         
         # Create list of all keys to validate (individual detectors + network)
         test_keys = detector_list.copy()  # Start with individual detector names
-        if pdet is False:
-            test_keys.append("snr_net")  # Add network SNR key for regular SNR calculations
-        else:
-            test_keys.append("pdet_net")         # Add network pdet key for probability calculations
+        test_keys.append("snr_net")  # Add network SNR key for regular SNR calculations
 
         # Validate each detector and network output
         for key in test_keys:
             # Check that required key exists in output dictionary
             assert key in snr_dict, f"Missing {key} in output"
             values = snr_dict[key]
+
+            self._validate_snr_helper(values, expected_shape, key)
+
+    def _validate_snr_helper(self, values, expected_shape, key):
+        """Validate SNR network output against observed values.
+
+        Parameters
+        ----------
+            snr : `dict`
+                Dictionary containing SNR values
+            expected_shape: `tuple`
+                Expected shape of output arrays
+        """
+        
+        # Validate array shape matches expected dimensions
+        assert values.shape == expected_shape, \
+            f"Shape mismatch for {key}: expected {expected_shape}, got {values.shape}"
+        
+        # Regular SNR values: must be positive real numbers
+        assert values.dtype == np.float64, f"{key} expected float64, got {values.dtype}"
+        assert np.all(np.isfinite(values)), f"{key} values must be finite (no NaN/inf)"
+        assert np.all(np.isreal(values)), f"{key} values must be real (no complex numbers)"
+        assert np.all(values >= 0), f"{key} values must be non-negative (SNR ≥ 0)"
+
+    def _validate_pdet_output(self, pdet_dict, expected_shape, detector_list, pdet_type):
+        """Validate probability of detection output structure and numerical properties.
+        
+        Parameters
+        ----------
+            pdet_dict : `dict`
+                Dictionary containing probability detection values
+            expected_shape: `tuple`
+                Expected shape of output arrays
+            detector_list: `list`
+                List of detector names to validate
+            pdet_type: `str`
+                Type of probability detection ('boolean' or 'probability_distribution')
+        """
+        # Validate that output is a dictionary
+        assert isinstance(pdet_dict, dict), "Output must be a dictionary"
+        
+        # Create list of all keys to validate (individual detectors + network)
+        test_keys = detector_list.copy()  # Start with individual detector names
+        test_keys.append("pdet_net")  # Add network pdet key for probability calculations
+
+        # Validate each detector and network output
+        for key in test_keys:
+            # Check that required key exists in output dictionary
+            assert key in pdet_dict, f"Missing {key} in output"
+            values = pdet_dict[key]
             
             # Validate array shape matches expected dimensions
             assert values.shape == expected_shape, \
                 f"Shape mismatch for {key}: expected {expected_shape}, got {values.shape}"
             
-            # Apply validation rules based on the type of output
-            if pdet == 'bool':
+            # Apply validation rules based on the type of probability detection
+            if pdet_type == 'boolean':
                 # Boolean probability of detection: values must be 0 (not detected) or 1 (detected)
                 assert np.all(np.isin(values, [0, 1])), f"{key} values must be binary (0 or 1)"
                 
-            elif pdet == 'matched_filter':
+            elif pdet_type == 'probability_distribution':
                 # Matched-filter probability: continuous values between 0 and 1
                 assert np.all((values >= 0) & (values <= 1)), f"{key} values must be in [0, 1]"
-                
-            elif pdet is False:
-                # Regular SNR values: must be positive real numbers
-                assert values.dtype == np.float64, f"{key} expected float64, got {values.dtype}"
-                assert np.all(np.isfinite(values)), f"{key} values must be finite (no NaN/inf)"
-                assert np.all(np.isreal(values)), f"{key} values must be real (no complex numbers)"
-                assert np.all(values >= 0), f"{key} values must be non-negative (SNR ≥ 0)"

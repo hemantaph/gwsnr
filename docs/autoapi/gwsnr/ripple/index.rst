@@ -10,6 +10,6 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
-   rippleinnerproduct/index.rst
+   RippleInnerProduct/index.rst
 
 

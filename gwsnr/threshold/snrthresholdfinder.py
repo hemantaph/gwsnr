@@ -91,11 +91,11 @@ class SNRThresholdFinder:
     def __init__(self, 
                 catalog_file=None, 
                 npool=4,
-                multiprocessing_verbose=True,
+                selection_range=None,
                 original_detection_statistic=None, projected_detection_statistic=None,
                 parameters_to_fit=None,
                 sample_size=20000,
-                selection_range=None,
+                multiprocessing_verbose=True,
         ):
 
         self.npool = npool

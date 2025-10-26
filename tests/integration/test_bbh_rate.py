@@ -15,8 +15,8 @@ Test Coverage:
     - Performance benchmarks for efficiency
 
 Usage:
-    pytest tests/integration/test_bbh_rate.py::TestBBHRateCalculation::test_rate_bbh -v -s
-    pytest tests/integration/test_bbh_rate.py -v -s
+pytest tests/integration/test_bbh_rate.py -v -s
+pytest tests/integration/test_bbh_rate.py::TestBBHRateCalculation::test_rate_bbh -v -s
 """
 
 import numpy as np
@@ -29,7 +29,7 @@ np.random.seed(1234)
 
 # Default GWSNR configuration dictionary for all tests
 # This provides a consistent baseline that individual tests can modify as needed
-CONFIG = {
+DEFAULT_CONFIG = {
     # Computational settings
     'npool': 4,                              # Number of parallel processes for multiprocessing
     
@@ -47,7 +47,7 @@ CONFIG = {
     
     # Waveform generation parameters
     'sampling_frequency': 2048.0,            # Sampling frequency (Hz)
-    'waveform_approximant': "IMRPhenomXPHM",    # Waveform model for BBH systems
+    'waveform_approximant': "IMRPhenomD",    # Waveform model for BBH systems
     'frequency_domain_source_model': 'lal_binary_black_hole',  # LAL source model
     'minimum_frequency': 20.0,               # Low-frequency cutoff (Hz)
     
@@ -55,7 +55,7 @@ CONFIG = {
     'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
     'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
-
+    
     # detector settings
     'psds': None,
     'ifos': None,
@@ -66,14 +66,7 @@ CONFIG = {
     
     # Analysis settings
     'mtot_cut': False,                       # Don't apply total mass cuts
-    'pdet': False,                           # Calculate SNR, not probability of detection
-    'snr_th': 8.0,                          # Single-detector SNR threshold
-    'snr_th_net': 8.0,                      # Network SNR threshold
-
-    # SNR recalculation settings
-    'snr_recalculation': True,
-    'snr_recalculation_range': [4, 12],
-    'snr_recalculation_waveform_approximant': "IMRPhenomXPHM",
+    'pdet_kwargs': None,                           # Calculate SNR, not probability of detection
 }
 
 class TestBBHRateCalculation():
@@ -96,12 +89,12 @@ class TestBBHRateCalculation():
         - Performance: calculation completes within reasonable time
         """
         # Create configuration for this test (use existing interpolators for speed)
-        config = CONFIG.copy()
+        config = DEFAULT_CONFIG.copy()
         config['gwsnr_verbose'] = False
+        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
         
         # hybrid initialization
         gwsnr = GWSNR(**config)
-
 
         # get astrophysical BBH parameters
         # this is generate using ler package
@@ -111,10 +104,8 @@ class TestBBHRateCalculation():
         gw_params = load_json(bbh_params_path) # 10,000 BBH events
 
         start = time.time()
-        # SNR calculation
-        snr = gwsnroptimal_snr(gw_param_dict=gw_params)
         # Pdet calculation
-        pdet = gwsnr.pdet(snr_dict=snr)
+        pdet = gwsnr.pdet(gw_param_dict=gw_params)
         # rate calculation
         rate = self.intrinsic_BBH_merger_rate * np.average(pdet["pdet_net"])
 

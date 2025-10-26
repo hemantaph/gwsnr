@@ -77,7 +77,7 @@ param_dict= dict(
 )
 
 # signal-to-noise ratio with detectors LIGO-Hanford, LIGO-Livingston, and Virgo with O4 observing run sensitivity
-snr_dict = gwsnroptimal_snr(**param_dict)
+snr_dict = gwsnr.optimal_snr(**param_dict)
 
 # probability of detection with a threshold of 8. The result is a dict with keys as detector names and values as the detection probabilities, and also the network detection probability.
 
@@ -192,7 +192,7 @@ param_dict= dict(
 
 # 
 # signal-to-noise ratio with detectors LIGO-Hanford, LIGO-Livingston, and Virgo with O4 observing run sensitivity
-snr_dict = gwsnroptimal_snr(**param_dict)
+snr_dict = gwsnr.optimal_snr(**param_dict)
 
 # Calculate the probability of detection with a threshold of 8 for matched filter SNR
 pdet = gwsnr.pdet(snr_dict=snr_dict, snr_th=8., snr_th_net=8., type="matched_filter") # or type="bool"

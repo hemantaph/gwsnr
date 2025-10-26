@@ -221,13 +221,13 @@ Attributes
 
    >>> from gwsnr import GWSNR
    >>> snr_calc = GWSNR(snr_method='interpolation_no_spins')
-   >>> result = snr_calcoptimal_snr(mass_1=30, mass_2=25, luminosity_distance=100)
+   >>> result = snr_calc.optimal_snr(mass_1=30, mass_2=25, luminosity_distance=100)
    >>> print(f"Network SNR: {result['snr_net'][0]:.2f}")
 
    With aligned spins:
 
    >>> snr_calc = GWSNR(snr_method='interpolation_aligned_spins')
-   >>> result = snr_calcoptimal_snr(mass_1=30, mass_2=25, a_1=0.5, a_2=-0.3)
+   >>> result = snr_calc.optimal_snr(mass_1=30, mass_2=25, a_1=0.5, a_2=-0.3)
 
    Detection probability:
 
@@ -1472,7 +1472,7 @@ Attributes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: optimal_snr(mass_1=np.array([10.0]), mass_2=np.array([10.0]), luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False)
+   .. py:method::optimal_snr(mass_1=np.array([10.0]), mass_2=np.array([10.0]), luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=False, output_jsonfile=False)
 
       
       Calculate optimal SNR for gravitational wave signals from compact binary coalescences.

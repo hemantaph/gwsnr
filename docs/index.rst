@@ -38,7 +38,7 @@ Then, compute the SNR for a binary black hole system:
    gwsnr = GWSNR()
 
    # Compute SNR for a 30-30 Msun binary at 1000 Mpc with other random extrinsic parameters
-   snrs = gwsnroptimal_snr(mass_1=30, mass_2=30, luminosity_distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+   snrs = gwsnr.optimal_snr(mass_1=30, mass_2=30, luminosity_distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
 
    print(f"Network Optimal SNR: {snrs['snr_net']:.2f}")
 

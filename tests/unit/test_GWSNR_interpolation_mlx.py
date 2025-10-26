@@ -55,6 +55,10 @@ MLX_CONFIG = {
     'snr_method': "interpolation_aligned_spins_mlx", # Default to MLX aligned spins backend
     'interpolator_dir': "../interpolator_pickle", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
+
+    # detector settings
+    'psds': None,  # default to None to use built-in PSDs
+    'ifos': None,  # default to None to use built-in detectors
     
     # Logging and output settings
     'gwsnr_verbose': True,                   # Enable detailed logging
@@ -62,12 +66,9 @@ MLX_CONFIG = {
     
     # Analysis settings
     'mtot_cut': False,                       # Don't apply total mass cuts
-    'pdet': False,                           # Calculate SNR, not probability of detection
-    'snr_th': 8.0,                          # Single-detector SNR threshold
-    'snr_th_net': 8.0,                      # Network SNR threshold
+    'pdet_kwargs': None,                           # Calculate SNR, not probability of detection
 }
 
-@pytest.mark.skipif(not is_apple_silicon, reason="MLX tests only run on Apple Silicon (ARM64 macOS)")
 class TestGWSNRInterpolationMLX(CommonTestUtils):
     """Test suite for GWSNR MLX-accelerated interpolation backends."""
 
@@ -98,13 +99,13 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         )
         
         # Calculate SNR using MLX backend  
-        snr_result = gwsnroptimal_snr(gw_param_dict=param_dict)
+        snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         
         # Validate MLX output structure and numerical properties
-        self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
+        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
         
         # Test MLX reproducibility (JIT compilation should be deterministic)
-        snr_result2 = gwsnroptimal_snr(gw_param_dict=param_dict)  # Second call uses compiled function
+        snr_result2 = gwsnr.optimal_snr(gw_param_dict=param_dict)  # Second call uses compiled function
         np.testing.assert_allclose(
             snr_result["snr_net"],   # Network SNR from first calculation
             snr_result2["snr_net"],  # Network SNR from second calculation (JIT compiled)
@@ -124,7 +125,7 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         })
         
         gwsnr_numba = GWSNR(**config_numba)
-        snr_numba = gwsnr_numbaoptimal_snr(gw_param_dict=param_dict)
+        snr_numba = gwsnr_numba.optimal_snr(gw_param_dict=param_dict)
         
         # Cross-validate: MLX and Numba should produce reasonably consistent results
         # (Allow some tolerance due to different interpolation implementations)
@@ -162,7 +163,7 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         )
         
         # Calculate SNR using MLX no-spins backend
-        snr_result = gwsnroptimal_snr(gw_param_dict=param_dict)
+        snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         
         # Validate output
-        self._validate_output(snr_result, (nsamples,), gwsnr.detector_list, pdet=False)
+        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)

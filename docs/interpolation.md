@@ -234,7 +234,7 @@ param_dict = dict(
     a_2 = np.random.uniform(-0.8,0.8, size=nsamples), # dimensionless spin of the secondary black hole
 )
 
-interp_snr_aligned_spins = gwsnr_aligned_spinsoptimal_snr(gw_param_dict=param_dict) # or gwsnr_aligned_spinsoptimal_snr(**param_dict)
+interp_snr_aligned_spins = gwsnr_aligned_spins.optimal_snr(gw_param_dict=param_dict) # or gwsnr_aligned_spins.optimal_snr(**param_dict)
 
 print(interp_snr_aligned_spins)
 ```

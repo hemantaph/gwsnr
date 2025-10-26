@@ -65,9 +65,7 @@ DEFAULT_CONFIG = {
     
     # Analysis settings
     'mtot_cut': False,                       # Don't apply total mass cuts
-    'pdet': False,                           # Calculate SNR, not probability of detection
-    'snr_th': 8.0,                          # Single-detector SNR threshold
-    'snr_th_net': 8.0,                      # Network SNR threshold
+    'pdet_kwargs': None,                           # Calculate SNR, not probability of detection
 }
 
 class TestGWSNRInterpolation(CommonTestUtils):
@@ -102,17 +100,17 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Calculate SNR values and save results to JSON file
         output_file = "snr_data_interpolation.json"
-        interp_snr = gwsnroptimal_snr(gw_param_dict=param_dict, output_jsonfile=output_file)
+        interp_snr = gwsnr.optimal_snr(gw_param_dict=param_dict, output_jsonfile=output_file)
 
         # Validate that output has correct structure and numerical properties
-        self._validate_output(interp_snr, (nsamples,), gwsnr.detector_list, pdet=False)
+        self._validate_snr_output(interp_snr, (nsamples,), gwsnr.detector_list)
 
         # Verify that JSON output file was created successfully
         assert os.path.exists(output_file), "Output JSON file was not created"
         assert os.path.getsize(output_file) > 0, "Output file is empty"
 
         # Test computational reproducibility (same inputs should give identical outputs)
-        interp_snr2 = gwsnroptimal_snr(gw_param_dict=param_dict)  # Calculate again with same parameters
+        interp_snr2 = gwsnr.optimal_snr(gw_param_dict=param_dict)  # Calculate again with same parameters
         np.testing.assert_allclose(
             interp_snr["snr_net"],   # Network SNR from first calculation
             interp_snr2["snr_net"],  # Network SNR from second calculation
@@ -136,7 +134,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         
         # Test Case 1: Negative masses (physically impossible)
         with pytest.raises((ValueError, AssertionError)):
-            gwsnroptimal_snr(gw_param_dict={
+            gwsnr.optimal_snr(gw_param_dict={
                 'mass_1': np.array([-30]),      # Negative primary mass (invalid)
                 'mass_2': np.array([20]),       # Positive secondary mass
                 'luminosity_distance': np.array([400]),  # Valid distance
@@ -144,7 +142,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Test Case 2: NaN (Not a Number) values in input
         with pytest.raises((TypeError, ValueError)):
-            gwsnroptimal_snr(gw_param_dict={
+            gwsnr.optimal_snr(gw_param_dict={
                 'mass_1': np.array([30, 40]),           # Valid primary masses
                 'mass_2': np.array([20, np.nan]),       # NaN in secondary mass (invalid)
                 'luminosity_distance': np.array([400, 500]),  # Valid distances
@@ -152,7 +150,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Test Case 3: Infinite values in input  
         with pytest.raises((TypeError, ValueError)):
-            gwsnroptimal_snr(gw_param_dict={
+            gwsnr.optimal_snr(gw_param_dict={
                 'mass_1': np.array([30, 40]),           # Valid primary masses
                 'mass_2': np.array([20, np.inf]),       # Infinite secondary mass (invalid)
                 'luminosity_distance': np.array([400, 500]),  # Valid distances
@@ -160,7 +158,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
 
         # Test Case 4: Empty input arrays (no events to process)
         with pytest.raises((ValueError, AssertionError)):
-            gwsnroptimal_snr(gw_param_dict={
+            gwsnr.optimal_snr(gw_param_dict={
                 'mass_1': np.array([]),                 # Empty mass array
                 'mass_2': np.array([]),                 # Empty mass array  
                 'luminosity_distance': np.array([]),    # Empty distance array
@@ -197,10 +195,10 @@ class TestGWSNRInterpolation(CommonTestUtils):
         }
         
         # Calculate SNR for the single event
-        interp_snr = gwsnroptimal_snr(gw_param_dict=param_dict)
+        interp_snr = gwsnr.optimal_snr(gw_param_dict=param_dict)
         
         # Validate output structure (expecting single event output shape)
-        self._validate_output(interp_snr, (1,), gwsnr.detector_list, pdet=False)
+        self._validate_snr_output(interp_snr, (1,), gwsnr.detector_list)
 
     def test_custom_input_arguments(self):
         """
@@ -245,80 +243,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         gwsnr = GWSNR(**config)
         
         # Calculate SNR for BNS test events
-        interp_snr = gwsnroptimal_snr(gw_param_dict=param_dict)
+        interp_snr = gwsnr.optimal_snr(gw_param_dict=param_dict)
         
         # Validate output structure and properties
-        self._validate_output(interp_snr, (nsamples,), gwsnr.detector_list, pdet=False)
-
-    def test_pdet_generation(self):
-        """
-        Tests
-        -----
-        - Probability of detection calculations with multiple methodologies
-            - Direct boolean pdet calculation
-            - Matched-filter SNR-based pdet calculation
-        - Output validation: dictionary structure, data types, shapes, numerical properties
-        - Consistency between direct and derived pdet values
-        """
-        # Generate test parameters for BBH events with aligned spins
-        nsamples = 20
-        param_dict = self._generate_params(
-            nsamples, 
-            event_type='bbh',        # Binary black hole events
-            spin_zero=False,         # Include aligned spins
-            spin_precession=False    # No precessing spins
-        )
-
-        # METHOD 1: Direct boolean probability of detection calculation
-        config_pdet = DEFAULT_CONFIG.copy()
-        config_pdet.update({
-            'snr_method': "interpolation_aligned_spins", # Aligned spins method
-            'gwsnr_verbose': False,                  # Suppress verbose output
-            'pdet': 'bool',                         # Calculate boolean pdet directly
-            'snr_th': 8.0,                          # Single-detector threshold
-            'snr_th_net': 8.0                       # Network threshold
-        })
-
-        # Initialize GWSNR for direct boolean pdet calculation
-        gwsnr_pdet = GWSNR(**config_pdet)
-        # Calculate boolean pdet values (0 = not detected, 1 = detected)
-        interp_pdet = gwsnr_pdetoptimal_snr(gw_param_dict=param_dict)
-        # Validate boolean pdet output structure
-        self._validate_output(interp_pdet, (nsamples,), gwsnr_pdet.detector_list, pdet='bool')
-
-        # METHOD 2: Calculate SNR first, then derive pdet values
-        config_snr = DEFAULT_CONFIG.copy()
-        config_snr['create_new_interpolator'] = False  # Use existing interpolators
-        
-        # Initialize GWSNR for SNR calculation
-        gwsnr_snr = GWSNR(**config_snr)
-        # Calculate optimal SNR values for all events
-        interp_snr = gwsnr_snroptimal_snr(gw_param_dict=param_dict)
-
-        # Derive different types of pdet from the calculated SNR values
-        # Boolean pdet: binary decision based on SNR thresholds
-        interp_pdet_optimal = gwsnr_snr.pdet(
-            snr_dict=interp_snr,    # Input SNR dictionary
-            snr_th=8.0,             # Single-detector SNR threshold  
-            snr_th_net=8.0,         # Network SNR threshold
-            type='bool'             # Boolean output type
-        )
-        
-        # Matched-filter pdet: continuous probability based on noise statistics
-        interp_pdet_match_filter = gwsnr_snr.pdet(
-            snr_dict=interp_snr,    # Input SNR dictionary
-            snr_th=8.0,             # Single-detector SNR threshold
-            snr_th_net=8.0,         # Network SNR threshold  
-            type='matched_filter'   # Continuous probability output
-        )
-
-        # Validate matched-filter pdet output structure (values in [0,1])
-        self._validate_output(interp_pdet_match_filter, (nsamples,), gwsnr_snr.detector_list, pdet='matched_filter')
-
-        # CONSISTENCY CHECK: Verify that direct and derived boolean pdet match
-        for key in interp_pdet.keys():
-            np.testing.assert_array_equal(
-                interp_pdet[key],           # Direct boolean pdet calculation
-                interp_pdet_optimal[key],   # Boolean pdet derived from SNR
-                err_msg=f"Pdet outputs from snr() and pdet() do not match for key {key}"
-            )
+        self._validate_snr_output(interp_snr, (nsamples,), gwsnr.detector_list)
