@@ -12,7 +12,7 @@ Test Coverage:
 Usage:
 -----
 pytest tests/unit/test_GWSNR_inner_product_jax.py -v -s
-pytest tests/unit/test_GWSNR_inner_product_jax.py::TestGWSNRInnerProductJAX::test_name -v -s
+pytest tests/unit/test_GWSNR_inner_product_jax.py::TestGWSNRInnerProductJAX::test_jax_cross_validation_with_standard_method -v -s
 """
 
 import os
