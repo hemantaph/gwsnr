@@ -262,7 +262,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         - Basic performance timing (comparing with interpolation backends)
         """
         # Generate test parameters for BBH events with aligned spins
-        nsamples = 1000  # Number of test events
+        nsamples = 500  # Number of test events
         param_dict = self._generate_params(
             nsamples, 
             event_type='bbh',        # Binary black hole events

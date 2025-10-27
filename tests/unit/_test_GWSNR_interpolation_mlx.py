@@ -21,8 +21,8 @@ Usage:
 -----
 First change the name of this file to test_GWSNR_interpolation_mlx.py
 
-pytest tests/unit/test_GWSNR_interpolation_mlx.py -v -s
-pytest tests/unit/test_GWSNR_interpolation_mlx.py::TestGWSNRInterpolationMLX::test_name -v -s
+pytest tests/unit/_test_GWSNR_interpolation_mlx.py -v -s
+pytest tests/unit/_test_GWSNR_interpolation_mlx.py::TestGWSNRInterpolationMLX::test_name -v -s
 """
 
 import os
