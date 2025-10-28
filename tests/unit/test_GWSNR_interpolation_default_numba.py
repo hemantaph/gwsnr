@@ -94,7 +94,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         config = DEFAULT_CONFIG.copy()
         # gwsnr_dir = os.path.dirname(__file__)
         # gwsnr_dir = os.path.join(gwsnr_dir, './interpolator_pickle')
-        config['interpolator_dir'] = './interpolator_pickle'
+        config['interpolator_dir'] = '../interpolator_pickle'
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)

@@ -8,10 +8,10 @@ __pycache__/
 .venv/
 .vscode/
 ann_data/
-tests/interpolator_pickle/
+# tests/interpolator_pickle/
 docs/examples/interpolator_pickle/
 # ./interpolator_pickle/
-tests/ann_data/
+# tests/ann_data/
 docs/examples/ann_data/
 # ./ann_data/
 docs/examples/*.json
