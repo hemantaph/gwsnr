@@ -72,7 +72,7 @@ Attributes
 
    
 
-.. py:class:: GWSNR(npool=int(4), mtot_min=2 * 4.98, mtot_max=2 * 112.5 + 10.0, ratio_min=0.1, ratio_max=1.0, spin_max=0.99, mtot_resolution=200, ratio_resolution=20, spin_resolution=10, batch_size_interpolation=1000000, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', frequency_domain_source_model='lal_binary_black_hole', minimum_frequency=20.0, reference_frequency=None, duration_max=None, duration_min=None, fixed_duration=None, snr_method='interpolation_no_spins', snr_type='optimal_snr', noise_realization=None, psds=None, ifos=None, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, gwsnr_verbose=True, multiprocessing_verbose=True, mtot_cut=False, pdet_kwargs=None, ann_path_dict=None, snr_recalculation=False, snr_recalculation_range=[6, 14], snr_recalculation_waveform_approximant='IMRPhenomXPHM')
+.. py:class:: GWSNR(npool=int(4), snr_method='interpolation_no_spins', snr_type='optimal_snr', gwsnr_verbose=True, multiprocessing_verbose=True, pdet_kwargs=None, mtot_min=2 * 4.98, mtot_max=2 * 112.5 + 10.0, ratio_min=0.1, ratio_max=1.0, spin_max=0.99, mtot_resolution=200, ratio_resolution=20, spin_resolution=10, batch_size_interpolation=1000000, interpolator_dir='./interpolator_pickle', create_new_interpolator=False, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', frequency_domain_source_model='lal_binary_black_hole', minimum_frequency=20.0, reference_frequency=None, duration_max=None, duration_min=None, fixed_duration=None, mtot_cut=False, psds=None, ifos=None, noise_realization=None, ann_path_dict=None, snr_recalculation=False, snr_recalculation_range=[6, 14], snr_recalculation_waveform_approximant='IMRPhenomXPHM')
 
 
    
@@ -142,6 +142,9 @@ Attributes
        **fixed_duration** : float, optional
            Fixed duration for all waveforms if specified.
 
+       **mtot_cut** : bool, default=False
+           Limit mtot_max based on minimum_frequency to avoid undetectable systems.
+
        **snr_method** : str, default='interpolation_no_spins'
            SNR calculation method:
            - 'interpolation_no_spins[_jax/_mlx]': Fast interpolation without spins
@@ -177,9 +180,6 @@ Attributes
        **multiprocessing_verbose** : bool, default=True
            Show progress bars during computation.
 
-       **mtot_cut** : bool, default=False
-           Limit mtot_max based on minimum_frequency to avoid undetectable systems.
-
        **pdet_kwargs** : dict, optional
            Detection probability parameters:
            - 'snr_th': Individual detector threshold (default=8.0)
@@ -191,9 +191,9 @@ Attributes
            ANN model paths. None uses built-in models.
 
        **snr_recalculation** : bool, default=False
-           Enable hybrid recalculation near detection threshold.
+           Enable hybrid recalculation (with 'inner_product') near detection threshold.
 
-       **snr_recalculation_range** : list, default=[4,12]
+       **snr_recalculation_range** : list, default=[6,14]
            SNR range for triggering recalculation.
 
        **snr_recalculation_waveform_approximant** : str, default='IMRPhenomXPHM'
@@ -267,7 +267,7 @@ Attributes
       
       ``float``
 
-      Minimum total mass (M☉) for interpolation grid.
+      Minimum total mass (Mo) for interpolation grid.
 
 
 
@@ -291,7 +291,7 @@ Attributes
       
       ``float``
 
-      Maximum total mass (M☉) for interpolation grid.
+      Maximum total mass (Mo) for interpolation grid.
 
 
 
@@ -2140,6 +2140,7 @@ Attributes
               - 'gaussian': Gaussian noise (sigma=1)
               - 'noncentral_chi2': Non-central chi-squared (2 DOF per detector)
               If None, uses pdet_kwargs['distribution_type'].
+              - 'fixed_snr': Deterministic detection based on optimal SNR (only for 'boolean' pdet_type)
 
       :Returns:
 

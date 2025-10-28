@@ -137,7 +137,7 @@ Glossary
    :caption: Examples:
 
    examples/snr_generation
-   examples/ann_model_generation_custom
+   examples/model_generation
    examples/threshold
 
 
