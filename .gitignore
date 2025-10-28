@@ -10,10 +10,10 @@ __pycache__/
 ann_data/
 tests/interpolator_pickle/
 docs/examples/interpolator_pickle/
-interpolator_pickle/
+.interpolator_pickle/
 tests/ann_data/
 docs/examples/ann_data/
-ann_data/
+.ann_data/
 docs/examples/*.json
 
 # Jupyter
