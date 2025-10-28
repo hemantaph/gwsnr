@@ -91,7 +91,7 @@ class TestGWSNRSNRRecalculation(CommonTestUtils):
         - Performance: hybrid should be faster than full bilby recalculation
         """
         # Create configuration for this test (use existing interpolators for speed)
-        # config = CONFIG.copy()
+        config = CONFIG.copy()
         # gwsnr_dir = os.path.dirname(__file__)
         # gwsnr_dir = os.path.join(gwsnr_dir, './interpolator_pickle')
         config['interpolator_dir'] = '../../interpolator_pickle'
