@@ -2306,7 +2306,7 @@ class GWSNR:
 
         return pdet_dict
 
-    def horizon_distance_analytical(self, mass_1=1.4, mass_2=1.4, snr_th=None, snr_th_net=None):
+    def horizon_distance_analytical(self, mass_1=1.4, mass_2=1.4, snr_th=None):
         """
         Calculate detector horizon distance for compact binary coalescences. Follows analytical formula from arXiv:gr-qc/0509116 .
 
@@ -2352,11 +2352,6 @@ class GWSNR:
             snr_th = snr_th
         else:
             snr_th = self.pdet_kwargs['snr_th']
-
-        if snr_th_net:
-            snr_th_net = snr_th_net
-        else:
-            snr_th_net = self.pdet_kwargs['snr_th_net']
 
         detectors = np.array(self.detector_list.copy())
         detector_tensor = np.array(self.detector_tensor_list.copy())

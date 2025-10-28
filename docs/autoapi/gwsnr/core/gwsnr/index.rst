@@ -2181,7 +2181,7 @@ Attributes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: horizon_distance_analytical(mass_1=1.4, mass_2=1.4, snr_th=None, snr_th_net=None)
+   .. py:method:: horizon_distance_analytical(mass_1=1.4, mass_2=1.4, snr_th=None)
 
       
       Calculate detector horizon distance for compact binary coalescences. Follows analytical formula from arXiv:gr-qc/0509116 .

@@ -137,8 +137,10 @@ Glossary
    :caption: Examples:
 
    examples/snr_generation
+   examples/pdet_generation
    examples/model_generation
    examples/threshold
+   examples/horizon_distance
 
 
 Indices and tables
