@@ -90,7 +90,7 @@ class TestSNRThresholdFinder:
         # Load astrophysical BBH parameters from Reed Essick O4 injection catalog
         # Data source: Zenodo repository with necessary parameters extracted
         test_dir = os.path.dirname(__file__)
-        injection_data = os.path.join(test_dir, 'injection_data.json')
+        injection_data = os.path.join(test_dir, 'injection_data_bbh.json')
         gw_params = load_json(injection_data)  # 20,000 BBH injections
 
         # Create configuration for this test with real injection data

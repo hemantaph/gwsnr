@@ -91,7 +91,7 @@ Component-level tests validating individual GWSNR methods, computational backend
 - Cross-validation utilities
 - Performance timing helpers
 
-### `injection_data.json`
+### `injection_data_bbh.json`
 **Test data for unit tests**
 - 20,000 BBH injection parameters
 - Reed Essick O4 injection catalog subset
@@ -176,7 +176,7 @@ pytest tests/unit/test_GWSNR_interpolation_default_numba.py::TestGWSNRInterpolat
 ### Required
 
 - `pytest`, `gwsnr`, `jax`, `jaxlib`, `ripplegw`, `scikit-learn`, `tensorflow`, `ml-dtypes`
-- Test data files (`injection_data.json`)
+- Test data files (`injection_data_bbh.json`)
 - Optional: `mlx` for MLX tests with Apple Silicon Hardware. `"jax[cuda12]"` for Nvidia GPU support.
 
 

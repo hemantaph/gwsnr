@@ -10,10 +10,11 @@ __pycache__/
 ann_data/
 tests/interpolator_pickle/
 docs/examples/interpolator_pickle/
+interpolator_pickle/
 tests/ann_data/
 docs/examples/ann_data/
-docs/examples/bbh_gw_params.json
-docs/examples/injection_data.json
+ann_data/
+docs/examples/*.json
 
 # Jupyter
 .ipynb_checkpoints/

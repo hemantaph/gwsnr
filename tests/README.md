@@ -48,7 +48,7 @@ tests/
 ├── unit/                                  # Unit tests
 │   ├── README.md                         # Unit test documentation
 │   ├── unit_utils.py                     # Common test utilities and fixtures
-│   ├── injection_data.json               # Test data for unit tests
+│   ├── injection_data_bbh.json               # Test data for unit tests
 │   ├── test_GWSNR_interpolation_default_numba.py
 │   ├── test_GWSNR_interpolation_jax.py
 │   ├── test_GWSNR_interpolation_mlx.py
@@ -79,7 +79,7 @@ tests/
 
 - **Core**: `pytest`, `numpy`, `gwsnr`
 - **Optional**: `jax` (JAX tests), `mlx` (MLX tests), `ripplegw` (inner_product_jax tests), `tensorflow` and `scikit-learn` (ANN tests). Upgrading `ml-dtypes` may be required for compatibility.
-- **Data**: Test data files (`injection_data.json`, `bbh_gw_params.json`) included
+- **Data**: Test data files (`injection_data_bbh.json`, `bbh_gw_params.json`) included
 
 ## Performance Expectations
 

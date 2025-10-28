@@ -225,6 +225,9 @@ class SNRThresholdFinder:
         param = self.selection_range['parameter']
         idx_ = (param >= min_val) & (param <= max_val)
 
+        if np.sum(idx_) == 0:
+            raise ValueError("No injections found within the specified selection range.")
+
         dim = len(self.parameters_to_fit['parameter'].shape)
         if dim < 2:
             self.parameters_to_fit['parameter'] = self.parameters_to_fit['parameter'][idx_]
