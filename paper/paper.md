@@ -33,7 +33,7 @@ The *`gwsnr`* Python package addresses this challenge by providing efficient and
 
 The package provides a flexible and user-friendly interface for combining detector noise models, waveform families, detector configurations, and signal parameters. It accelerates $\rho_{\rm opt}$ evaluation using a **partial-scaling interpolation** method for non-precessing binaries and a multiprocessing **inner-product** routine for frequency-domain waveforms implemented in `lalsuite` (@lalsuite:2018), including those with spin precession and subdominant modes. For rapid $P_{\rm det}$ estimation, *`gwsnr`* also supports ANN-based models and a Hybrid SNR recalculation scheme. Finally, using an optimal-SNR threshold $\rho_{\rm opt,thr}$, the package computes the horizon distance ($D_{\rm hor}$), a standard measure of detector sensitivity, via both analytical (@Allen:2012) and numerical methods.   
 
-High performance is achieved through *`NumPy`* vectorization (@numpy:2022) and Just-in-Time (JIT) compilation with *`Numba`* (@numba:2022), with optional GPU acceleration available via *`JAX`* (@jax:2018) and *`MLX`* (@mlx:2023). These JIT compilers translate Python code into optimized machine code at runtime, while built-in parallelization strategies such as `numba.prange`, `jax.vmap`, and `mlx.vmap` maximize efficiency on both CPUs and GPUs.  
+High performance is achieved through *`NumPy`* vectorization (@numpy:2022) and Just-in-Time (JIT) compilation with *`Numba`* (@numba:2022), with optional GPU acceleration available via *`JAX`* (@jax:2018) and *`MLX`* (@mlx:2023). These JIT compilers translate Python code into optimized machine code at runtime, while built-in parallelization strategies such as `numba.prange`, `jax.vmap`, and `mlx.vmap` maximize efficiency on both CPUs and GPUs (supported hardware includes NVIDIA and Apple Silicon GPUs).
 
 This combination of efficiency and usability makes *`gwsnr`* a valuable tool for GW data analysis. It enables large-scale simulations of compact binary mergers, facilitates the estimation of detectable lensed and unlensed event rates (as demonstrated in the *`ler`* package; @ler:2024, @Leo:2024, @More:2025, @Janquart:2023, @Abbott:2021, @ligolensing:2023, @Wierda:2021, @Wempe:2022), and supports the treatment of selection effects through $P_{\rm det}$ in hierarchical Bayesian frameworks (@Thrane:2019, @Essick:2023).
 
@@ -56,7 +56,7 @@ $$
 \rho = \sqrt{F_+^2 \langle \tilde{h}_+|\tilde{h}_+\rangle + F_\times^2 \langle \tilde{h}_\times|\tilde{h}_\times\rangle} .
 $$  
 
-Although waveform generation is costly, *`gwsnr`* accelerates it using `multiprocessing`, `numba.njit`, and optional `jax` backends (with `ripple`; @Edwards:2023).
+While the inner product method is computationally expensive, *`gwsnr`* accelerates it through `multiprocessing`, `numba.njit`, and optional `jax` backends (with `ripplegw` for waveform generation; @Edwards:2023).
 
 ### Partial Scaling Interpolation  
 
@@ -72,7 +72,7 @@ $$
 \rho = \rho_{1/2}\, \frac{\mathcal{M}^{5/6}}{D_\mathrm{eff}} .
 $$  
 
-This replaces costly integrations with interpolation, enabling major speed-ups.  
+This replaces costly inner-product integrations with fast interpolation, yielding significant speed-ups.
 
 ### ANN-based $P_{\rm det}$ Estimation  
 
@@ -90,7 +90,7 @@ This approach retains the speed of approximations while ensuring accuracy for sy
 
 In *`gwsnr`*, estimation of $P_{\rm det}$ is based on a detection threshold for the observed (matched-filter) SNR, $\rho_{\rm obs,thr}$. The observed SNR, $\rho_{\rm obs}$, is modeled either as a Gaussian random variate centered at $\rho_{\rm opt}$ (or $\rho_{\rm opt,net}$ for a detector network) with unit variance (@Fishbach:2020, @Abbott:2019), or as a non-central $\chi$ distribution (`scipy.stats.ncx2`; @scipy:2020) with non-centrality parameter $\lambda = \rho_{\rm opt}$ (or $\rho_{\rm opt,net}$) and two degrees of freedom for a single detector, extended to $2N$ for a network of $N$ detectors (@Essick:2023).  
 
-*`gwsnr`* uses precomputed $\rho_{\rm obs,thr}$ values derived from semianalytic sensitivity estimates of GW transient injection catalogues (following @Essick:2023). The package also supports custom threshold computation from user-provided catalogue data, including parameter-dependent thresholds that vary with intrinsic properties such as total observed mass ($m_{\rm tot, obs}$).
+*`gwsnr`* uses precomputed $\rho_{\rm obs,thr}$ values derived from semianalytic sensitivity estimates of GW transient injection catalogues (following @Essick:2023). The package also supports custom threshold computation from user-provided catalogue data, including parameter-dependent thresholds that vary with intrinsic properties such as the primary mass ($m_{\rm 1, src}$).
 
 ### Horizon Distance Calculation  
 

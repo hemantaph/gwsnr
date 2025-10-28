@@ -303,8 +303,6 @@ class SNRThresholdFinder:
             for args in tqdm(input_args, total=len(input_args), ncols=100):
                 del_H_i, H_i, H_true_i, iter_i = cross_entropy_difference(args)
 
-                
-
                 del_H[iter_i] = del_H_i
                 H[iter_i] = H_i
                 H_true[iter_i] = H_true_i

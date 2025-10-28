@@ -116,6 +116,8 @@ class GWSNR:
         Minimum waveform duration in seconds.
     fixed_duration : float, optional
         Fixed duration for all waveforms if specified.
+    mtot_cut : bool, default=False
+        Limit mtot_max based on minimum_frequency to avoid undetectable systems.
     snr_method : str, default='interpolation_no_spins'
         SNR calculation method:
         - 'interpolation_no_spins[_jax/_mlx]': Fast interpolation without spins
@@ -142,8 +144,6 @@ class GWSNR:
         Print initialization parameters.
     multiprocessing_verbose : bool, default=True
         Show progress bars during computation.
-    mtot_cut : bool, default=False
-        Limit mtot_max based on minimum_frequency to avoid undetectable systems.
     pdet_kwargs : dict, optional
         Detection probability parameters:
         - 'snr_th': Individual detector threshold (default=8.0)
@@ -153,8 +153,8 @@ class GWSNR:
     ann_path_dict : dict or str, optional
         ANN model paths. None uses built-in models.
     snr_recalculation : bool, default=False
-        Enable hybrid recalculation near detection threshold.
-    snr_recalculation_range : list, default=[4,12]
+        Enable hybrid recalculation (with 'inner_product') near detection threshold.
+    snr_recalculation_range : list, default=[6,14]
         SNR range for triggering recalculation.
     snr_recalculation_waveform_approximant : str, default='IMRPhenomXPHM'
         Waveform for recalculation.
@@ -193,11 +193,11 @@ class GWSNR:
 
     mtot_min = None
     """``float`` \n
-    Minimum total mass (M☉) for interpolation grid."""
+    Minimum total mass (Mo) for interpolation grid."""
 
     mtot_max = None
     """``float`` \n
-    Maximum total mass (M☉) for interpolation grid."""
+    Maximum total mass (Mo) for interpolation grid."""
 
     ratio_min = None
     """``float`` \n
@@ -361,7 +361,14 @@ class GWSNR:
 
     def __init__(
         self,
+        # General settings
         npool=int(4),
+        snr_method="interpolation_no_spins",
+        snr_type="optimal_snr",
+        gwsnr_verbose=True,
+        multiprocessing_verbose=True,
+        pdet_kwargs=None,
+        # Settings for interpolation grid
         mtot_min=2*4.98, # 4.98 Mo is the minimum component mass of BBH systems in GWTC-3
         mtot_max=2*112.5+10.0, # 112.5 Mo is the maximum component mass of BBH systems in GWTC-3. 10.0 Mo is added to avoid edge effects.
         ratio_min=0.1,
@@ -371,6 +378,9 @@ class GWSNR:
         ratio_resolution=20,
         spin_resolution=10,
         batch_size_interpolation=1000000,
+        interpolator_dir="./interpolator_pickle",
+        create_new_interpolator=False,
+        # GW signal settings
         sampling_frequency=2048.0,
         waveform_approximant="IMRPhenomD",
         frequency_domain_source_model='lal_binary_black_hole',
@@ -379,18 +389,14 @@ class GWSNR:
         duration_max=None,
         duration_min=None,
         fixed_duration=None,
-        snr_method="interpolation_no_spins",
-        snr_type="optimal_snr",
-        noise_realization=None,
+        mtot_cut=False,
+        # Detector settings
         psds=None,
         ifos=None,
-        interpolator_dir="./interpolator_pickle",
-        create_new_interpolator=False,
-        gwsnr_verbose=True,
-        multiprocessing_verbose=True,
-        mtot_cut=False,
-        pdet_kwargs=None,
+        noise_realization=None, # not implemented yet
+        # ANN settings
         ann_path_dict=None,
+        # Hybrid SNR recalculation settings
         snr_recalculation=False,
         snr_recalculation_range=[6,14],
         snr_recalculation_waveform_approximant="IMRPhenomXPHM",
@@ -2161,6 +2167,7 @@ class GWSNR:
             - 'gaussian': Gaussian noise (sigma=1)
             - 'noncentral_chi2': Non-central chi-squared (2 DOF per detector)
             If None, uses pdet_kwargs['distribution_type'].
+            - 'fixed_snr': Deterministic detection based on optimal SNR (only for 'boolean' pdet_type)
 
         Returns
         -------
@@ -2251,7 +2258,12 @@ class GWSNR:
 
                     observed_snr = snr_dict[det] + np.random.normal(0, 1, size=snr_dict[det].shape)
                     pdet_dict[det] = np.array(snr_th[i] < observed_snr, dtype=int)
-                
+
+                elif distribution_type == "fixed_snr":
+
+                    observed_snr = snr_dict[det]
+                    pdet_dict[det] = np.array(snr_th[i] < observed_snr, dtype=int)
+
                 if include_observed_snr:
                     pdet_dict[f"observed_snr_{det}"] = observed_snr
 
@@ -2281,6 +2293,9 @@ class GWSNR:
                 pdet_dict["pdet_net"] = np.array(snr_th_net < observed_snr_net, dtype=int)
             elif distribution_type == "gaussian":
                 observed_snr_net = snr_dict["snr_net"] + np.random.normal(0, 1, size=snr_dict["snr_net"].shape)
+                pdet_dict["pdet_net"] = np.array(snr_th_net < observed_snr_net, dtype=int)
+            elif distribution_type == "fixed_snr":
+                observed_snr_net = snr_dict["snr_net"]
                 pdet_dict["pdet_net"] = np.array(snr_th_net < observed_snr_net, dtype=int)
             
             if include_observed_snr:

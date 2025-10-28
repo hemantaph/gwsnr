@@ -9,8 +9,11 @@ __pycache__/
 .vscode/
 ann_data/
 tests/interpolator_pickle/
+docs/examples/interpolator_pickle/
 tests/ann_data/
-
+docs/examples/ann_data/
+docs/examples/bbh_gw_params.json
+docs/examples/injection_data.json
 
 # Jupyter
 .ipynb_checkpoints/
@@ -21,7 +24,6 @@ docs/_build/
 # JSON files (specific directories)
 examples/**/*.json
 devdir/**/*.json
-docs/**/*.json
 
 # Pickle files (specific directories)
 examples/**/*.pickle

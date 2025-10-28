@@ -345,210 +345,192 @@ Kong, Shatin, New Territories, Hong Kong}
 
 Gravitational waves (GWs), ripples in spacetime predicted by Einstein's
 theory of General Relativity, have revolutionized astrophysics since
-their first detection in 2015. Emitted by cataclysmic events such as
-mergers of binary black holes (BBHs), binary neutron stars (BNSs), and
-black hole-neutron star pairs (BH-NSs), these waves provide a unique
-window into the cosmos.
-
-A central quantity in GW analysis is the Signal-to-Noise Ratio (SNR),
-which measures the strength of a GW signal relative to the background
-noise in detectors such as LIGO (The LIGO Scientific Collaboration et
-al. (2015), B. P. Abbott et al. (2020), Buikema et al. (2020)), Virgo
-(F. Acernese et al. (2014), F. Acernese et al. (2019)), and KAGRA
-(Akutsu et al. (2020), Aso et al. (2013)). While real detections are
-established using a False-Alarm Rate (FAR) threshold, under stationary
-Gaussian noise assumptions the condition that the SNR exceeds a chosen
-threshold can serve as a practical proxy (Essick (2023), Essick and
-Fishbach (2024)), especially in simulations of detectable events and in
-studies aimed at extracting astrophysical information (Abbott, B. P. et
-al. (2016)).
-
-Applications such as population simulations for rate estimation (B. P.
-Abbott et al. (2016)) and hierarchical Bayesian inference with selection
-effects (Thrane and Talbot (2019), Essick and Fishbach (2024)) require
-repeated and efficient computation of the Probability of Detection
-(\(P_{\rm det}\)), which is generally derived from SNR. However,
-traditional approaches that rely on noise-weighted inner products for
-SNR evaluation are computationally demanding and often impractical for
-such large-scale analyses (Taylor and Gerosa (2018), Gerosa et al.
-(2020)).
+their first detection in 2015 (Abbott, B. P. et al. (2016a), B.  P.
+Abbott et al. (2016)). These waves are emitted by cataclysmic events
+like the merging of binary black holes (BBHs), binary neutron stars
+(BNSs) and BH-NS pairs, providing a unique window into the cosmos. A
+critical aspect of GW analysis is the Signal-to-Noise Ratio (SNR). SNR
+quantifies the strength of a GW signal relative to the background noise
+in a detector, like LIGO (The LIGO Scientific Collaboration et al.
+(2015), B. P. Abbott et al. (2020), Buikema et al. (2020)), Virgo (F.
+Acernese et al. (2014), F. Acernese et al. (2019)) or KAGRA (Akutsu et
+al. (2020), Aso et al. (2013)). This ratio is pivotal in confirming the
+detection of GWs and extracting astrophysical information from them
+(Abbott, B. P. et al. (2016b)). However, specific scenarios in GW
+research, particularly in simulations of detectable GW events (B. P.
+Abbott et al. (2016)) and in hierarchical Bayesian analysis (Thrane and
+Talbot (2019)) where selection effects are considered, demand extensive
+and efficient computation of SNR. This requirement presents a
+significant challenge, as conventional computational approaches, such as
+noise-weighted inner product, are typically time-consuming and
+impractical for such specialized and large-scale analyses (Taylor and
+Gerosa (2018), Gerosa et al. (2020)).
 
 \section{Statement of Need}\label{statement-of-need}
 
-The \emph{\texttt{gwsnr}} Python package addresses this challenge by
-providing efficient and flexible tools for computing the optimal SNR
-(\(\rho_{\rm opt}\)). This quantity depends on the intrinsic and
-extrinsic source parameters, the detector antenna response
-(\(F_{+,\times}\)), and the noise power spectral density (PSD) (Allen et
-al. (2012)). The primary use case of \(\rho_{\rm opt}\) in
-\emph{\texttt{gwsnr}} is the estimation of \(P_{\rm det}\), which is
-evaluated against a detection statistics threshold.
+The \emph{\texttt{gwsnr}} Python package addresses the need for
+efficient SNR computation in GW research. It provides a flexible and
+user-friendly interface, allowing users to combine various detector
+noise models, waveform models, detector configurations, and signal
+parameters. \emph{\texttt{gwsnr}} enhances SNR calculations through
+several key features. Firstly, it utilizes an innovative interpolation
+method, employing a partial-scaling approach for accurately
+interpolating the SNR of GWs from spin-less and spin-aligned binary
+systems. Secondly, the package features a noise-weighted inner product
+method, similar to that in the \emph{\texttt{bilby}} package (Ashton et
+al. (2019), Ashton, Gregory et al. (2022)), but enhanced with
+multiprocessing capabilities. This parallel processing is crucial for
+handling large datasets and computationally intensive analyses. Thirdly,
+a trained Artificial Neural Network (ANN) model is incorporated for
+rapid `probability of detection' (Pdet) estimation for BBH systems with
+spin precession. Lastly, \emph{\texttt{gwsnr}} leverages
+\emph{\texttt{numpy}} (NumPy Community (2022)) vectorization, and
+\emph{\texttt{numba}}'s (Lam, Pitrou, and Seibert (2022)) and
+\emph{\texttt{JAX}}'s (James Bradbury and others (2018)) Just-In-Time
+compiler (\texttt{numbba.njit} and \texttt{jax.jit}), which optimizes
+performance by compiling Python code into machine code at runtime,
+drastically reducing execution times. This combination of advanced
+techniques and user-friendly design makes gwsnr a valuable tool for GW
+data analysis, particularly in simulating detectable compact binary
+mergers, determining rates of both lensed and unlensed GW events (as
+demonstrated by its use in the \emph{\texttt{ler}} package; Phurailatpam
+et al. (2024), Ng et al. (2024), More and Phurailatpam (2025), Janquart
+et al. (2023), R. Abbott et al. (2021), Collaboration et al. (2023),
+Wierda et al. (2021), Wempe et al. (2022)), and will help in the
+analysis of selection effects within hierarchical Bayesian frameworks
+(Thrane and Talbot (2019)).
 
-The package provides a flexible and user-friendly interface for
-combining detector noise models, waveform families, detector
-configurations, and signal parameters. It accelerates \(\rho_{\rm opt}\)
-evaluation using a \textbf{partial-scaling interpolation} method for
-non-precessing binaries and a multiprocessing \textbf{inner-product}
-routine for frequency-domain waveforms implemented in \texttt{lalsuite}
-(LIGO Scientific Collaboration, Virgo Collaboration, and KAGRA
-Collaboration (2018)), including those with spin precession and
-subdominant modes. For rapid \(P_{\rm det}\) estimation,
-\emph{\texttt{gwsnr}} also supports ANN-based models and a Hybrid SNR
-recalculation scheme. Finally, using an optimal-SNR threshold
-\(\rho_{\rm opt,thr}\), the package computes the horizon distance
-(\(D_{\rm hor}\)), a standard measure of detector sensitivity, via both
-analytical (Allen et al. (2012)) and numerical methods.
+\section{Mathematical Formulation}\label{mathematical-formulation}
 
-High performance is achieved through \emph{\texttt{NumPy}} vectorization
-(NumPy Community (2022)) and Just-in-Time (JIT) compilation with
-\emph{\texttt{Numba}} (Lam, Pitrou, and Seibert (2022)), with optional
-GPU acceleration available via \emph{\texttt{JAX}} (James Bradbury and
-others (2018)) and \emph{\texttt{MLX}} (Hannun et al. (n.d.)). These JIT
-compilers translate Python code into optimized machine code at runtime,
-while built-in parallelization strategies such as \texttt{numba.prange},
-\texttt{jax.vmap}, and \texttt{mlx.vmap} maximize efficiency on both
-CPUs and GPUs.
+The \texttt{gwsnr} package provides two efficient methods for computing
+the optimal SNR in GW data analysis: the Noise-Weighted Inner Product
+Method with Multiprocessing and the Partial Scaling Interpolation
+Method. In addition, there are two approaches for estimating
+\(P_{\rm det}\) for precessing systems: ANN-based \(P_{\rm det}\)
+Estimation and the Partial Scaling Interpolation Method with SNR
+recalculation. Extensive details of these methods can be found in the
+package documentation (Phurailatpam and Hannuksela (2025)).
 
-This combination of efficiency and usability makes \emph{\texttt{gwsnr}}
-a valuable tool for GW data analysis. It enables large-scale simulations
-of compact binary mergers, facilitates the estimation of detectable
-lensed and unlensed event rates (as demonstrated in the
-\emph{\texttt{ler}} package; Phurailatpam et al. (2024), Ng et al.
-(2024), More and Phurailatpam (2025), Janquart et al. (2023), R. Abbott
-et al. (2021), Collaboration et al. (2023), Wierda et al. (2021), Wempe
-et al. (2022)), and supports the treatment of selection effects through
-\(P_{\rm det}\) in hierarchical Bayesian frameworks (Thrane and Talbot
-(2019), Essick (2023)).
+\subsubsection{Noise-Weighted Inner Product Method with
+Multiprocessing}\label{noise-weighted-inner-product-method-with-multiprocessing}
 
-\section{Mathematical Formulation and Methods
-Overview}\label{mathematical-formulation-and-methods-overview}
-
-Following are the key mathematical formulations and methods implemented
-in \emph{\texttt{gwsnr}} for SNR calculation, \(P_{\rm det}\)
-estimation, and \(D_{\rm hor}\) computation.
-
-\subsubsection{Noise-Weighted Inner
-Product}\label{noise-weighted-inner-product}
-
-The standard frequency-domain inner product (Allen et al. (2012))
-between two signals \(\tilde{a}(f)\) and \(\tilde{b}(f)\) is
+The noise-weighted inner product is a robust and widely used technique,
+suitable for any frequency-domain gravitational waveform, including
+complex models with spin precession and higher-order harmonics available
+in \texttt{lalsimulation} (LIGO Scientific Collaboration, Virgo
+Collaboration, and KAGRA Collaboration (2018)). Following (Allen et al.
+(2012)), the inner product between two frequency-domain signals,
+\(\tilde{a}(f)\) and \(\tilde{b}(f)\), is defined as:
 
 \[
-\langle a | b \rangle = 4 \Re \int_{f_{\min}}^{f_{\max}} \frac{\tilde{a}(f)\tilde{b}^*(f)}{S_n(f)} df ,
+\left< a | b \right> = 4 \Re \int_{f_{\min}}^{f_{\max}} \frac{\tilde{a}(f)\tilde{b}^*(f)}{S_n(f)} df
 \]
 
-where \(S_n(f)\) is the detector PSD. The optimal SNR is
-\(\rho = \sqrt{\langle h|h\rangle}\), and for polarizations
-\(h_+, h_\times\):
+Here, \(S_n(f)\) is the one-sided power spectral density of the detector
+noise, and \((f_{\min}, f_{\max})\) is the analysis frequency band. The
+optimal SNR \(\rho\), is the norm of the inner-product for the given
+signal \(h\) : \(\rho = \sqrt{\langle h | h \rangle}\). For a
+gravitational wave signal composed of plus (\(h_+\)) and cross
+(\(h_\times\)) polarizations, and assuming orthogonality between them,
+the SNR can be expressed in terms of the detector's antenna patterns,
+\(F_+\) and \(F_\times\):
 
 \[
-\rho = \sqrt{F_+^2 \langle \tilde{h}_+|\tilde{h}_+\rangle + F_\times^2 \langle \tilde{h}_\times|\tilde{h}_\times\rangle} .
+\rho = \sqrt{ F_+^2 \left< \tilde{h}_+ | \tilde{h}_+ \right> + F_{\times}^2 \left< \tilde{h}_{\times} | \tilde{h}_{\times} \right> }
 \]
 
-Although waveform generation is costly, \emph{\texttt{gwsnr}}
-accelerates it using \texttt{multiprocessing}, \texttt{numba.njit}, and
-optional \texttt{jax} backends (with \texttt{ripple}; Edwards et al.
-(2024)).
+While this approach is versatile, it can be computationally intensive,
+with waveform generation representing the primary bottleneck. The
+\texttt{gwsnr} package addresses this challenge by parallelizing
+waveform generation across multiple CPU cores and accelerating the
+antenna pattern and inner product calculations using \texttt{numba.njit}
+compilation. Additionally, \texttt{gwsnr} provides optional support for
+JAX-based waveform generation and acceleration via the \texttt{ripple}
+waveform library (Edwards et al. 2024), utilizing \texttt{jax.jit} for
+just-in-time compilation and \texttt{jax.vmap} for efficient batched
+operations.
 
-\subsubsection{Partial Scaling
-Interpolation}\label{partial-scaling-interpolation}
+\subsubsection{Partial Scaling Interpolation
+Method}\label{partial-scaling-interpolation-method}
 
-For aligned-spin or non-spinning binaries, \emph{\texttt{gwsnr}} adapts
-FINDCHIRP (Allen et al. (2012)) to precompute a partial-scaled SNR,
+For non-spinning or aligned-spin binary systems restricted to the
+dominant harmonic mode, \texttt{gwsnr} implements a highly efficient
+interpolation-based technique called the Partial Scaling method. This
+approach, adapted from the FINDCHIRP algorithm (Allen et al. (2012)),
+decouples the computationally expensive parts of the SNR calculation
+from the extrinsic source parameters. It achieves this by defining a
+``partial-scaled SNR'' \(\rho_{1/2}\), which isolates the dependence on
+the intrinsic parameters (masses and spins). For a given full IMR
+waveform SNR, \(\rho_{\text{full}}\), the partial SNR is defined as:
 
 \[
-\rho_{1/2} = \frac{D_\mathrm{eff}}{\mathcal{M}^{5/6}} \rho_{\rm opt} ,
+\rho_{1/2} = \left(\frac{D_\mathrm{eff}}{1~\mathrm{Mpc}}\right) \left(\frac{\mathcal{M}}{M_\odot}\right)^{-5/6} \times \rho_{\text{full}}
 \]
 
-where \(\mathcal{M}\) is the chirp mass and \(D_{\rm eff}\) the
-effective distance. \(\rho_{1/2}\) is stored on a parameter grid (2D for
-non-spinning, 4D for aligned spins). New SNRs are recovered by spline
-interpolation and rescaling:
+Here, \(\mathcal{M}\) is the chirp mass and \(D_{\text{eff}}\) is the
+effective distance, which encapsulates the luminosity distance, sky
+location, and detector orientation wrt the binary. Since \(\rho_{1/2}\)
+depends only on the intrinsic properties of the binary, its value can be
+pre-computed on a grid and stored. For non-spinning systems, this is a
+two-dimensional grid of total mass (\(M\)) and mass ratio (\(q\)), while
+for aligned-spin systems, it is a four-dimensional grid that also
+includes the two spin magnitudes. To find the SNR for a new binary,
+\texttt{gwsnr} performs a rapid cubic spline interpolation on the
+pre-computed grid to find the corresponding \(\rho_{1/2}\) value. The
+final SNR is then recovered almost instantaneously by applying the
+scaling transformation:
 
 \[
-\rho = \rho_{1/2}\, \frac{\mathcal{M}^{5/6}}{D_\mathrm{eff}} .
+\rho = \rho_{1/2} \times \left(\frac{\mathcal{M}}{M_\odot}\right)^{5/6} \times \left(\frac{1~\mathrm{Mpc}}{D_\mathrm{eff}}\right)
 \]
 
-This replaces costly integrations with interpolation, enabling major
-speed-ups.
+This procedure transforms a computationally intensive integration into a
+simple, JIT-compiled interpolation and multiplication, enabling massive
+performance gains for large-scale population studies.
 
-\subsubsection{\texorpdfstring{ANN-based \(P_{\rm det}\)
-Estimation}{ANN-based P\_\{\textbackslash rm det\} Estimation}}\label{ann-based-p_rm-det-estimation}
+\subsubsection{ANN-based Pdet
+Estimation}\label{ann-based-pdet-estimation}
 
-\emph{\texttt{gwsnr}} includes an ANN built with \texttt{tensorflow}
-(Abadi et al. (2015)) and \texttt{scikit-learn} (Pedregosa et al.
-(2011)), trained to approximate \(\rho_{\rm opt}\) for BBH systems with
-the IMRPhenomXPHM waveform, which includes spin precession and
-subdominant modes. While the ANN is poor at estimating
-\(\rho_{\rm opt}\) directly, its outputs are effective for
-\(P_{\rm det}\), since detectability depends on threshold crossing
-rather than precise values.
+The \texttt{gwsnr} package now incorporates an artificial neural network
+(ANN) model, developed using TensorFlow (Abadi et al. (2015)) and
+scikit-learn (Pedregosa et al. (2011)), to rapidly estimate
+\(P_{\rm det}\) in binary black hole (BBH) systems using the
+IMRPhenomXPHM waveform approximant. This complex IMR waveform model
+accounts for spin-precessing systems with subdominant harmonics. The ANN
+model is especially useful when precise signal-to-noise ratio (SNR)
+calculations are not critical, providing a quick and effective means of
+estimating \(P_{\rm det}\). This value indicates detectability under
+Gaussian noise by determining if the SNR exceeds a certain threshold
+(e.g., \(\rho_{\rm th}=8\)). Trained on a large dataset from the
+\texttt{ler} package, the ANN model uses `partial scaled SNR' values as
+a primary input, reducing input dimensionality from 15 to 5 and
+enhancing accuracy. This approach offers a practical solution for
+assessing detectability under specified conditions. Other similar
+efforts with ANN models are detailed in (Chapman-Bird et al. (2023),
+Gerosa et al. (2020), Callister et al. (2024)).
 
-Trained on large \emph{\texttt{ler}} datasets, the model uses
-partial-scaled SNRs to reduce input dimensionality (15 to 5) and
-accelerate detectability estimates under stationary Gaussian noise.
-Users can also retrain the ANN for different detectors or astrophysical
-settings. Related work includes (Chapman-Bird et al. (2023), Gerosa et
-al. (2020), Callister et al. (2024)).
+In addition to providing trained ANN models for specific configurations,
+\texttt{gwsnr} offers users the flexibility to develop and train custom
+models tailored to their unique requirements. This adaptability allows
+for optimization based on variations in detector sensitivity,
+gravitational-wave properties, and other research-specific factors,
+ensuring maximum model effectiveness across different scenarios.
 
-\subsubsection{\texorpdfstring{Hybrid SNR Recalculation for
-\(P_{\rm det}\)
-Estimation}{Hybrid SNR Recalculation for P\_\{\textbackslash rm det\} Estimation}}\label{hybrid-snr-recalculation-for-p_rm-det-estimation}
+\subsubsection{Partial Scaling Interpolation Method with SNR
+Recalculation for Pdet
+Estimation}\label{partial-scaling-interpolation-method-with-snr-recalculation-for-pdet-estimation}
 
-The Partial Scaling method is efficient for aligned-spin systems but
-unreliable for precessing binaries, and the ANN-based approach is less
-accurate. To address this, \emph{\texttt{gwsnr}} uses a hybrid strategy:
-it first estimates SNRs with Partial Scaling or ANN, identifies signals
-near the threshold \(\rho_{\rm th}\), and then recalculates them with
-the Noise-Weighted Inner Product.
-
-This approach retains the speed of approximations while ensuring
-accuracy for systems close to the detection limit, producing more
-reliable \(P_{\rm det}\) estimates.
-
-\subsubsection{\texorpdfstring{Statistical Models for
-\(P_{\rm det}\)}{Statistical Models for P\_\{\textbackslash rm det\}}}\label{statistical-models-for-p_rm-det}
-
-In \emph{\texttt{gwsnr}}, estimation of \(P_{\rm det}\) is based on a
-detection threshold for the observed (matched-filter) SNR,
-\(\rho_{\rm obs,thr}\). The observed SNR, \(\rho_{\rm obs}\), is modeled
-either as a Gaussian random variate centered at \(\rho_{\rm opt}\) (or
-\(\rho_{\rm opt,net}\) for a detector network) with unit variance
-(Fishbach, Farr, and Holz (2020), B. P. Abbott et al. (2019)), or as a
-non-central \(\chi\) distribution (\texttt{scipy.stats.ncx2}; Virtanen
-et al. (2020)) with non-centrality parameter
-\(\lambda = \rho_{\rm opt}\) (or \(\rho_{\rm opt,net}\)) and two degrees
-of freedom for a single detector, extended to \(2N\) for a network of
-\(N\) detectors (Essick (2023)).
-
-\emph{\texttt{gwsnr}} uses precomputed \(\rho_{\rm obs,thr}\) values
-derived from semianalytic sensitivity estimates of GW transient
-injection catalogues (following Essick (2023)). The package also
-supports custom threshold computation from user-provided catalogue data,
-including parameter-dependent thresholds that vary with intrinsic
-properties such as total observed mass (\(m_{\rm tot, obs}\)).
-
-\subsubsection{Horizon Distance
-Calculation}\label{horizon-distance-calculation}
-
-\(D_{\rm hor}\) is a standard measure of detector sensitivity, defined
-as the maximum distance at which an optimally oriented source can be
-detected with a given threshold \(\rho_{\rm opt,thr}\) (Allen et al.
-(2012)). \emph{\texttt{gwsnr}} computes \(D_{\rm hor}\) using two
-methods.
-
-The \textbf{analytical method} rescales a known \(D_{\rm eff}\) by
-
-\[
-D_{\rm hor} = \frac{\rho_{\rm opt}}{\rho_{\rm th}} D_{\rm eff}.
-\]
-
-The \textbf{numerical method} maximizes SNR over sky location, then
-solves for the luminosity distance (\(d_L\)) where
-
-\[
-\rho(d_L) - \rho_{\rm opt, thr} = 0 .
-\]
+While the Partial Scaling method is highly efficient for aligned-spin
+systems, its utility can be further enhanced by recalculating the SNR
+for precessing systems within a predefined small range of generated
+SNRs. This is done by first obtaining optimal SNRs with the Partial
+Scaling method, selecting the SNRs near \(\rho_{\rm th}\), and then
+recalculating the SNRs for these systems using the Noise-Weighted Inner
+Product Method. This approach allows us to leverage the speed of the
+Partial Scaling method while ensuring accurate SNR values for systems
+close to the detection threshold. The recalculated SNRs can then be used
+to estimate \(P_{\rm det}\), providing a balance between computational
+efficiency and accuracy.
 
 \section{Acknowledgements}\label{acknowledgements}
 
@@ -562,8 +544,7 @@ possible. Thanks are also due to the LIGO Laboratory for the
 computational resources, supported by National Science Foundation Grants
 No.~PHY-0757058 and No.~PHY-0823459.
 
-\section*{References}\label{references}
-\addcontentsline{toc}{section}{References}
+\section{References}\label{references}
 
 \phantomsection\label{refs}
 \begin{CSLReferences}{1}{0}
@@ -580,19 +561,24 @@ BINARY BLACK HOLE MERGER GW150914.''} \emph{The Astrophysical Journal
 Letters} 818 (2): L22.
 \url{https://doi.org/10.3847/2041-8205/818/2/l22}.
 
+\bibitem[\citeproctext]{ref-Abbott:2016}
+Abbott, B. P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acernese, K.
+Ackley, C. Adams, et al. 2016a. {``Observation of Gravitational Waves
+from a Binary Black Hole Merger.''} \emph{Physical Review Letters} 116
+(6). \url{https://doi.org/10.1103/physrevlett.116.061102}.
+
 \bibitem[\citeproctext]{ref-Abbott:2016:detection}
 Abbott, B. P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acernese, K.
-Ackley, C. Adams, et al. 2016. {``GW150914: First Results from the
+Ackley, C. Adams, et al. 2016b. {``GW150914: First Results from the
 Search for Binary Black Hole Coalescence with Advanced LIGO.''}
 \emph{Physical Review D} 93 (12).
 \url{https://doi.org/10.1103/physrevd.93.122003}.
 
-\bibitem[\citeproctext]{ref-Abbott:2019}
-Abbott, B. P., R. Abbott, T. D. Abbott, S. Abraham, F. Acernese, K.
-Ackley, C. Adams, et al. 2019. {``Binary Black Hole Population
-Properties Inferred from the First and Second Observing Runs of Advanced
-LIGO and Advanced Virgo.''} \emph{The Astrophysical Journal Letters} 882
-(2): L24. \url{https://doi.org/10.3847/2041-8213/ab3800}.
+\bibitem[\citeproctext]{ref-Abbott:2016:pe}
+Abbott, B. P., R. Abbott, T. D. Abbott, M. R. Abernathy, F. Acernese, K.
+Ackley, C. Adams, et al. 2016. {``Properties of the Binary Black Hole
+Merger GW150914.''} \emph{Physical Review Letters} 116 (24).
+\url{https://doi.org/10.1103/physrevlett.116.241102}.
 
 \bibitem[\citeproctext]{ref-Abbott:2020}
 Abbott, B. P., R. Abbott, T. D. Abbott, S. Abraham, F. Acernese, K.
@@ -634,6 +620,20 @@ of Gravitational Waves from Inspiraling Compact Binaries.''}
 \emph{Physical Review D} 85 (12).
 \url{https://doi.org/10.1103/physrevd.85.122006}.
 
+\bibitem[\citeproctext]{ref-Ashton:2022}
+Ashton, Gregory, Sylvia Biscoveanu, Neil Cornish, Isaac Dal Canto,
+Prayush Kumar, Duncan Meacher, Hannah Middleton, Divyansh Mistry, Rory
+Smith, and Tom Stevenson. 2022. {``{bilby: a user-friendly Bayesian
+inference library}.''} \emph{GitHub Repository}. GitHub.
+\url{https://github.com/GregoryAshton/Bilby}.
+
+\bibitem[\citeproctext]{ref-Ashton:2019}
+Ashton, Gregory, Moritz Hübner, Paul D. Lasky, Colm Talbot, Kendall
+Ackley, Sylvia Biscoveanu, Qi Chu, et al. 2019. {``Bilby: A
+User-Friendly Bayesian Inference Library for Gravitational-Wave
+Astronomy.''} \emph{The Astrophysical Journal Supplement Series} 241
+(2): 27. \url{https://doi.org/10.3847/1538-4365/ab06fc}.
+
 \bibitem[\citeproctext]{ref-Aso:2013}
 Aso, Yoichi, Yuta Michimura, Kentaro Somiya, Masaki Ando, Osamu
 Miyakawa, Takanori Sekiguchi, Daisuke Tatsumi, and Hiroaki Yamamoto.
@@ -673,31 +673,10 @@ Daniel Foreman-Mackey, Maximiliano Isi, and Aaron Zimmerman. 2024.
 wave data analysis}.''} \emph{Phys. Rev. D} 110 (6): 064028.
 \url{https://doi.org/10.1103/PhysRevD.110.064028}.
 
-\bibitem[\citeproctext]{ref-Essick:2023}
-Essick, Reed. 2023. {``Semianalytic Sensitivity Estimates for Catalogs
-of Gravitational-Wave Transients.''}
-\url{https://arxiv.org/abs/2307.02765}.
-
-\bibitem[\citeproctext]{ref-Essick:2024}
-Essick, Reed, and Maya Fishbach. 2024. {``Ensuring Consistency Between
-Noise and Detection in Hierarchical Bayesian Inference.''} \emph{The
-Astrophysical Journal} 962 (2): 169.
-\url{https://doi.org/10.3847/1538-4357/ad1604}.
-
-\bibitem[\citeproctext]{ref-Fishbach:2020}
-Fishbach, Maya, Will M. Farr, and Daniel E. Holz. 2020. {``The Most
-Massive Binary Black Hole Detections and the Identification of
-Population Outliers.''} \emph{The Astrophysical Journal Letters} 891
-(2): L31. \url{https://doi.org/10.3847/2041-8213/ab77c9}.
-
 \bibitem[\citeproctext]{ref-Gerosa:2020}
 Gerosa, Davide et al. 2020. {``Gravitational-Wave Selection Effects
 Using Neural-Network Classifiers.''} \emph{Physical Review D} 102 (10).
 \url{https://doi.org/10.1103/physrevd.102.103020}.
-
-\bibitem[\citeproctext]{ref-mlx:2023}
-Hannun, Awni, Jagrit Digani, Angelos Katharopoulos, and Ronan Collobert.
-n.d. {``{mlx}.''} \url{https://github.com/ml-explore}.
 
 \bibitem[\citeproctext]{ref-jax:2018}
 James Bradbury, Peter Hawkins, Roy Frostig, and Various others. 2018.
@@ -744,6 +723,11 @@ Bertrand Thirion, Olivier Grisel, Mathieu Blondel, et al. 2011.
 {``Scikit-Learn: Machine Learning in {P}ython.''} \emph{Journal of
 Machine Learning Research} 12: 2825--30.
 
+\bibitem[\citeproctext]{ref-gwsnr:documentation}
+Phurailatpam, Hemantakumar, and Otto Akseli Hannuksela. 2025. {``Gwsnr:
+Gravitational Wave Signal-to-Noise Ratio Computation Package
+Documentation.''} \url{https://gwsnr.readthedocs.io/en/latest/}.
+
 \bibitem[\citeproctext]{ref-ler:2024}
 Phurailatpam, Hemantakumar, Anupreeta More, Harsh Narola, Ng Chung Yin,
 Justin Janquart, Chris Van Den Broeck, Otto Akseli Hannuksela, Neha
@@ -769,12 +753,6 @@ Inference in Gravitational-Wave Astronomy: Parameter Estimation, Model
 Selection, and Hierarchical Models.''} \emph{Publications of the
 Astronomical Society of Australia} 36.
 \url{https://doi.org/10.1017/pasa.2019.2}.
-
-\bibitem[\citeproctext]{ref-scipy:2020}
-Virtanen, Pauli, Ralf Gommers, Travis E. Oliphant, Matt Haberland, Tyler
-Reddy, David Cournapeau, Evgeni Burovski, et al. 2020. {``{SciPy 1.0:
-Fundamental Algorithms for Scientific Computing in Python}.''}
-\emph{Nature Methods}. SciPy. \url{https://www.scipy.org/}.
 
 \bibitem[\citeproctext]{ref-Wempe:2022}
 Wempe, Ewoud, Léon V. E. Koopmans, A. Renske A. C. Wierda, Otto Akseli
