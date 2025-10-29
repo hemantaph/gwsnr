@@ -420,21 +420,21 @@ class GWSNR:
         self.spin_max = spin_max
         self.batch_size_interpolation = batch_size_interpolation
 
-        # getting interpolator data from the package
-        # first check if the interpolator directory './interpolator_pickle' exists
-        if not pathlib.Path(interpolator_dir).exists():
-            # Get the path to the resource
-            with path('gwsnr.core', 'interpolator_pickle') as resource_path:
-                print(f"Copying interpolator data from the library resource {resource_path} to the current working directory.")
-                resource_path = pathlib.Path(resource_path)  # Ensure it's a Path object
+        # # getting interpolator data from the package
+        # # first check if the interpolator directory './interpolator_pickle' exists
+        # if not pathlib.Path(interpolator_dir).exists():
+        #     # Get the path to the resource
+        #     with path('gwsnr.core', 'interpolator_pickle') as resource_path:
+        #         print(f"Copying interpolator data from the library resource {resource_path} to the current working directory.")
+        #         resource_path = pathlib.Path(resource_path)  # Ensure it's a Path object
 
-                # Define destination path (same name in current working directory)
-                dest_path = pathlib.Path.cwd() / interpolator_dir
+        #         # Define destination path (same name in current working directory)
+        #         dest_path = pathlib.Path.cwd() / interpolator_dir
 
-                # Copy entire directory tree
-                if dest_path.exists():
-                    shutil.rmtree(dest_path)
-                shutil.copytree(resource_path, dest_path)
+        #         # Copy entire directory tree
+        #         if dest_path.exists():
+        #             shutil.rmtree(dest_path)
+        #         shutil.copytree(resource_path, dest_path)
 
         # dealing with mtot_max
         # set max cut off according to minimum_frequency
