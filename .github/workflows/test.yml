@@ -18,6 +18,11 @@ jobs:
         pip install .
         pip install pytest
         pip install ripplegw
+        pip install jax
+        pip install jaxlib
+        pip install scikit-learn==1.7.1
+        pip install tensorflow==2.17.1
+        pip install ml-dtypes --upgrade
         
     - name: Run tests
       run: pytest -v -s
