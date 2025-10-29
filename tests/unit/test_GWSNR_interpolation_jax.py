@@ -42,9 +42,9 @@ DEFAULT_CONFIG = {
     'spin_max': 0.99,                        # Maximum dimensionless spin magnitude
     
     # Interpolation grid resolution
-    'mtot_resolution': 200,                  # Number of total mass grid points
-    'ratio_resolution': 20,                  # Number of mass ratio grid points  
-    'spin_resolution': 10,                   # Number of spin grid points
+    'mtot_resolution': 50,                  # Number of total mass grid points
+    'ratio_resolution': 10,                  # Number of mass ratio grid points  
+    'spin_resolution': 5,                   # Number of spin grid points
     
     # Waveform generation parameters
     'sampling_frequency': 2048.0,            # Sampling frequency (Hz)
