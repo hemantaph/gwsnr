@@ -44,7 +44,7 @@ Then, compute the SNR for a binary black hole system:
 
 .. note::
 
-   ``gwsnr`` supports Python 3.10+ and automatically utilizes multi-core CPUs and NVIDIA GPUs (or Apple Silicon GPUs) when available. Refer to the :doc:`Installation` section for detailed setup instructions.
+   ``gwsnr`` supports Python 3.10+ (but 3.11 recommended) and utilizes multi-core CPUs and NVIDIA GPUs (or Apple Silicon GPUs) when available. Refer to the :doc:`Installation` section for detailed setup instructions.
 
 About the Project
 -----------------

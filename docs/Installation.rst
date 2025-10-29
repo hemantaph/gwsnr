@@ -3,6 +3,8 @@ Installation
 ============
 
 .. note::
+
+    ``gwsnr`` supports Python 3.10+ (but 3.11 recommended) and utilizes multi-core CPUs and NVIDIA GPUs (or Apple Silicon GPUs) when available. 
     
     For package development and contribution refer here (:ref:`development`).
 
