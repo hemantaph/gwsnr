@@ -67,6 +67,10 @@ Traditional SNR calculations rely on noise-weighted inner products and are compu
 `gwsnr` underpins simulations and analyses of **GW population statistics**, **rate estimation**, and **lensed versus unlensed event predictions**—as demonstrated in the [`ler`](https://ler.readthedocs.io/en/latest/) package.  
 Its computational efficiency makes it particularly suited for **hierarchical Bayesian frameworks** that require rapid, repeated evaluation of $P_{\rm det}$ across large parameter spaces.
 
+## Examples
+
+Detailed usage examples and tutorials are available in the gwsnr/docs/examples directory and online at the [gwsnr documentation site](https://gwsnr.hemantaph.com).
+
 ## Documentation
 
 The `gwsnr` package documentation is available at [ReadTheDocs](https://gwsnr.hemantaph.com).
