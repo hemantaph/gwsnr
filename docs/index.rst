@@ -1,5 +1,5 @@
-Welcome to :red:`gwsnr`’s documentation!
-================================
+Welcome to :red:`gwsnr`'s documentation!
+=============================================
 
 .. raw:: html
 
@@ -8,7 +8,7 @@ Welcome to :red:`gwsnr`’s documentation!
    </div>
 
 :red:`gwsnr` : Efficient :red_first:`Gravitational`-:red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Calculator
-------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
 
 ``gwsnr`` is a Python package for fast and accurate gravitational-wave (GW) Signal-to-Noise Ratio (SNR) calculation. It is designed for semi-analytical Probability of Detection (Pdet) estimation in population simulations and for hierarchical Bayesian inference with selection effects. The package achieves a **speed-up of more than 5,000x** compared to traditional methods, while maintaining an **accuracy above 99.5%**.
 
@@ -124,6 +124,7 @@ Glossary
    :caption: API:
 
    autoapi/gwsnr/core/index
+   autoapi/gwsnr/threshold/index
    autoapi/gwsnr/numba/index
    autoapi/gwsnr/jax/index
    autoapi/gwsnr/mlx/index

@@ -85,40 +85,6 @@ Classes
    >>> best_thr, del_H, H, H_true, snr_thrs = finder.find_threshold(iteration=10)
    >>> print(f"Best SNR threshold: {best_thr:.2f}")
 
-   Instance Attributes
-   ----------
-   SNRThresholdFinder class has the following attributes,
-
-   +-------------------------------------+----------------------------------+
-   | Atrributes                          | Type                             |
-   +=====================================+==================================+
-   | original_detection_statistic       | dict                             |
-   +-------------------------------------+----------------------------------+
-   | projected_detection_statistic      | dict                             |
-   +-------------------------------------+----------------------------------+
-   | parameters_to_fit                 | list                             |
-   +-------------------------------------+----------------------------------+
-   | sample_size                        | int                              |
-   +-------------------------------------+----------------------------------+
-   | selection_range                    | dict                             |
-   +-------------------------------------+----------------------------------+
-
-   Instance Methods
-   ----------
-   GWSNR class has the following methods,
-
-   +-------------------------------------+----------------------------------+
-   | Methods                             | Description                      |
-   +=====================================+==================================+
-   | det_data                            | Load and preprocess catalog data |
-   +-------------------------------------+----------------------------------+
-   | find_threshold                      | Find the optimal SNR threshold   |
-   +-------------------------------------+----------------------------------+
-   | find_best_SNR_threshold             | Find the best SNR threshold using |
-   |                                     | spline interpolation and         |
-   |                                     | optimization                     |
-   +-------------------------------------+----------------------------------+
-
 
 
    ..
