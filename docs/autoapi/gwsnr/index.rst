@@ -60,103 +60,105 @@ Classes
 
 
    
-   Calculate signal-to-noise ratio (SNR) and detection probability for gravitational wave signals.
+       Calculate SNR and detection probability for gravitational wave signals from compact binaries.
 
-   This class provides multiple computational methods for SNR calculation:
-   - Fast interpolation using precomputed coefficients
-   - Noise-weighted inner products with LAL/Ripple waveforms
-   - JAX/MLX acceleration for GPU computation
-   - Neural network estimation for population studies
+       Provides multiple computational methods for optimal SNR calculation:
+       - Interpolation: Fast calculation using precomputed coefficients
+       - Inner product: Direct computation with LAL/Ripple waveforms
+       - JAX/MLX: GPU-accelerated computation
+       - ANN: Neural network-based estimation
 
-   Supports various detector networks, waveform approximants, and spin configurations.
+       Other features include:
+       - observed SNR based Pdet calculation with various statistical models
+       - Horizon distance estimation for detectors and detector networks
 
    :Parameters:
 
        **npool** : int, default=4
-           Number of processors for parallel processing.
+           Number of processors for parallel computation.
 
-       **mtot_min** : float, default=9.96=2*4.98
-           Minimum total mass in solar masses for interpolation grid. 4.98 Mo is the minimum component mass of BBH systems in GWTC-3. 9.96=2*4.98
+       **mtot_min** : float, default=9.96
+           Minimum total mass (solar masses) for interpolation grid.
 
-       **mtot_max** : float, default=235.0=2*112.5+10.0
-           Maximum total mass in solar masses. Auto-adjusted if mtot_cut=True. 112.5 Mo is the maximum component mass of BBH systems in GWTC-3. 10.0 Mo is added to avoid edge effects.
+       **mtot_max** : float, default=235.0
+           Maximum total mass (solar masses). Auto-adjusted if mtot_cut=True.
 
        **ratio_min** : float, default=0.1
-           Minimum mass ratio (m2/m1) for interpolation grid.
+           Minimum mass ratio (m2/m1) for interpolation.
 
        **ratio_max** : float, default=1.0
-           Maximum mass ratio for interpolation grid.
+           Maximum mass ratio for interpolation.
 
        **spin_max** : float, default=0.99
-           Maximum aligned spin magnitude for interpolation methods.
+           Maximum aligned spin magnitude.
 
        **mtot_resolution** : int, default=200
-           Number of total mass grid points for interpolation.
+           Grid points for total mass interpolation.
 
        **ratio_resolution** : int, default=20
-           Number of mass ratio grid points for interpolation.
+           Grid points for mass ratio interpolation.
 
        **spin_resolution** : int, default=10
-           Number of spin grid points for aligned-spin methods.
+           Grid points for spin interpolation (aligned-spin methods).
 
        **batch_size_interpolation** : int, default=1000000
            Batch size for interpolation calculations.
 
        **sampling_frequency** : float, default=2048.0
-           Detector sampling frequency in Hz.
+           Detector sampling frequency (Hz).
 
        **waveform_approximant** : str, default='IMRPhenomD'
-           Waveform model (e.g., 'IMRPhenomD', 'IMRPhenomXPHM', 'TaylorF2').
+           Waveform model: 'IMRPhenomD', 'IMRPhenomXPHM', 'TaylorF2', etc.
 
        **frequency_domain_source_model** : str, default='lal_binary_black_hole'
            LAL source model for waveform generation.
 
        **minimum_frequency** : float, default=20.0
-           Minimum frequency in Hz for waveform generation.
+           Minimum frequency (Hz) for waveform generation.
 
        **reference_frequency** : float, optional
-           Reference frequency in Hz. Defaults to minimum_frequency.
+           Reference frequency (Hz). Defaults to minimum_frequency.
 
        **duration_max** : float, optional
-           Maximum waveform duration in seconds. Auto-set for some approximants.
+           Maximum waveform duration (seconds). Auto-set for some approximants.
 
        **duration_min** : float, optional
-           Minimum waveform duration in seconds.
+           Minimum waveform duration (seconds).
 
        **fixed_duration** : float, optional
-           Fixed duration for all waveforms if specified.
+           Fixed duration (seconds) for all waveforms.
 
        **mtot_cut** : bool, default=False
-           Limit mtot_max based on minimum_frequency to avoid undetectable systems.
+           If True, limit mtot_max based on minimum_frequency.
 
        **snr_method** : str, default='interpolation_no_spins'
-           SNR calculation method:
-           - 'interpolation_no_spins[_jax/_mlx]': Fast interpolation without spins
-           - 'interpolation_aligned_spins[_jax/_mlx]': With aligned spins
-           - 'inner_product[_jax]': Direct inner product calculation
-           - 'ann': Artificial neural network estimation
+           SNR calculation method. Options:
+           - 'interpolation_no_spins[_numba/_jax/_mlx]'
+           - 'interpolation_aligned_spins[_numba/_jax/_mlx]'
+           - 'inner_product[_jax]'
+           - 'ann'
 
        **snr_type** : str, default='optimal_snr'
-           Type of SNR ('optimal_snr' or 'observed_snr').
+           SNR type: 'optimal_snr' or 'observed_snr' (not implemented).
 
        **noise_realization** : array_like, optional
-           Noise realization for observed SNR (not yet implemented).
+           Noise realization for observed SNR (not implemented).
 
        **psds** : dict, optional
-           Power spectral densities for detectors. Options:
+           Detector power spectral densities:
            - None: Use bilby defaults
            - {'H1': 'aLIGODesign', 'L1': 'aLIGODesign'}: PSD names
            - {'H1': 'custom_psd.txt'}: Custom PSD files
            - {'H1': 1234567890}: GPS time for data-based PSD
 
        **ifos** : list, optional
-           Custom interferometer objects. None uses defaults from psds.
+           Custom interferometer objects. Defaults from psds if None.
 
        **interpolator_dir** : str, default='./interpolator_pickle'
-           Directory for interpolation coefficient storage.
+           Directory for storing interpolation coefficients.
 
        **create_new_interpolator** : bool, default=False
-           Force generation of new interpolation coefficients.
+           If True, regenerate interpolation coefficients.
 
        **gwsnr_verbose** : bool, default=True
            Print initialization parameters.
@@ -166,22 +168,22 @@ Classes
 
        **pdet_kwargs** : dict, optional
            Detection probability parameters:
-           - 'snr_th': Individual detector threshold (default=8.0)
-           - 'snr_th_net': Network threshold (default=8.0)
+           - 'snr_th': Single detector threshold (default=10.0)
+           - 'snr_th_net': Network threshold (default=10.0)
            - 'pdet_type': 'boolean' or 'probability_distribution'
            - 'distribution_type': 'gaussian' or 'noncentral_chi2'
 
        **ann_path_dict** : dict or str, optional
-           ANN model paths. None uses built-in models.
+           Paths to ANN models. Uses built-in models if None.
 
        **snr_recalculation** : bool, default=False
-           Enable hybrid recalculation (with 'inner_product') near detection threshold.
+           Enable hybrid recalculation near detection threshold.
 
        **snr_recalculation_range** : list, default=[6,14]
-           SNR range for triggering recalculation.
+           SNR range [min, max] for triggering recalculation.
 
        **snr_recalculation_waveform_approximant** : str, default='IMRPhenomXPHM'
-           Waveform for recalculation.
+           Waveform approximant for recalculation.
 
 
 
@@ -193,30 +195,22 @@ Classes
 
    .. rubric:: Notes
 
-   - Interpolation methods are fastest for population studies
-   - Inner product methods are most accurate for individual events
-   - JAX methods leverage GPU acceleration when available
-   - ANN methods provide fast detection probability estimates, but less accurate SNRs
+   - Interpolation methods: fastest for population studies
+   - Inner product methods: most accurate for individual events
+   - JAX/MLX methods: leverage GPU acceleration
+   - ANN methods: fast detection probability, lower SNR accuracy
 
 
    .. rubric:: Examples
 
-   Basic usage with interpolation:
+       Basic interpolation usage:
 
-   >>> from gwsnr import GWSNR
-   >>> snr_calc = GWSNR(snr_method='interpolation_no_spins')
-   >>> result = snr_calc.optimal_snr(mass_1=30, mass_2=25, luminosity_distance=100)
-   >>> print(f"Network SNR: {result['snr_net'][0]:.2f}")
-
-   With aligned spins:
-
-   >>> snr_calc = GWSNR(snr_method='interpolation_aligned_spins')
-   >>> result = snr_calc.optimal_snr(mass_1=30, mass_2=25, a_1=0.5, a_2=-0.3)
-
-   Detection probability:
-
-   >>> pdet_calc = GWSNR(pdet_kwargs={'snr_th': 8})
-   >>> pdet = pdet_calc.pdet(mass_1=30, mass_2=25, luminosity_distance=200)
+       >>> from gwsnr import GWSNR
+       >>> gwsnr = GWSNR()
+       >>> snrs = gwsnr.optimal_snr(mass_1=30, mass_2=30, luminosity_distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+       >>> pdet = gwsnr.pdet(mass_1=30, mass_2=30, luminosity_distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+       >>> print(f"SNR value: {snrs},
+   P_det value: {pdet}")
 
 
 
