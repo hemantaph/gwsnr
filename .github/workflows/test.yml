@@ -11,15 +11,15 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.10'
 
     - name: Install dependencies
       run: |
         pip install .
         pip install pytest
-        pip install ripplegw
         pip install jax
         pip install jaxlib
+        pip install ripplegw
         pip install scikit-learn==1.7.1
         pip install tensorflow==2.17.1
         pip install ml-dtypes --upgrade
