@@ -49,6 +49,38 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:attribute:: f_u
+      :value: '1024.0'
+
+      
+
+   .. py:attribute:: f_ref
+      :value: 'None'
+
+      
+
+   .. py:attribute:: f_l
+      :value: '20.0'
+
+      
+
+   .. py:attribute:: arg_list
+      :value: "['Mchirp', 'eta', 'a_1', 'a_2', 'luminosity_distance', 'tc', 'phase', 'theta_jn']"
+
+      
+
+   .. py:attribute:: gen_hphc
+
+      
+
+   .. py:attribute:: vmap_waveform
+
+      
+
+   .. py:attribute:: vmap_findchirp_chirptime
+
+      
+
    .. py:method:: arg_selection(waveform_name)
 
       

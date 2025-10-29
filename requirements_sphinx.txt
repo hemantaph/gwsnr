@@ -1,7 +1,7 @@
 html5lib==1.0b8
 setuptools
 nbsphinx==0.9.3
-sphinx-autoapi==3.0.0
+sphinx-autoapi==3.6.1
 autoapi==2.0.1
 nbsphinx==0.9.3
 sphinx-copybutton==0.5.2

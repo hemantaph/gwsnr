@@ -187,6 +187,7 @@ Classes
    ..
        !! processed by numpydoc !!
    .. py:attribute:: npool
+      :value: 'None'
 
       
       ``int``
@@ -211,6 +212,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: mtot_min
+      :value: 'None'
 
       
       ``float``
@@ -235,6 +237,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: mtot_max
+      :value: 'None'
 
       
       ``float``
@@ -259,6 +262,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: ratio_min
+      :value: 'None'
 
       
       ``float``
@@ -283,6 +287,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: ratio_max
+      :value: 'None'
 
       
       ``float``
@@ -307,6 +312,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: spin_max
+      :value: 'None'
 
       
       ``float``
@@ -331,6 +337,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: mtot_resolution
+      :value: 'None'
 
       
       ``int``
@@ -355,6 +362,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: ratio_resolution
+      :value: 'None'
 
       
       ``int``
@@ -379,6 +387,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: spin_resolution
+      :value: 'None'
 
       
       ``int``
@@ -403,6 +412,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: ratio_arr
+      :value: 'None'
 
       
       ``numpy.ndarray``
@@ -427,6 +437,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: mtot_arr
+      :value: 'None'
 
       
       ``numpy.ndarray``
@@ -451,6 +462,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: a_1_arr
+      :value: 'None'
 
       
       ``numpy.ndarray``
@@ -475,6 +487,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: a_2_arr
+      :value: 'None'
 
       
       ``numpy.ndarray``
@@ -499,6 +512,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: sampling_frequency
+      :value: 'None'
 
       
       ``float``
@@ -523,6 +537,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: waveform_approximant
+      :value: 'None'
 
       
       ``str``
@@ -547,6 +562,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: frequency_domain_source_model
+      :value: 'None'
 
       
       ``str``
@@ -571,6 +587,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: f_min
+      :value: 'None'
 
       
       ``float``
@@ -595,6 +612,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: f_ref
+      :value: 'None'
 
       
       ``float``
@@ -619,6 +637,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: duration_max
+      :value: 'None'
 
       
       ``float`` or ``None``
@@ -643,6 +662,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: duration_min
+      :value: 'None'
 
       
       ``float`` or ``None``
@@ -667,6 +687,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: snr_method
+      :value: 'None'
 
       
       ``str``
@@ -691,6 +712,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: snr_type
+      :value: 'None'
 
       
       ``str``
@@ -715,6 +737,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: noise_realization
+      :value: 'None'
 
       
       ``numpy.ndarray`` or ``None``
@@ -739,6 +762,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: psds_list
+      :value: 'None'
 
       
       ``list`` of ``PowerSpectralDensity``
@@ -763,6 +787,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: detector_tensor_list
+      :value: 'None'
 
       
       ``list`` of ``numpy.ndarray``
@@ -787,6 +812,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: detector_list
+      :value: 'None'
 
       
       ``list`` of ``str``
@@ -811,6 +837,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: ifos
+      :value: 'None'
 
       
       ``list`` of ``Interferometer``
@@ -835,6 +862,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: interpolator_dir
+      :value: 'None'
 
       
       ``str``
@@ -859,6 +887,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: path_interpolator
+      :value: 'None'
 
       
       ``list`` of ``str``
@@ -883,6 +912,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: snr_partialsacaled_list
+      :value: 'None'
 
       
       ``list`` of ``numpy.ndarray``
@@ -907,6 +937,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: multiprocessing_verbose
+      :value: 'None'
 
       
       ``bool``
@@ -931,6 +962,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: param_dict_given
+      :value: 'None'
 
       
       ``dict``
@@ -955,6 +987,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: snr_th
+      :value: 'None'
 
       
       ``float``
@@ -979,6 +1012,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: snr_th_net
+      :value: 'None'
 
       
       ``float``
@@ -1003,6 +1037,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: model_dict
+      :value: 'None'
 
       
       ``dict``
@@ -1027,6 +1062,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: scaler_dict
+      :value: 'None'
 
       
       ``dict``
@@ -1051,6 +1087,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: error_adjustment
+      :value: 'None'
 
       
       ``dict``
@@ -1075,6 +1112,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: ann_catalogue
+      :value: 'None'
 
       
       ``dict``
@@ -1099,6 +1137,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: snr_recalculation
+      :value: 'None'
 
       
       ``bool``
@@ -1123,6 +1162,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: snr_recalculation_range
+      :value: 'None'
 
       
       ``list``
@@ -1147,6 +1187,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: snr_recalculation_waveform_approximant
+      :value: 'None'
 
       
       ``str``
@@ -1171,6 +1212,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: get_interpolated_snr
+      :value: 'None'
 
       
       ``function``
@@ -1195,6 +1237,7 @@ Classes
           !! processed by numpydoc !!
 
    .. py:attribute:: noise_weighted_inner_product_jax
+      :value: 'None'
 
       
       ``function``
@@ -1217,6 +1260,26 @@ Classes
 
       ..
           !! processed by numpydoc !!
+
+   .. py:attribute:: pdet_kwargs
+      :value: 'None'
+
+      
+
+   .. py:attribute:: fixed_duration
+      :value: 'None'
+
+      
+
+   .. py:attribute:: batch_size_interpolation
+      :value: '1000000'
+
+      
+
+   .. py:attribute:: mtot_cut
+      :value: 'False'
+
+      
 
    .. py:method:: interpolator_setup(interpolator_dir, create_new_interpolator, psds_list, detector_tensor_list, detector_list)
 

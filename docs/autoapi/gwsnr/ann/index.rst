@@ -77,6 +77,33 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:attribute:: directory
+      :value: "'./gwsnr_data'"
+
+      
+
+   .. py:attribute:: ann_model
+
+      
+
+   .. py:attribute:: ann
+      :value: 'None'
+
+      
+
+   .. py:attribute:: scaler
+      :value: 'None'
+
+      
+
+   .. py:attribute:: gwsnr_args
+
+      
+
+   .. py:attribute:: gwsnr
+
+      
+
    .. py:method:: get_input_output_data(params=None, randomize=True)
 
 

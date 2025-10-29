@@ -105,6 +105,26 @@ Functions
 
    ..
        !! processed by numpydoc !!
+   .. py:attribute:: npool
+      :value: '4'
+
+      
+
+   .. py:attribute:: multiprocessing_verbose
+      :value: 'True'
+
+      
+
+   .. py:attribute:: selection_range
+      :value: 'None'
+
+      
+
+   .. py:attribute:: sample_size
+      :value: '20000'
+
+      
+
    .. py:method:: det_data(catalog_file)
 
       

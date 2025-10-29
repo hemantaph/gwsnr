@@ -54,7 +54,7 @@ Attributes
 
 
 .. py:data:: Gamma
-   :value: 0.5772156649015329
+   :value: '0.5772156649015329'
 
    
 
@@ -63,7 +63,7 @@ Attributes
    
 
 .. py:data:: MTSUN_SI
-   :value: 4.925491025543576e-06
+   :value: '4.925491025543576e-06'
 
    
 
