@@ -5,8 +5,10 @@ __pycache__/
 *.so
 .pypirc
 .pytest_cache/
+.pytest_cache
 .venv/
 .vscode/
+.pyc
 ann_data/
 # tests/interpolator_pickle/
 docs/examples/interpolator_pickle/

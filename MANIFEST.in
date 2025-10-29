@@ -1,0 +1,2 @@
+include gwsnr/ann/ann_data/*
+recursive-include gwsnr/core/interpolator_pickle *

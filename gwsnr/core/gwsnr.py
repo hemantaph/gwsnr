@@ -422,7 +422,7 @@ class GWSNR:
 
         # getting interpolator data from the package
         # first check if the interpolator directory './interpolator_pickle' exists
-        if not pathlib.Path('./interpolator_pickle').exists():
+        if not pathlib.Path(interpolator_dir).exists():
             # Get the path to the resource
             with path('gwsnr.core', 'interpolator_pickle') as resource_path:
                 print(f"Copying interpolator data from the library resource {resource_path} to the current working directory.")

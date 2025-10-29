@@ -39,9 +39,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        'gwsnr': ['ann/ann_data/*', 'core/interpolator_pickle/*'],
+        'gwsnr': ['ann/ann_data/*'],
         'gwsnr.ann': ['ann_data/*'],
-        'gwsnr.core': ['interpolator_pickle/*'],
+        'gwsnr.core': ['interpolator_pickle/*', 'interpolator_pickle/*/*'],
     },
     python_requires='>=3.10',
     classifiers=[
