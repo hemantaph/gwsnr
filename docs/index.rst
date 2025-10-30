@@ -137,11 +137,11 @@ Glossary
    :maxdepth: 2
    :caption: Examples:
 
-   examples/snr_generation
-   examples/pdet_generation
-   examples/model_generation
-   examples/threshold
-   examples/horizon_distance
+   ../examples/snr_generation
+   ../examples/pdet_generation
+   ../examples/model_generation
+   ../examples/threshold
+   ../examples/horizon_distance
 
 
 Indices and tables
