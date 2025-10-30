@@ -3,10 +3,11 @@
 setuptools>=80.9.0
 astropy>=6.1.7
 bilby>=2.5.2
+lalsimulation>=6.2.0
+lal>=2.7.0
 corner>=2.2.3
 gwpy>=3.0.12
 h5py>=3.11.0
-lalsuite>=7.26.1
 numba>=0.61.2
 numpy>=1.26.4
 pandas>=2.3.0
