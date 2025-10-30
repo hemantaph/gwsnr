@@ -16,10 +16,15 @@ pip install gwsnr
 
 ```python
 from gwsnr import GWSNR
+
+# Initialize the default calculator
 gwsnr = GWSNR()
-snrs = gwsnr.optimal_snr(mass_1=30, mass_2=30, distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
-pdet = gwsnr.pdet(mass_1=30, mass_2=30, distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
-print(f"SNR value: {snrs}, P_det value: {pdet}")
+
+# Compute SNR and Pdet for a 30-30 Msun binary at 1000 Mpc with other random extrinsic parameters
+snrs = gwsnr.optimal_snr(mass_1=30, mass_2=30, luminosity_distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+pdet = gwsnr.pdet(mass_1=30, mass_2=30, luminosity_distance=1000, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0)
+
+print(f"SNR value: {snrs},\nP_det value: {pdet}")
 ```
 
 ## Summary
