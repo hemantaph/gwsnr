@@ -8,9 +8,10 @@ tags:
   - LIGO
 authors:
   - name: Hemantakumar Phurailatpam
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-0471-3724
     affiliation: "1"
   - name: Otto Akseli HANNUKSELA 
+    orcid: 0000-0002-3887-7137
     affiliation: "1"
 affiliations:
   - name: Department of Physics, The Chinese University of Hong Kong, Shatin, New Territories, Hong Kong
