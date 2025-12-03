@@ -1,5 +1,5 @@
 # gwsnr: Gravitational Wave Signal-to-Noise Ratio Computation Package
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-orange)](https://hemantaph.github.io/gwsnr/) [![PyPI version](https://badge.fury.io/py/ler.svg)](https://badge.fury.io/py/gwsnr) [![DOI](https://zenodo.org/badge/626733473.svg)]()
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-orange)](https://hemantaph.github.io/gwsnr/) [![PyPI version](https://badge.fury.io/py/ler.svg)](https://badge.fury.io/py/gwsnr) [![DOI](https://zenodo.org/badge/626733473.svg)](https://doi.org/10.5281/zenodo.17803641)
 
 
 <p align="center">
