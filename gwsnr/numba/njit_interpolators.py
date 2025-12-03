@@ -11,9 +11,9 @@ def find_index_1d_numba(x_array, x_new):
 
     Parameters
     ----------
-    x_array : jnp.ndarray
+    x_array : np.ndarray
         The array of x values for interpolation. Must be sorted in ascending order.
-    x_new : float or jnp.ndarray
+    x_new : float or np.ndarray
         The new x value(s) to find the index for.
 
     Returns
@@ -58,9 +58,9 @@ def spline_interp_4pts_numba(x_eval, x_pts, y_pts, condition_i):
     ----------
     x_eval : float
         The x value at which to evaluate the cubic function.
-    x_pts : jnp.ndarray
+    x_pts : np.ndarray
         The x values of the 4 points used for interpolation. Must be sorted in ascending order
-    y_pts : jnp.ndarray
+    y_pts : np.ndarray
         The y values corresponding to the x_pts. Must have the same length as x_pts.
     condition_i : int
         An integer indicating the condition for edge handling:
@@ -120,15 +120,15 @@ def spline_interp_4x4x4x4pts_numba(q_array, mtot_array, a1_array, a2_array, snrp
     
     Parameters
     ----------
-    q_array : jnp.ndarray
+    q_array : np.ndarray
         The array of q values for interpolation. Must be sorted in ascending order.
-    mtot_array : jnp.ndarray
+    mtot_array : np.ndarray
         The array of mtot values for interpolation. Must be sorted in ascending order.
-    a1_array : jnp.ndarray
+    a1_array : np.ndarray
         The array of a1 values for interpolation. Must be sorted in ascending order.
-    a2_array : jnp.ndarray
+    a2_array : np.ndarray
         The array of a2 values for interpolation. Must be sorted in ascending order.
-    snrpartialscaled_array : jnp.ndarray
+    snrpartialscaled_array : np.ndarray
         The 4D array of snrpartialscaled values with shape (4, 4, 4, 4).
         This array contains the values to be interpolated.
     q_new : float
@@ -210,29 +210,29 @@ def spline_interp_4x4x4x4pts_batched_numba(q_array, mtot_array, a1_array, a2_arr
 
     Parameters
     ----------
-    q_array : jnp.ndarray
+    q_array : np.ndarray
         The array of q values for interpolation. Must be sorted in ascending order.
-    mtot_array : jnp.ndarray
+    mtot_array : np.ndarray
         The array of mtot values for interpolation. Must be sorted in ascending order.
-    a1_array : jnp.ndarray
+    a1_array : np.ndarray
         The array of a1 values for interpolation. Must be sorted in ascending order.
-    a2_array : jnp.ndarray
+    a2_array : np.ndarray
         The array of a2 values for interpolation. Must be sorted in ascending order.
-    snrpartialscaled_array : jnp.ndarray
+    snrpartialscaled_array : np.ndarray
         The 4D array of snrpartialscaled values.
-    q_new_batch : jnp.ndarray
+    q_new_batch : np.ndarray
         The new q values at which to evaluate the cubic spline. Must be a 1D array.
-    mtot_new_batch : jnp.ndarray
+    mtot_new_batch : np.ndarray
         The new mtot values at which to evaluate the cubic spline. Must be a 1
         The new a1 values at which to evaluate the cubic spline. Must be a 1D array.
-    a1_new_batch : jnp.ndarray
+    a1_new_batch : np.ndarray
         The new a1 values at which to evaluate the cubic spline. Must be a 1D array.
-    a2_new_batch : jnp.ndarray
+    a2_new_batch : np.ndarray
         The new a2 values at which to evaluate the cubic spline. Must be a 1D array.
         
     Returns
     -------
-    jnp.ndarray
+    np.ndarray
         A 1D array of interpolated values at the new coordinates (q_new_batch, mtot_new_batch, a1_new_batch, a2_new_batch).
 
     """
