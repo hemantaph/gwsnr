@@ -10,7 +10,7 @@
    This module provides optimized numerical functions for gravitational wave data analysis,
    including chirp time calculations, antenna response computations, polarization tensors,
    coordinate transformations, and noise-weighted inner products. All functions are compiled
-   with Numba's @njit decorator for high-performance computation, with parallel processing
+   with Numba's #  @njit decorator for high-performance computation, with parallel processing
    support using prange for multi-threaded execution where applicable.
 
    ..

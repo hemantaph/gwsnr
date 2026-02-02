@@ -14,12 +14,14 @@ from .utils import (
     dealing_with_psds,
     power_spectral_density_pycbc,
     interpolator_check,
-    interpolator_pickle_path,
+    interpolator_json_path,
     get_gw_parameters,
 )
 
 from .multiprocessing_routine import (
     noise_weighted_inner_prod_h_inner_h,
+    noise_weighted_inner_prod_h_inner_h_slim,
+    _init_worker_h_inner_h,
     noise_weighted_inner_prod_d_inner_h,
     noise_weighted_inner_prod_ripple,
 )
@@ -41,7 +43,7 @@ from .multiprocessing_routine import (
 #     'dealing_with_psds',
 #     'power_spectral_density_pycbc',
 #     'interpolator_check',
-#     'interpolator_pickle_path',
+#     'interpolator_json_path',
 #     'get_gw_parameters',
 #     # multiprocessing_routine
 #     'noise_weighted_inner_prod_h_inner_h', 'noise_weighted_inner_prod_d_inner_h',

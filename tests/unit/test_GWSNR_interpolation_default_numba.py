@@ -59,7 +59,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
-    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_json", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
     
     # detector settings
@@ -93,7 +93,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         
         # Initialize GWSNR instance with test configuration
@@ -113,7 +113,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         interp_snr = gwsnr.optimal_snr(gw_param_dict=param_dict, output_jsonfile=output_file)
 
         # Validate that output has correct structure and numerical properties
-        self._validate_snr_output(interp_snr, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(interp_snr, (nsamples,), gwsnr.detector_list)
 
         # Verify that JSON output file was created successfully
         assert os.path.exists(output_file), "Output JSON file was not created"
@@ -125,8 +125,8 @@ class TestGWSNRInterpolation(CommonTestUtils):
         # Test computational reproducibility (same inputs should give identical outputs)
         interp_snr2 = gwsnr.optimal_snr(gw_param_dict=param_dict)  # Calculate again with same parameters
         np.testing.assert_allclose(
-            interp_snr["snr_net"],   # Network SNR from first calculation
-            interp_snr2["snr_net"],  # Network SNR from second calculation
+            interp_snr['optimal_snr_net'],   # Network SNR from first calculation
+            interp_snr2['optimal_snr_net'],  # Network SNR from second calculation
             rtol=1e-10,                      # Very tight relative tolerance
             err_msg="SNR calculation is not deterministic"
         )
@@ -141,7 +141,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
         
@@ -190,7 +190,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         # Configure GWSNR for non-spinning binary analysis
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
@@ -217,7 +217,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         interp_snr = gwsnr.optimal_snr(gw_param_dict=param_dict)
         
         # Validate output structure (expecting single event output shape)
-        self._validate_snr_output(interp_snr, (1,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(interp_snr, (1,), gwsnr.detector_list)
 
     def test_custom_input_arguments(self):
         """
@@ -241,7 +241,7 @@ class TestGWSNRInterpolation(CommonTestUtils):
         # Create custom configuration optimized for BNS events
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config.update({            
             # Analysis method  
@@ -272,4 +272,4 @@ class TestGWSNRInterpolation(CommonTestUtils):
         print(interp_snr)
         
         # Validate output structure and properties
-        self._validate_snr_output(interp_snr, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(interp_snr, (nsamples,), gwsnr.detector_list)

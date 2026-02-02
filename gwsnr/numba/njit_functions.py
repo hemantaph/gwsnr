@@ -5,7 +5,7 @@ Numba-compiled helper functions for gravitational wave signal-to-noise ratio cal
 This module provides optimized numerical functions for gravitational wave data analysis,
 including chirp time calculations, antenna response computations, polarization tensors,
 coordinate transformations, and noise-weighted inner products. All functions are compiled
-with Numba's @njit decorator for high-performance computation, with parallel processing
+with Numba's #  @njit decorator for high-performance computation, with parallel processing
 support using prange for multi-threaded execution where applicable.
 """
 
@@ -21,7 +21,8 @@ Gamma = 0.5772156649015329
 Pi = np.pi
 MTSUN_SI = 4.925491025543576e-06
 
-@njit
+
+#  @njit
 def findchirp_chirptime(m1, m2, fmin):
     """
     Time taken from f_min to f_lso (last stable orbit). 3.5PN in fourier phase considered.
@@ -96,8 +97,9 @@ def findchirp_chirptime(m1, m2, fmin):
         / x8T
     )
 
-@njit
-def einsum1(m,n):
+
+#  @njit
+def einsum1(m, n):
     """
     Function to calculate einsum of two 3x1 vectors
 
@@ -107,26 +109,27 @@ def einsum1(m,n):
         3x1 vector.
     n : `numpy.ndarray`
         3x1 vector.
-        
+
     Returns
     -------
     ans : `numpy.ndarray`
         3x3 matrix.
     """
-    ans = np.zeros((3,3))
-    ans[0,0] = m[0]*n[0]
-    ans[0,1] = m[0]*n[1]
-    ans[0,2] = m[0]*n[2]
-    ans[1,0] = m[1]*n[0]
-    ans[1,1] = m[1]*n[1]
-    ans[1,2] = m[1]*n[2]
-    ans[2,0] = m[2]*n[0]
-    ans[2,1] = m[2]*n[1]
-    ans[2,2] = m[2]*n[2]
+    ans = np.zeros((3, 3))
+    ans[0, 0] = m[0] * n[0]
+    ans[0, 1] = m[0] * n[1]
+    ans[0, 2] = m[0] * n[2]
+    ans[1, 0] = m[1] * n[0]
+    ans[1, 1] = m[1] * n[1]
+    ans[1, 2] = m[1] * n[2]
+    ans[2, 0] = m[2] * n[0]
+    ans[2, 1] = m[2] * n[1]
+    ans[2, 2] = m[2] * n[2]
     return ans
 
-@njit
-def einsum2(m,n):
+
+#  @njit
+def einsum2(m, n):
     """
     Function to calculate einsum of two 3x3 matrices
 
@@ -142,10 +145,21 @@ def einsum2(m,n):
     ans : `numpy.ndarray`
         3x3 matrix.
     """
-    ans = m[0,0]*n[0,0] + m[0,1]*n[0,1] + m[0,2]*n[0,2] + m[1,0]*n[1,0] + m[1,1]*n[1,1] + m[1,2]*n[1,2] + m[2,0]*n[2,0] + m[2,1]*n[2,1] + m[2,2]*n[2,2]
+    ans = (
+        m[0, 0] * n[0, 0]
+        + m[0, 1] * n[0, 1]
+        + m[0, 2] * n[0, 2]
+        + m[1, 0] * n[1, 0]
+        + m[1, 1] * n[1, 1]
+        + m[1, 2] * n[1, 2]
+        + m[2, 0] * n[2, 0]
+        + m[2, 1] * n[2, 1]
+        + m[2, 2] * n[2, 2]
+    )
     return ans
 
-@njit
+
+#  @njit
 def gps_to_gmst(gps_time):
     """
     Function to convert gps time to greenwich mean sidereal time
@@ -162,9 +176,10 @@ def gps_to_gmst(gps_time):
     """
     slope = 7.292115855425873e-05
     intercept = -45991.08966925838
-    return slope*gps_time+intercept
+    return slope * gps_time + intercept
 
-@njit
+
+#  @njit
 def ra_dec_to_theta_phi(ra, dec, gmst):
     """
     Function to convert ra and dec to theta and phi
@@ -190,7 +205,8 @@ def ra_dec_to_theta_phi(ra, dec, gmst):
     theta = np.pi / 2.0 - dec
     return theta, phi
 
-@njit
+
+#  @njit
 def get_polarization_tensor_plus(ra, dec, time, psi):
     """
     Function to calculate the polarization tensor
@@ -213,14 +229,21 @@ def get_polarization_tensor_plus(ra, dec, time, psi):
     """
     gmst = np.fmod(gps_to_gmst(time), 2 * np.pi)
     theta, phi = ra_dec_to_theta_phi(ra, dec, gmst)
-    u = np.array([np.cos(phi) * np.cos(theta), np.cos(theta) * np.sin(phi), -np.sin(theta)])
-    v = np.array([-np.sin(phi), np.cos(phi), 0])
+    u = np.empty(3)
+    u[0] = np.cos(phi) * np.cos(theta)
+    u[1] = np.cos(theta) * np.sin(phi)
+    u[2] = -np.sin(theta)
+    v = np.empty(3)
+    v[0] = -np.sin(phi)
+    v[1] = np.cos(phi)
+    v[2] = 0.0
     m = -u * np.sin(psi) - v * np.cos(psi)
     n = -u * np.cos(psi) + v * np.sin(psi)
 
     return einsum1(m, m) - einsum1(n, n)
-    
-@njit
+
+
+#  @njit
 def get_polarization_tensor_cross(ra, dec, time, psi):
     """
     Function to calculate the polarization tensor
@@ -243,14 +266,21 @@ def get_polarization_tensor_cross(ra, dec, time, psi):
     """
     gmst = np.fmod(gps_to_gmst(time), 2 * np.pi)
     theta, phi = ra_dec_to_theta_phi(ra, dec, gmst)
-    u = np.array([np.cos(phi) * np.cos(theta), np.cos(theta) * np.sin(phi), -np.sin(theta)])
-    v = np.array([-np.sin(phi), np.cos(phi), 0])
+    u = np.empty(3)
+    u[0] = np.cos(phi) * np.cos(theta)
+    u[1] = np.cos(theta) * np.sin(phi)
+    u[2] = -np.sin(theta)
+    v = np.empty(3)
+    v[0] = -np.sin(phi)
+    v[1] = np.cos(phi)
+    v[2] = 0.0
     m = -u * np.sin(psi) - v * np.cos(psi)
     n = -u * np.cos(psi) + v * np.sin(psi)
 
     return einsum1(m, n) + einsum1(n, m)
 
-@njit
+
+#  @njit
 def antenna_response_plus(ra, dec, time, psi, detector_tensor):
     """
     Function to calculate the antenna response
@@ -279,7 +309,8 @@ def antenna_response_plus(ra, dec, time, psi, detector_tensor):
     polarization_tensor = get_polarization_tensor_plus(ra, dec, time, psi)
     return einsum2(detector_tensor, polarization_tensor)
 
-@njit
+
+#  @njit
 def antenna_response_cross(ra, dec, time, psi, detector_tensor):
     """
     Function to calculate the antenna response
@@ -308,7 +339,8 @@ def antenna_response_cross(ra, dec, time, psi, detector_tensor):
     polarization_tensor = get_polarization_tensor_cross(ra, dec, time, psi)
     return einsum2(detector_tensor, polarization_tensor)
 
-@njit(parallel=True)
+
+#  @njit(parallel=True)
 def antenna_response_array(ra, dec, time, psi, detector_tensor):
     """
     Function to calculate the antenna response in array form.
@@ -333,19 +365,24 @@ def antenna_response_array(ra, dec, time, psi, detector_tensor):
     """
 
     len_det = len(detector_tensor)
-    len_param = len(ra) 
+    len_param = len(ra)
     Fp = np.zeros((len_det, len_param))
     Fc = np.zeros((len_det, len_param))
 
     for i in prange(len_param):
         for j in range(len_det):
-        
-            Fp[j,i] = antenna_response_plus(ra[i], dec[i], time[i], psi[i], detector_tensor[j])
-            Fc[j,i] = antenna_response_cross(ra[i], dec[i], time[i], psi[i], detector_tensor[j])
+
+            Fp[j, i] = antenna_response_plus(
+                ra[i], dec[i], time[i], psi[i], detector_tensor[j]
+            )
+            Fc[j, i] = antenna_response_cross(
+                ra[i], dec[i], time[i], psi[i], detector_tensor[j]
+            )
 
     return Fp, Fc
 
-@njit
+
+#  @njit
 def effective_distance(
     luminosity_distance, theta_jn, ra, dec, geocent_time, psi, detector_tensor
 ):
@@ -375,14 +412,16 @@ def effective_distance(
         Effective distance of the source in Mpc.
     """
 
-    Fp, Fc = antenna_response_plus(ra, dec, geocent_time, psi, detector_tensor), antenna_response_cross(ra, dec, geocent_time, psi, detector_tensor)
+    Fp, Fc = antenna_response_plus(
+        ra, dec, geocent_time, psi, detector_tensor
+    ), antenna_response_cross(ra, dec, geocent_time, psi, detector_tensor)
 
     return luminosity_distance / np.sqrt(
-            Fp**2 * ((1 + np.cos(theta_jn) ** 2) / 2) ** 2
-            + Fc**2 * np.cos(theta_jn) ** 2
-        )
+        Fp**2 * ((1 + np.cos(theta_jn) ** 2) / 2) ** 2 + Fc**2 * np.cos(theta_jn) ** 2
+    )
 
-@njit(parallel=True)
+
+#  @njit(parallel=True)
 def effective_distance_array(
     luminosity_distance, theta_jn, ra, dec, geocent_time, psi, detector_tensor
 ):
@@ -413,20 +452,30 @@ def effective_distance_array(
     """
 
     len_det = len(detector_tensor)
-    len_param = len(ra) 
+    len_param = len(ra)
     eff_dist = np.zeros((len_det, len_param))
 
     for i in prange(len_param):
         for j in range(len_det):
-            eff_dist[j,i] = effective_distance(
-                luminosity_distance[i], theta_jn[i], ra[i], dec[i], geocent_time[i], psi[i], detector_tensor[j]
+            eff_dist[j, i] = effective_distance(
+                luminosity_distance[i],
+                theta_jn[i],
+                ra[i],
+                dec[i],
+                geocent_time[i],
+                psi[i],
+                detector_tensor[j],
             )
 
     return eff_dist
 
-@njit
+
+#  @njit
 def noise_weighted_inner_product(
-    signal1, signal2, psd, duration,
+    signal1,
+    signal2,
+    psd,
+    duration,
 ):
     """
     Noise weighted inner product of two time series data sets.
@@ -446,7 +495,8 @@ def noise_weighted_inner_product(
     nwip_arr = np.conj(signal1) * signal2 / psd
     return 4 / duration * np.sum(nwip_arr)
 
-@njit(parallel=True)
+
+#  @njit(parallel=True)
 def linear_interpolator(xnew_array, y_array, x_array, fill_value=np.inf):
     """
     Linear interpolator for 1D data.
@@ -483,7 +533,8 @@ def linear_interpolator(xnew_array, y_array, x_array, fill_value=np.inf):
 
     return result
 
-# @njit
+
+# #  @njit
 # def _helper_hphc(hp,hc,fsize_arr,fs,size,f_l,i):
 #     # remove the np.nan padding
 #     hp_ = np.array(hp[i][:fsize_arr[i]], dtype=np.complex128)

@@ -56,7 +56,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
-    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_json", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
     
     # detector settings
@@ -90,9 +90,9 @@ class TestGWSNRPdet(CommonTestUtils):
         # Create configuration for this test 
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
+        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2', include_optimal_snr=False, include_observed_snr=True)
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)
@@ -107,13 +107,13 @@ class TestGWSNRPdet(CommonTestUtils):
         )
 
         # Calculate Pdet values 
-        interp_pdet = gwsnr.pdet(gw_param_dict=param_dict, include_observed_snr=True)
+        interp_pdet = gwsnr.pdet(gw_param_dict=param_dict)
 
         # Validate that output has correct structure and numerical properties
         self._validate_pdet_output(interp_pdet, (nsamples,), gwsnr.detector_list, pdet_type='boolean')
 
         # validate observed SNR values
-        self._validate_snr_helper(interp_pdet['observed_snr_net'], (nsamples,), 'observed_snr_net')
+        self._validate_observed_snr_output(interp_pdet, (nsamples,), gwsnr.detector_list)
 
     def test_output_pdet_obs_gaussian_bool(self):
         """
@@ -128,9 +128,9 @@ class TestGWSNRPdet(CommonTestUtils):
         # Create configuration for this test 
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='gaussian')
+        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='gaussian', include_optimal_snr=False, include_observed_snr=True)
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)
@@ -145,13 +145,13 @@ class TestGWSNRPdet(CommonTestUtils):
         )
 
         # Calculate Pdet values 
-        interp_pdet = gwsnr.pdet(gw_param_dict=param_dict, include_observed_snr=True)
+        interp_pdet = gwsnr.pdet(gw_param_dict=param_dict)
 
         # Validate that output has correct structure and numerical properties
         self._validate_pdet_output(interp_pdet, (nsamples,), gwsnr.detector_list, pdet_type='boolean')
 
         # validate observed SNR values
-        self._validate_snr_helper(interp_pdet['observed_snr_net'], (nsamples,), 'observed_snr_net')
+        self._validate_observed_snr_output(interp_pdet, (nsamples,), gwsnr.detector_list)
 
     def test_output_pdet_obs_noncentral_chi2_pdf(self):
         """
@@ -166,9 +166,9 @@ class TestGWSNRPdet(CommonTestUtils):
         # Create configuration for this test 
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='probability_distribution', distribution_type='noncentral_chi2')
+        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='probability_distribution', distribution_type='noncentral_chi2', include_optimal_snr=True, include_observed_snr=False)
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)
@@ -183,13 +183,13 @@ class TestGWSNRPdet(CommonTestUtils):
         )
 
         # Calculate Pdet values 
-        interp_pdet = gwsnr.pdet(gw_param_dict=param_dict, include_optimal_snr=True)
+        interp_pdet = gwsnr.pdet(gw_param_dict=param_dict)
 
         # Validate that output has correct structure and numerical properties
         self._validate_pdet_output(interp_pdet, (nsamples,), gwsnr.detector_list, pdet_type='probability_distribution')
 
         # validate optimal SNR values
-        self._validate_snr_helper(interp_pdet['optimal_snr_net'], (nsamples,), 'optimal_snr_net')
+        self._validate_optimal_snr_output(interp_pdet, (nsamples,), gwsnr.detector_list)
 
     def test_output_pdet_obs_gaussian_pdf(self):
         """
@@ -204,9 +204,9 @@ class TestGWSNRPdet(CommonTestUtils):
         # Create configuration for this test 
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='probability_distribution', distribution_type='gaussian')
+        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='probability_distribution', distribution_type='gaussian', include_optimal_snr=True, include_observed_snr=False)
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)
@@ -221,11 +221,11 @@ class TestGWSNRPdet(CommonTestUtils):
         )
 
         # Calculate Pdet values 
-        interp_pdet = gwsnr.pdet(gw_param_dict=param_dict, include_optimal_snr=True)
+        interp_pdet = gwsnr.pdet(gw_param_dict=param_dict)
 
         # Validate that output has correct structure and numerical properties
         self._validate_pdet_output(interp_pdet, (nsamples,), gwsnr.detector_list, pdet_type='probability_distribution')
 
         # validate optimal SNR values
-        self._validate_snr_helper(interp_pdet['optimal_snr_net'], (nsamples,), 'optimal_snr_net')
+        self._validate_optimal_snr_output(interp_pdet, (nsamples,), gwsnr.detector_list)
         

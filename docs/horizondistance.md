@@ -64,8 +64,8 @@ print(f"horizon distance (numerical): {d_hor_numerical} Mpc")
 ```
 
 ```
-horizon distance (analytical): {'L1': array([416.49490771]), 'H1': array([416.49490771]), 'V1': array([317.93916075])} Mpc
-horizon distance (numerical): {'L1': 416.49483499582857, 'H1': 416.4948722301051, 'V1': 228.76581222284585, 'snr_net': 557.9508489044383} Mpc
+horizon distance (analytical): {'horizon_distance_L1': array([416.49490771]), 'horizon_distance_H1': array([416.49490771]), 'horizon_distance_V1': array([317.93916075])} Mpc
+horizon distance (numerical): {'horizon_distance_L1': 416.49483499582857, 'horizon_distance_H1': 416.4948722301051, 'horizon_distance_V1': 228.76581222284585, 'horizon_distance_net': 557.9508489044383} Mpc
 ```
 
 ## Horizon Distance of a BNS System across various Detectors

@@ -1,21 +1,18 @@
 # LALSuite will take the longest to install
-
 setuptools>=80.9.0
 astropy>=6.1.7
 bilby>=2.5.2
 corner>=2.2.3
 gwpy>=3.0.12
 h5py>=3.11.0
-lalsuite>=7.26.1
-# lal>=7.7.0,
 numba>=0.61.2
-numpy>=1.26.4
 pandas>=2.3.0
 scipy>=1.15.3
 tqdm>=4.67.1
 absl-py>=2.1.0
 pycbc>=2.8.3
-ml-dtypes>=0.3.1 # ml-dtypes version not same for mac and linux. You will need to install and upgrade it separately.
+
+# ml-dtypes>=0.3.1 # ml-dtypes version not same for mac and linux. You will need to install and upgrade it separately.
 
 #astropy-iers-data>=0.2025.6.9.14.9.37
 #astunparse>=1.6.3

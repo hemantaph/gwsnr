@@ -241,10 +241,10 @@ print(interp_snr_aligned_spins)
 
 **Expected Output:**
 ```
-{'L1': array([ 0.32863562, 12.80466615,  4.64289071, ...,  9.40759371,
-       18.66322763,  3.73022863]), 'H1': array([ 0.90286756, 15.01545159,  5.19427481, ..., 11.65219727,
-       23.79538297,  5.33905121]), 'V1': array([ 1.85612149, 12.78743709,  2.20533615, ...,  9.99559578,
-       17.89409329,  1.94768776]), 'snr_net': array([ 2.09006176, 23.51471473,  7.30755995, ..., 18.00523412,
+{'optimal_snr_L1': array([ 0.32863562, 12.80466615,  4.64289071, ...,  9.40759371,
+       18.66322763,  3.73022863]), 'optimal_snr_H1': array([ 0.90286756, 15.01545159,  5.19427481, ..., 11.65219727,
+       23.79538297,  5.33905121]), 'optimal_snr_V1': array([ 1.85612149, 12.78743709,  2.20533615, ...,  9.99559578,
+       17.89409329,  1.94768776]), 'optimal_snr_net': array([ 2.09006176, 23.51471473,  7.30755995, ..., 18.00523412,
        35.13879467,  6.79805569])}
 ```
 
@@ -271,7 +271,7 @@ To quantify the performance, we benchmarked the time required to compute SNR for
 | Method / Backend         | Execution Time (1M Samples) | Notes                                      |
 |--------------------------|----------------------------|--------------------------------------------|
 | Standard Python (No JIT) | ~6-14 minutes              | Baseline performance on 1-8 CPU cores     |
-| Numba (CPU)              | 2.12 s                     | Uses `@njit` and `prange` for parallelization |
+| Numba (CPU)              | 2.12 s                     | Uses `#  @njit` and `prange` for parallelization |
 | JAX (CPU)                | 1.48 s                     | Uses `jit` and `vmap` for efficient vectorization |
 | JAX (GPU)                | 88.9 ms                    | **Recommended**. Over 15× faster than CPU JAX |
 

@@ -57,7 +57,7 @@ DEFAULT_CONFIG = {
 
     # SNR calculation method and settings
     'snr_method': "ann",  # Use ANN for SNR calculation
-    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_json", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings
@@ -93,7 +93,7 @@ class TestGWSNRSNRRecalculation(CommonTestUtils):
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False
         # config['snr_recalculation'] = True

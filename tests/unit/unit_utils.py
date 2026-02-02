@@ -101,8 +101,8 @@ class CommonTestUtils:
 
         return param_dict
 
-    def _validate_snr_output(self, snr_dict, expected_shape, detector_list):
-        """Validate SNR output structure and numerical properties.
+    def _validate_optimal_snr_output(self, snr_dict, expected_shape, detector_list):
+        """Validate optimal SNR output structure and numerical properties.
         
         Parameters
         ----------
@@ -117,13 +117,42 @@ class CommonTestUtils:
         assert isinstance(snr_dict, dict), "Output must be a dictionary"
         
         # Create list of all keys to validate (individual detectors + network)
-        test_keys = detector_list.copy()  # Start with individual detector names
-        test_keys.append("snr_net")  # Add network SNR key for regular SNR calculations
+        detector_list = detector_list.copy()  # Start with individual detector names
+        test_keys = [f'optimal_snr_{det}' for det in detector_list]
+        test_keys.append('optimal_snr_net')  # Add network SNR key for regular SNR calculations
 
         # Validate each detector and network output
         for key in test_keys:
             # Check that required key exists in output dictionary
-            assert key in snr_dict, f"Missing {key} in output"
+            assert key in snr_dict, f"Missing {key} in output. Available keys: {list(snr_dict.keys())}"
+            values = snr_dict[key]
+
+            self._validate_snr_helper(values, expected_shape, key)
+
+    def _validate_observed_snr_output(self, snr_dict, expected_shape, detector_list):
+        """Validate observed SNR output structure and numerical properties.
+        
+        Parameters
+        ----------
+            snr_dict : `dict`
+                Dictionary containing SNR values
+            expected_shape: `tuple`
+                Expected shape of output arrays
+            detector_list: `list`
+                List of detector names to validate
+        """
+        # Validate that output is a dictionary
+        assert isinstance(snr_dict, dict), "Output must be a dictionary"
+        
+        # Create list of all keys to validate (individual detectors + network)
+        detector_list = detector_list.copy()  # Start with individual detector names
+        test_keys = [f'observed_snr_{det}' for det in detector_list]
+        test_keys.append('observed_snr_net')  # Add network SNR key for regular SNR calculations
+
+        # Validate each detector and network output
+        for key in test_keys:
+            # Check that required key exists in output dictionary
+            assert key in snr_dict, f"Missing {key} in output. Available keys: {list(snr_dict.keys())}"
             values = snr_dict[key]
 
             self._validate_snr_helper(values, expected_shape, key)
@@ -167,7 +196,8 @@ class CommonTestUtils:
         assert isinstance(pdet_dict, dict), "Output must be a dictionary"
         
         # Create list of all keys to validate (individual detectors + network)
-        test_keys = detector_list.copy()  # Start with individual detector names
+        # Keys use format 'pdet_{detector}' (e.g., 'pdet_H1', 'pdet_L1')
+        test_keys = [f'pdet_{det}' for det in detector_list]
         test_keys.append("pdet_net")  # Add network pdet key for probability calculations
 
         # Validate each detector and network output

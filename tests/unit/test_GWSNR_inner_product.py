@@ -54,7 +54,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "inner_product",  # Use interpolation with aligned spins
-    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_json", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings
@@ -92,7 +92,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = True
 
@@ -111,8 +111,16 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         # Calculate SNR values and save results to JSON file
         output_file = "snr_data_interpolation.json"
         snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict, output_jsonfile=output_file)
+        
+        # Debug: print keys to understand structure
+        if snr_result is None:
+            print("ERROR: snr_result is None")
+            print(f"param_dict keys: {param_dict.keys()}")
+        else:
+            print(f"snr_result keys: {list(snr_result.keys())}")
+        
         # Validate that output has correct structure and numerical properties
-        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
         # Verify that JSON output file was created successfully
         assert os.path.exists(output_file), "Output JSON file was not created"
@@ -124,8 +132,8 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         # Test reproducibility
         snr_result2 = gwsnr.optimal_snr(gw_param_dict=param_dict)
         np.testing.assert_allclose(
-            snr_result["snr_net"], # Network SNR from first calculation
-            snr_result2["snr_net"], # Network SNR from second calculation
+            snr_result['optimal_snr_net'], # Network SNR from first calculation
+            snr_result2['optimal_snr_net'], # Network SNR from second calculation
             rtol=1e-10, # Very tight tolerance for reproducibility
             err_msg="Non-deterministic SNR calculation"
         )
@@ -141,7 +149,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         # DEFAULT_CONFIGure GWSNR with reduced verbosity for cleaner test output
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
         config['ifos'] = ["L1"]          # Use single detector for simplicity
@@ -172,7 +180,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
 
             snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
             # Validate that output has correct structure and numerical properties
-            self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+            self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
     def test_custom_detector_configuration(self):
         """
@@ -216,7 +224,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
         config['ifos'] = [ifo_a1]        # Use single custom detector
@@ -226,7 +234,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
 
         snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         # Validate that output has correct structure and numerical properties
-        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
         ###########################################
         # Test custom PSDs for standard detectors #
@@ -240,7 +248,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
         config['psds'] = custom_psds
@@ -248,7 +256,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         gwsnr = GWSNR(**config)
         snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         # Validate that output has correct structure and numerical properties
-        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
     def test_multiprocessing_performance(self):
         """
@@ -273,7 +281,7 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during error testing
 
@@ -302,13 +310,13 @@ class TestGWSNRInnerProduct(CommonTestUtils):
         
         # Cross-validation between methods
         np.testing.assert_allclose(
-            serial_snr["snr_net"],
-            parallel_imap_snr["snr_net"],
+            serial_snr['optimal_snr_net'],
+            parallel_imap_snr['optimal_snr_net'],
             rtol=1e-8, err_msg="Serial and parallel_imap should match"
         )
         np.testing.assert_allclose(
-            serial_snr["snr_net"],
-            parallel_map_snr["snr_net"],
+            serial_snr['optimal_snr_net'],
+            parallel_map_snr['optimal_snr_net'],
             rtol=1e-8, err_msg="Serial and parallel_map should match"
         )
         

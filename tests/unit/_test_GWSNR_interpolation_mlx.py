@@ -76,7 +76,7 @@ DEFAULT_CONFIG = {
     
     # MLX-specific SNR calculation settings
     'snr_method': "interpolation_aligned_spins_mlx", # Default to MLX aligned spins backend
-    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_json", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings
@@ -107,7 +107,7 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         """
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
@@ -130,13 +130,13 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         
         # Validate MLX output structure and numerical properties
-        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
         
         # Test MLX reproducibility (JIT compilation should be deterministic)
         snr_result2 = gwsnr.optimal_snr(gw_param_dict=param_dict)  # Second call uses compiled function
         np.testing.assert_allclose(
-            snr_result["snr_net"],   # Network SNR from first calculation
-            snr_result2["snr_net"],  # Network SNR from second calculation (JIT compiled)
+            snr_result['optimal_snr_net'],   # Network SNR from first calculation
+            snr_result2['optimal_snr_net'],  # Network SNR from second calculation (JIT compiled)
             rtol=1e-10,                      # Very tight tolerance for MLX determinism
             err_msg="MLX backend should be deterministic after JIT compilation"
         )
@@ -147,7 +147,7 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         # Standard Numba backend for comparison
         config_numba = DEFAULT_CONFIG.copy()  # Use same base config
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config_numba['interpolator_dir'] = gwsnr_dir
         config_numba.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
@@ -161,8 +161,8 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         # Cross-validate: MLX and Numba should produce reasonably consistent results
         # (Allow some tolerance due to different interpolation implementations)
         np.testing.assert_allclose(
-            snr_result["snr_net"],    # MLX network SNR
-            snr_numba["snr_net"],  # Numba network SNR
+            snr_result['optimal_snr_net'],    # MLX network SNR
+            snr_numba['optimal_snr_net'],  # Numba network SNR
             rtol=0.1,                      # Allow 10% relative difference
             err_msg="MLX and Numba backends should produce similar SNR values"
         )
@@ -178,7 +178,7 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         # Configure GWSNR for MLX no spins interpolation
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
@@ -201,4 +201,4 @@ class TestGWSNRInterpolationMLX(CommonTestUtils):
         snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         
         # Validate output
-        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)

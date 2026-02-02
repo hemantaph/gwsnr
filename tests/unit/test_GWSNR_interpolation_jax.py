@@ -7,6 +7,8 @@ Requirements:
 - optional: pip install -U "jax[cuda12]"  # for CUDA 12 GPU support
 - pip install pytest
 
+Note: lastest test show jaxlib==0.9.0, jax==0.9.0 and numpy==2.3.5, ml_dtypes==0.5.4
+
 Test Coverage:
 --------------
 - JAX aligned spins interpolation: "interpolation_aligned_spins_jax" backend, using IMRPhenomD waveform model
@@ -54,7 +56,7 @@ DEFAULT_CONFIG = {
     
     # JAX-specific SNR calculation settings
     'snr_method': "interpolation_aligned_spins_jax", # Default to JAX aligned spins backend
-    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_json", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings
@@ -84,7 +86,7 @@ class TestGWSNRInterpolationJAX(CommonTestUtils):
         """
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
@@ -106,13 +108,13 @@ class TestGWSNRInterpolationJAX(CommonTestUtils):
         snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         
         # Validate JAX output structure and numerical properties
-        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
         
         # Test JAX reproducibility (JIT compilation should be deterministic)
         snr_result2 = gwsnr.optimal_snr(gw_param_dict=param_dict)  # Second call uses compiled function
         np.testing.assert_allclose(
-            snr_result["snr_net"],   # Network SNR from first calculation
-            snr_result2["snr_net"],  # Network SNR from second calculation (JIT compiled)
+            snr_result['optimal_snr_net'],   # Network SNR from first calculation
+            snr_result2['optimal_snr_net'],  # Network SNR from second calculation (JIT compiled)
             rtol=1e-10,                      # Very tight tolerance for JAX determinism
             err_msg="JAX backend should be deterministic after JIT compilation"
         )
@@ -123,7 +125,7 @@ class TestGWSNRInterpolationJAX(CommonTestUtils):
         # Standard Numba backend for comparison
         config_numba = DEFAULT_CONFIG.copy()  # Use same base config
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config_numba['interpolator_dir'] = gwsnr_dir
         config_numba.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
@@ -137,8 +139,8 @@ class TestGWSNRInterpolationJAX(CommonTestUtils):
         # Cross-validate: JAX and Numba should produce reasonably consistent results
         # (Allow some tolerance due to different interpolation implementations)
         np.testing.assert_allclose(
-            snr_result["snr_net"],    # JAX network SNR
-            snr_numba["snr_net"],  # Numba network SNR
+            snr_result['optimal_snr_net'],    # JAX network SNR
+            snr_numba['optimal_snr_net'],  # Numba network SNR
             rtol=0.1,                      # Allow 10% relative difference
             err_msg="JAX and Numba backends should produce similar SNR values"
         )
@@ -153,7 +155,7 @@ class TestGWSNRInterpolationJAX(CommonTestUtils):
         # Configure GWSNR for JAX no spins interpolation
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config.update({
             'gwsnr_verbose': False,              # Reduce log output for cleaner tests
@@ -176,4 +178,4 @@ class TestGWSNRInterpolationJAX(CommonTestUtils):
         snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
         
         # Validate output
-        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)

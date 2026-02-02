@@ -11,6 +11,7 @@ import pickle
 import numpy as np
 import bilby
 from gwpy.timeseries import TimeSeries
+
 # from scipy.interpolate import CubicSpline
 from scipy.interpolate import interp1d
 
@@ -28,6 +29,7 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()  # Convert ndarray to list
         # Fallback to default behavior for other types
         return super(NumpyEncoder, self).default(obj)
+
 
 def save_json(file_name, param):
     """Save a dictionary as a json file.
@@ -53,6 +55,7 @@ def save_json(file_name, param):
         with open(file_name, "w", encoding="utf-8") as write_file:
             json.dump(param, write_file, indent=4, cls=NumpyEncoder)
 
+
 def load_json(file_name):
     """Load a json file.
 
@@ -70,6 +73,7 @@ def load_json(file_name):
 
     return param
 
+
 def save_pickle(file_name, param):
     """Save a dictionary as a pickle file.
 
@@ -82,6 +86,7 @@ def save_pickle(file_name, param):
     """
     with open(file_name, "wb") as handle:
         pickle.dump(param, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 def load_pickle(file_name):
     """Load a pickle file.
@@ -100,6 +105,7 @@ def load_pickle(file_name):
 
     return param
 
+
 def load_ann_h5(filename):
     """
     Function to load a specific dataset from an .h5 file
@@ -108,7 +114,7 @@ def load_ann_h5(filename):
     ----------
     filename : str
         name of the .h5 file
-        
+
     Returns
     ----------
     model : `keras.models.Model`
@@ -116,10 +122,13 @@ def load_ann_h5(filename):
     """
     # supress warning
     import absl.logging
+
     absl.logging.set_verbosity(absl.logging.ERROR)
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
     from tensorflow.keras.models import load_model
+
     return load_model(filename)
+
 
 def append_json(file_name, new_dictionary, old_dictionary=None, replace=False):
     """
@@ -133,11 +142,11 @@ def append_json(file_name, new_dictionary, old_dictionary=None, replace=False):
     Parameters
     ----------
     file_name : `str`
-        json file name for storing the parameters. 
+        json file name for storing the parameters.
     new_dictionary : `dict`
         dictionary to be appended to the json file.
     old_dictionary : `dict`, optional
-        If provided the values of the new dictionary will be appended to the old dictionary and save in the 'file_name' json file. 
+        If provided the values of the new dictionary will be appended to the old dictionary and save in the 'file_name' json file.
         Default is None.
     replace : `bool`, optional
         If True, replace the json file with the dictionary. Default is False.
@@ -152,11 +161,11 @@ def append_json(file_name, new_dictionary, old_dictionary=None, replace=False):
     elif replace:
         data = new_dictionary
     elif not os.path.exists(file_name):
-        #print(f" {file_name} file does not exist. Creating a new one...")
+        # print(f" {file_name} file does not exist. Creating a new one...")
         replace = True
         data = new_dictionary
     else:
-        #print("getting data from file")
+        # print("getting data from file")
         with open(file_name, "r", encoding="utf-8") as f:
             data = json.load(f)
     # end = datetime.datetime.now()
@@ -174,7 +183,7 @@ def append_json(file_name, new_dictionary, old_dictionary=None, replace=False):
 
     # save the dictionary
     # start = datetime.datetime.now()
-    #print(data)
+    # print(data)
     with open(file_name, "w", encoding="utf-8") as write_file:
         json.dump(data, write_file, indent=4, cls=NumpyEncoder)
     # end = datetime.datetime.now()
@@ -182,10 +191,11 @@ def append_json(file_name, new_dictionary, old_dictionary=None, replace=False):
 
     return data
 
+
 def add_dictionaries_together(dictionary1, dictionary2):
     """
     Adds two dictionaries with the same keys together.
-    
+
     Parameters
     ----------
     dictionary1 : `dict`
@@ -244,6 +254,7 @@ def add_dictionaries_together(dictionary1, dictionary2):
             )
     return dictionary
 
+
 def get_param_from_json(json_file):
     """
     Function to get the parameters from json file.
@@ -263,6 +274,7 @@ def get_param_from_json(json_file):
     for key, value in param.items():
         param[key] = np.array(value)
     return param
+
 
 def load_ann_h5_from_module(package, directory, filename):
     """
@@ -284,12 +296,14 @@ def load_ann_h5_from_module(package, directory, filename):
     """
     # supress warning
     import absl.logging
+
     absl.logging.set_verbosity(absl.logging.ERROR)
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
     from tensorflow.keras.models import load_model
 
-    with resources.path(package + '.' + directory, filename) as h5_path:
+    with resources.path(package + "." + directory, filename) as h5_path:
         return load_model(h5_path)
+
 
 def load_json_from_module(package, directory, filename):
     """
@@ -310,10 +324,11 @@ def load_json_from_module(package, directory, filename):
         Dictionary loaded from the .json file
     """
 
-    with resources.path(package + '.' + directory, filename) as json_path:
+    with resources.path(package + "." + directory, filename) as json_path:
         with open(json_path, "r", encoding="utf-8") as f:
             return json.load(f)
-    
+
+
 def load_pickle_from_module(package, directory, filename):
     """
     Function to load a specific dataset from a .pkl file within the package
@@ -332,9 +347,10 @@ def load_pickle_from_module(package, directory, filename):
     data : `dict`
         Dictionary loaded from the .pkl file
     """
-    
-    with resources.path(package + '.' + directory, filename) as pkl_path:
+
+    with resources.path(package + "." + directory, filename) as pkl_path:
         return pickle.load(open(pkl_path, "rb"))
+
 
 def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.0):
     """
@@ -474,7 +490,7 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
                 os.makedirs("./psd_data")
 
             # check if the txt file exists in psd directory
-            path_ = f'./psd_data/{det}_{int(analysis_start+1)}_psd.txt'
+            path_ = f"./psd_data/{det}_{int(analysis_start+1)}_psd.txt"
             it_exist = os.path.exists(path_)
 
             if not it_exist:
@@ -484,11 +500,21 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
                 # download the data
                 print(f"Downloading data for {det} detector")
                 X1_psd_data = TimeSeries.fetch_open_data(
-                    det, psd_start_time, psd_start_time + psd_duration, sample_rate=sample_rate, cache=True)
+                    det,
+                    psd_start_time,
+                    psd_start_time + psd_duration,
+                    sample_rate=sample_rate,
+                    cache=True,
+                )
 
                 # calculate the psd
                 psd_alpha = 2 * X1.strain_data.roll_off / duration
-                X1_psd = X1_psd_data.psd(fftlength=duration, overlap=0, window=("tukey", psd_alpha), method="median")
+                X1_psd = X1_psd_data.psd(
+                    fftlength=duration,
+                    overlap=0,
+                    window=("tukey", psd_alpha),
+                    method="median",
+                )
 
                 # save the psd
                 print(f"Saving psd data for {det} detector at {path_}")
@@ -496,8 +522,8 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
 
                 # initialize the psd object
                 psd_obj = bilby.gw.detector.PowerSpectralDensity(
-                        frequency_array=X1_psd.frequencies.value, psd_array=X1_psd.value
-                    )
+                    frequency_array=X1_psd.frequencies.value, psd_array=X1_psd.value
+                )
             else:
                 print(f"Loading psd data for {det} detector from {path_}")
                 psd_obj = bilby.gw.detector.PowerSpectralDensity(psd_file=path_)
@@ -511,10 +537,11 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
             )
         else:
             raise ValueError(error_msg)
-        
+
         detector_tensor_list.append(ifos[i].detector_tensor)
 
     return psds_list, detector_tensor_list, detector_list, ifos
+
 
 def power_spectral_density_bilby(psd_txt):
     """
@@ -535,16 +562,17 @@ def power_spectral_density_bilby(psd_txt):
     elif psd_txt[-7:] == "psd.txt":
         psd_object = bilby.gw.detector.PowerSpectralDensity(psd_file=psd_txt)
     else:
-        raise ValueError(
-            "psd file name should end with either 'psd.txt' or 'asd.txt'"
-        )
+        raise ValueError("psd file name should end with either 'psd.txt' or 'asd.txt'")
 
     frequency_array = psd_object.frequency_array
     psd_array = psd_object.psd_array
     # spline_coeff = CubicSpline(frequency_array, psd_array).c
-    spline_coeff = interp1d(frequency_array, psd_array, bounds_error=False, fill_value=np.inf)
+    spline_coeff = interp1d(
+        frequency_array, psd_array, bounds_error=False, fill_value=np.inf
+    )
 
-    return [frequency_array, psd_array, spline_coeff]
+    return [np.array(frequency_array), np.array(psd_array), spline_coeff]
+
 
 def power_spectral_density_pycbc(psd, f_min=20.0, sampling_frequency=2048.0):
     """
@@ -576,14 +604,16 @@ def power_spectral_density_pycbc(psd, f_min=20.0, sampling_frequency=2048.0):
     frequency_array = psd_.get_sample_frequencies().data
     psd_array = psd_.to_frequencyseries().data
     # spline_coeff = CubicSpline(frequency_array, psd_array).c
-    spline_coeff = interp1d(frequency_array, psd_array, bounds_error=False, fill_value=np.inf)
+    spline_coeff = interp1d(
+        frequency_array, psd_array, bounds_error=False, fill_value=np.inf
+    )
 
-    return [frequency_array, psd_array, spline_coeff]
+    return [np.array(frequency_array), np.array(psd_array), spline_coeff]
 
 
 # interpolator check and generation
 def interpolator_check(
-    param_dict_given,
+    identifier_dict,
     interpolator_dir,
     create_new,
 ):
@@ -592,10 +622,10 @@ def interpolator_check(
 
     Parameters
     ----------
-    param_dict_given : dict
+    identifier_dict : dict
         dictionary of parameters based on which the existence of interpolator will be checked
     interpolator_dir : str
-        path to the interpolator pickle file
+        path to the interpolator json file
     create_new : bool
         if True, new interpolator will be generated even if the interpolator exists
         if False, existing interpolator will be used if exists, otherwise new interpolator will be generated
@@ -610,9 +640,9 @@ def interpolator_check(
         list of detector names
     """
 
-    detector_list = param_dict_given["detector"]
-    psds_list = param_dict_given["psds"]
-    detector_tensor_list = param_dict_given["detector_tensor"]
+    detector_list = identifier_dict["detector"]
+    psds_list = identifier_dict["psds"]
+    detector_tensor_list = identifier_dict["detector_tensor"]
     detector_list_ = []
     detector_tensor_list_ = []
     psds_list_ = []
@@ -623,12 +653,12 @@ def interpolator_check(
     # for each detector, one by one
     k = 0
     for det in detector_list:
-        param_dict_given["detector"] = det
-        param_dict_given["psds"] = psds_list[k]
-        param_dict_given["detector_tensor"] = detector_tensor_list[k]
-        # checking 
-        path_interpolator, it_exist = interpolator_pickle_path(
-            param_dict_given, interpolator_dir
+        identifier_dict["detector"] = det
+        identifier_dict["psds"] = psds_list[k]
+        identifier_dict["detector_tensor"] = detector_tensor_list[k]
+        # checking
+        path_interpolator, it_exist = interpolator_json_path(
+            identifier_dict, interpolator_dir
         )
         if create_new:
             it_exist = False
@@ -658,28 +688,28 @@ def interpolator_check(
     )
 
 
-def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
+def interpolator_json_path(identifier_dict, path="./interpolator_json"):
     """
-    Function for storing or getting interpolator (snr_partialsacaled) pickle path
+    Function for storing or getting interpolator (snr_partialsacaled) json path
 
     Parameters
     ----------
-    param_dict_given : dict
+    identifier_dict : dict
         dictionary of parameters based on which the existence of interpolator will be checked
     path : str
-        path to the directory where the interpolator pickle file will be stored
+        path to the directory where the interpolator json file will be stored
 
     Returns
     -------
     path_interpolator : str
-        path to the interpolator pickle file
-        e.g. './interpolator_pickle/L1/partialSNR_dict_0.pickle'
+        path to the interpolator json file
+        e.g. './interpolator_json/L1/partialSNR_dict_0.json'
     it_exist: bool
         True if the interpolator exists
         False if the interpolator does not exists
     """
 
-    detector = param_dict_given["detector"]
+    detector = identifier_dict["detector"]
     # arg no. for the detector from the detector list
     det_path = path + "/" + detector
 
@@ -691,53 +721,58 @@ def interpolator_pickle_path(param_dict_given, path="./interpolator_pickle"):
     if not os.path.exists(det_path):
         os.makedirs(det_path)
 
-    # check if param_dict_list.pickle exists
-    if not os.path.exists(det_path + "/param_dict_list.pickle"):
+    # check if param_dict_list.json exists
+    if not os.path.exists(det_path + "/param_dict_list.json"):
         dict_list = []
-        save_pickle(det_path + "/param_dict_list.pickle", dict_list)
+        save_json(det_path + "/param_dict_list.json", dict_list)
 
-    # for checking existing interpolator pickle in the det_path/param_dict_list.pickle file
-    param_dict_stored = load_pickle(det_path + "/param_dict_list.pickle")
+    # for checking existing interpolator json in the det_path/param_dict_list.json file
+    param_dict_stored = load_json(det_path + "/param_dict_list.json")
 
     len_ = len(param_dict_stored)
-    # del param_dict_given["psds"]
-    param_dict_given["psds"] = str(param_dict_given["psds"][0:2])
-    param_dict_given["detector_tensor"] = str(param_dict_given["detector_tensor"])
+    # Convert to JSON-serializable format
+    # psds is [freq_array, psd_array, interp1d_func] - take first 2 elements
+    psds = identifier_dict["psds"]
+    detector_tensor = identifier_dict["detector_tensor"]
+    del identifier_dict["psds"]
+    del identifier_dict["detector_tensor"]
 
-    # # expilcitly check if the param_dict_given is not available in the param_dict_stored
-    # for param_dict in param_dict_stored:
-    #     for key in param_dict_given.keys():
-    #         if param_dict_given[key] != param_dict[key]:
-    #             print(f"param_dict_given {key} = {param_dict_given[key]} is not equal to param_dict_stored {key} = {param_dict[key]}")
-    #         else:
-    #             print(f"param_dict_given {key} = {param_dict_given[key]} is equal to param_dict_stored {key} = {param_dict[key]}")
+    # Helper function to format values to 6 significant figures (e.g., 4.43925e-41)
+    def to_sig_figs(arr):
+        return [float(f"{x:.5e}") for x in arr]
 
+    identifier_dict["psds_first_5_last_5_elements"] = [
+        to_sig_figs(np.array(psds[0])[:5]) + to_sig_figs(np.array(psds[0])[-5:]),
+        to_sig_figs(np.array(psds[1])[:5]) + to_sig_figs(np.array(psds[1])[-5:]),
+    ]
+    # detector_tensor is a numpy array - convert to list (6 significant figures)
+    identifier_dict["detector_tensor"] = [
+        [float(f"{x:.5e}") for x in row] for row in np.array(detector_tensor)
+    ]
 
-    # print("\n\n", param_dict_given)
-    # print("\n\n",param_dict_stored)
-    if param_dict_given in param_dict_stored:
-        # try and except is added so that user can regenerate a new interpolator pickle file just by
+    if identifier_dict in param_dict_stored:
+        # try and except is added so that user can regenerate a new interpolator json file just by
         # deleting the right file and reruing gwsnr with that params again
         # also, if the user delete the file by mistake, it will generate in the next run
-        idx = param_dict_stored.index(param_dict_given)
-        # check if interpolator pickle exists
+        idx = param_dict_stored.index(identifier_dict)
+        # check if interpolator json exists
         # get partialSNR interpolator if exists
-        path_interpolator = det_path + "/partialSNR_dict_" + str(idx) + ".pickle"
+        path_interpolator = det_path + "/partialSNR_dict_" + str(idx) + ".json"
         # there will be exception if the file is deleted by mistake
         if os.path.exists(path_interpolator):
             it_exist = True
         else:
             it_exist = False
 
-    # if related dict not found in the param_dict_list.pickle
+    # if related dict not found in the param_dict_list.json
     else:
         it_exist = False
-        path_interpolator = det_path + "/partialSNR_dict_" + str(len_) + ".pickle"
-        # print("related dict not found in the param_dict_list.pickle, new interpolator will be generated")
+        path_interpolator = det_path + "/partialSNR_dict_" + str(len_) + ".json"
+        # print("related dict not found in the param_dict_list.json, new interpolator will be generated")
 
-        # store the pickle dict
-        param_dict_stored.append(param_dict_given)
-        save_pickle(det_path + "/param_dict_list.pickle", param_dict_stored)
+        # store the json dict
+        param_dict_stored.append(identifier_dict)
+        save_json(det_path + "/param_dict_list.json", param_dict_stored)
 
     # print(f"In case if you need regeneration of interpolator of the given gwsnr param, please delete this file, {path_interpolator} \n")
 
@@ -752,10 +787,12 @@ def get_gw_parameters(gw_param_dict):
         try:
             gw_param_dict = get_param_from_json(gw_param_dict)
         except:
-            raise ValueError("gw_param_dict should be either a dictionary or a json string")
+            raise ValueError(
+                "gw_param_dict should be either a dictionary or a json string"
+            )
     else:
         raise ValueError("gw_param_dict should be either a dictionary or a json string")
-    
+
     # add error handling for all parameters
     for key, value in gw_param_dict.items():
         if isinstance(value, (list, np.ndarray)):
@@ -767,7 +804,7 @@ def get_gw_parameters(gw_param_dict):
         if key in ["mass_1", "mass_2", "luminosity_distance", "geocent_time"]:
             if np.any(np.array(value) < 0):
                 raise ValueError(f"Parameter '{key}' contains negative values: {value}")
-            
+
         if key in ["a_1", "a_2", "eccentricity"]:
             if np.any(np.array(value) > 1):
                 raise ValueError(f"Parameter '{key}' contains invalid values: {value}")
@@ -797,7 +834,7 @@ def get_gw_parameters(gw_param_dict):
     # Extract tidal parameters or initialize to zeros
     lambda_1 = gw_param_dict.get("lambda_1", np.zeros(size))
     lambda_2 = gw_param_dict.get("lambda_2", np.zeros(size))
-    
+
     # Extract eccentricity or initialize to zeros
     eccentricity = gw_param_dict.get("eccentricity", np.zeros(size))
 
@@ -842,4 +879,23 @@ def get_gw_parameters(gw_param_dict):
         eccentricity,
     )
 
-    return mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, geocent_time, ra, dec, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, lambda_1, lambda_2, eccentricity
+    return (
+        mass_1,
+        mass_2,
+        luminosity_distance,
+        theta_jn,
+        psi,
+        phase,
+        geocent_time,
+        ra,
+        dec,
+        a_1,
+        a_2,
+        tilt_1,
+        tilt_2,
+        phi_12,
+        phi_jl,
+        lambda_1,
+        lambda_2,
+        eccentricity,
+    )

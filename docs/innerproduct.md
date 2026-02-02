@@ -123,7 +123,7 @@ print('Computed SNRs with inner product:\n', snrs)
 
 ```
 Computed SNRs with inner product:
-{'L1': array([46.53]), 'H1': array([48.20]), 'V1': array([13.21]), 'snr_net': array([68.28])}
+{'optimal_snr_L1': array([46.53]), 'optimal_snr_H1': array([48.20]), 'optimal_snr_V1': array([13.21]), 'optimal_snr_net': array([68.28])}
 ```
 
 ## Performance

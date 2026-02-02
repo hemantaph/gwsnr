@@ -39,10 +39,10 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        'gwsnr': ['ann/ann_data/*'],
+        'gwsnr': ['ann/ann_data/*', 'core/core_data/*'],
         'gwsnr.ann': ['ann_data/*'],
-        # 'gwsnr': ['core/interpolator_pickle/*'],
-        # 'gwsnr.core': ['interpolator_pickle/*/*'],
+        'gwsnr.core': ['core_data/*'],
+        'gwsnr.core.core_data': ['*.zip'],
     },
     python_requires='>=3.10',
     classifiers=[

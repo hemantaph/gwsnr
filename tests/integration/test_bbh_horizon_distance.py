@@ -59,7 +59,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "interpolation_aligned_spins",  # Use interpolation with aligned spins
-    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_json", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
     
     # detector settings
@@ -95,10 +95,10 @@ class TestBBHHorizonDistanceCalculation():
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
+        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2', include_optimal_snr=False, include_observed_snr=False)
         
         # hybrid initialization
         gwsnr = GWSNR(**config)
@@ -115,11 +115,11 @@ class TestBBHHorizonDistanceCalculation():
         execution_time = time.time() - start
 
         # print results
-        print(f"\nHorizon distance (Mpc) for {gwsnr.detector_list} network: {horizon_distance_dict['snr_net']}")
-        print(f"Optimised sky location (ra, dec in rad) for {gwsnr.detector_list} network: {sky_location_dict['snr_net']}")
+        print(f"\nHorizon distance (Mpc) for {gwsnr.detector_list} network: {horizon_distance_dict['optimal_snr_net']}")
+        print(f"Optimised sky location (ra, dec in rad) for {gwsnr.detector_list} network: {sky_location_dict['optimal_snr_net']}")
 
         for key, value in horizon_distance_dict.items():
-            name = key if key != 'snr_net' else f'{gwsnr.detector_list} network'
+            name = key if key != 'optimal_snr_net' else f'{gwsnr.detector_list} network'
             assert isinstance(value, float), f"expected float64, got {type(value)}"
             assert np.isfinite(value), f"horizon distance must be finite (no NaN/inf)"
             assert np.isreal(value), f"horizon distance must be real (no complex numbers)"
@@ -135,7 +135,7 @@ class TestBBHHorizonDistanceCalculation():
             )
 
         for key, value in sky_location_dict.items():
-            name = key if key != 'snr_net' else f'{gwsnr.detector_list} network'
+            name = key if key != 'optimal_snr_net' else f'{gwsnr.detector_list} network'
             # ra check
             assert (value[0] >= 0.0) and (value[0] <= 2*np.pi), f"right ascension (ra) for {name} must be in [0, 2pi], got {value[0]}"
             # dec check
@@ -169,10 +169,10 @@ class TestBBHHorizonDistanceCalculation():
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
+        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2', include_optimal_snr=False, include_observed_snr=False)
         
         # hybrid initialization
         gwsnr = GWSNR(**config)

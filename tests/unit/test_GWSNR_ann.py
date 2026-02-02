@@ -59,7 +59,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "ann",  # Use ANN for SNR and pdet calculatio=12]
-    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_json", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings
@@ -89,10 +89,10 @@ class TestGWSNRANN(CommonTestUtils):
         # Create configuration for this test (use existing interpolators for speed)
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['snr_method'] = 'ann'
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2')
+        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2', include_optimal_snr=False, include_observed_snr=False)
         
         # hybrid initialization
         gwsnr_ann = GWSNR(**config)
@@ -131,7 +131,7 @@ class TestGWSNRANN(CommonTestUtils):
         times["bilby"] = time.time() - start
 
         self._validate_pdet_output(ann_pdet, (nsamples,), gwsnr_ann.detector_list, pdet_type='boolean')
-        # self._validate_snr_output(bilby_snr, nsamples) # Bilby output already validated in other tests
+        # self._validate_optimal_snr_output(bilby_snr, nsamples) # Bilby output already validated in other tests
 
         # Test Pdet consistency
         agreement = np.mean(np.asarray(ann_pdet['pdet_net']) == np.asarray(bilby_pdet['pdet_net']))

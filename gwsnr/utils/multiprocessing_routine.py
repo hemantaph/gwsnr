@@ -9,6 +9,170 @@ import bilby
 from ..numba import noise_weighted_inner_product
 
 
+# Global variable to hold shared data in worker processes
+# This avoids pickling large data for each work item - only once per worker
+_worker_shared_data = {}
+
+
+def _init_worker_h_inner_h(
+    psd_list,
+    approximant,
+    f_min,
+    f_ref,
+    sampling_frequency,
+    frequency_domain_source_model,
+):
+    """
+    Initialize worker process with shared data.
+
+    This function is called once per worker process when the pool is created.
+    Shared data is stored in a global variable that workers can access.
+
+    Parameters
+    ----------
+    psd_list : list
+        List of PSDs for each detector (large data, sent only once per worker)
+    approximant : str
+        Waveform approximant name
+    f_min : float
+        Minimum frequency
+    f_ref : float
+        Reference frequency
+    sampling_frequency : float
+        Sampling frequency
+    frequency_domain_source_model : str
+        Frequency domain source model name
+    """
+    global _worker_shared_data
+    _worker_shared_data["psd_list"] = psd_list
+    _worker_shared_data["approximant"] = approximant
+    _worker_shared_data["f_min"] = f_min
+    _worker_shared_data["f_ref"] = f_ref
+    _worker_shared_data["sampling_frequency"] = sampling_frequency
+    _worker_shared_data["frequency_domain_source_model"] = frequency_domain_source_model
+
+
+def noise_weighted_inner_prod_h_inner_h_slim(params):
+    """
+    Optimized version of noise_weighted_inner_prod_h_inner_h that uses shared worker data.
+
+    This function accesses shared data (psd_list, approximant, etc.) from global
+    _worker_shared_data instead of receiving it in params. This dramatically reduces
+    the amount of data pickled per work item.
+
+    Parameters
+    ----------
+    params : tuple
+        Tuple containing only per-work-item data:
+        (mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, ra, dec,
+         geocent_time, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, lambda_1,
+         lambda_2, eccentricity, duration, iteration_index)
+
+    Returns
+    -------
+    tuple
+        (hp_inner_hp_list, hc_inner_hc_list, iteration_index)
+    """
+    global _worker_shared_data
+
+    # Get shared data from worker-level storage
+    psds_objects = _worker_shared_data["psd_list"]
+    approximant = _worker_shared_data["approximant"]
+    f_min = _worker_shared_data["f_min"]
+    f_ref = _worker_shared_data["f_ref"]
+    sampling_frequency = _worker_shared_data["sampling_frequency"]
+    frequency_domain_source_model = _worker_shared_data["frequency_domain_source_model"]
+
+    # Unpack per-item params
+    (
+        mass_1,
+        mass_2,
+        luminosity_distance,
+        theta_jn,
+        psi,
+        phase,
+        ra,
+        dec,
+        geocent_time,
+        a_1,
+        a_2,
+        tilt_1,
+        tilt_2,
+        phi_12,
+        phi_jl,
+        lambda_1,
+        lambda_2,
+        eccentricity,
+        duration,
+        iteration_index,
+    ) = params
+
+    bilby.core.utils.logger.disabled = True
+    np.random.seed(88170235)
+
+    parameters = {
+        "mass_1": mass_1,
+        "mass_2": mass_2,
+        "luminosity_distance": luminosity_distance,
+        "theta_jn": theta_jn,
+        "psi": psi,
+        "phase": phase,
+        "geocent_time": geocent_time,
+        "ra": ra,
+        "dec": dec,
+        "a_1": a_1,
+        "a_2": a_2,
+        "tilt_1": tilt_1,
+        "tilt_2": tilt_2,
+        "phi_12": phi_12,
+        "phi_jl": phi_jl,
+        "lambda_1": lambda_1,
+        "lambda_2": lambda_2,
+        "eccentricity": eccentricity,
+    }
+
+    waveform_arguments = dict(
+        waveform_approximant=approximant,
+        reference_frequency=f_ref,
+        minimum_frequency=f_min,
+    )
+
+    waveform_generator = bilby.gw.WaveformGenerator(
+        duration=duration,
+        sampling_frequency=sampling_frequency,
+        frequency_domain_source_model=getattr(
+            bilby.gw.source, frequency_domain_source_model
+        ),
+        waveform_arguments=waveform_arguments,
+    )
+    polas = waveform_generator.frequency_domain_strain(parameters=parameters)
+
+    hp_inner_hp_list = []
+    hc_inner_hc_list = []
+
+    for idx in range(len(psds_objects)):
+        p_array = psds_objects[idx][2](waveform_generator.frequency_array)
+        idx2 = (p_array != 0.0) & (p_array != np.inf)
+
+        hp_inner_hp = noise_weighted_inner_product(
+            polas["plus"][idx2],
+            polas["plus"][idx2],
+            p_array[idx2],
+            waveform_generator.duration,
+        )
+        hc_inner_hc = noise_weighted_inner_product(
+            polas["cross"][idx2],
+            polas["cross"][idx2],
+            p_array[idx2],
+            waveform_generator.duration,
+        )
+
+        hp_inner_hp_list.append(hp_inner_hp)
+        hc_inner_hc_list.append(hc_inner_hc)
+
+    return (hp_inner_hp_list, hc_inner_hc_list, iteration_index)
+
+
 def noise_weighted_inner_prod_h_inner_h(params):
     """
     Probaility of detection of GW for the given sensitivity of the detectors
@@ -70,7 +234,7 @@ def noise_weighted_inner_prod_h_inner_h(params):
             list of psds for each detector
         params[25] : str
             frequency_domain_source_model name
-        
+
 
     Returns
     -------
@@ -129,7 +293,7 @@ def noise_weighted_inner_prod_h_inner_h(params):
     # list_of_detectors = params[26:].tolist()
     psds_objects = params[24]
     for idx in range(len(psds_objects)):
-    # for idx, det in enumerate(list_of_detectors):
+        # for idx, det in enumerate(list_of_detectors):
 
         # need to compute the inner product for
         p_array = psds_objects[idx][2](waveform_generator.frequency_array)
@@ -153,6 +317,7 @@ def noise_weighted_inner_prod_h_inner_h(params):
         hc_inner_hc_list.append(hc_inner_hc)
 
     return (hp_inner_hp_list, hc_inner_hc_list, params[23])
+
 
 def noise_weighted_inner_prod_d_inner_h(params):
     """
@@ -217,7 +382,7 @@ def noise_weighted_inner_prod_d_inner_h(params):
             frequency_domain_source_model name
         params[26] : list or None
             noise realization. If None, then PSD as noise realization
-        
+
 
     Returns
     -------
@@ -279,7 +444,7 @@ def noise_weighted_inner_prod_d_inner_h(params):
     psds_objects = params[24]
     noise = params[26]
     for idx in range(len(psds_objects)):
-    # for idx, det in enumerate(list_of_detectors):
+        # for idx, det in enumerate(list_of_detectors):
 
         # need to compute the inner product for
         p_array = psds_objects[idx][2](waveform_generator.frequency_array)
@@ -328,43 +493,50 @@ def noise_weighted_inner_prod_d_inner_h(params):
         n_inner_hp_list.append(n_inner_hp)
         n_inner_hc_list.append(n_inner_hc)
 
-    return (hp_inner_hp_list, hc_inner_hc_list, n_inner_hp_list, n_inner_hc_list, params[23])
+    return (
+        hp_inner_hp_list,
+        hc_inner_hc_list,
+        n_inner_hp_list,
+        n_inner_hc_list,
+        params[23],
+    )
+
 
 def noise_weighted_inner_prod_ripple(params):
     """
-        Probaility of detection of GW for the given sensitivity of the detectors
+    Probaility of detection of GW for the given sensitivity of the detectors
 
-        Parameters
-        ----------
-        params : list
-            list of parameters for the inner product calculation
-            List contains: \n
-            params[0] : `numpy.ndarray`
-                plus polarization
-            params[1] : `numpy.ndarray`
-                cross polarization
-            params[2] : `numpy.ndarray`
-                frequency array
-            params[3] : `float`
-                cutt-off size of given arrays
-            params[4] : `float`
-                minimum frequency
-            params[5] : `float`
-                duration
-            params[6] : `int`
-                index
-            params[7] : `list` 
-                psd objects of given detectors
+    Parameters
+    ----------
+    params : list
+        list of parameters for the inner product calculation
+        List contains: \n
+        params[0] : `numpy.ndarray`
+            plus polarization
+        params[1] : `numpy.ndarray`
+            cross polarization
+        params[2] : `numpy.ndarray`
+            frequency array
+        params[3] : `float`
+            cutt-off size of given arrays
+        params[4] : `float`
+            minimum frequency
+        params[5] : `float`
+            duration
+        params[6] : `int`
+            index
+        params[7] : `list`
+            psd objects of given detectors
 
-        Returns
-        -------
-        SNRs_list : list
-            contains opt_snr for each detector and net_opt_snr
-        params[22] : int
-            index tracker
+    Returns
+    -------
+    SNRs_list : list
+        contains opt_snr for each detector and net_opt_snr
+    params[22] : int
+        index tracker
     """
 
-    ## input 
+    ## input
     hp = params[0]
     hc = params[1]
     fs = params[2]
@@ -378,8 +550,8 @@ def noise_weighted_inner_prod_ripple(params):
     hc = np.array(hc[:fsize])
     # find the index of 20Hz or nearby
     # set all elements to zero below this index
-    fs =  fs[:fsize]
-    idx = np.abs( fs - fmin).argmin()
+    fs = fs[:fsize]
+    idx = np.abs(fs - fmin).argmin()
     hp[:idx] = 0.0 + 0.0j
     hc[:idx] = 0.0 + 0.0j
 
@@ -389,7 +561,7 @@ def noise_weighted_inner_prod_ripple(params):
     hp_inner_hp_list = []
     hc_inner_hc_list = []
     psds_objects = params[7]
-    
+
     for idx in range(len(psds_objects)):
 
         # need to compute the inner product for
@@ -415,7 +587,5 @@ def noise_weighted_inner_prod_ripple(params):
 
         hp_inner_hp_list.append(hp_inner_hp)
         hc_inner_hc_list.append(hc_inner_hc)
-    
+
     return (hp_inner_hp_list, hc_inner_hc_list, params[6])
-
-

@@ -54,7 +54,7 @@ DEFAULT_CONFIG = {
     
     # SNR calculation method and settings  
     'snr_method': "inner_product_jax",       # Use JAX-accelerated inner product
-    'interpolator_dir': "./interpolator_pickle", # Directory for saved interpolators
+    'interpolator_dir': "./interpolator_json", # Directory for saved interpolators
     'create_new_interpolator': False,           # Use existing interpolators (faster)
 
     # detector settings
@@ -116,13 +116,13 @@ class TestGWSNRInnerProductJAX(CommonTestUtils):
         standard_snr = gwsnr_standard.optimal_snr(gw_param_dict=param_dict)
         
         # Validate both outputs
-        self._validate_snr_output(jax_snr, (nsamples,), gwsnr_jax.detector_list)
-        self._validate_snr_output(standard_snr, (nsamples,), gwsnr_standard.detector_list)
+        self._validate_optimal_snr_output(jax_snr, (nsamples,), gwsnr_jax.detector_list)
+        self._validate_optimal_snr_output(standard_snr, (nsamples,), gwsnr_standard.detector_list)
         
         # Cross-validate results - JAX/ripplegw and LAL implementations should agree
         np.testing.assert_allclose(
-            jax_snr["snr_net"],
-            standard_snr["snr_net"],
+            jax_snr['optimal_snr_net'],
+            standard_snr['optimal_snr_net'],
             rtol=1e-3,  # 0.1% tolerance for cross-implementation comparison
             err_msg="JAX and standard methods should produce consistent SNR values"
         )
@@ -139,7 +139,7 @@ class TestGWSNRInnerProductJAX(CommonTestUtils):
         # Configure GWSNR with reduced verbosity for cleaner test output
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False  # Suppress log messages during testing
 
@@ -170,7 +170,7 @@ class TestGWSNRInnerProductJAX(CommonTestUtils):
 
             snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict)
             # Validate that output has correct structure and numerical properties
-            self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+            self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
     def test_jax_reproducibility_and_performance(self):
         """
@@ -184,7 +184,7 @@ class TestGWSNRInnerProductJAX(CommonTestUtils):
         # Create configuration for this test
         config = DEFAULT_CONFIG.copy()
         gwsnr_dir = os.path.dirname(__file__)
-        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_pickle')
+        gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['waveform_approximant'] = "IMRPhenomD"
         config['gwsnr_verbose'] = False
@@ -205,7 +205,7 @@ class TestGWSNRInnerProductJAX(CommonTestUtils):
         output_file = "snr_data_jax.json"
         snr_result = gwsnr.optimal_snr(gw_param_dict=param_dict, output_jsonfile=output_file)
         # Validate that output has correct structure and numerical properties
-        self._validate_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
+        self._validate_optimal_snr_output(snr_result, (nsamples,), gwsnr.detector_list)
 
         # Verify that JSON output file was created successfully
         assert os.path.exists(output_file), "Output JSON file was not created"
@@ -217,8 +217,8 @@ class TestGWSNRInnerProductJAX(CommonTestUtils):
         # Test reproducibility
         snr_result2 = gwsnr.optimal_snr(gw_param_dict=param_dict)
         np.testing.assert_allclose(
-            snr_result["snr_net"], # Network SNR from first calculation
-            snr_result2["snr_net"], # Network SNR from second calculation
+            snr_result['optimal_snr_net'], # Network SNR from first calculation
+            snr_result2['optimal_snr_net'], # Network SNR from second calculation
             rtol=1e-10, # Very tight tolerance for reproducibility
             err_msg="JAX SNR calculation should be deterministic"
         )

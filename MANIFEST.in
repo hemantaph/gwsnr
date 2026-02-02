@@ -1,2 +1,5 @@
 include gwsnr/ann/ann_data/*
-recursive-include gwsnr/core/interpolator_pickle *
+recursive-include gwsnr/core/core_data *
+include README.md
+include LICENSE
+include pyproject.toml

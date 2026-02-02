@@ -45,9 +45,10 @@ Functions
    gwsnr.utils.dealing_with_psds
    gwsnr.utils.power_spectral_density_pycbc
    gwsnr.utils.interpolator_check
-   gwsnr.utils.interpolator_pickle_path
+   gwsnr.utils.interpolator_json_path
    gwsnr.utils.get_gw_parameters
    gwsnr.utils.noise_weighted_inner_prod_h_inner_h
+   gwsnr.utils.noise_weighted_inner_prod_h_inner_h_slim
    gwsnr.utils.noise_weighted_inner_prod_d_inner_h
    gwsnr.utils.noise_weighted_inner_prod_ripple
 
@@ -574,7 +575,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: interpolator_check(param_dict_given, interpolator_dir, create_new)
+.. py:function:: interpolator_check(identifier_dict, interpolator_dir, create_new)
 
    
    Function for interpolator (snr_partialsacaled) check and generation if not exists.
@@ -582,11 +583,11 @@ Functions
 
    :Parameters:
 
-       **param_dict_given** : dict
+       **identifier_dict** : dict
            dictionary of parameters based on which the existence of interpolator will be checked
 
        **interpolator_dir** : str
-           path to the interpolator pickle file
+           path to the interpolator json file
 
        **create_new** : bool
            if True, new interpolator will be generated even if the interpolator exists
@@ -618,25 +619,25 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: interpolator_pickle_path(param_dict_given, path='./interpolator_pickle')
+.. py:function:: interpolator_json_path(identifier_dict, path='./interpolator_json')
 
    
-   Function for storing or getting interpolator (snr_partialsacaled) pickle path
+   Function for storing or getting interpolator (snr_partialsacaled) json path
 
 
    :Parameters:
 
-       **param_dict_given** : dict
+       **identifier_dict** : dict
            dictionary of parameters based on which the existence of interpolator will be checked
 
        **path** : str
-           path to the directory where the interpolator pickle file will be stored
+           path to the directory where the interpolator json file will be stored
 
    :Returns:
 
        **path_interpolator** : str
-           path to the interpolator pickle file
-           e.g. './interpolator_pickle/L1/partialSNR_dict_0.pickle'
+           path to the interpolator json file
+           e.g. './interpolator_json/L1/partialSNR_dict_0.json'
 
        it_exist: bool
            True if the interpolator exists
@@ -732,6 +733,43 @@ Functions
 
        **params[22]** : int
            index tracker
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: noise_weighted_inner_prod_h_inner_h_slim(params)
+
+   
+   Optimized version of noise_weighted_inner_prod_h_inner_h that uses shared worker data.
+
+   This function accesses shared data (psd_list, approximant, etc.) from global
+   _worker_shared_data instead of receiving it in params. This dramatically reduces
+   the amount of data pickled per work item.
+
+   :Parameters:
+
+       **params** : tuple
+           Tuple containing only per-work-item data:
+           (mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, ra, dec,
+            geocent_time, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, lambda_1,
+            lambda_2, eccentricity, duration, iteration_index)
+
+   :Returns:
+
+       tuple
+           (hp_inner_hp_list, hc_inner_hc_list, iteration_index)
 
 
 

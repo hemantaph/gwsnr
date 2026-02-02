@@ -20,11 +20,49 @@ Functions
 
 .. autoapisummary::
 
+   gwsnr.utils.multiprocessing_routine.noise_weighted_inner_prod_h_inner_h_slim
    gwsnr.utils.multiprocessing_routine.noise_weighted_inner_prod_h_inner_h
    gwsnr.utils.multiprocessing_routine.noise_weighted_inner_prod_d_inner_h
    gwsnr.utils.multiprocessing_routine.noise_weighted_inner_prod_ripple
 
 
+
+.. py:function:: noise_weighted_inner_prod_h_inner_h_slim(params)
+
+   
+   Optimized version of noise_weighted_inner_prod_h_inner_h that uses shared worker data.
+
+   This function accesses shared data (psd_list, approximant, etc.) from global
+   _worker_shared_data instead of receiving it in params. This dramatically reduces
+   the amount of data pickled per work item.
+
+   :Parameters:
+
+       **params** : tuple
+           Tuple containing only per-work-item data:
+           (mass_1, mass_2, luminosity_distance, theta_jn, psi, phase, ra, dec,
+            geocent_time, a_1, a_2, tilt_1, tilt_2, phi_12, phi_jl, lambda_1,
+            lambda_2, eccentricity, duration, iteration_index)
+
+   :Returns:
+
+       tuple
+           (hp_inner_hp_list, hc_inner_hc_list, iteration_index)
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: noise_weighted_inner_prod_h_inner_h(params)
 

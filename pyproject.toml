@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gwsnr"
-dynamic = ["version", "dependencies"]
+dynamic = ["version"]
 description = "A Python package for calculating gravitational wave signal-to-noise ratios"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Hemantakumar Phurailatpam", email = "hemantaphurailatpam@gmail.com"},
 ]
@@ -19,7 +19,6 @@ keywords = ["gravitational-waves", "signal-processing", "physics", "astronomy"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -27,20 +26,92 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
+dependencies = [
+    "setuptools>=80.9.0",
+    "astropy>=6.1.7",
+    "bilby>=2.5.2",
+    "corner>=2.2.3",
+    "gwpy>=3.0.12",
+    "h5py>=3.11.0",
+    "numba>=0.61.2",
+    "pandas>=2.3.0",
+    "scipy>=1.15.3",
+    "tqdm>=4.67.1",
+    "absl-py>=2.1.0",
+    "pycbc>=2.8.3",
+]
 
 [project.urls]
 Homepage = "https://github.com/hemantaph/gwsnr"
-Documentation = "https://gwsnr.readthedocs.io"
+Documentation = "https://gwsnr.hemantaph.com"
 Repository = "https://github.com/hemantaph/gwsnr"
 "Bug Tracker" = "https://github.com/hemantaph/gwsnr/issues"
 
 [tool.setuptools.dynamic]
 version = {attr = "gwsnr._version.__version__"}
-dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["gwsnr*"]
+exclude = ["*.__pycache__*", "*__pycache__*"]
 
 [tool.setuptools.package-data]
-gwsnr = ["ann/ann_data/*", "core/interpolator_pickle/*"]
+gwsnr = [
+    "ann/ann_data/*",
+    "core/core_data/*",
+    "core/core_data/*.zip",
+]
+
+[project.optional-dependencies]
+# Optional JAX support CUDA
+jax = [
+    "jax>=0.4.34",
+    "jaxlib>=0.4.34",
+]
+# Optional JAX support Apple Silicon
+# not recommended
+
+# Optional MLX support
+mlx = [
+    "mlx-lm>=0.0.1",
+]
+# Optional TensorFlow support
+tensorflow = [
+    "tensorflow>=2.15.0",
+]
+# Development dependencies
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "isort>=5.12",
+    "flake8>=6.0",
+]
+# Documentation dependencies
+docs = [
+    "sphinx>=7.0",
+    "sphinx-autodoc-typehints>=1.23",
+    "html5lib==1.0b8",
+    "setuptools",
+    "nbsphinx==0.9.3",
+    "sphinx-autoapi==3.0.0",
+    "autoapi==2.0.1",
+    "nbsphinx==0.9.3",
+    "sphinx-copybutton==0.5.2",
+    "sphinx-rtd-theme==3.0.2",
+    "numpydoc==1.6.0",
+    "sphinx-tabs==3.4.1",
+    "sphinx-jupyterbook-latex==1.0.0",
+    "myst-parser==3.0.1",
+    "linkify-it-py==2.0.3",
+    "sphinx-rtd-dark-mode==1.3.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "isort>=5.12",
+    "flake8>=6.0",
+]

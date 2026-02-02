@@ -10,9 +10,9 @@ __pycache__/
 .vscode/
 .pyc
 ann_data/
-tests/interpolator_pickle/
-docs/examples/interpolator_pickle/
-# ./interpolator_pickle/
+tests/interpolator_json/
+docs/examples/interpolator_json/
+# ./interpolator_json/
 tests/ann_data/
 docs/examples/ann_data/
 # ./ann_data/
@@ -27,6 +27,7 @@ docs/_build/
 # JSON files (specific directories)
 examples/**/*.json
 devdir/**/*.json
+examples/
 
 # Pickle files (specific directories)
 examples/**/*.pickle
@@ -37,7 +38,7 @@ docs/**/*.pickle
 docs/**/*.pkl
 
 # Interpolator pickle directory
-examples/interpolator_pickle/
+examples/interpolator_json/
 
 # macOS
 .DS_Store
