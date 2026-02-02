@@ -12,7 +12,7 @@ __pycache__/
 ann_data/
 tests/interpolator_json/
 docs/examples/interpolator_json/
-# ./interpolator_json/
+interpolator_json/
 tests/ann_data/
 docs/examples/ann_data/
 # ./ann_data/
