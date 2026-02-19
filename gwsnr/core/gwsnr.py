@@ -424,8 +424,8 @@ class GWSNR:
                 snr_th_net=10.0,
                 pdet_type="boolean",
                 distribution_type="noncentral_chi2",
-                include_optimal_snr=False,
-                include_observed_snr=False,
+                include_optimal_snr=True,
+                include_observed_snr=True,
             )
         )
 

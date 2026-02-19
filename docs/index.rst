@@ -10,7 +10,7 @@ Welcome to :red:`gwsnr`'s documentation!
 :red:`gwsnr` : Efficient :red_first:`Gravitational`-:red_first:`Wave` :red_first:`Signal`-to-:red_first:`Noise` :red_first:`Ratio` Calculator
 -------------------------------------------------------------------------------------------------------------------------------------
 
-**Try gwsnr now at** `Google Colab Notebook <https://colab.research.google.com/drive/1GDh4aOXyacut7h7Nt3VSgreDnx8NdPzS?usp=sharing>`_!
+**Try gwsnr now at** `Google Colab Notebook <https://colab.research.google.com/drive/1GDh4aOXyacut7h7Nt3VSgreDnx8NdPzS?usp=sharing>`_! See the `gwsnr paper <https://arxiv.org/abs/2412.09888>`_ for a detailed technical overview.
 
 ``gwsnr`` is a Python package for fast and accurate gravitational-wave (GW) Signal-to-Noise Ratio (SNR) calculation. It is designed for semi-analytical Probability of Detection (Pdet) estimation in population simulations and for hierarchical Bayesian inference with selection effects. The package achieves a **speed-up of more than 5,000x** compared to traditional methods, while maintaining an **accuracy above 99.5%**.
 
@@ -30,7 +30,7 @@ Install the package using pip:
 
    pip install gwsnr
 
-Then, compute the SNR for a binary black hole system:
+Then, compute the SNR and Pdet for a binary black hole system:
 
 .. code-block:: python
 
