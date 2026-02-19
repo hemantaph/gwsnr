@@ -10,6 +10,10 @@ Installation
 
 .. tabs::
 
+   .. code-tab:: bash uv (standard with Numba; CPU)
+
+        uv add gwsnr
+
    .. code-tab:: bash pip (standard with Numba; CPU)
 
         pip install gwsnr
