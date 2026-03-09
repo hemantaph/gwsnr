@@ -5,7 +5,7 @@ Numba-compiled helper functions for gravitational wave signal-to-noise ratio cal
 This module provides optimized numerical functions for gravitational wave data analysis,
 including chirp time calculations, antenna response computations, polarization tensors,
 coordinate transformations, and noise-weighted inner products. All functions are compiled
-with Numba's #  @njit decorator for high-performance computation, with parallel processing
+with Numba's @njit decorator for high-performance computation, with parallel processing
 support using prange for multi-threaded execution where applicable.
 """
 
@@ -22,7 +22,7 @@ Pi = np.pi
 MTSUN_SI = 4.925491025543576e-06
 
 
-#  @njit
+@njit(cache=True)
 def findchirp_chirptime(m1, m2, fmin):
     """
     Time taken from f_min to f_lso (last stable orbit). 3.5PN in fourier phase considered.
@@ -98,7 +98,7 @@ def findchirp_chirptime(m1, m2, fmin):
     )
 
 
-#  @njit
+@njit(cache=True)
 def einsum1(m, n):
     """
     Function to calculate einsum of two 3x1 vectors
@@ -128,7 +128,7 @@ def einsum1(m, n):
     return ans
 
 
-#  @njit
+@njit(cache=True)
 def einsum2(m, n):
     """
     Function to calculate einsum of two 3x3 matrices
@@ -159,7 +159,7 @@ def einsum2(m, n):
     return ans
 
 
-#  @njit
+@njit(cache=True)
 def gps_to_gmst(gps_time):
     """
     Function to convert gps time to greenwich mean sidereal time
@@ -179,7 +179,7 @@ def gps_to_gmst(gps_time):
     return slope * gps_time + intercept
 
 
-#  @njit
+@njit(cache=True)
 def ra_dec_to_theta_phi(ra, dec, gmst):
     """
     Function to convert ra and dec to theta and phi
@@ -206,7 +206,7 @@ def ra_dec_to_theta_phi(ra, dec, gmst):
     return theta, phi
 
 
-#  @njit
+@njit(cache=True)
 def get_polarization_tensor_plus(ra, dec, time, psi):
     """
     Function to calculate the polarization tensor
@@ -243,7 +243,7 @@ def get_polarization_tensor_plus(ra, dec, time, psi):
     return einsum1(m, m) - einsum1(n, n)
 
 
-#  @njit
+@njit(cache=True)
 def get_polarization_tensor_cross(ra, dec, time, psi):
     """
     Function to calculate the polarization tensor
@@ -280,7 +280,7 @@ def get_polarization_tensor_cross(ra, dec, time, psi):
     return einsum1(m, n) + einsum1(n, m)
 
 
-#  @njit
+@njit(cache=True)
 def antenna_response_plus(ra, dec, time, psi, detector_tensor):
     """
     Function to calculate the antenna response
@@ -310,7 +310,7 @@ def antenna_response_plus(ra, dec, time, psi, detector_tensor):
     return einsum2(detector_tensor, polarization_tensor)
 
 
-#  @njit
+@njit(cache=True)
 def antenna_response_cross(ra, dec, time, psi, detector_tensor):
     """
     Function to calculate the antenna response
@@ -340,7 +340,7 @@ def antenna_response_cross(ra, dec, time, psi, detector_tensor):
     return einsum2(detector_tensor, polarization_tensor)
 
 
-#  @njit(parallel=True)
+@njit(parallel=True, cache=True)
 def antenna_response_array(ra, dec, time, psi, detector_tensor):
     """
     Function to calculate the antenna response in array form.
@@ -382,7 +382,7 @@ def antenna_response_array(ra, dec, time, psi, detector_tensor):
     return Fp, Fc
 
 
-#  @njit
+@njit(cache=True)
 def effective_distance(
     luminosity_distance, theta_jn, ra, dec, geocent_time, psi, detector_tensor
 ):
@@ -421,7 +421,7 @@ def effective_distance(
     )
 
 
-#  @njit(parallel=True)
+@njit(parallel=True, cache=True)
 def effective_distance_array(
     luminosity_distance, theta_jn, ra, dec, geocent_time, psi, detector_tensor
 ):
@@ -470,7 +470,7 @@ def effective_distance_array(
     return eff_dist
 
 
-#  @njit
+@njit(cache=True)
 def noise_weighted_inner_product(
     signal1,
     signal2,
@@ -496,7 +496,7 @@ def noise_weighted_inner_product(
     return 4 / duration * np.sum(nwip_arr)
 
 
-#  @njit(parallel=True)
+@njit(parallel=True, cache=True)
 def linear_interpolator(xnew_array, y_array, x_array, fill_value=np.inf):
     """
     Linear interpolator for 1D data.
@@ -534,7 +534,7 @@ def linear_interpolator(xnew_array, y_array, x_array, fill_value=np.inf):
     return result
 
 
-# #  @njit
+# @njit
 # def _helper_hphc(hp,hc,fsize_arr,fs,size,f_l,i):
 #     # remove the np.nan padding
 #     hp_ = np.array(hp[i][:fsize_arr[i]], dtype=np.complex128)

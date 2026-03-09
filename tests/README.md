@@ -1,11 +1,11 @@
-# GWSNR Test Suite
+# gwsnr Test Suite
 
-Comprehensive test suite for validating GWSNR functionality across unit and integration scenarios. The test suite ensures reliability, accuracy, and performance of gravitational wave signal-to-noise ratio calculations.
+Comprehensive test suite for validating gwsnr functionality across unit and integration scenarios. The test suite ensures reliability, accuracy, and performance of gravitational wave signal-to-noise ratio calculations.
 
 ## Test Organization
 
 ### Unit Tests (`unit/`)
-Component-level tests validating individual GWSNR methods and backends:
+Component-level tests validating individual gwsnr methods and backends:
 - **SNR Calculation Methods**: Interpolation, inner product, and ANN-based approaches
 - **Backend Implementations**: Numba, JAX, and MLX acceleration frameworks
 - **Detection Statistics**: Probability of detection (Pdet) and threshold optimization

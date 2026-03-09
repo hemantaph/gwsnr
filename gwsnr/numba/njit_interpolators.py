@@ -3,7 +3,7 @@ from numba import njit, prange
 from .njit_functions import antenna_response_array
 
 
-#  @njit
+@njit(cache=True)
 def find_index_1d_numba(x_array, x_new):
     """
     Find the index for cubic spline interpolation in 1D.
@@ -50,7 +50,7 @@ def find_index_1d_numba(x_array, x_new):
     return i, condition_i
 
 
-#  @njit
+@njit(cache=True)
 def spline_interp_4pts_numba(x_eval, x_pts, y_pts, condition_i):
     """
     Evaluate a cubic function at a given point using 4-point interpolation.
@@ -123,7 +123,7 @@ def spline_interp_4pts_numba(x_eval, x_pts, y_pts, condition_i):
 
 
 ######### Interpolation 4D #########
-#  @njit
+@njit(cache=True)
 def spline_interp_4x4x4x4pts_numba(
     q_array,
     mtot_array,
@@ -217,7 +217,7 @@ def spline_interp_4x4x4x4pts_numba(
     return final_snr
 
 
-#  @njit(parallel=True)
+@njit(parallel=True, cache=True)
 def spline_interp_4x4x4x4pts_batched_numba(
     q_array,
     mtot_array,
@@ -320,7 +320,7 @@ def spline_interp_4x4x4x4pts_batched_numba(
     return out
 
 
-#  @njit
+@njit(cache=True)
 def get_interpolated_snr_aligned_spins_numba(
     mass_1,
     mass_2,
@@ -392,7 +392,7 @@ def get_interpolated_snr_aligned_spins_numba(
 
 
 ######### Interpolation 2D #########
-#  @njit
+@njit(cache=True)
 def spline_interp_4x4pts_numba(
     q_array, mtot_array, snrpartialscaled_array, q_new, mtot_new, int_q, int_m
 ):
@@ -415,7 +415,7 @@ def spline_interp_4x4pts_numba(
     return final_snr
 
 
-#  @njit(parallel=True)
+@njit(parallel=True, cache=True)
 def spline_interp_4x4pts_batched_numba(
     q_array, mtot_array, snrpartialscaled_array, q_new_batch, mtot_new_batch
 ):
@@ -462,7 +462,7 @@ def spline_interp_4x4pts_batched_numba(
     return out
 
 
-#  @njit
+@njit(cache=True)
 def get_interpolated_snr_no_spins_numba(
     mass_1,
     mass_2,
