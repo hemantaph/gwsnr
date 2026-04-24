@@ -29,15 +29,10 @@ import multiprocessing as mp
 
 import numpy as np
 from tqdm import tqdm
-from scipy.stats import norm, ncx2
 
-# warning suppression lal
+# scipy.stats (norm, ncx2) and lal are imported lazily inside the methods that use them
 import warnings
 
-warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
-import lal
-
-lal.swig_redirect_standard_output_error(False)
 
 from ..utils import (  # noqa: E402
     dealing_with_psds,
@@ -2012,6 +2007,12 @@ class GWSNR:
         >>> print(f"Network SNR: {result['optimal_snr_net'][0]:.2f}")
         """
 
+        # LAL waveform backend — suppress swig I/O redirect on first use
+        import warnings
+        warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
+        import lal
+        lal.swig_redirect_standard_output_error(False)
+
         # if gw_param_dict is given, then use that
         gw_param_dict = gw_param_dict.copy() if gw_param_dict else None
 
@@ -2694,6 +2695,7 @@ class GWSNR:
             output_jsonfile=output_jsonfile,
         )
 
+        from scipy.stats import norm, ncx2
         snr_th = snr_th if snr_th else self.pdet_kwargs["snr_th"]
         snr_th_net = snr_th_net if snr_th_net else self.pdet_kwargs["snr_th_net"]
         pdet_type = pdet_type if pdet_type else self.pdet_kwargs["pdet_type"]
@@ -3246,6 +3248,9 @@ class GWSNR:
     @npool.setter
     def npool(self, value):
         self._npool = value
+        # Set Numba threads to npool to match parallelism
+        from numba import set_num_threads
+        set_num_threads(value)
 
     @property
     def mtot_min(self):

@@ -29,10 +29,7 @@ from scipy.optimize import curve_fit
 # import jax
 # jax.config.update("jax_enable_x64", True)
 
-import tensorflow as tf
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, accuracy_score
+# tensorflow, sklearn are heavy optional dependencies — imported lazily inside methods
 
 
 class ANNModelGenerator():
@@ -550,6 +547,7 @@ class ANNModelGenerator():
         - Stores fitted scaler in :attr:`~scaler` for prediction use \n
         - StandardScaler: z = (x - mean) / std \n
         """
+        from sklearn.preprocessing import StandardScaler
         sc = StandardScaler()
         X_train = sc.fit_transform(X_train)
         self.scaler = sc
@@ -594,6 +592,7 @@ class ANNModelGenerator():
         - Creates Dense layers starting from index 1 of num_nodes_list \n
         - First layer receives input implicitly based on training data shape \n
         """
+        import tensorflow as tf
         ann = tf.keras.models.Sequential()
 
         for i in range(1, len(num_nodes_list)):
@@ -892,6 +891,7 @@ class ANNModelGenerator():
         X, y = self._get_input_output_data(params=gw_param_dict, randomize=randomize)
 
         # Split data into training and test sets
+        from sklearn.model_selection import train_test_split
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
         # Initialize and fit scaler
@@ -1038,6 +1038,7 @@ class ANNModelGenerator():
         y_test = (y_test>snr_threshold)
 
         # Compute confusion matrix
+        from sklearn.metrics import confusion_matrix, accuracy_score
         cm = confusion_matrix(y_test, y_pred)
         print(cm)
 

@@ -9,8 +9,6 @@ import json
 from importlib import resources
 import pickle
 import numpy as np
-import bilby
-from gwpy.timeseries import TimeSeries
 
 # from scipy.interpolate import CubicSpline
 from scipy.interpolate import interp1d
@@ -377,6 +375,9 @@ def dealing_with_psds(psds=None, ifos=None, f_min=20.0, sampling_frequency=2048.
         list of detector names
     """
 
+    import bilby
+    from gwpy.timeseries import TimeSeries
+
     if not psds and not ifos:
         # if psds is not given, choose bilby's default psds
         print("psds not given. Choosing bilby's default psds")
@@ -557,6 +558,8 @@ def power_spectral_density_bilby(psd_txt):
     -------
     psd_array : bilby.gw.detector.psd.PowerSpectralDensity object
     """
+    import bilby
+
     if psd_txt[-7:] == "asd.txt":
         psd_object = bilby.gw.detector.PowerSpectralDensity(asd_file=psd_txt)
     elif psd_txt[-7:] == "psd.txt":

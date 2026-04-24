@@ -1,2 +1,2 @@
-from .snrthresholdfinder import *
-from .crossentropydifference import *
+from .snrthresholdfinder import SNRThresholdFinder
+from .crossentropydifference import cross_entropy_difference

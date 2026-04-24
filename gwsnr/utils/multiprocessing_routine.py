@@ -4,7 +4,6 @@ Helper functions for multiprocessing in snr generation
 """
 
 import numpy as np
-import bilby
 
 from ..numba import noise_weighted_inner_product
 
@@ -43,6 +42,10 @@ def _init_worker_h_inner_h(
     frequency_domain_source_model : str
         Frequency domain source model name
     """
+    # Set Numba threads to 1 inside multiprocessing workers to avoid CPU oversubscription
+    from numba import set_num_threads
+    set_num_threads(1)
+
     global _worker_shared_data
     _worker_shared_data["psd_list"] = psd_list
     _worker_shared_data["approximant"] = approximant
@@ -107,6 +110,7 @@ def noise_weighted_inner_prod_h_inner_h_slim(params):
         iteration_index,
     ) = params
 
+    import bilby
     bilby.core.utils.logger.disabled = True
     np.random.seed(88170235)
 
@@ -244,6 +248,7 @@ def noise_weighted_inner_prod_h_inner_h(params):
         index tracker
     """
 
+    import bilby
     bilby.core.utils.logger.disabled = True
     np.random.seed(88170235)
     parameters = {
@@ -392,6 +397,7 @@ def noise_weighted_inner_prod_d_inner_h(params):
         index tracker
     """
 
+    import bilby
     bilby.core.utils.logger.disabled = True
     np.random.seed(88170235)
     parameters = {
