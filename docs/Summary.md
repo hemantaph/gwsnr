@@ -7,49 +7,41 @@
   </figcaption>
 </figure>
 
-**`gwsnr`** is a high-performance Python package for efficient and accurate computation of the **optimal signal-to-noise ratio** ($\rho_{\rm opt}$) and **probability of detection** ($P_{\rm det}$) in gravitational-wave (GW) astrophysics.  
-It is designed for large-scale simulations of compact binary mergers—such as **BBH**, **BNS**, and **BH–NS** systems—and for hierarchical Bayesian inference studies that require repeated SNR or $P_{\rm det}$ evaluations under selection effects.
+**`gwsnr`** is a Python package for efficient and accurate computation of the **optimal signal-to-noise ratio** ($\rho_{\rm opt}$) and **probability of detection** ($P_{\rm det}$) in gravitational-wave (GW) astrophysics. It is designed for large-scale simulations of compact binary mergers (BBH, BNS, and BH-NS systems) and for hierarchical Bayesian inference studies that require repeated SNR or $P_{\rm det}$ evaluations under selection effects.
 
-Traditional SNR calculations rely on noise-weighted inner products and are computationally intensive. `gwsnr` overcomes this bottleneck by combining **NumPy** vectorization, **JIT compilation** via [`Numba`](https://numba.pydata.org/), [`JAX`](https://github.com/google/jax), and [`MLX`](https://ml-explore.github.io/mlx/), along with **Python multiprocessing**. This combination enables massive acceleration on both CPUs and GPUs, achieving several orders-of-magnitude speed-up over conventional approaches.
+In population simulations and rate-estimation workflows, $P_{\rm det}$ must be evaluated many times. Standard noise-weighted inner products are accurate but become a bottleneck at scale. Packages such as `Bilby`, `PyCBC`, and `GstLAL` are not primarily built for millions of fast detectability checks. `gwsnr` fills that gap: it provides a modular detectability engine with user-controlled detector, waveform, and population settings, and can model both $\rho_{\rm opt}$ and the noise-realised [matched-filter SNR](detectionstatistics.html#defining-match-filter-snr) ($\rho_{\rm obs}$) under stationary Gaussian noise assumptions.
+
+To gain speed, `gwsnr` combines **NumPy** vectorisation, **JIT compilation** via [`Numba`](https://numba.pydata.org/), optional [`JAX`](https://github.com/google/jax) and [`MLX`](https://ml-explore.github.io/mlx/) backends, and **Python multiprocessing**. The partial-scaling interpolation path achieves accuracy above **99.5%** compared with standard inner-product calculations and speed-ups of order **$5{,}000\times$** relative to `Bilby` in benchmark tests (see [performance summary](performancesummary.html)). The package is used as the core detectability calculator in [`ler`](https://ler.hemantaph.com/).
 
 ---
 
-### Key Capabilities
+### Key capabilities
 
-- **Noise-Weighted Inner Product:**  
-  Provides accurate SNR computation for arbitrary frequency-domain waveforms, including precessing and higher-order harmonic models available in [`LALSuite`](https://lscsoft.docs.ligo.org/lalsuite/lalsimulation/).  
-  Accelerated using multiprocessing and JIT-compiled routines, with optional `JAX` backend integration via [`ripple`](https://github.com/tedwards2412/ripple).
+- **Noise-weighted inner product:**  
+  Accurate SNR computation for arbitrary frequency-domain waveforms, including precessing and higher-order harmonic models from [`LALSuite`](https://lscsoft.docs.ligo.org/lalsuite/lalsimulation/). Accelerated with multiprocessing and JIT-compiled routines; optional `JAX` backend via [`ripplegw`](https://github.com/tedwards2412/ripple).
 
-- **Partial-Scaling Interpolation:**  
-  Implements an interpolation-based approach for aligned-spin or non-spinning binaries.  
-  Precomputes partial-scaled SNRs on parameter grids, enabling rapid recovery of $\rho_{\rm opt}$ by simple rescaling—dramatically reducing computational cost.
+- **Partial-scaling interpolation:**  
+  Fast method for non-spinning and aligned-spin binaries. Precomputes partial-scaled SNRs on parameter grids and recovers $\rho_{\rm opt}$ by simple rescaling.
 
-- **ANN-Based $P_{\rm det}$ Estimation:**  
-  Incorporates a trained Artificial Neural Network (ANN) built with `TensorFlow` and `scikit-learn`, capable of estimating detectability for precessing systems using reduced-dimensional input derived from partial-scaled SNRs.  
-  The model can be retrained for different detectors or astrophysical scenarios.
+- **ANN-based $P_{\rm det}$ estimation:**  
+  Optional `TensorFlow`/`scikit-learn` model for settings where direct interpolation is impractical. Users can retrain models for different detectors or populations.
 
-- **Hybrid SNR Recalculation:**  
-  Combines the speed of interpolation or ANN-based estimates with the precision of the inner-product method.  
-  Signals near the detection threshold are automatically re-evaluated for higher accuracy.
+- **Hybrid SNR recalculation:**  
+  Uses interpolation or ANN estimates first, then re-evaluates events near the detection threshold with the exact inner-product method.
 
-- **Statistical $P_{\rm det}$ Models:**  
-  Implements Gaussian and non-central $\chi$-based statistical models for observed SNRs across single or multi-detector networks.  
-  Supports user-defined detection thresholds and catalogue-based sensitivity functions.
+- **Statistical $P_{\rm det}$ models:**  
+  Gaussian and non-central $\chi^2$ models for $\rho_{\rm obs}$ in single- and multi-detector networks. Supports user-defined thresholds and catalogue-based sensitivity functions.
 
-- **Horizon Distance ($D_{\rm hor}$):**  
-  Calculates the maximum distance at which a source is detectable above a given $\rho_{\rm opt,thr}$, using either analytical rescaling or numerical root-solving.  
-  Useful for sensitivity studies and detector reach estimations.
+- **Horizon distance ($D_{\rm hor}$):**  
+  Maximum distance at which a source is detectable above a given $\rho_{\rm opt,th}$, via analytical rescaling or numerical root-finding.
 
-- **Integration and Extensibility:**  
-  Provides a modular API to flexibly combine waveform models, detector noise PSDs, and configuration parameters—ideal for population synthesis, rate estimation, and hierarchical inference with selection effects.
+- **Modular API:**  
+  Flexible combination of waveform models, detector noise PSDs, and configuration parameters for population synthesis, rate estimation, and hierarchical inference with selection effects.
 
 ---
 
 ### Applications
 
-`gwsnr` underpins simulations and analyses of **GW population statistics**, **rate estimation**, and **lensed versus unlensed event predictions**—as demonstrated in the [`ler`](https://ler.readthedocs.io/en/latest/) package.  
-Its computational efficiency makes it particularly suited for **hierarchical Bayesian frameworks** that require rapid, repeated evaluation of $P_{\rm det}$ across large parameter spaces.
+`gwsnr` supports GW population statistics, astrophysical rate estimation, detector-sensitivity studies, and selection-effect modeling in hierarchical inference. It is integrated into [`ler`](https://ler.hemantaph.com/) for simulating detectable unlensed and strongly lensed events.
 
-<!-- Full mathematical and implementation details are provided in the Sections: [Inner Product](https://gwsnr.readthedocs.io/en/latest/innerproduct.html), [Interpolation](https://gwsnr.readthedocs.io/en/latest/interpolation.html), [ANN](https://gwsnr.readthedocs.io/en/latest/ann.html), [Hybrid](https://gwsnr.readthedocs.io/en/latest/hybrid.html). -->
-
-
+For the full technical description, see the [`gwsnr` paper](https://arxiv.org/abs/2412.09888). Mathematical and implementation details are in [Inner Product](innerproduct.html), [Interpolation](interpolation.html), [ANN](ann.html), [Hybrid](hybrid.html), [Probability of Detection](probabilityofdetection.html), and [Horizon Distance](horizondistance.html).

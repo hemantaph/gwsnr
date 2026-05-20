@@ -115,3 +115,8 @@ dev = [
     "isort>=5.12",
     "flake8>=6.0",
 ]
+
+[tool.uv]
+# Default project layout: `uv sync` creates or updates `.venv` at the repo root.
+# Typical dev workflow: `uv sync --group dev`, then `uv run pytest …`.
+managed = true

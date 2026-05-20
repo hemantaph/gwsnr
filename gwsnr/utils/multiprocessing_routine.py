@@ -11,6 +11,7 @@ from ..numba import noise_weighted_inner_product
 # Global variable to hold shared data in worker processes
 # This avoids pickling large data for each work item - only once per worker
 _worker_shared_data = {}
+_warned_waveform_domain_error = False
 
 
 def _init_worker_h_inner_h(
@@ -149,7 +150,22 @@ def noise_weighted_inner_prod_h_inner_h_slim(params):
         ),
         waveform_arguments=waveform_arguments,
     )
-    polas = waveform_generator.frequency_domain_strain(parameters=parameters)
+    try:
+        polas = waveform_generator.frequency_domain_strain(parameters=parameters)
+    except RuntimeError:
+        global _warned_waveform_domain_error
+        if not _warned_waveform_domain_error:
+            print(
+                "[gwsnr] Waveform generation failed (likely fCut <= f_min for high-mass systems). "
+                "Returning SNR=0 for those samples. If this happens often, try again with "
+                "input argument: mtot_cut=True (and/or lower mtot_max)."
+            )
+            _warned_waveform_domain_error = True
+        # LAL can fail when the waveform cutoff frequency is below the requested
+        # minimum_frequency (e.g. XLALSimIMRPhenomDGenerateFD: fCut <= f_min).
+        # In that case there is no signal power in-band, so return zero inner products.
+        zero = 0.0 + 0.0j
+        return ([zero] * len(psds_objects), [zero] * len(psds_objects), iteration_index)
 
     hp_inner_hp_list = []
     hc_inner_hc_list = []
@@ -287,7 +303,21 @@ def noise_weighted_inner_prod_h_inner_h(params):
         frequency_domain_source_model=getattr(bilby.gw.source, params[25]),
         waveform_arguments=waveform_arguments,
     )
-    polas = waveform_generator.frequency_domain_strain(parameters=parameters)
+    try:
+        polas = waveform_generator.frequency_domain_strain(parameters=parameters)
+    except RuntimeError:
+        global _warned_waveform_domain_error
+        if not _warned_waveform_domain_error:
+            print(
+                "[gwsnr] Waveform generation failed (likely fCut <= f_min for high-mass systems). "
+                "Returning SNR=0 for those samples. If this happens often, try again with "
+                "input argument: mtot_cut=True (and/or lower mtot_max)."
+            )
+            _warned_waveform_domain_error = True
+        # See slim worker for rationale.
+        psds_objects = params[24]
+        zero = 0.0 + 0.0j
+        return ([zero] * len(psds_objects), [zero] * len(psds_objects), params[23])
 
     # h = F+.h+ + Fx.hx
     # <h|h> = F+^2<h+,h+> + Fx^2<hx,hx> + F+Fx 2<h+,hx>
@@ -436,7 +466,27 @@ def noise_weighted_inner_prod_d_inner_h(params):
         frequency_domain_source_model=getattr(bilby.gw.source, params[25]),
         waveform_arguments=waveform_arguments,
     )
-    polas = waveform_generator.frequency_domain_strain(parameters=parameters)
+    try:
+        polas = waveform_generator.frequency_domain_strain(parameters=parameters)
+    except RuntimeError:
+        global _warned_waveform_domain_error
+        if not _warned_waveform_domain_error:
+            print(
+                "[gwsnr] Waveform generation failed (likely fCut <= f_min for high-mass systems). "
+                "Returning SNR=0 for those samples. If this happens often, try again with "
+                "input argument: mtot_cut=True (and/or lower mtot_max)."
+            )
+            _warned_waveform_domain_error = True
+        psds_objects = params[24]
+        zero = 0.0 + 0.0j
+        # hp/hc self-inner-products plus noise cross terms all become zero if waveform fails
+        return (
+            [zero] * len(psds_objects),
+            [zero] * len(psds_objects),
+            [zero] * len(psds_objects),
+            [zero] * len(psds_objects),
+            params[23],
+        )
 
     # h = F+.h+ + Fx.hx
     # <h|h> = F+^2<h+,h+> + Fx^2<hx,hx> + F+Fx 2<h+,hx>

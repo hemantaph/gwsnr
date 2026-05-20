@@ -1,10 +1,11 @@
 """
-GWSNR: Gravitational Wave Signal-to-Noise Ratio
+GWSNR: Gravitational Wave Signal-to-Noise Ratio.
+
+``import gwsnr`` only configures lightweight threading defaults; ``GWSNR`` and
+the ``core`` subpackage are loaded on first access (see ``__getattr__``).
 """
-# In your package __init__.py
 
 import os
-import multiprocessing as mp
 import warnings
 
 # disable OpenMP warnings
@@ -21,17 +22,20 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 os.environ.setdefault("MKL_NUM_THREADS", "1")
 os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 
+
 def set_multiprocessing_start_method():
     """
-    Set the multiprocessing start method based on OS and environment variables.
-    Defaults:
-    - macOS: 'spawn' (safer with threaded native libraries)
-    - Linux/other POSIX: 'fork'
+    Set ``multiprocessing`` start method once per process when explicitly called.
 
-    Overrides:
-    - GWSNR_USE_SPAWN=True forces 'spawn'
-    - GWSNR_USE_FORK=True forces 'fork'
+    Default choices: ``spawn`` on macOS, ``fork`` on other POSIX systems. Windows
+    is left unchanged (``spawn``).
+
+    Environment overrides (POSIX): ``GWSNR_USE_SPAWN=True`` or
+    ``GWSNR_USE_FORK=True`` (if both are set, ``spawn`` is used and a warning is
+    issued).
     """
+    import multiprocessing as mp
+
     method = None
 
     if os.name == "posix":
@@ -87,18 +91,12 @@ def set_multiprocessing_start_method():
         # For Windows, default is already 'spawn', nothing to do.
         pass
 
-# Call the function on package import
-set_multiprocessing_start_method()
 
-
-import warnings
 import logging
-from . import core
-from .core import GWSNR
 from ._version import __version__
 
 # Package metadata
-__all__ = ['GWSNR', 'core']
+__all__ = ["GWSNR", "core", "set_multiprocessing_start_method", "__version__"]
 __author__ = 'Hemantakumar Phurailatpam <hemantaphurailatpam@gmail.com>'
 __license__ = "MIT"
 __email__ = "hemantaphurailatpam@gmail.com"
@@ -112,3 +110,34 @@ warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
+def __getattr__(name):
+    """
+    Resolve ``GWSNR`` or the ``core`` subpackage on first use.
+
+    Parameters
+    ----------
+    name : str
+        Attribute name on the ``gwsnr`` package.
+
+    Returns
+    -------
+    type or module
+        ``GWSNR`` from ``gwsnr.core`` or the ``gwsnr.core`` package.
+
+    Raises
+    ------
+    AttributeError
+        If ``name`` is not one of the names exported via this hook.
+    """
+    if name == "core":
+        import importlib
+
+        _core = importlib.import_module(f"{__name__}.core")
+        globals()[name] = _core
+        return _core
+    if name == "GWSNR":
+        from .core import GWSNR as _GWSNR
+
+        globals()[name] = _GWSNR
+        return _GWSNR
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

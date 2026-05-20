@@ -2104,6 +2104,7 @@ class GWSNR:
             idx = np.logical_and(mtot >= self.mtot_min, mtot <= self.mtot_max)
         else:
             idx = np.ones_like(mtot, dtype=bool)
+
         size1 = np.sum(idx)
         iterations = np.arange(size1)  # to keep track of index
 
