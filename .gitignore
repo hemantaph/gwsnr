@@ -45,6 +45,7 @@ examples/interpolator_json/
 
 # Distribution / packaging
 .Python
+paper_pdf/
 build/
 develop-eggs/
 dist/
