@@ -132,8 +132,7 @@ $\rho_{1/2} = (D_{\rm eff}/\mathcal{M}^{5/6})\,\rho_{\rm opt}$ is stored on
 grids and rescaled as
 
 $$
-\rho_{\rm opt}
-=
+\rho_{\rm opt} =
 \rho_{1/2}
 \frac{\mathcal{M}^{5/6}}{D_{\rm eff}} .
 $$
@@ -141,11 +140,9 @@ $$
 For a deterministic detection threshold on a chosen SNR quantity $\rho$,
 
 $$
-P_{\rm det}
-=
-P({\rm det}\mid\vec{\theta})
-=
-\Theta(\rho-\rho_{\rm th}),
+P_{\rm det} =
+P({\rm det}\mid\vec{\theta}) =
+\Theta(\rho-\rho_{\rm th}) ,
 $$
 
 where $\vec{\theta}$ denotes the GW parameters and $\Theta$ is the Heaviside
