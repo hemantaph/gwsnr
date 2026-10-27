@@ -170,8 +170,19 @@ class ANNModelGenerator():
         self._error_adjustment = None
 
         # GWSNR configuration dictionary
+        pdet_kwargs = dict(
+            snr_th=snr_th,
+            snr_th_net=snr_th,
+            pdet_type="boolean",
+            distribution_type="noncentral_chi2",
+            include_optimal_snr=True,
+            include_observed_snr=False,
+        )
         self._gwsnr_args = dict(
             npool=npool,
+            snr_method=snr_method,
+            snr_type="optimal_snr",
+            pdet_kwargs=pdet_kwargs,
             mtot_min=2*4.98,  # 4.98 M☉ is minimum component mass in GWTC-3
             mtot_max=2*112.5+10.0,  # 112.5 M☉ is maximum + 10.0 buffer
             ratio_min=0.1,
@@ -180,45 +191,41 @@ class ANNModelGenerator():
             mtot_resolution=200,
             ratio_resolution=20,
             spin_resolution=10,
+            batch_size_interpolation=1000000,
             sampling_frequency=2048.0,
             waveform_approximant=waveform_approximant,
+            frequency_domain_source_model="lal_binary_black_hole",
             minimum_frequency=20.0,
-            snr_method="interpolation_aligned_spins",
+            reference_frequency=None,
+            duration_max=None,
+            duration_min=None,
+            fixed_duration=None,
             psds=None,
             ifos=None,
+            noise_realization=None,
             interpolator_dir="./interpolator_json",
             create_new_interpolator=False,
             gwsnr_verbose=gwsnr_verbose,
             multiprocessing_verbose=True,
             mtot_cut=False,
             snr_th=snr_th,
+            ann_path_dict=None,
+            snr_recalculation=False,
+            snr_recalculation_range=[6, 14],
+            snr_recalculation_waveform_approximant="IMRPhenomXPHM",
         )
         self._gwsnr_args.update(kwargs)
+        pdet_kwargs.update(self._gwsnr_args.get("pdet_kwargs") or {})
+        self._gwsnr_args["pdet_kwargs"] = pdet_kwargs
 
         # GWSNR instance initialization
-        self._gwsnr = GWSNR(
-            npool=self._gwsnr_args['npool'],
-            mtot_min=self._gwsnr_args['mtot_min'],
-            mtot_max=self._gwsnr_args['mtot_max'],
-            ratio_min=self._gwsnr_args['ratio_min'],
-            ratio_max=self._gwsnr_args['ratio_max'],
-            spin_max=self._gwsnr_args['spin_max'],
-            mtot_resolution=self._gwsnr_args['mtot_resolution'],
-            ratio_resolution=self._gwsnr_args['ratio_resolution'],
-            spin_resolution=self._gwsnr_args['spin_resolution'],
-            sampling_frequency=self._gwsnr_args['sampling_frequency'],
-            waveform_approximant=self._gwsnr_args['waveform_approximant'],
-            minimum_frequency=self._gwsnr_args['minimum_frequency'],
-            snr_method=snr_method,
-            psds=self._gwsnr_args['psds'],
-            ifos=self._gwsnr_args['ifos'],
-            interpolator_dir=self._gwsnr_args['interpolator_dir'],
-            create_new_interpolator=self._gwsnr_args['create_new_interpolator'],
-            gwsnr_verbose=self._gwsnr_args['gwsnr_verbose'],
-            multiprocessing_verbose=self._gwsnr_args['multiprocessing_verbose'],
-            mtot_cut=self._gwsnr_args['mtot_cut'],
-            snr_th=self._gwsnr_args['snr_th'],
-        )
+        import inspect
+        gwsnr_init_keys = set(inspect.signature(GWSNR.__init__).parameters) - {"self"}
+        gwsnr_init_args = {
+            key: value for key, value in self._gwsnr_args.items()
+            if key in gwsnr_init_keys
+        }
+        self._gwsnr = GWSNR(**gwsnr_init_args)
 
     # -------------------------------------------
     # PROPERTIES
@@ -399,7 +406,7 @@ class ANNModelGenerator():
         Raises
         ------
         ValueError
-            If output SNR data ('optimal_snr_net' or detector key) not found in params.
+            If output SNR data is not found in params.
 
         Notes
         -----
@@ -422,12 +429,19 @@ class ANNModelGenerator():
 
         # Extract output SNR values
         det_ = self.gwsnr.detector_list[0]
-        if 'optimal_snr_net' in params:
-            y1 = np.array(params['optimal_snr_net'])
-        elif det_ in params:
-            y1 = np.array(params[det_])
+        output_key_candidates = [
+            f"optimal_snr_{det_}",
+            "optimal_snr_net",
+            det_,
+            "snr_net",
+        ]
+        for key in output_key_candidates:
+            if key in params:
+                y1 = np.array(params[key])
+                break
         else:
-            raise ValueError("Output data (snr) not found")
+            expected_keys = ", ".join(output_key_candidates)
+            raise ValueError(f"Output data (snr) not found. Expected one of: {expected_keys}")
 
         return X1, y1
         
@@ -676,6 +690,55 @@ class ANNModelGenerator():
         X = self.scaler.transform(X)
 
         return X, y
+
+    def _get_evaluation_data(self, gw_param_dict=None, randomize=True):
+        """
+        Resolve scaled evaluation data for model metrics.
+        """
+        if self.ann is None:
+            raise ValueError("ANN model is not loaded or trained. Call ann_model_training() or load_model_scaler_error() first.")
+        if self.scaler is None:
+            raise ValueError("Scaler is not loaded or fitted. Call ann_model_training() or load_model_scaler_error() first.")
+
+        if gw_param_dict is not None:
+            gw_param_dict = self._get_parameters(gw_param_dict)
+            X_test, y_test = self._get_input_output_data(params=gw_param_dict, randomize=randomize)
+            X_test = self.scaler.transform(X_test)
+        else:
+            X_test = self.X_test
+            y_test = self.y_test
+
+        if X_test is None or y_test is None:
+            raise ValueError(
+                "No evaluation data is available. Pass gw_param_dict to this method, "
+                "or call ann_model_training() first so X_test and y_test are populated."
+            )
+
+        X_test = np.asarray(X_test)
+        y_test = np.asarray(y_test)
+        if X_test.size == 0 or y_test.size == 0:
+            raise ValueError("Evaluation data is empty. Provide a non-empty gw_param_dict.")
+        if len(X_test) != len(y_test):
+            raise ValueError(
+                f"Evaluation data length mismatch: len(X_test)={len(X_test)}, len(y_test)={len(y_test)}."
+            )
+
+        return X_test, y_test
+
+    def _apply_error_adjustment(self, y_pred):
+        """
+        Apply loaded/trained linear SNR error correction.
+        """
+        if self.error_adjustment is None:
+            raise ValueError(
+                "error_adjustment=True but no error adjustment is loaded or computed. "
+                "Load it with load_model_scaler_error(error_adjustment_file_name=...), "
+                "run ann_model_training(), or call with error_adjustment=False."
+            )
+
+        a = self.error_adjustment['slope']
+        b = self.error_adjustment['intercept']
+        return y_pred-(a*y_pred + b)
 
     def _save_ann_path_dict(self, 
         ann_file_name='ann_model.h5', 
@@ -962,24 +1025,14 @@ class ANNModelGenerator():
         """
         snr_threshold = self.gwsnr_args['snr_th']
 
-        # Load or use stored test data
-        if gw_param_dict is not None:
-            gw_param_dict = self._get_parameters(gw_param_dict)
-            X_test, y_test = self._get_input_output_data(params=gw_param_dict, randomize=randomize)
-            X_test = self.scaler.transform(X_test)
-        else:
-            X_test = self.X_test
-            y_test = self.y_test
+        X_test, y_test = self._get_evaluation_data(gw_param_dict=gw_param_dict, randomize=randomize)
 
         # Predict SNR values
         y_pred = self.ann.predict(X_test).flatten()
 
         # Apply error adjustment if requested
         if error_adjustment:
-            adjustment_dict = self.error_adjustment
-            a = adjustment_dict['slope']
-            b = adjustment_dict['intercept']
-            y_pred = y_pred-(a*y_pred + b)
+            y_pred = self._apply_error_adjustment(y_pred)
 
         # Calculate error rate
         len1 = len(y_pred)
@@ -989,7 +1042,7 @@ class ANNModelGenerator():
 
         return error, y_pred, y_test
 
-    def pdet_confusion_matrix(self, gw_param_dict=None, randomize=True, snr_threshold=8.0):
+    def pdet_confusion_matrix(self, gw_param_dict=None, randomize=True, snr_threshold=None, error_adjustment=True):
         """
         Generate confusion matrix for detection probability classification.
 
@@ -1003,9 +1056,13 @@ class ANNModelGenerator():
         randomize : ``bool``
             If True, randomly shuffle parameters (only used if gw_param_dict provided).\n
             default: True
-        snr_threshold : ``float``
-            SNR threshold for detection classification.\n
-            default: 8.0
+        snr_threshold : ``float`` or ``None``
+            SNR threshold for detection classification. If None, uses
+            :attr:`~gwsnr_args['snr_th']`.\n
+            default: None
+        error_adjustment : ``bool``
+            If True, apply linear error correction before thresholding.\n
+            default: True
 
         Returns
         -------
@@ -1023,17 +1080,13 @@ class ANNModelGenerator():
         - Uses sklearn.metrics.confusion_matrix and accuracy_score \n
         - Prints confusion matrix and accuracy to stdout \n
         """
-        # Load or use stored test data
-        if gw_param_dict is not None:
-            gw_param_dict = self._get_parameters(gw_param_dict)
-            X_test, y_test = self._get_input_output_data(params=gw_param_dict, randomize=randomize)
-            X_test = self.scaler.transform(X_test)
-        else:
-            X_test = self.X_test
-            y_test = self.y_test
+        snr_threshold = self.gwsnr_args['snr_th'] if snr_threshold is None else snr_threshold
+        X_test, y_test = self._get_evaluation_data(gw_param_dict=gw_param_dict, randomize=randomize)
 
         # Predict and apply threshold
         y_pred = self.ann.predict(X_test).flatten()
+        if error_adjustment:
+            y_pred = self._apply_error_adjustment(y_pred)
         y_pred = (y_pred>snr_threshold)
         y_test = (y_test>snr_threshold)
 
@@ -1123,12 +1176,16 @@ class ANNModelGenerator():
 
         Notes
         -----
-        - Calls :meth:`~pdet_error` with error_adjustment=True for predictions \n
+        - Calls :meth:`~pdet_error` with error_adjustment=False for raw predictions \n
         - Saves updated parameters to :attr:`~directory`/{error_adjustment_file_name} \n
         """
 
-        # Get predictions
-        _, y_pred_, y_test_ = self.pdet_error(gw_param_dict=gw_param_dict, randomize=True, error_adjustment=True)
+        # Get raw predictions before fitting a new adjustment.
+        _, y_pred_, y_test_ = self.pdet_error(
+            gw_param_dict=gw_param_dict,
+            randomize=randomize,
+            error_adjustment=False,
+        )
 
         # Calculate new error adjustment
         self.error_adjustment = self._helper_error_adjustment(y_pred_, y_test_, snr_range=snr_range)
@@ -1177,10 +1234,7 @@ class ANNModelGenerator():
 
         # Apply error adjustment if requested
         if error_adjustment:
-            adjustment_dict = self.error_adjustment
-            a = adjustment_dict['slope']
-            b = adjustment_dict['intercept']
-            y_pred = y_pred-(a*y_pred + b)
+            y_pred = self._apply_error_adjustment(y_pred)
 
         return y_pred
 

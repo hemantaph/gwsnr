@@ -188,12 +188,20 @@ class GWSNR:
         default: True
     pdet_kwargs : `dict`
         Detection probability parameters.
-        Default: {'snr_th': 10.0, 'snr_th_net': 10.0, 'pdet_type': 'boolean', 'distribution_type': 'gaussian'}
+        Default: dict(
+                snr_th=8.0,
+                snr_th_net=8.0,
+                pdet_type="boolean",
+                distribution_type="noncentral_chi2",
+                include_optimal_snr=True,
+                include_observed_snr=True,
+                return_only_net_results=False,
+            )
     ann_path_dict : `dict` or `str`
         Paths to ANN models. Uses built-in models if None. Optional.
     snr_recalculation : `bool`
         Enable hybrid recalculation near detection threshold. Optional.
-    snr_recalculation_range : `list`, default=[6,14]
+    snr_recalculation_range : `list`, default=[4,12]
         SNR range [min, max] for triggering recalculation. Optional.
     snr_recalculation_waveform_approximant : `str`
         Waveform approximant for recalculation. Optional.
@@ -383,7 +391,7 @@ class GWSNR:
         ann_path_dict=None,
         # Hybrid SNR recalculation settings
         snr_recalculation=False,
-        snr_recalculation_range=[6, 14],
+        snr_recalculation_range=[4, 12],
         snr_recalculation_waveform_approximant="IMRPhenomXPHM",
     ):
 
@@ -411,18 +419,18 @@ class GWSNR:
         print("\nInitializing GWSNR class...\n")
         # setting instance attributes
         self.npool = npool
-        self.pdet_kwargs = (
-            pdet_kwargs
-            if pdet_kwargs is not None
-            else dict(
-                snr_th=10.0,
-                snr_th_net=10.0,
-                pdet_type="boolean",
-                distribution_type="noncentral_chi2",
-                include_optimal_snr=True,
-                include_observed_snr=True,
-            )
+        self.pdet_kwargs = dict(
+            snr_th=8.0,
+            snr_th_net=8.0,
+            pdet_type="boolean",
+            distribution_type="noncentral_chi2",
+            include_optimal_snr=True,
+            include_observed_snr=True,
+            return_only_net_results=False,
         )
+        if pdet_kwargs is not None:
+            self.pdet_kwargs.update(pdet_kwargs)
+            
 
         self.duration_max = duration_max
         self.duration_min = duration_min
@@ -1416,12 +1424,15 @@ class GWSNR:
         detectors = np.array(self.detector_list)
         size = len(mass_1)
         mtot = mass_1 + mass_2
-        idx2 = np.logical_and(mtot >= self.mtot_min, mtot <= self.mtot_max)
+        if self.mtot_cut:
+            idx2 = np.logical_and(mtot >= self.mtot_min, mtot <= self.mtot_max)
+        else:
+            idx2 = np.ones_like(mtot, dtype=bool)
         idx_tracker = np.nonzero(idx2)[0]
         size_ = len(idx_tracker)
         if size_ == 0:
             raise ValueError(
-                "mass_1 and mass_2 must be within the range of mtot_min and mtot_max"
+                "mass_1 and mass_2 must be within the range of mtot_min and mtot_max when mtot_cut=True"
             )
 
         # output data
@@ -2580,6 +2591,7 @@ class GWSNR:
         distribution_type=None,
         include_optimal_snr=False,
         include_observed_snr=False,
+        return_only_net_results=False,
     ):
         """
         Calculate probability of detection for gravitational wave signals.
@@ -2644,6 +2656,10 @@ class GWSNR:
             - 'noncentral_chi2': Non-central chi-squared (2 DOF per detector)
             If None, uses pdet_kwargs['distribution_type'].
             - 'fixed_snr': Deterministic detection based on optimal SNR (only for 'boolean' pdet_type)
+        return_only_net_results : bool, default=False
+            If True, returns only network detection probabilities ('pdet_net' and optionally
+            'observed_snr_net' and 'optimal_snr_net'). If False, returns results for all
+            detectors and network.
 
         Returns
         -------
@@ -2714,6 +2730,11 @@ class GWSNR:
             include_observed_snr
             if include_observed_snr
             else self.pdet_kwargs["include_observed_snr"]
+        )
+        return_only_net_results = (
+            return_only_net_results
+            if return_only_net_results
+            else self.pdet_kwargs["return_only_net_results"]
         )
 
         # check if snr_th is an array (for multi-detector) or a single value
@@ -2835,6 +2856,10 @@ class GWSNR:
         if include_optimal_snr:
             pdet_dict["optimal_snr_net"] = snr_dict["optimal_snr_net"]
 
+        # Filter to return only network results if requested
+        if return_only_net_results:
+            pdet_dict = {k: v for k, v in pdet_dict.items() if "net" in k}
+
         return pdet_dict
 
     def horizon_distance_analytical(self, mass_1=1.4, mass_2=1.4, snr_th=None):
@@ -2953,7 +2978,8 @@ class GWSNR:
 
         Finds the maximum luminosity distance at which a gravitational wave signal can be
         detected above threshold SNR. For each detector, determines optimal sky location
-        that maximizes antenna response, then solves for distance where SNR equals threshold.
+        and inclination that maximize antenna response, then solves for distance where
+        SNR equals threshold.
 
         Parameters
         ----------
@@ -2993,10 +3019,16 @@ class GWSNR:
             Network SNR threshold. Uses class default if None.
         detector_location_as_optimal_sky : bool, default=False
             If True, uses detector zenith as optimal sky location instead of optimization.
+            Individual-detector horizons are evaluated face-on at the detector zenith.
         minimize_function_dict : dict, optional
-            Parameters for sky location optimization. It contains input for scipy's differential_evolution.
+            Parameters for sky location and inclination optimization. It contains
+            input for scipy's differential_evolution.
             Default: dict(
-                bounds=[(0, 2*np.pi), (-np.pi/2, np.pi/2)], # ra, dec bounds
+                bounds=[
+                    (0, 2*np.pi),
+                    (-np.pi/2, np.pi/2),
+                    (0, np.pi),
+                ], # ra, dec, theta_jn bounds
                 tol=1e-7,
                 polish=True,
                 maxiter=10000
@@ -3017,24 +3049,34 @@ class GWSNR:
             Horizon distances in Mpc for each detector and network.
             Keys: 'horizon_distance_{detector}' (e.g., 'horizon_distance_H1', 'horizon_distance_L1')
             and 'horizon_distance_net' for the network.
-        optimal_sky_location : dict
-            Optimal sky coordinates (ra, dec) in radians for maximum SNR at given geocent_time.
-            Keys: 'optimal_sky_location_{detector}' (e.g., 'optimal_sky_location_H1')
-            and 'optimal_sky_location_net' for the network.
+        optimal_orientation : dict
+            Optimal sky coordinates and inclination in radians for maximum SNR
+            at given geocent_time. Values are dictionaries with keys 'ra',
+            'dec', and 'theta_jn'.
+            Keys: 'optimal_orientation_{detector}' (e.g., 'optimal_orientation_H1')
+            and 'optimal_orientation_net' for the network.
 
         Notes
         -----
-        - Uses differential evolution to find optimal sky location maximizing antenna response
+        - Uses differential evolution to find optimal sky location and inclination
+          maximizing antenna response
         - Network horizon maximizes quadrature sum of detector SNRs
-        - Individual detector horizons maximize (F_plus² + F_cross²)
+        - Individual detector horizons maximize the inclination-weighted antenna response
         - Root finding determines distance where SNR equals threshold
         - Computation time depends on optimization tolerances and system complexity
 
         Examples
         --------
         >>> snr = GWSNR(snr_method='inner_product')
-        >>> horizon, sky = snr.horizon_distance_numerical(mass_1=1.4, mass_2=1.4)
-        >>> print(f"Network horizon: {horizon['horizon_distance_net']:.1f} Mpc at (RA={sky['optimal_sky_location_net'][0]:.2f}, Dec={sky['optimal_sky_location_net'][1]:.2f})")
+        >>> horizon, orientation = snr.horizon_distance_numerical(
+        ...     mass_1=1.4, mass_2=1.4
+        ... )
+        >>> print(
+        ...     f"Network horizon: {horizon['horizon_distance_net']:.1f} Mpc "
+        ...     f"at (RA={orientation['optimal_orientation_net']['ra']:.2f}, "
+        ...     f"Dec={orientation['optimal_orientation_net']['dec']:.2f}, "
+        ...     f"theta_jn={orientation['optimal_orientation_net']['theta_jn']:.2f})"
+        ... )
         """
 
         # find root i.e. snr = snr_th
@@ -3075,10 +3117,21 @@ class GWSNR:
 
         if minimize_function_dict is None:
             minimize_function_dict = dict(
-                bounds=[(0, 2 * np.pi), (-np.pi / 2, np.pi / 2)],
+                bounds=[(0, 2 * np.pi), (-np.pi / 2, np.pi / 2), (0, np.pi)],
                 tol=1e-7,
                 polish=True,
                 maxiter=10000,
+            )
+        else:
+            minimize_function_dict = minimize_function_dict.copy()
+
+        minimization_bounds = list(minimize_function_dict["bounds"])
+        if len(minimization_bounds) == 2:
+            minimization_bounds.append((0, np.pi))
+        elif len(minimization_bounds) != 3:
+            raise ValueError(
+                "minimize_function_dict['bounds'] must contain bounds for "
+                "(ra, dec) or (ra, dec, theta_jn)."
             )
 
         if root_scalar_dict is None:
@@ -3089,7 +3142,7 @@ class GWSNR:
         detectors = np.array(detectors)
 
         horizon = {}
-        optimal_sky_location = {}  # ra, dec
+        optimal_orientation = {}
 
         if detector_location_as_optimal_sky:
             ifos = self.ifos
@@ -3102,11 +3155,13 @@ class GWSNR:
 
                 def snr_minimize(x):
                     """Minimize the inverse of SNR to maximize SNR"""
-                    ra, dec = x
+                    ra, dec, theta_jn_ = x
 
                     snr = self.optimal_snr(
                         mass_1=mass_1,
                         mass_2=mass_2,
+                        luminosity_distance=luminosity_distance,
+                        theta_jn=theta_jn_,
                         psi=psi,
                         phase=phase,
                         geocent_time=geocent_time,
@@ -3123,12 +3178,12 @@ class GWSNR:
                         eccentricity=eccentricity,
                     )["optimal_snr_net"][0]
 
-                    return 1 / snr
+                    return np.inf if snr <= 0 else 1 / snr
 
-                # Use differential evolution to find the ra and dec that maximize the antenna response
-                ra_max, dec_max = differential_evolution(
+                # Use differential evolution to find the ra, dec, and theta_jn that maximize the SNR
+                ra_max, dec_max, theta_jn_max = differential_evolution(
                     snr_minimize,
-                    bounds=minimize_function_dict["bounds"],  # Only ra and dec bounds
+                    bounds=minimization_bounds,
                     tol=minimize_function_dict["tol"],
                     polish=minimize_function_dict["polish"],
                     maxiter=minimize_function_dict["maxiter"],
@@ -3151,11 +3206,12 @@ class GWSNR:
                     ).icrs
                     ra_max = zen.ra.rad
                     dec_max = zen.dec.rad
+                    theta_jn_max = 0.0
 
                 else:
-                    # use the maximization function to find the ra and dec that maximize the antenna response
+                    # use the maximization function to find the ra, dec, and theta_jn that maximize the antenna response
                     def antenna_response_minimization(x):
-                        ra_, dec_ = x
+                        ra_, dec_, theta_jn_ = x
                         detector_tensor = np.array(self.detector_tensor_list[i])
 
                         f_plus = antenna_response_plus(
@@ -3164,14 +3220,21 @@ class GWSNR:
                         f_cross = antenna_response_cross(
                             ra_, dec_, geocent_time, psi, detector_tensor
                         )
+                        ci = np.cos(theta_jn_)
+                        response_squared = (
+                            f_plus**2 * ((1 + ci**2) / 2) ** 2
+                            + f_cross**2 * ci**2
+                        )
 
-                        return 1 / (f_plus**2 + f_cross**2)
+                        return (
+                            np.inf
+                            if response_squared <= 0
+                            else 1 / response_squared
+                        )
 
-                    ra_max, dec_max = differential_evolution(
+                    ra_max, dec_max, theta_jn_max = differential_evolution(
                         antenna_response_minimization,
-                        bounds=minimize_function_dict[
-                            "bounds"
-                        ],  # Only ra and dec bounds
+                        bounds=minimization_bounds,
                         tol=minimize_function_dict["tol"],
                         polish=minimize_function_dict["polish"],
                         maxiter=minimize_function_dict["maxiter"],
@@ -3186,7 +3249,11 @@ class GWSNR:
                     f_cross_max = antenna_response_cross(
                         ra_max, dec_max, geocent_time, psi, self.detector_tensor_list[i]
                     )
-                    antenna_max = np.sqrt(f_plus_max**2 + f_cross_max**2)
+                    ci = np.cos(theta_jn_max)
+                    antenna_max = np.sqrt(
+                        f_plus_max**2 * ((1 + ci**2) / 2) ** 2
+                        + f_cross_max**2 * ci**2
+                    )
                     # raise warning if antenna response is not close to 1
                     if not np.isclose(antenna_max, 1.0, atol=1e-2):
                         print(
@@ -3204,6 +3271,7 @@ class GWSNR:
                     mass_1=mass_1,
                     mass_2=mass_2,
                     luminosity_distance=dl,
+                    theta_jn=theta_jn_max,
                     psi=psi,
                     phase=phase,
                     geocent_time=geocent_time,
@@ -3220,7 +3288,8 @@ class GWSNR:
                     eccentricity=eccentricity,
                 )[f"optimal_snr_{det}"][0]
 
-                return optimal_snr - snr_th_net
+                threshold = snr_th_net if det == "net" else snr_th
+                return optimal_snr - threshold
 
             # find root i.e. snr = snr_th
             horizon[f"horizon_distance_{det}"] = root_scalar(
@@ -3229,9 +3298,13 @@ class GWSNR:
                 method=root_scalar_dict["method"],
                 xtol=root_scalar_dict["xtol"],
             ).root
-            optimal_sky_location[f"optimal_sky_location_{det}"] = (ra_max, dec_max)
+            optimal_orientation[f"optimal_orientation_{det}"] = {
+                "ra": ra_max,
+                "dec": dec_max,
+                "theta_jn": theta_jn_max,
+            }
 
-        return horizon, optimal_sky_location
+        return horizon, optimal_orientation
 
     @property
     def npool(self):
@@ -3783,7 +3856,7 @@ class GWSNR:
         -------
         snr_th : `float`
             Individual detector SNR threshold.\n
-            default: 10.0
+            default: 8.0
         """
         return self._snr_th
 
@@ -3800,7 +3873,7 @@ class GWSNR:
         -------
         snr_th_net : `float`
             Network SNR threshold.\n
-            default: 10.0
+            default: 8.0
         """
         return self._snr_th_net
 

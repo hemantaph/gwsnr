@@ -74,7 +74,7 @@ DEFAULT_CONFIG = {
 
     # SNR recalculation settings
     'snr_recalculation': True,
-    'snr_recalculation_range': [6, 14],
+    'snr_recalculation_range': [4, 12],
     'snr_recalculation_waveform_approximant': "IMRPhenomXPHM",
 }
 
@@ -97,7 +97,7 @@ class TestGWSNRSNRRecalculation(CommonTestUtils):
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False
         # config['snr_recalculation'] = True
-        # config['snr_recalculation_range'] = [6, 14]
+        # config['snr_recalculation_range'] = [4, 12]
         # config['snr_recalculation_waveform_approximant'] = "IMRPhenomXPHM"
         
         # hybrid initialization

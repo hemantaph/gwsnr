@@ -93,8 +93,8 @@ class TestBBHHorizonDistanceCalculation:
         config["interpolator_dir"] = gwsnr_dir
         config["gwsnr_verbose"] = False
         config["pdet_kwargs"] = dict(
-            snr_th=10.0,
-            snr_th_net=10.0,
+            snr_th=8.0,
+            snr_th_net=8.0,
             pdet_type="boolean",
             distribution_type="noncentral_chi2",
             include_optimal_snr=False,
@@ -106,14 +106,14 @@ class TestBBHHorizonDistanceCalculation:
 
         # validation run
         # this also helps initialize any internal njit functions
-        horizon_distance_dict_validation, sky_location_dict_validation = (
+        horizon_distance_dict_validation, orientation_dict_validation = (
             gwsnr.horizon_distance_numerical(mass_1=30.0, mass_2=30.0)
         )
 
         start = time.time()
 
         # horizon distance calculation for a BBH event (mass_1=mass_2=30Mo)
-        horizon_distance_dict, sky_location_dict = gwsnr.horizon_distance_numerical(
+        horizon_distance_dict, orientation_dict = gwsnr.horizon_distance_numerical(
             mass_1=30.0, mass_2=30.0
         )
 
@@ -124,7 +124,9 @@ class TestBBHHorizonDistanceCalculation:
             f"\nHorizon distance (Mpc) for {gwsnr.detector_list} network: {horizon_distance_dict['horizon_distance_net']}"
         )
         print(
-            f"Optimised sky location (ra, dec in rad) for {gwsnr.detector_list} network: {sky_location_dict['optimal_sky_location_net']}"
+            "Optimised orientation (ra, dec, theta_jn in rad) for "
+            f"{gwsnr.detector_list} network: "
+            f"{orientation_dict['optimal_orientation_net']}"
         )
 
         for key, value in horizon_distance_dict.items():
@@ -151,22 +153,38 @@ class TestBBHHorizonDistanceCalculation:
                 err_msg=f"Horizon distance results mismatch for {key} detector",
             )
 
-        for key, value in sky_location_dict.items():
+        for key, value in orientation_dict.items():
             name = (
                 key
-                if key != "optimal_sky_location_net"
+                if key != "optimal_orientation_net"
                 else f"{gwsnr.detector_list} network"
             )
+            assert isinstance(value, dict), (
+                f"optimal orientation for {name} must be a dictionary"
+            )
             # ra check
-            assert (value[0] >= 0.0) and (
-                value[0] <= 2 * np.pi
-            ), f"right ascension (ra) for {name} must be in [0, 2pi], got {value[0]}"
+            assert (value["ra"] >= 0.0) and (
+                value["ra"] <= 2 * np.pi
+            ), (
+                f"right ascension (ra) for {name} must be in [0, 2pi], "
+                f"got {value['ra']}"
+            )
             # dec check
-            assert (value[1] >= -np.pi / 2) and (
-                value[1] <= np.pi / 2
-            ), f"declination (dec) for {name} must be in [-pi/2, pi/2], got {value[1]}"
+            assert (value["dec"] >= -np.pi / 2) and (
+                value["dec"] <= np.pi / 2
+            ), (
+                f"declination (dec) for {name} must be in [-pi/2, pi/2], "
+                f"got {value['dec']}"
+            )
+            # theta_jn check
+            assert (value["theta_jn"] >= 0.0) and (
+                value["theta_jn"] <= np.pi
+            ), (
+                f"inclination (theta_jn) for {name} must be in [0, pi], "
+                f"got {value['theta_jn']}"
+            )
             # # validation for result consistency
-            # validation_value = sky_location_dict_validation[key]
+            # validation_value = orientation_dict_validation[key]
             # np.testing.assert_allclose(
             #     value,
             #     validation_value,
@@ -180,7 +198,7 @@ class TestBBHHorizonDistanceCalculation:
 
         # array input should raise TypeError
         with pytest.raises(TypeError):
-            horizon_distance_dict, sky_location_dict = gwsnr.horizon_distance_numerical(
+            horizon_distance_dict, orientation_dict = gwsnr.horizon_distance_numerical(
                 mass_1=np.array([30.0]), mass_2=np.array([30.0])
             )
 
@@ -202,8 +220,8 @@ class TestBBHHorizonDistanceCalculation:
         config["interpolator_dir"] = gwsnr_dir
         config["gwsnr_verbose"] = False
         config["pdet_kwargs"] = dict(
-            snr_th=10.0,
-            snr_th_net=10.0,
+            snr_th=8.0,
+            snr_th_net=8.0,
             pdet_type="boolean",
             distribution_type="noncentral_chi2",
             include_optimal_snr=False,

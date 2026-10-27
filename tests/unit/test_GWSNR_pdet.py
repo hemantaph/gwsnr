@@ -92,7 +92,7 @@ class TestGWSNRPdet(CommonTestUtils):
         gwsnr_dir = os.path.dirname(__file__)
         gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2', include_optimal_snr=False, include_observed_snr=True)
+        config['pdet_kwargs'] = dict(snr_th=8.0, snr_th_net=8.0, pdet_type='boolean', distribution_type='noncentral_chi2', include_optimal_snr=False, include_observed_snr=True)
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)
@@ -130,7 +130,7 @@ class TestGWSNRPdet(CommonTestUtils):
         gwsnr_dir = os.path.dirname(__file__)
         gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='gaussian', include_optimal_snr=False, include_observed_snr=True)
+        config['pdet_kwargs'] = dict(snr_th=8.0, snr_th_net=8.0, pdet_type='boolean', distribution_type='gaussian', include_optimal_snr=False, include_observed_snr=True)
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)
@@ -168,7 +168,7 @@ class TestGWSNRPdet(CommonTestUtils):
         gwsnr_dir = os.path.dirname(__file__)
         gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='probability_distribution', distribution_type='noncentral_chi2', include_optimal_snr=True, include_observed_snr=False)
+        config['pdet_kwargs'] = dict(snr_th=8.0, snr_th_net=8.0, pdet_type='probability_distribution', distribution_type='noncentral_chi2', include_optimal_snr=True, include_observed_snr=False)
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)
@@ -206,7 +206,7 @@ class TestGWSNRPdet(CommonTestUtils):
         gwsnr_dir = os.path.dirname(__file__)
         gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='probability_distribution', distribution_type='gaussian', include_optimal_snr=True, include_observed_snr=False)
+        config['pdet_kwargs'] = dict(snr_th=8.0, snr_th_net=8.0, pdet_type='probability_distribution', distribution_type='gaussian', include_optimal_snr=True, include_observed_snr=False)
         
         # Initialize GWSNR instance with test configuration
         gwsnr = GWSNR(**config)

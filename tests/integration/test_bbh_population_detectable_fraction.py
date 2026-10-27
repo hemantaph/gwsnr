@@ -96,7 +96,7 @@ class TestBBHSelectionEffect():
         gwsnr_dir = os.path.join(gwsnr_dir, '../interpolator_json')
         config['interpolator_dir'] = gwsnr_dir
         config['gwsnr_verbose'] = False
-        config['pdet_kwargs'] = dict(snr_th=10.0, snr_th_net=10.0, pdet_type='boolean', distribution_type='noncentral_chi2', include_optimal_snr=False, include_observed_snr=False)
+        config['pdet_kwargs'] = dict(snr_th=8.0, snr_th_net=8.0, pdet_type='boolean', distribution_type='noncentral_chi2', include_optimal_snr=False, include_observed_snr=False)
         
         # hybrid initialization
         gwsnr = GWSNR(**config)
@@ -125,4 +125,3 @@ class TestBBHSelectionEffect():
         assert np.isreal(p_lambda), f"Detectable fraction must be real (no complex numbers)"
         assert (p_lambda > 0) and (p_lambda < 1), f"Detectable fraction for {gwsnr.detector_list} network must be in a reasonable astrophysical range, got {p_lambda}"
         assert execution_time < 60, f"Detectable fraction calculation took too long: {execution_time} seconds"
-

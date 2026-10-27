@@ -2482,10 +2482,12 @@ Attributes
               Keys: 'horizon_distance_{detector}' (e.g., 'horizon_distance_H1', 'horizon_distance_L1')
               and 'horizon_distance_net' for the network.
 
-          **optimal_sky_location** : dict
-              Optimal sky coordinates (ra, dec) in radians for maximum SNR at given geocent_time.
-              Keys: 'optimal_sky_location_{detector}' (e.g., 'optimal_sky_location_H1')
-              and 'optimal_sky_location_net' for the network.
+          **optimal_orientation** : dict
+              Optimal sky coordinates and inclination in radians for maximum SNR
+              at given geocent_time. Values are dictionaries with keys 'ra',
+              'dec', and 'theta_jn'.
+              Keys: 'optimal_orientation_{detector}' (e.g., 'optimal_orientation_H1')
+              and 'optimal_orientation_net' for the network.
 
 
 
@@ -2496,9 +2498,10 @@ Attributes
 
       .. rubric:: Notes
 
-      - Uses differential evolution to find optimal sky location maximizing antenna response
+      - Uses differential evolution to find optimal sky location and inclination
+        maximizing antenna response
       - Network horizon maximizes quadrature sum of detector SNRs
-      - Individual detector horizons maximize (F_plus² + F_cross²)
+      - Individual detector horizons maximize the inclination-weighted antenna response
       - Root finding determines distance where SNR equals threshold
       - Computation time depends on optimization tolerances and system complexity
 
@@ -2506,12 +2509,17 @@ Attributes
       .. rubric:: Examples
 
       >>> snr = GWSNR(snr_method='inner_product')
-      >>> horizon, sky = snr.horizon_distance_numerical(mass_1=1.4, mass_2=1.4)
-      >>> print(f"Network horizon: {horizon['horizon_distance_net']:.1f} Mpc at (RA={sky['optimal_sky_location_net'][0]:.2f}, Dec={sky['optimal_sky_location_net'][1]:.2f})")
+      >>> horizon, orientation = snr.horizon_distance_numerical(
+      ...     mass_1=1.4, mass_2=1.4
+      ... )
+      >>> print(
+      ...     f"Network horizon: {horizon['horizon_distance_net']:.1f} Mpc "
+      ...     f"at (RA={orientation['optimal_orientation_net']['ra']:.2f}, "
+      ...     f"Dec={orientation['optimal_orientation_net']['dec']:.2f}, "
+      ...     f"theta_jn={orientation['optimal_orientation_net']['theta_jn']:.2f})"
+      ... )
 
 
 
       ..
           !! processed by numpydoc !!
-
-
