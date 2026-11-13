@@ -2009,6 +2009,8 @@ class GWSNR:
         - Waveform duration auto-estimated from chirp time with 1.1x safety factor
         - Uses multiprocessing for parallel computation across npool processors
         - Requires 'if __name__ == "__main__":' guard when using multiprocessing
+        - Includes both polarization powers and 2 Fp Fc Re((hp|hc)); the mixed
+          contribution need not vanish for precessing or higher-mode waveforms
         - Most accurate method but slower than interpolation for population studies
 
         Examples
@@ -2138,7 +2140,7 @@ class GWSNR:
         frequency_domain_source_model = self.frequency_domain_source_model
 
         # get polarization tensor
-        # np.shape(Fp) = (size1, len(num_det))
+        # np.shape(Fp) = (len(num_det), size1)
         Fp, Fc = antenna_response_array(
             ra[idx], dec[idx], geocent_time[idx], psi[idx], detector_tensor
         )
@@ -2217,6 +2219,7 @@ class GWSNR:
         # np.shape(hp_inner_hp) = (len(num_det), size1)
         hp_inner_hp = np.zeros((len(num_det), size1), dtype=np.complex128)
         hc_inner_hc = np.zeros((len(num_det), size1), dtype=np.complex128)
+        hp_inner_hc = np.zeros((len(num_det), size1), dtype=np.complex128)
 
         if self.snr_type == "optimal_snr":
 
@@ -2245,21 +2248,29 @@ class GWSNR:
                         total=len(input_arguments),
                         ncols=100,
                     ):
-                        # but, np.shape(hp_inner_hp_i) = (size1, len(num_det))
-                        hp_inner_hp_i, hc_inner_hc_i, iter_i = result
+                        # Each worker returns one product per detector for event iter_i.
+                        hp_inner_hp_i, hc_inner_hc_i, hp_inner_hc_i, iter_i = result
                         hp_inner_hp[:, iter_i] = hp_inner_hp_i
                         hc_inner_hc[:, iter_i] = hc_inner_hc_i
+                        hp_inner_hc[:, iter_i] = hp_inner_hc_i
                 else:
                     # with map, without tqdm
                     for result in pool.map(
                         noise_weighted_inner_prod_h_inner_h_slim, input_arguments
                     ):
-                        hp_inner_hp_i, hc_inner_hc_i, iter_i = result
+                        hp_inner_hp_i, hc_inner_hc_i, hp_inner_hc_i, iter_i = result
                         hp_inner_hp[:, iter_i] = hp_inner_hp_i
                         hc_inner_hc[:, iter_i] = hc_inner_hc_i
+                        hp_inner_hc[:, iter_i] = hp_inner_hc_i
 
             # combining the results
-            snrs_sq = abs((Fp**2) * hp_inner_hp + (Fc**2) * hc_inner_hc)
+            # Fp and Fc are real. The two mixed products are conjugates,
+            # so Fp*Fc * ((hp|hc) + (hc|hp)) = 2*Fp*Fc*Re(hp|hc).
+            snrs_sq = abs(
+                (Fp**2) * hp_inner_hp
+                + (Fc**2) * hc_inner_hc
+                + 2.0 * Fp * Fc * np.real(hp_inner_hc)
+            )
             snr = np.sqrt(snrs_sq)
 
         elif self.snr_type == "observed_snr":
@@ -2340,8 +2351,9 @@ class GWSNR:
         Calculate optimal SNR using JAX-accelerated Ripple waveforms and noise-weighted inner products.
 
         Uses the Ripple waveform generator with JAX backend for fast SNR computation via
-        vectorized inner products. Supports arbitrary spin configurations and provides
-        significant speedup over LAL-based methods for population studies.
+        batched waveform generation. Includes both polarization powers and the mixed
+        contribution 2 Fp Fc Re((hp|hc)). The currently supported Ripple models are
+        nonprecessing; use the LAL inner-product backend for IMRPhenomXPHM.
 
         Parameters
         ----------
@@ -2396,10 +2408,12 @@ class GWSNR:
         Notes
         -----
         - Requires snr_method='inner_product_jax' during initialization
-        - Uses JAX JIT compilation and vectorization for GPU acceleration
+        - Uses JAX JIT compilation and vectorization; select CPU with JAX_PLATFORMS=cpu
         - Duration auto-estimated with safety bounds from duration_min/max
-        - Compatible with Ripple-supported approximants (IMRPhenomD, IMRPhenomXPHM)
-        - Supports precessing spins through full parameter space
+        - Supported approximants: IMRPhenomD, IMRPhenomXAS, TaylorF2,
+          and IMRPhenomD_NRTidalv2 (nonprecessing models)
+        - Includes both conjugate mixed-polarization terms; their sum vanishes
+          only when Re((hp|hc)) = 0 for the chosen PSD and frequency band
 
         Examples
         --------
@@ -2516,7 +2530,7 @@ class GWSNR:
         )
 
         # from ripple_class.noise_weighted_inner_product_jax
-        hp_inner_hp, hc_inner_hc = self.noise_weighted_inner_product_jax(
+        hp_inner_hp, hc_inner_hc, hp_inner_hc = self.noise_weighted_inner_product_jax(
             gw_param_dict=input_dict,
             psd_list=psd_list,
             detector_list=detectors,
@@ -2527,11 +2541,16 @@ class GWSNR:
         )
 
         # get polarization tensor
-        # np.shape(Fp) = (size1, len(num_det))
+        # np.shape(Fp) = (len(num_det), size1)
         Fp, Fc = antenna_response_array(
             ra[idx], dec[idx], geocent_time[idx], psi[idx], detector_tensor
         )
-        snrs_sq = abs((Fp**2) * hp_inner_hp + (Fc**2) * hc_inner_hc)
+        # Include both conjugate mixed-polarization terms, as in the LAL path.
+        snrs_sq = abs(
+            (Fp**2) * hp_inner_hp
+            + (Fc**2) * hc_inner_hc
+            + 2.0 * Fp * Fc * np.real(hp_inner_hc)
+        )
         snr = np.sqrt(snrs_sq)
         snr_effective = np.sqrt(np.sum(snrs_sq, axis=0))
 

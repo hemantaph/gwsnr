@@ -596,7 +596,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: pdet_confusion_matrix(gw_param_dict=None, randomize=True, snr_threshold=8.0)
+   .. py:method:: pdet_confusion_matrix(gw_param_dict=None, randomize=True, snr_threshold=None, error_adjustment=True)
 
       
       Generate confusion matrix for detection probability classification.
@@ -614,10 +614,16 @@ Classes
 
               default: True
 
-          **snr_threshold** : ``float``
-              SNR threshold for detection classification.
+          **snr_threshold** : ``float`` or ``None``
+              SNR threshold for detection classification. If None, uses
+              :attr:`~gwsnr_args['snr_th']`.
 
-              default: 8.0
+              default: None
+
+          **error_adjustment** : ``bool``
+              If True, apply linear error correction before thresholding.
+
+              default: True
 
       :Returns:
 
@@ -750,7 +756,7 @@ Classes
 
       .. rubric:: Notes
 
-      - Calls :meth:`~pdet_error` with error_adjustment=True for predictions
+      - Calls :meth:`~pdet_error` with error_adjustment=False for raw predictions
 
       - Saves updated parameters to :attr:`~directory`/{error_adjustment_file_name}
 

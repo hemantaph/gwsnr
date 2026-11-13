@@ -170,8 +170,10 @@ class RippleInnerProduct:
 
         Returns
         -------
-        hp_inner_hp: `numpy.ndarray`
-            Noise weighted inner product of h+ with h+
+        hp_inner_hp, hc_inner_hc, hp_inner_hc : numpy.ndarray
+            Complex noise-weighted polarization products, with shape
+            (number of detectors, number of events). The reverse mixed product
+            is the complex conjugate of hp_inner_hc.
         """
 
         # set up GW parameters
@@ -265,12 +267,14 @@ class RippleInnerProduct:
         # np.shape(hp_inner_hp) = (len(num_det), size1)
         hp_inner_hp = np.zeros((num_det, size), dtype=np.complex128)
         hc_inner_hc = np.zeros((num_det, size), dtype=np.complex128)
+        hp_inner_hc = np.zeros((num_det, size), dtype=np.complex128)
 
         # for j in range(size):
         #     result = noise_weighted_inner_prod_ripple(input_arguments[j])
-        #     hp_inner_hp_i, hc_inner_hc_i, iter_i = result
+        #     hp_inner_hp_i, hc_inner_hc_i, hp_inner_hc_i, iter_i = result
         #     hp_inner_hp[:, iter_i] = hp_inner_hp_i
         #     hc_inner_hc[:, iter_i] = hc_inner_hc_i
+        #     hp_inner_hc[:, iter_i] = hp_inner_hc_i
 
         # mp.set_start_method('fork', force=True)
 
@@ -283,19 +287,21 @@ class RippleInnerProduct:
                     total=len(input_arguments),
                     ncols=100,
                 ):
-                    # but, np.shape(hp_inner_hp_i) = (size1, len(num_det))
-                    hp_inner_hp_i, hc_inner_hc_i, iter_i = result
+                    # Each worker returns one product per detector for event iter_i.
+                    hp_inner_hp_i, hc_inner_hc_i, hp_inner_hc_i, iter_i = result
                     hp_inner_hp[:, iter_i] = hp_inner_hp_i
                     hc_inner_hc[:, iter_i] = hc_inner_hc_i
+                    hp_inner_hc[:, iter_i] = hp_inner_hc_i
             else:
                 # with map, without tqdm
                 for result in pool.map(noise_weighted_inner_prod_ripple, input_arguments):
-                    hp_inner_hp_i, hc_inner_hc_i, iter_i = result
+                    hp_inner_hp_i, hc_inner_hc_i, hp_inner_hc_i, iter_i = result
                     hp_inner_hp[:, iter_i] = hp_inner_hp_i
                     hc_inner_hc[:, iter_i] = hc_inner_hc_i
+                    hp_inner_hc[:, iter_i] = hp_inner_hc_i
         # mp.set_start_method('spawn', force=True)
 
-        return hp_inner_hp, hc_inner_hc
+        return hp_inner_hp, hc_inner_hc, hp_inner_hc
 
     # def noise_weighted_inner_product_jax(self, gw_param_dict, psd_list, detector_list, duration=None, duration_min=2, duration_max=128, npool=4, multiprocessing_verbose=True):
     #     """
@@ -440,7 +446,7 @@ class RippleInnerProduct:
     #                 total=len(input_arguments),
     #                 ncols=100,
     #             ):
-    #                 # but, np.shape(hp_inner_hp_i) = (size1, len(num_det))
+    #                 # Each worker returns one product per detector for event iter_i.
     #                 hp_inner_hp_i, hc_inner_hc_i, iter_i = result
     #                 hp_inner_hp[:, iter_i] = hp_inner_hp_i
     #                 hc_inner_hc[:, iter_i] = hc_inner_hc_i

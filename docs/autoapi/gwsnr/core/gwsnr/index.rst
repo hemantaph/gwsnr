@@ -70,7 +70,7 @@ Attributes
 
    
 
-.. py:class:: GWSNR(npool=int(4), snr_method='interpolation_aligned_spins', snr_type='optimal_snr', gwsnr_verbose=True, multiprocessing_verbose=True, pdet_kwargs=None, mtot_min=2 * 4.98, mtot_max=2 * 112.5 + 10.0, ratio_min=0.1, ratio_max=1.0, spin_max=0.99, mtot_resolution=200, ratio_resolution=20, spin_resolution=10, batch_size_interpolation=1000000, interpolator_dir='./interpolator_json', create_new_interpolator=False, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', frequency_domain_source_model='lal_binary_black_hole', minimum_frequency=20.0, reference_frequency=None, duration_max=None, duration_min=None, fixed_duration=None, mtot_cut=False, psds=None, ifos=None, noise_realization=None, ann_path_dict=None, snr_recalculation=False, snr_recalculation_range=[6, 14], snr_recalculation_waveform_approximant='IMRPhenomXPHM')
+.. py:class:: GWSNR(npool=int(4), snr_method='interpolation_aligned_spins', snr_type='optimal_snr', gwsnr_verbose=True, multiprocessing_verbose=True, pdet_kwargs=None, mtot_min=2 * 4.98, mtot_max=2 * 112.5 + 10.0, ratio_min=0.1, ratio_max=1.0, spin_max=0.99, mtot_resolution=200, ratio_resolution=20, spin_resolution=10, batch_size_interpolation=1000000, interpolator_dir='./interpolator_json', create_new_interpolator=False, sampling_frequency=2048.0, waveform_approximant='IMRPhenomD', frequency_domain_source_model='lal_binary_black_hole', minimum_frequency=20.0, reference_frequency=None, duration_max=None, duration_min=None, fixed_duration=None, mtot_cut=False, psds=None, ifos=None, noise_realization=None, ann_path_dict=None, snr_recalculation=False, snr_recalculation_range=[4, 12], snr_recalculation_waveform_approximant='IMRPhenomXPHM')
 
 
    
@@ -260,7 +260,15 @@ Attributes
 
        **pdet_kwargs** : `dict`
            Detection probability parameters.
-           Default: {'snr_th': 10.0, 'snr_th_net': 10.0, 'pdet_type': 'boolean', 'distribution_type': 'gaussian'}
+           Default: dict(
+                   snr_th=8.0,
+                   snr_th_net=8.0,
+                   pdet_type="boolean",
+                   distribution_type="noncentral_chi2",
+                   include_optimal_snr=True,
+                   include_observed_snr=True,
+                   return_only_net_results=False,
+               )
 
        **ann_path_dict** : `dict` or `str`
            Paths to ANN models. Uses built-in models if None. Optional.
@@ -268,7 +276,7 @@ Attributes
        **snr_recalculation** : `bool`
            Enable hybrid recalculation near detection threshold. Optional.
 
-       **snr_recalculation_range** : `list`, default=[6,14]
+       **snr_recalculation_range** : `list`, default=[4,12]
            SNR range [min, max] for triggering recalculation. Optional.
 
        **snr_recalculation_waveform_approximant** : `str`
@@ -1385,7 +1393,7 @@ Attributes
           **snr_th** : `float`
               Individual detector SNR threshold.
 
-              default: 10.0
+              default: 8.0
 
 
 
@@ -1414,7 +1422,7 @@ Attributes
           **snr_th_net** : `float`
               Network SNR threshold.
 
-              default: 10.0
+              default: 8.0
 
 
 
@@ -1652,7 +1660,6 @@ Attributes
           !! processed by numpydoc !!
 
    .. py:attribute:: pdet_kwargs
-      :value: 'None'
 
       
 
@@ -2090,6 +2097,8 @@ Attributes
       - Waveform duration auto-estimated from chirp time with 1.1x safety factor
       - Uses multiprocessing for parallel computation across npool processors
       - Requires 'if __name__ == "__main__":' guard when using multiprocessing
+      - Includes both polarization powers and 2 Fp Fc Re((hp|hc)); the mixed
+        contribution need not vanish for precessing or higher-mode waveforms
       - Most accurate method but slower than interpolation for population studies
 
 
@@ -2110,8 +2119,9 @@ Attributes
       Calculate optimal SNR using JAX-accelerated Ripple waveforms and noise-weighted inner products.
 
       Uses the Ripple waveform generator with JAX backend for fast SNR computation via
-      vectorized inner products. Supports arbitrary spin configurations and provides
-      significant speedup over LAL-based methods for population studies.
+      batched waveform generation. Includes both polarization powers and the mixed
+      contribution 2 Fp Fc Re((hp|hc)). The currently supported Ripple models are
+      nonprecessing; use the LAL inner-product backend for IMRPhenomXPHM.
 
       :Parameters:
 
@@ -2192,10 +2202,12 @@ Attributes
       .. rubric:: Notes
 
       - Requires snr_method='inner_product_jax' during initialization
-      - Uses JAX JIT compilation and vectorization for GPU acceleration
+      - Uses JAX JIT compilation and vectorization; select CPU with JAX_PLATFORMS=cpu
       - Duration auto-estimated with safety bounds from duration_min/max
-      - Compatible with Ripple-supported approximants (IMRPhenomD, IMRPhenomXPHM)
-      - Supports precessing spins through full parameter space
+      - Supported approximants: IMRPhenomD, IMRPhenomXAS, TaylorF2,
+        and IMRPhenomD_NRTidalv2 (nonprecessing models)
+      - Includes both conjugate mixed-polarization terms; their sum vanishes
+        only when Re((hp|hc)) = 0 for the chosen PSD and frequency band
 
 
       .. rubric:: Examples
@@ -2209,7 +2221,7 @@ Attributes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: pdet(mass_1=np.array([10.0]), mass_2=np.array([10.0]), luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=None, output_jsonfile=False, snr_th=None, snr_th_net=None, pdet_type=None, distribution_type=None, include_optimal_snr=False, include_observed_snr=False)
+   .. py:method:: pdet(mass_1=np.array([10.0]), mass_2=np.array([10.0]), luminosity_distance=100.0, theta_jn=0.0, psi=0.0, phase=0.0, geocent_time=1246527224.169434, ra=0.0, dec=0.0, a_1=0.0, a_2=0.0, tilt_1=0.0, tilt_2=0.0, phi_12=0.0, phi_jl=0.0, lambda_1=0.0, lambda_2=0.0, eccentricity=0.0, gw_param_dict=None, output_jsonfile=False, snr_th=None, snr_th_net=None, pdet_type=None, distribution_type=None, include_optimal_snr=False, include_observed_snr=False, return_only_net_results=False)
 
       
       Calculate probability of detection for gravitational wave signals.
@@ -2297,6 +2309,11 @@ Attributes
               - 'noncentral_chi2': Non-central chi-squared (2 DOF per detector)
               If None, uses pdet_kwargs['distribution_type'].
               - 'fixed_snr': Deterministic detection based on optimal SNR (only for 'boolean' pdet_type)
+
+          **return_only_net_results** : bool, default=False
+              If True, returns only network detection probabilities ('pdet_net' and optionally
+              'observed_snr_net' and 'optimal_snr_net'). If False, returns results for all
+              detectors and network.
 
       :Returns:
 
@@ -2397,7 +2414,8 @@ Attributes
 
       Finds the maximum luminosity distance at which a gravitational wave signal can be
       detected above threshold SNR. For each detector, determines optimal sky location
-      that maximizes antenna response, then solves for distance where SNR equals threshold.
+      and inclination that maximize antenna response, then solves for distance where
+      SNR equals threshold.
 
       :Parameters:
 
@@ -2454,11 +2472,17 @@ Attributes
 
           **detector_location_as_optimal_sky** : bool, default=False
               If True, uses detector zenith as optimal sky location instead of optimization.
+              Individual-detector horizons are evaluated face-on at the detector zenith.
 
           **minimize_function_dict** : dict, optional
-              Parameters for sky location optimization. It contains input for scipy's differential_evolution.
+              Parameters for sky location and inclination optimization. It contains
+              input for scipy's differential_evolution.
               Default: dict(
-                  bounds=[(0, 2*np.pi), (-np.pi/2, np.pi/2)], # ra, dec bounds
+                  bounds=[
+                      (0, 2*np.pi),
+                      (-np.pi/2, np.pi/2),
+                      (0, np.pi),
+                  ], # ra, dec, theta_jn bounds
                   tol=1e-7,
                   polish=True,
                   maxiter=10000

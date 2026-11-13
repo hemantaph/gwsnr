@@ -96,7 +96,7 @@ Attributes
        !! processed by numpydoc !!
 
 .. py:data:: __version__
-   :value: "'0.5.0'"
+   :value: "'0.5.2'"
 
    
 

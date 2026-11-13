@@ -728,11 +728,9 @@ Functions
 
    :Returns:
 
-       **SNRs_list** : list
-           contains opt_snr for each detector and net_opt_snr
-
-       **params[22]** : int
-           index tracker
+       tuple
+           (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list, iteration_index).
+           The mixed product is complex; (hc|hp) = conjugate((hp|hc)).
 
 
 
@@ -769,7 +767,8 @@ Functions
    :Returns:
 
        tuple
-           (hp_inner_hp_list, hc_inner_hc_list, iteration_index)
+           (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list, iteration_index).
+           The mixed product is complex; (hc|hp) = conjugate((hp|hc)).
 
 
 
@@ -855,11 +854,10 @@ Functions
 
    :Returns:
 
-       **SNRs_list** : list
-           contains opt_snr for each detector and net_opt_snr
-
-       **params[22]** : int
-           index tracker
+       tuple
+           (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list,
+           n_inner_hp_list, n_inner_hc_list, iteration_index).
+           The mixed product is complex; (hc|hp) = conjugate((hp|hc)).
 
 
 
@@ -907,11 +905,9 @@ Functions
 
    :Returns:
 
-       **SNRs_list** : list
-           contains opt_snr for each detector and net_opt_snr
-
-       **params[22]** : int
-           index tracker
+       tuple
+           (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list, iteration_index).
+           The mixed product is complex; (hc|hp) = conjugate((hp|hc)).
 
 
 

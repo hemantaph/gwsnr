@@ -75,7 +75,8 @@ def noise_weighted_inner_prod_h_inner_h_slim(params):
     Returns
     -------
     tuple
-        (hp_inner_hp_list, hc_inner_hc_list, iteration_index)
+        (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list, iteration_index).
+        The mixed product is complex; (hc|hp) = conjugate((hp|hc)).
     """
     global _worker_shared_data
 
@@ -165,10 +166,12 @@ def noise_weighted_inner_prod_h_inner_h_slim(params):
         # minimum_frequency (e.g. XLALSimIMRPhenomDGenerateFD: fCut <= f_min).
         # In that case there is no signal power in-band, so return zero inner products.
         zero = 0.0 + 0.0j
-        return ([zero] * len(psds_objects), [zero] * len(psds_objects), iteration_index)
+        return ([zero] * len(psds_objects), [zero] * len(psds_objects),
+                [zero] * len(psds_objects), iteration_index)
 
     hp_inner_hp_list = []
     hc_inner_hc_list = []
+    hp_inner_hc_list = []
 
     for idx in range(len(psds_objects)):
         p_array = psds_objects[idx][2](waveform_generator.frequency_array)
@@ -187,10 +190,18 @@ def noise_weighted_inner_prod_h_inner_h_slim(params):
             waveform_generator.duration,
         )
 
+        hp_inner_hc = noise_weighted_inner_product(
+            polas["plus"][idx2],
+            polas["cross"][idx2],
+            p_array[idx2],
+            waveform_generator.duration,
+        )
+
         hp_inner_hp_list.append(hp_inner_hp)
         hc_inner_hc_list.append(hc_inner_hc)
+        hp_inner_hc_list.append(hp_inner_hc)
 
-    return (hp_inner_hp_list, hc_inner_hc_list, iteration_index)
+    return (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list, iteration_index)
 
 
 def noise_weighted_inner_prod_h_inner_h(params):
@@ -258,10 +269,9 @@ def noise_weighted_inner_prod_h_inner_h(params):
 
     Returns
     -------
-    SNRs_list : list
-        contains opt_snr for each detector and net_opt_snr
-    params[22] : int
-        index tracker
+    tuple
+        (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list, iteration_index).
+        The mixed product is complex; (hc|hp) = conjugate((hp|hc)).
     """
 
     import bilby
@@ -317,14 +327,15 @@ def noise_weighted_inner_prod_h_inner_h(params):
         # See slim worker for rationale.
         psds_objects = params[24]
         zero = 0.0 + 0.0j
-        return ([zero] * len(psds_objects), [zero] * len(psds_objects), params[23])
+        return ([zero] * len(psds_objects), [zero] * len(psds_objects),
+                [zero] * len(psds_objects), params[23])
 
-    # h = F+.h+ + Fx.hx
-    # <h|h> = F+^2<h+,h+> + Fx^2<hx,hx> + F+Fx 2<h+,hx>
-    # <h|h> = F+^2<h+,h+> + Fx^2<hx,hx>, if h+ and hx are orthogonal
-    # F+^2 and Fx^2 will be added later
+    # For real antenna factors, (h|h) = Fp^2(hp|hp) + Fc^2(hc|hc)
+    # + 2 Fp Fc Re(hp|hc), since (hc|hp) = conjugate((hp|hc)).
+    # Antenna factors are applied by the caller.
     hp_inner_hp_list = []
     hc_inner_hc_list = []
+    hp_inner_hc_list = []
     # list_of_detectors = params[26:].tolist()
     psds_objects = params[24]
     for idx in range(len(psds_objects)):
@@ -348,10 +359,18 @@ def noise_weighted_inner_prod_h_inner_h(params):
             waveform_generator.duration,
         )
 
+        hp_inner_hc = noise_weighted_inner_product(
+            polas["plus"][idx2],
+            polas["cross"][idx2],
+            p_array[idx2],
+            waveform_generator.duration,
+        )
+
         hp_inner_hp_list.append(hp_inner_hp)
         hc_inner_hc_list.append(hc_inner_hc)
+        hp_inner_hc_list.append(hp_inner_hc)
 
-    return (hp_inner_hp_list, hc_inner_hc_list, params[23])
+    return (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list, params[23])
 
 
 def noise_weighted_inner_prod_d_inner_h(params):
@@ -421,10 +440,10 @@ def noise_weighted_inner_prod_d_inner_h(params):
 
     Returns
     -------
-    SNRs_list : list
-        contains opt_snr for each detector and net_opt_snr
-    params[22] : int
-        index tracker
+    tuple
+        (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list,
+        n_inner_hp_list, n_inner_hc_list, iteration_index).
+        The mixed product is complex; (hc|hp) = conjugate((hp|hc)).
     """
 
     import bilby
@@ -479,8 +498,9 @@ def noise_weighted_inner_prod_d_inner_h(params):
             _warned_waveform_domain_error = True
         psds_objects = params[24]
         zero = 0.0 + 0.0j
-        # hp/hc self-inner-products plus noise cross terms all become zero if waveform fails
+        # Polarization and noise inner products all vanish if waveform generation fails.
         return (
+            [zero] * len(psds_objects),
             [zero] * len(psds_objects),
             [zero] * len(psds_objects),
             [zero] * len(psds_objects),
@@ -488,12 +508,12 @@ def noise_weighted_inner_prod_d_inner_h(params):
             params[23],
         )
 
-    # h = F+.h+ + Fx.hx
-    # <h|h> = F+^2<h+,h+> + Fx^2<hx,hx> + F+Fx 2<h+,hx>
-    # <h|h> = F+^2<h+,h+> + Fx^2<hx,hx>, if h+ and hx are orthogonal
-    # F+^2 and Fx^2 will be added later
+    # For real antenna factors, (h|h) = Fp^2(hp|hp) + Fc^2(hc|hc)
+    # + 2 Fp Fc Re(hp|hc), since (hc|hp) = conjugate((hp|hc)).
+    # Antenna factors are applied by the caller.
     hp_inner_hp_list = []
     hc_inner_hc_list = []
+    hp_inner_hc_list = []
     n_inner_hp_list = []
     n_inner_hc_list = []
     # list_of_detectors = params[26:].tolist()
@@ -544,14 +564,23 @@ def noise_weighted_inner_prod_d_inner_h(params):
         #     np.save("polas_cross.npy", polas["cross"][idx2])
         #     np.save("duration.npy", waveform_generator.duration)
 
+        hp_inner_hc = noise_weighted_inner_product(
+            polas["plus"][idx2],
+            polas["cross"][idx2],
+            p_array[idx2],
+            waveform_generator.duration,
+        )
+
         hp_inner_hp_list.append(hp_inner_hp)
         hc_inner_hc_list.append(hc_inner_hc)
+        hp_inner_hc_list.append(hp_inner_hc)
         n_inner_hp_list.append(n_inner_hp)
         n_inner_hc_list.append(n_inner_hc)
 
     return (
         hp_inner_hp_list,
         hc_inner_hc_list,
+        hp_inner_hc_list,
         n_inner_hp_list,
         n_inner_hc_list,
         params[23],
@@ -586,10 +615,9 @@ def noise_weighted_inner_prod_ripple(params):
 
     Returns
     -------
-    SNRs_list : list
-        contains opt_snr for each detector and net_opt_snr
-    params[22] : int
-        index tracker
+    tuple
+        (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list, iteration_index).
+        The mixed product is complex; (hc|hp) = conjugate((hp|hc)).
     """
 
     ## input
@@ -611,11 +639,12 @@ def noise_weighted_inner_prod_ripple(params):
     hp[:idx] = 0.0 + 0.0j
     hc[:idx] = 0.0 + 0.0j
 
-    # h = F+.h+ + Fx.hx
-    # <h|h> = <h+,h+> + <hx,hx> + 2<h+,hx>
-    # <h|h> = <h+,h+> + <hx,hx>, if h+ and hx are orthogonal
+    # For real antenna factors, (h|h) = Fp^2(hp|hp) + Fc^2(hc|hc)
+    # + 2 Fp Fc Re(hp|hc), since (hc|hp) = conjugate((hp|hc)).
+    # Antenna factors are applied by the caller.
     hp_inner_hp_list = []
     hc_inner_hc_list = []
+    hp_inner_hc_list = []
     psds_objects = params[7]
 
     for idx in range(len(psds_objects)):
@@ -641,7 +670,15 @@ def noise_weighted_inner_prod_ripple(params):
             duration,
         )
 
+        hp_inner_hc = noise_weighted_inner_product(
+            hp[idx2],
+            hc[idx2],
+            p_array[idx2],
+            duration,
+        )
+
         hp_inner_hp_list.append(hp_inner_hp)
         hc_inner_hc_list.append(hc_inner_hc)
+        hp_inner_hc_list.append(hp_inner_hc)
 
-    return (hp_inner_hp_list, hc_inner_hc_list, params[6])
+    return (hp_inner_hp_list, hc_inner_hc_list, hp_inner_hc_list, params[6])

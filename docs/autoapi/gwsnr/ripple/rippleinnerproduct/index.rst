@@ -163,8 +163,10 @@ Classes
 
       :Returns:
 
-          hp_inner_hp: `numpy.ndarray`
-              Noise weighted inner product of h+ with h+
+          **hp_inner_hp, hc_inner_hc, hp_inner_hc** : numpy.ndarray
+              Complex noise-weighted polarization products, with shape
+              (number of detectors, number of events). The reverse mixed product
+              is the complex conjugate of hp_inner_hc.
 
 
 

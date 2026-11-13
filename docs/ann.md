@@ -1,5 +1,9 @@
 # ANN-based Pdet Estimation
 
+:::{note}
+Version 0.5.2 corrects the direct inner-product SNR by including the mixed-polarization terms. Existing ANN weights and externally supplied training labels are not changed by upgrading the package. Labels generated with the former two-term expression must be recomputed with the corrected inner-product method, and the model retrained, to target the full detector norm. For a direct precessing-waveform calculation, use `snr_method="inner_product"`; hybrid recalculation uses this corrected method for the selected events.
+:::
+
 The `gwsnr` package now incorporates an artificial neural network (ANN) model, developed using TensorFlow (@tensorflow:2015) and scikit-learn (@scikitlearn:2011), to rapidly estimate $P_{\rm det}$ in binary black hole (BBH) systems using the IMRPhenomXPHM waveform approximant. This complex IMR waveform model accounts for spin-precessing systems with subdominant harmonics. The ANN model is especially useful when precise signal-to-noise ratio (SNR) calculations are not critical, providing a quick and effective means of estimating $P_{\rm det}$. This value indicates detectability under Gaussian noise by determining if the SNR exceeds a certain threshold (e.g., $\rho_{\rm th}=8$). Trained on a large dataset from the `ler` package, the ANN model uses 'partial scaled SNR' values as a primary input, reducing input dimensionality from 15 to 5 and enhancing accuracy. This approach offers a practical solution for assessing detectability under specified conditions. Other similar efforts with ANN models are detailed in (@ChapmanBird:2023, @Gerosa:2020, @Callister:2024).
 
 ## Data generation

@@ -33,6 +33,10 @@ project = 'gwsnr'
 copyright = '2023, Phurailatpam Hemantakumar'
 author = 'Phurailatpam Hemantakumar'
 release = get_version()
+version = release
+
+# Render saved notebook outputs without running simulations or requiring local kernels.
+nbsphinx_execute = "never"
 
 
 # -- General configuration ---------------------------------------------------
